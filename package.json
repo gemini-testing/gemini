@@ -1,0 +1,27 @@
+{
+  "name": "shooter",
+  "version": "0.1.0",
+  "description": "UI Screenshot testing utility",
+  "bin": {
+    "shooter": "./bin/shooter"
+  },
+  "dependencies": {
+    "gm": "~1.14.2",
+    "selenium-webdriver": "~2.39.0",
+    "inherit": "~2.1.0",
+    "coa": "~0.4.0",
+    "js-yaml": "~3.0.1",
+    "q": "~1.0.0",
+    "q-io": "~1.10.8",
+    "chalk": "~0.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "directories": {
+    "test": "test"
+  }
+}
