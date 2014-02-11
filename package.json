@@ -13,7 +13,8 @@
     "js-yaml": "~3.0.1",
     "q": "~1.0.0",
     "q-io": "~1.10.8",
-    "chalk": "~0.4.0"
+    "chalk": "~0.4.0",
+    "temp": "~0.6.0"
   },
   "devDependencies": {},
   "scripts": {
