@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Shooter report</title>
+        <style>
+            .success::before {
+                content: '\2713 ';
+                color: green;
+            }
+
+            .fail {
+                color: red;
+            }
+
+            .fail:before {
+                content: '\2718 ';
+                color: red;
+            }
+
+            .image-box {
+                display: inline-block;
+                padding: 5px;
+            }
+
+        </style>
+    </head>
+    
+    <body>
+        <h1>Shooter report</h1>
+        <% plans.forEach(function(plan) { %>
+            <h2><%- plan.name %></h2>
+            <% plan.tests.forEach(function(test) { %>
+                <h3 class="<%= test.equal? 'success' : 'fail' %>"><%- test.state %></h3>
+                <% if (test.equal) { %>
+                    <img src="<%= attach(plan.name, test.state, 'current') %>">
+                <%} else {%>
+                    <div class="image-box">
+                        <div>Reference</div>
+                        <img class="ref-image" src="<%= attach(plan.name, test.state, 'ref') %>">
+                    </div>
+
+
+                    <div class="image-box">
+                        <div>Current</div>
+                        <img class="current-image" src="<%= attach(plan.name, test.state, 'current') %>">
+                    </div>
+                <%} %>
+            <%});%>
+        <% });%>
+    </body>
+</html>
