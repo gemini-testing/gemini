@@ -17,9 +17,12 @@
     "temp": "~0.6.0",
     "lodash": "~2.4.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "~1.17.1",
+    "must": "~0.11.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "",
   "license": "MIT",
