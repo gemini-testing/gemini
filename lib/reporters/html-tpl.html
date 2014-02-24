@@ -3,6 +3,14 @@
     <head>
         <title>Shooter report</title>
         <style>
+            .plan {
+                padding-left: 30px;
+            }
+
+            .state {
+                padding-left: 30px;
+            }
+
             .success::before {
                 content: '\2713 ';
                 color: green;
@@ -27,32 +35,37 @@
     
     <body>
         <h1>Shooter report</h1>
-        <% plans.forEach(function(plan) { %>
-            <h2><%- plan.name %></h2>
-            <% plan.tests.forEach(function(test) { %>
-                <h3 class="<%= test.equal? 'success' : 'fail' %>"><%- test.state %></h3>
-                <% if (test.equal) { %>
-                    <img src="<%= attach(plan.name, test.state, 'current') %>">
-                <%} else {%>
-                    <div class="image-box">
-                        <div>Reference</div>
-                        <img class="ref-image" src="<%= attach(plan.name, test.state, 'ref') %>">
-                    </div>
+        {{#each plans}}
+        <h2>{{name}}</h2>
+        <div class="plan">
+            {{#each states}}
+            <h3>{{name}}</h3>
+            <div class="state">
+                {{#each browsers}}
+                <h4 class="{{status}}">{{browser}}</h4>
+                <div class="browser">
+                    {{#if equal}}
+                        {{image "current"}}
+                    {{else}}
+                        <div class="image-box">
+                            <div class="image-title">Reference</div>
+                            {{image "ref"}}
+                        </div>
+                        <div class="image-box">
+                            <div class="image-title">Current</div>
+                            {{image "current"}}
+                        </div>
+                        <div class="image-box">
+                            <div class="image-title">Diff</div>
+                            {{image "diff"}}
+                        </div>
 
-
-                    <div class="image-box">
-                        <div>Current</div>
-                        <img class="current-image" src="<%= attach(plan.name, test.state, 'current') %>">
-                    </div>
-
-
-                     <div class="image-box">
-                        <div>Diff</div>
-                        <img class="ref-image" src="<%= attach(plan.name, test.state, 'diff') %>">
-                    </div>
-
-                <%} %>
-            <%});%>
-        <% });%>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </div>
+            {{/each}}
+        </div>
+        {{/each}}
     </body>
 </html>
