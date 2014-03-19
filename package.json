@@ -19,7 +19,7 @@
     "wd": "~0.2.11"
   },
   "devDependencies": {
-    "mocha": "~1.17.1",
+    "mocha": "~1.18.2",
     "must": "~0.11.0"
   },
   "scripts": {
