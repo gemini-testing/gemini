@@ -96,6 +96,11 @@ All method are chainable:
   Capture region determined by minimum bounding rect for all
   of theese elements plus their `box-shadow` size.
 
+* `setDynamicElements({name1: 'selector', name2: 'selector', ...})` - same as
+  `setElements`, but specifies elements that does not appear in DOM tree
+  at the moment page loaded. Dynamic elements will make your tests slower, so
+  don't use it for static content.
+
 * `capture(stateName, callback(actions, element))` - defines new state to capture.
   Optional callback describes a sequence of actions to bring the page to this state,
   starting from **previous** state. States are executed one after another in order
