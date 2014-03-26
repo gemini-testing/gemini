@@ -1,7 +1,7 @@
-shooter
+gemini
 =======
 
-Shooter is the utility for regression testing of web pages appearance.
+Gemini is the utility for regression testing of web pages appearance.
 
 Unlike other similar tools, tests not the whole pages, but
 only specified blocks. This makes such tests more reliable and
@@ -23,12 +23,12 @@ brew install graphicsmagick
 After all dependencies have been satisfied, you can install package with `npm`:
 
 ```
-npm install -g https://github.com/SevInf/shooter/archive/master.tar.gz
+npm install -g https://github.com/SevInf/gemini/archive/master.tar.gz
 ```
 
 ## Configuration
 
-Shooter is configured using `.shooter.yml` file at the root of the project.
+Gemini is configured using `.gemini.yml` file at the root of the project.
 Example:
 
 ```yaml
@@ -50,7 +50,7 @@ you want to run test in other browsers, then `phantomjs`.
 * `browsers` - list of browsers to use for testing. Each browser should be available
 on selenium grid.
 * `screenshotsDir` - directory to save reference screenshots to. Specified
-relatively to config file directory. `shooter/screens` by default.
+relatively to config file directory. `gemini/screens` by default.
 
 ## Writing tests
 
@@ -143,11 +143,11 @@ sequence, delay the screenshot for this amount of time.
 Once you have few plans written you need to capture reference images:
 
 ```
-shooter gather [paths to plans]
+gemini gather [paths to plans]
 ```
 
-If no paths are specified, every `.js` file from `shooter` directory will be read.
-By default, configuration will be loaded from `.shooter.yml` in the current directory.
+If no paths are specified, every `.js` file from `gemini` directory will be read.
+By default, configuration will be loaded from `.gemini.yml` in the current directory.
 To specify other config, use `--config` or `-c` option.
 
 ## Running tests
@@ -155,7 +155,7 @@ To specify other config, use `--config` or `-c` option.
 To compare you reference screenshots with current state of blocks, use:
 
 ```
-shooter test [paths to plan]
+gemini test [paths to plan]
 ```
 
 Paths and configuration are treated the same way as in `gather` command.
@@ -166,8 +166,8 @@ as the failed test.
 By default, you'll see only names of the states. To get more information
 you can use HTML reporter:
 
-`shooter test --reporter html [paths to plans]`
+`gemini test --reporter html [paths to plans]`
 
-This will produce HTML file in `shooter-report` directory. It will
+This will produce HTML file in `gemini-report` directory. It will
 display reference image, current image and difference between the two
 for each state in each browser.

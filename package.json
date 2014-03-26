@@ -1,9 +1,9 @@
 {
-  "name": "shooter",
+  "name": "gemini",
   "version": "0.1.0",
   "description": "UI Screenshot testing utility",
   "bin": {
-    "shooter": "./bin/shooter"
+    "gemini": "./bin/gemini"
   },
   "dependencies": {
     "gm": "~1.14.2",
