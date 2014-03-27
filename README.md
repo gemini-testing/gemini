@@ -10,7 +10,7 @@ more responsive to the changes of rest of webpage.
 Tool is created at [Yandex](http://www.yandex.com/) and will be especially
 useful to UI libraries developers.
 
-## Installation
+## Dependencies
 
 Currently, requires [`GraphicsMagick`](http://www.graphicsmagick.org/).
 
@@ -20,10 +20,15 @@ On MacOS X, it can be installed with [Homebrew](http://brew.sh/):
 brew install graphicsmagick
 ```
 
+Requires local or remote [selenium-grid](https://code.google.com/p/selenium/wiki/Grid2)
+installation to test in other browsers, then [phantomjs](http://phantomjs.org/).
+
+## Installation
+
 After all dependencies have been satisfied, you can install package with `npm`:
 
 ```
-npm install -g https://github.com/SevInf/gemini/archive/master.tar.gz
+npm install -g gemini
 ```
 
 ## Configuration
@@ -138,7 +143,17 @@ full list of actions:
 * `wait(milliseconds)` - wait for specified amount of time before next action. If it is the last action in
 sequence, delay the screenshot for this amount of time.
 
-## Gathering reference images
+## Commands
+
+You need `selenium-server` up and running if you want to run tests in real browsers.
+Without `selenium-server` only `phantomjs` browser can be used. In that case, run
+`phantomjs` in webdriver mode before executing `gemini`:
+
+```
+phantomjs --webdriver=4444
+```
+
+### Gathering reference images
 
 Once you have few plans written you need to capture reference images:
 
@@ -150,7 +165,7 @@ If no paths are specified, every `.js` file from `gemini` directory will be read
 By default, configuration will be loaded from `.gemini.yml` in the current directory.
 To specify other config, use `--config` or `-c` option.
 
-## Running tests
+### Running tests
 
 To compare you reference screenshots with current state of blocks, use:
 
