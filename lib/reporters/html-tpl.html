@@ -44,22 +44,26 @@
                 {{#each browsers}}
                 <h4 class="{{status}}">{{browserName}}</h4>
                 <div class="browser">
-                    {{#if equal}}
-                        {{image "current"}}
+                    {{#if error}}
+                        <pre>{{stacktrace}}</pre>
                     {{else}}
-                        <div class="image-box">
-                            <div class="image-title">Reference</div>
-                            {{image "ref"}}
-                        </div>
-                        <div class="image-box">
-                            <div class="image-title">Current</div>
+                        {{#if equal}}
                             {{image "current"}}
-                        </div>
-                        <div class="image-box">
-                            <div class="image-title">Diff</div>
-                            {{image "diff"}}
-                        </div>
+                        {{else}}
+                            <div class="image-box">
+                                <div class="image-title">Reference</div>
+                                {{image "ref"}}
+                            </div>
+                            <div class="image-box">
+                                <div class="image-title">Current</div>
+                                {{image "current"}}
+                            </div>
+                            <div class="image-box">
+                                <div class="image-title">Diff</div>
+                                {{image "diff"}}
+                            </div>
 
+                        {{/if}}
                     {{/if}}
                 </div>
                 {{/each}}
