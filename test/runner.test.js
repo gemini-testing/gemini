@@ -8,6 +8,7 @@ var q = require('q'),
 
     CONFIG_TEXT = [
         'rootUrl: http://example.com',
+        'gridUrl: http://grid.example.com',
         'browsers: ',
         '  - browser',
     ].join('\n');
@@ -18,7 +19,7 @@ describe('runner', function() {
 
         var browser = {
             open: function () { return q.resolve(); },
-            findElements: function() { return q.resolve(); },
+            buildElementsMap: function() { return q.resolve(); },
             captureState: function() { return q.resolve(); },
             quit: function() { return q.resolve(); }
         };
@@ -123,11 +124,15 @@ describe('runner', function() {
         it('should search for plan elements', function() {
             this.plan
                 .setElements({element: '.selector'})
+                .setDynamicElements({element2: '.selector'})
                 .capture('state');
 
-            this.sinon.spy(this.browser, 'findElements');
+            this.sinon.spy(this.browser, 'buildElementsMap');
             return this.runner.runPlans([this.plan]).then(function() {
-                sinon.assert.calledWith(this.browser.findElements, {element: '.selector'});
+                sinon.assert.calledWith(this.browser.buildElementsMap,
+                    {element: '.selector'},
+                    {element2: '.selector'}
+                );
             }.bind(this));
         });
 
@@ -149,7 +154,7 @@ describe('runner', function() {
                 .setElements({element: '.selector'})
                 .capture('state');
 
-            this.sinon.stub(this.browser, 'findElements').returns(q.resolve(stubElements));
+            this.sinon.stub(this.browser, 'buildElementsMap').returns(q.resolve(stubElements));
             this.sinon.spy(this.browser, 'captureState');
             return this.runner.runPlans([this.plan]).then(function() {
                 sinon.assert.calledWith(this.browser.captureState, sinon.match.any, stubElements);
