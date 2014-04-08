@@ -140,6 +140,17 @@ full list of actions:
   to the center of the element, `{x: 0, y: 0}` by default.
 * `dragAndDrop(element, dragTo)` - drag `element` to other `dragTo` element.
 * `sendKeys(keys)` - send a series of keyboard strokes to the web page.
+* `executeJS(function(window))` - run specified function in a browser. The argument of a function
+   is the browser's `window` object:
+
+   ```javascript
+   actions.executeJS(function(window) {
+       window.alert('Hello!');
+   });
+   ```
+
+   Note that function is executed in browser context, so any references to outer scope of callback won't work.
+
 * `wait(milliseconds)` - wait for specified amount of time before next action. If it is the last action in
 sequence, delay the screenshot for this amount of time.
 
