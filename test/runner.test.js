@@ -100,7 +100,7 @@ describe('runner', function() {
             }.bind(this));
         });
 
-        it('should launch browser second time if there is a `reload()` between states', function() {
+        it.skip('should launch browser second time if there is a `reload()` between states', function() {
             this.plan
                 .capture('state1')
                 .reload()
