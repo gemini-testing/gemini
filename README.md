@@ -139,7 +139,8 @@ full list of actions:
 * `mouseMove(element, [offset])` - move mouse to the given element. Offset is specified relatively
   to the center of the element, `{x: 0, y: 0}` by default.
 * `dragAndDrop(element, dragTo)` - drag `element` to other `dragTo` element.
-* `sendKeys(keys)` - send a series of keyboard strokes to the web page.
+* `sendKeys([element], keys)` - send a series of keyboard strokes to the speciefied element or
+   currently active element on a page.
 * `executeJS(function(window))` - run specified function in a browser. The argument of a function
    is the browser's `window` object:
 
