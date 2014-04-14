@@ -75,16 +75,17 @@ describe('runner', function() {
 
         it('should launch each browser in config', function() {
             this.runner.config.browsers = [
-                'browser1',
-                'browser2'
+                {name: 'browser1', version: '1'},
+                {name: 'browser2'}
             ];
+
             this.plan.capture('state');
 
             this.sinon.spy(this.launcher, 'launch');
 
             return this.runner.runPlans([this.plan]).then(function() {
-                sinon.assert.calledWith(this.launcher.launch, 'browser1');
-                sinon.assert.calledWith(this.launcher.launch, 'browser2');
+                sinon.assert.calledWith(this.launcher.launch, this.runner.config.browsers[0]);
+                sinon.assert.calledWith(this.launcher.launch, this.runner.config.browsers[1]);
             }.bind(this));
         });
 
