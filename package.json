@@ -5,6 +5,7 @@
   "bin": {
     "gemini": "./bin/gemini"
   },
+  "main": "lib/public-api.js",
   "dependencies": {
     "gm": "~1.14.2",
     "inherit": "~2.2.1",

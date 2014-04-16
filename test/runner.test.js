@@ -1,7 +1,7 @@
 'use strict';
 var q = require('q'),
     sinon = require('sinon'),
-    Plan = require('../lib/plan'),
+    createSuite = require('../lib/suite').create,
     State = require('../lib/state'),
     Config = require('../lib/config'),
     Runner = require('../lib/runner'),
@@ -13,11 +13,17 @@ var q = require('q'),
         '  - browser',
     ].join('\n');
 
+function addState(suite, name) {
+    var state = new State(suite, name, function() {});
+    suite.addState(state);
+}
+
 describe('runner', function() {
     beforeEach(function() {
         this.sinon = sinon.sandbox.create();
 
         var browser = {
+            fullName: 'browser',
             open: function () { return q.resolve(); },
             buildElementsMap: function() { return q.resolve(); },
             captureState: function() { return q.resolve(); },
@@ -33,9 +39,8 @@ describe('runner', function() {
             stop: function() {}
         };
 
-        this.plan = new Plan()
-            .setName('plan')
-            .setUrl('/path');
+        this.suite = new createSuite('suite');
+        this.suite.url = '/path';
 
         this.runner = new Runner(new Config('/root', CONFIG_TEXT), this.launcher);
     });
@@ -44,31 +49,32 @@ describe('runner', function() {
         this.sinon.restore();
     });
 
-    describe('runPlans', function() {
+    describe('run', function() {
         it('should emit `begin` event when tests start', function() {
             var spy = this.sinon.spy();
             this.runner.on('begin', spy);
-            return this.runner.runPlans([]).then(function() {
+            return this.runner.run([]).then(function() {
                 sinon.assert.calledOnce(spy);
             });
         });
 
-        it('should emit `beginPlan` event for each plan', function() {
+        it('should emit `beginSuite` event for each suite', function() {
             var spy = this.sinon.spy();
 
-            this.runner.on('beginPlan', spy);
-            return this.runner.runPlans([this.plan]).then(function() {
-                sinon.assert.calledWith(spy, 'plan');
+            this.runner.on('beginSuite', spy);
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.calledWith(spy, 'suite');
             });
         });
 
-        it('should emit `beginState` for each plan state', function() {
+        it('should emit `beginState` for each suite state', function() {
             var spy = this.sinon.spy();
-            this.plan.capture('state');
+
+            addState(this.suite, 'state');
             this.runner.on('beginState', spy);
 
-            return this.runner.runPlans([this.plan]).then(function() {
-                sinon.assert.calledWith(spy, 'plan', 'state');
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.calledWith(spy, 'suite', 'state', 'browser');
             });
 
         });
@@ -79,70 +85,70 @@ describe('runner', function() {
                 {name: 'browser2'}
             ];
 
-            this.plan.capture('state');
+            addState(this.suite, 'state');
 
             this.sinon.spy(this.launcher, 'launch');
 
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.launcher.launch, this.runner.config.browsers[0]);
                 sinon.assert.calledWith(this.launcher.launch, this.runner.config.browsers[1]);
             }.bind(this));
         });
 
-        it('should launch browser only once for all states', function() {
-            this.plan
-                .capture('state1')
-                .capture('state2');
+        it('should launch browser only once for suite', function() {
+            addState(this.suite, 'state1');
+            addState(this.suite, 'state2');
             this.sinon.spy(this.launcher, 'launch');
 
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledOnce(this.launcher.launch);
             }.bind(this));
         });
 
-        it.skip('should launch browser second time if there is a `reload()` between states', function() {
-            this.plan
-                .capture('state1')
-                .reload()
-                .capture('state2');
+        it('should launch browser second time if there is a second suite', function() {
+            var secondSuite = createSuite('second');
+
+            secondSuite.url = '/hello';
+            addState(this.suite, 'state');
+            addState(secondSuite, 'state');
 
             this.sinon.spy(this.launcher, 'launch');
 
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite, secondSuite]).then(function() {
                 sinon.assert.calledTwice(this.launcher.launch);
             }.bind(this));
         });
 
-        it('should open plan url in browser', function() {
-            this.plan.capture('state');
+        it('should open suite url in browser', function() {
+            addState(this.suite, 'state');
 
             this.sinon.spy(this.browser, 'open');
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.browser.open, 'http://example.com/path');
             }.bind(this));
         });
 
-        it('should search for plan elements', function() {
-            this.plan
-                .setElements({element: '.selector'})
-                .setDynamicElements({element2: '.selector'})
-                .capture('state');
+        it('should search for suite elements', function() {
+            this.suite.elementsSelectors = {element: '.selector'};
+            this.suite.dynamicElementsSelectors = {element2: '.selector2'};
+
+            addState(this.suite, 'state');
 
             this.sinon.spy(this.browser, 'buildElementsMap');
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.browser.buildElementsMap,
-                    {element: '.selector'},
-                    {element2: '.selector'}
+                    this.suite.elementsSelectors,
+                    this.suite.dynamicElementsSelectors
                 );
             }.bind(this));
         });
 
         it('should capture state in browser', function() {
-            this.plan.capture('state');
+            addState(this.suite, 'state');
 
             this.sinon.spy(this.browser, 'captureState');
 
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.browser.captureState,
                     sinon.match.instanceOf(State).and(sinon.match.has('name', 'state')));
             }.bind(this));
@@ -151,31 +157,30 @@ describe('runner', function() {
         it('should pass found elements along with a state', function() {
             var stubElements = {element: 'found'};
 
-            this.plan
-                .setElements({element: '.selector'})
-                .capture('state');
+            this.suite.elementsSelectors = {element: '.selector'};
+
+            addState(this.suite, 'state');
 
             this.sinon.stub(this.browser, 'buildElementsMap').returns(q.resolve(stubElements));
             this.sinon.spy(this.browser, 'captureState');
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.browser.captureState, sinon.match.any, stubElements);
             }.bind(this));
         });
 
-        it('should emit `endState` for each plan state', function() {
+        it('should emit `endState` for each suite state', function() {
             var spy = this.sinon.spy();
-            this.plan.capture('state');
+            addState(this.suite, 'state');
             this.runner.on('endState', spy);
 
-            return this.runner.runPlans([this.plan]).then(function() {
-                sinon.assert.calledWith(spy, 'plan', 'state');
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.calledWith(spy, 'suite', 'state', 'browser');
             });
         });
 
         it('should execute next state only after previous has been finished', function() {
-            this.plan
-                .capture('state1')
-                .capture('state2');
+            addState(this.suite, 'state1');
+            addState(this.suite, 'state2');
 
             var endState = this.sinon.spy(),
                 beginState = this.sinon.spy();
@@ -183,71 +188,114 @@ describe('runner', function() {
             this.runner.on('endState', endState);
             this.runner.on('beginState', beginState);
 
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.callOrder(
-                    endState.withArgs('plan', 'state1'),
-                    beginState.withArgs('plan', 'state2')
+                    endState.withArgs('suite', 'state1'),
+                    beginState.withArgs('suite', 'state2')
                 );
             });
             
         });
 
-        it('should emit `endPlan` for each plan', function() {
+        it('should emit `endSuite` for each suite', function() {
             var spy = this.sinon.spy();
-            this.runner.on('endPlan', spy);
-            return this.runner.runPlans([this.plan]).then(function() {
-                sinon.assert.calledWith(spy, 'plan');
+            this.runner.on('endSuite', spy);
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.calledWith(spy, 'suite');
             });
         });
 
-        it('should execute next plan only after previous has been finished', function() {
-            var nextPlan = new Plan().setName('nextPlan').setUrl('/path2'),
-                endPlan = sinon.spy(),
-                beginPlan = sinon.spy();
+        it('should also run child suites automatically', function() {
+            var spy = this.sinon.spy();
+            
+            createSuite('child', this.suite);
 
-            this.runner.on('endPlan', endPlan);
-            this.runner.on('beginPlan', beginPlan);
+            this.runner.on('beginSuite', spy);
 
-            return this.runner.runPlans([this.plan, nextPlan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
+                spy.secondCall.args.must.eql(['child']);
+            });
+        });
+
+        it('should finish parent suite only after all children', function() {
+            var spy = this.sinon.spy();
+            
+            createSuite('child', this.suite);
+
+            this.runner.on('endSuite', spy);
+
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.callOrder(
-                    endPlan.withArgs('plan'),
-                    beginPlan.withArgs('nextPlan')
+                    spy.withArgs('child'),
+                    spy.withArgs('suite')
                 );
             });
         });
 
-        it('should emit `end` after all plans', function() {
+        it('should execute next suite only after previous has been finished', function() {
+            var nextSuite = createSuite('next'),
+                endSuite = sinon.spy(),
+                beginSuite = sinon.spy();
+
+            nextSuite.url = '/path2';
+
+            this.runner.on('endSuite', endSuite);
+            this.runner.on('beginSuite', beginSuite);
+
+            return this.runner.run([this.suite, nextSuite]).then(function() {
+                sinon.assert.callOrder(
+                    endSuite.withArgs('suite'),
+                    beginSuite.withArgs('next')
+                );
+            });
+        });
+
+        it('should allow to run a suite without url and states', function() {
+            var beginSuite = sinon.spy(),
+                endSuite = sinon.spy(),
+                suite = createSuite('suite');
+
+            this.runner.on('beginSuite', beginSuite);
+            this.runner.on('endSuite', endSuite);
+
+            return this.runner.run([suite]).then(function() {
+                sinon.assert.calledWith(beginSuite, 'suite');
+                sinon.assert.calledWith(endSuite, 'suite');
+            });
+        });
+
+        it('should emit `end` after all suites', function() {
             var spy = this.sinon.spy();
             this.runner.on('end', spy);
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(spy);
             });
         });
 
         it('should emit events in correct order', function() {
             var begin = this.sinon.spy(),
-                beginPlan = this.sinon.spy(),
+                beginSuite= this.sinon.spy(),
                 beginState = this.sinon.spy(),
                 endState = this.sinon.spy(),
-                endPlan = this.sinon.spy(),
+                endSuite= this.sinon.spy(),
                 end = this.sinon.spy();
 
-            this.plan.capture('state');
+            addState(this.suite, 'state');
 
             this.runner.on('begin', begin);
-            this.runner.on('beginPlan', beginPlan);
+            this.runner.on('beginSuite', beginSuite);
             this.runner.on('beginState', beginState);
             this.runner.on('endState', endState);
-            this.runner.on('endPlan', endPlan);
+            this.runner.on('endSuite', endSuite);
             this.runner.on('end', end);
 
-            return this.runner.runPlans([this.plan]).then(function() {
+            return this.runner.run([this.suite]).then(function() {
                 sinon.assert.callOrder(
                     begin,
-                    beginPlan,
+                    beginSuite,
                     beginState,
                     endState,
-                    endPlan,
+                    endSuite,
                     end
                 );
             });

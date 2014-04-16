@@ -29,6 +29,20 @@ describe('suite', function() {
 
         });
 
+        it('should set `parent` property of a parent suite', function() {
+            var parent = createSuite('parent'),
+                child = createSuite('child', parent);
+
+            child.parent.must.be(parent);
+        });
+
+        it('should add new suite to the parent\'s children', function() {
+            var parent = createSuite('parent'),
+                child = createSuite('child', parent);
+
+            parent.children.must.contain(child);
+        });
+
 
     });
 
@@ -67,4 +81,36 @@ describe('suite', function() {
             this.suite.states[0].must.be(state);
         });
     });
+
+    describe('hasStates', function() {
+        beforeEach(function() {
+            this.suite = createSuite('suite');
+        });
+
+        it('should be false if there is no states', function() {
+            this.suite.hasStates.must.be.false();
+        });
+
+        it('should be true if there are states', function() {
+            this.suite.addState({name: 'state'});
+
+            this.suite.hasStates.must.be.true();
+        });
+    });
+
+    describe('isRoot', function() {
+
+        it('should be true for root suites', function() {
+            var suite = createSuite('suite');
+            suite.isRoot.must.be.true();
+        });
+
+        it('should be false for child suites', function() {
+            var parent = createSuite('parent'),
+                child = createSuite('child', parent);
+
+            child.isRoot.must.be.false();
+        });
+    });
+
 });
