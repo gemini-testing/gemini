@@ -1,0 +1,38 @@
+<h2>{{name}}</h2>
+<div class="suite">
+    {{#each states}}
+    <h3>{{name}}</h3>
+    <div class="state">
+        {{#each browsers}}
+        <h4 class="{{status}}">{{name}}</h4>
+        <div class="browser">
+            {{#if error}}
+                <pre>{{stacktrace}}</pre>
+            {{else}}
+                {{#if equal}}
+                    {{image "current"}}
+                {{else}}
+                    <div class="image-box">
+                        <div class="image-title">Reference</div>
+                        {{image "reference"}}
+                    </div>
+                    <div class="image-box">
+                        <div class="image-title">Current</div>
+                        {{image "current"}}
+                    </div>
+                    <div class="image-box">
+                        <div class="image-title">Diff</div>
+                        {{image "diff"}}
+                    </div>
+
+                {{/if}}
+            {{/if}}
+        </div>
+        {{/each}}
+    </div>
+    {{/each}}
+
+    {{#each children}}
+        {{> suite}}
+    {{/each}}
+</div>

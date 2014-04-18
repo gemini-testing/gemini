@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Gemini report</title>
+        <style>
+            .suite {
+                padding-left: 30px;
+            }
+
+            .state {
+                padding-left: 30px;
+            }
+
+            .success::before {
+                content: '\2713 ';
+                color: green;
+            }
+
+            .fail {
+                color: red;
+            }
+
+            .fail:before {
+                content: '\2718 ';
+                color: red;
+            }
+
+            .image-box {
+                display: inline-block;
+                padding: 5px;
+            }
+
+        </style>
+    </head>
+    
+    <body>
+        <h1>Gemini report</h1>
+        {{> suite}}
+    </body>
+</html>
