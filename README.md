@@ -52,7 +52,7 @@ browsers:
 
 Config file fields:
 
-* `rootUrl` - the root URL of your website. Target URLs of your test plans will
+* `rootUrl` - the root URL of your website. Target URLs of your test suites will
 be resolved relatively to it.
 * `gridUrl` - Selenium Grid URL to use for taking screenshots. Required, if
 you want to run test in other browsers, then `phantomjs`.
@@ -71,17 +71,19 @@ relatively to config file directory. `gemini/screens` by default.
 
 ## Writing tests
 
-For each block of website you need to test you need to write *test plan*. Plan
-consists of few *states* that needs to be verified. For each state you need to
+For each block of website you need to test you need to write one or more *test suites*. 
+Suite consists of few *states* that needs to be verified. For each state you need to
 specify *action sequence* that gets block to this state.
 
-Each test plan file is a node module exporting single function which
-configures the plan. Example:
+### Defining suites
+
+Test suite is defined with `gemini.suite` method. Example:
 
 ```javascript
-module.exports = function(plan) {
-    plan.setName('button')
-        .setUrl('/path/to/page')
+var gemini = require('gemini');
+
+gemini.suite('name', function(suite) {
+    suite.setUrl('/path/to/page')
         .setElements({
             button: '.button'
         })
@@ -95,15 +97,19 @@ module.exports = function(plan) {
         .capture('clicked', function(actions, elements) {
             actions.mouseUp(elements.button);
         });
-};
+});
 ```
+Arguments of a `gemini.suite`:
 
-### Plan methods
+* `name` - the name of the new test suite. Name is displayed in reports and
+affects screenshots filenames.
+* `callback(suite)` - callback, used to set up the suite. Receives a suite
+builder instance (described below).
+
+### Suite builder methods:
 
 All method are chainable:
 
-* `setName(name)` - sets the plan name. Displayed in reports and affects
-  screenshots filenames.
 * `setUrl(url)` - specifies address of web page to take screenshots from.
   URL is relative to `rootUrl` config field.
 * `setElements({name1: 'selector', name2: 'selector', ...})` - specifies elements
@@ -126,15 +132,61 @@ All method are chainable:
   Callback accepts two arguments:
    * `actions` - chainable object that should be used to specify a
       series of actions to perform.
-   * `elements` - hash of elements, defined by plan's `setElements` call.
-      Keys of object are the same as defined in plan. Values are internal
+   * `elements` - hash of elements, defined by suites `setElements` call.
+      Keys of object are the same as defined in suite. Values are internal
       objects representing browser elements.
       
       No method of elements should be called directly - they should be
       used only as arguments to an `actions` calls.
 
-* `reload()` - should be used before `capture` call to reload a browser before
-  next state. Can be used to get rid of side effects, caused by previous states.
+### Nested suites
+
+Suites can be nested. In this case, inner suite inherits `url`, `elements`
+and `dynamicElements` from outer. This properties can be overridden in 
+inner suites without affecting the outer.
+Each new suite causes reload of the browser, even if URL was not changed.
+
+```javascript
+var gemini = require('gemini');
+
+gemin.suite('parent', function(parent) {
+    parent.setUrl('/some/path')
+          .setElements({element: '.selector'});
+          .capture('state');
+
+    gemini.suite('first child', function(child) {
+        //this suite captures same elements on different page
+        child.setUrl('/other/path')
+            .capture('other state');
+    });
+
+    gemini.suite('second child', function(child) {
+        //this suite captures different elements on a same page
+        child.setElements({nextElement: '#next-selector'})
+             .capture('third state', function(actions, elements) {
+                 ...
+             })
+
+        gemini.suite('grandchild', function(grandchild) {
+            //this suite captures same elements, as a child,
+            //butt adds dynamic elements
+            grandchild.setDynamicElements({dynamic: '.dynamic-selector'})
+                      .capture('fourth state');
+
+        });
+    });
+
+    gemini.suite('third child', function(child) {
+        //this child uses completely different URL and set
+        //of elements
+        child.setUrl('/some/another/path')
+          .setElements({differentElement: '.different-selector'});
+          .setDynamicElements({yetAnotherElement: '.yet-another-selector'})
+          .capture('fifth state');
+
+    });
+});
+```
 
 ### Available actions
 
@@ -179,10 +231,10 @@ phantomjs --webdriver=4444
 
 ### Gathering reference images
 
-Once you have few plans written you need to capture reference images:
+Once you have few suites written you need to capture reference images:
 
 ```
-gemini gather [paths to plans]
+gemini gather [paths to suites]
 ```
 
 If no paths are specified, every `.js` file from `gemini` directory will be read.
@@ -194,7 +246,7 @@ To specify other config, use `--config` or `-c` option.
 To compare you reference screenshots with current state of blocks, use:
 
 ```
-gemini test [paths to plan]
+gemini test [paths to suites]
 ```
 
 Paths and configuration are treated the same way as in `gather` command.
@@ -205,7 +257,7 @@ as the failed test.
 By default, you'll see only names of the states. To get more information
 you can use HTML reporter:
 
-`gemini test --reporter html [paths to plans]`
+`gemini test --reporter html [paths to suites]`
 
 This will produce HTML file in `gemini-report` directory. It will
 display reference image, current image and difference between the two
