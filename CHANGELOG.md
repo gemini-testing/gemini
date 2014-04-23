@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 - 2014-04-23
+
+* Fix a bug with incorrect reference to the suite in states. Because of
+  this bug dynamic elements was not updated properly.
+
 ## 0.2.0 - 2014-04-22
 
 * New test suites API.  Plans are replaced by test suites defined by explicit call.
