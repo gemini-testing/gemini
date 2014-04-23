@@ -87,6 +87,14 @@ describe('public tests API', function() {
                 this.suite.children[0].states[0].name.must.equal('state');
             });
 
+            it('should make new state reference the suite', function() {
+                this.context.suite('name', function(suite) {
+                    suite.capture('state');
+                });
+
+                this.suite.children[0].states[0].suite.must.equal(this.suite.children[0]);
+            });
+
             it('should call passed callback upon activation', function() {
                 var spy = sinon.spy(),
                     browser = {
