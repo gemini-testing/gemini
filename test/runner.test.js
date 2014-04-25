@@ -79,6 +79,42 @@ describe('runner', function() {
 
         });
 
+        it('should not emit `beginState` if state is skipped', function() {
+            var spy = this.sinon.spy();
+            this.suite.addState({
+                name: 'state', 
+                shouldSkip: this.sinon.stub().returns(true)
+            });
+            this.runner.on('beginState', spy);
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.notCalled(spy);
+            });
+        });
+
+        it('should emit `skipState` if state is skipped', function() {
+            var spy = this.sinon.spy();
+            this.suite.addState({
+                name: 'state', 
+                shouldSkip: this.sinon.stub().returns(true)
+            });
+            this.runner.on('skipState', spy);
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.calledWith(spy, 'suite', 'state', 'browser');
+            });
+        });
+
+        it('should not emit `skipState` if state is not skipped', function() {
+            var spy = this.sinon.spy();
+            this.suite.addState({
+                name: 'state', 
+                shouldSkip: this.sinon.stub().returns(false)
+            });
+            this.runner.on('skipState', spy);
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.notCalled(spy);
+            });
+        });
+
         it('should launch each browser in config', function() {
             this.runner.config.browsers = [
                 {name: 'browser1', version: '1'},
@@ -175,6 +211,18 @@ describe('runner', function() {
 
             return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(spy, 'suite', 'state', 'browser');
+            });
+        });
+
+        it('should not emit `endState` if state is skipped', function() {
+            var spy = this.sinon.spy();
+            this.suite.addState({
+                name: 'state', 
+                shouldSkip: this.sinon.stub().returns(true)
+            });
+            this.runner.on('endState', spy);
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.notCalled(spy);
             });
         });
 
