@@ -124,6 +124,33 @@ All method are chainable:
   at the moment page loaded or disappears in process. Dynamic elements will make
   your tests slower, so don't use it for static content.
 
+* `skip([browser])` - skip all tests and nested suites for all browser,
+  some specified browser or specified version of a browser:
+
+  - `skip()` - skips tests and nested suites for all browsers;
+  - `skip(browserName)` or `skip({name: browserName})` - skips tests for all
+    versions of specified browser;
+  - `skip({name: browserName, version: browserVersion})` - skips tests for
+    particular version of a browser.
+  - `skip([browser1, browser2, ...])` - skip tests for multiple browsers or
+    versions.
+
+  All browsers from subsequent calls to `.skip()` are added to the skip list:
+
+  ```javascript
+  suite.skip({name: 'browser1', version: '1.0'})
+       .skip('browser2');
+  ```
+
+  is the same as:
+
+  ```javascript
+  suite.skip([
+      {name: 'browser1', version: '1.0'},
+      'browser2'
+  ]);
+  ```
+
 * `capture(stateName, callback(actions, element))` - defines new state to capture.
   Optional callback describes a sequence of actions to bring the page to this state,
   starting from **previous** state. States are executed one after another in order
