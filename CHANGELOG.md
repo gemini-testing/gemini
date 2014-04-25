@@ -1,5 +1,15 @@
 # Changelog
 
+## Next - somewhere in a future
+
+* Add `suite.skip()` method which allows to skip suite in some set of
+  browsers:
+
+  - `suite.skip()` - skip in all browsers.
+  - `suite.skip('chrome')` - skip in all versions of Chrome.
+  - `suite.skip({name: 'chrome', version: '33.0'})` - skip in Chrome 33.0
+  - `suite.skip(['chrome', 'opera'])` - skip in Chrome and Opera
+
 ## 0.2.1 - 2014-04-23
 
 * Fix a bug with incorrect reference to the suite in states. Because of
