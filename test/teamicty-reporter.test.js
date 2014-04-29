@@ -30,6 +30,14 @@ describe('TeamCity reporter', function() {
         assertLastWrite('##teamcity[testSuiteStarted name=\'someSuite\']\n');
     });
 
+    it('should report ignored state as ignored test', function() {
+        this.emitter.emit('begin');
+        this.emitter.emit('beginSuite', 'someSuite');
+        this.emitter.emit('skipState', 'someSuite', 'someState', 'browser');
+        assertLastWrite(
+            '##teamcity[testIgnored name=\'someState.browser\' flowId=\'someSuite.someState.browser\']\n');
+    });
+
     it('should report state start as test start', function() {
         this.emitter.emit('begin');
         this.emitter.emit('beginSuite', 'someSuite');

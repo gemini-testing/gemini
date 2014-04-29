@@ -113,5 +113,59 @@ describe('public tests API', function() {
 
             });
         });
+
+        describe('skip', function() {
+            it('should mark suite as skipped', function() {
+                this.context.suite('name', function(suite) {
+                    suite.skip();
+                });
+                this.suite.children[0].skipped.must.be.true();
+            });
+
+            it('should accept skipped browser name', function() {
+                this.context.suite('name', function(suite) {
+                    suite.skip('opera');
+                });
+
+                this.suite.children[0].skipped[0].must.be.eql({name: 'opera'});
+            });
+
+            it('should accept browser object', function() {
+                this.context.suite('name', function(suite) {
+                    suite.skip({name: 'opera'});
+                });
+
+                this.suite.children[0].skipped[0].must.be.eql({name: 'opera'});
+            });
+
+            it('should accept array of objects', function() {
+                this.context.suite('name', function(suite) {
+                    suite.skip([
+                        {name: 'opera'},
+                        {name: 'chrome'}
+                    ]);
+                });
+
+                this.suite.children[0].skipped.must.be.eql([
+                    {name: 'opera'},
+                    {name: 'chrome'}
+                ]);
+            });
+
+            it('should accept array of strings', function() {
+                this.context.suite('name', function(suite) {
+                    suite.skip([
+                        'opera',
+                        'chrome'
+                    ]);
+                });
+
+                this.suite.children[0].skipped.must.be.eql([
+                    {name: 'opera'},
+                    {name: 'chrome'}
+                ]);
+            });
+
+        });
     });
 });

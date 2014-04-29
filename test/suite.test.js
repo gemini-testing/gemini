@@ -113,4 +113,87 @@ describe('suite', function() {
         });
     });
 
+    describe('skipped', function() {
+        beforeEach(function() {
+            this.suite = createSuite('suite');
+        });
+        
+        it('should be false by default', function() {
+            this.suite.skipped.must.be.false();
+        });
+
+        it('should be changed by skip() method', function() {
+            this.suite.skip();
+            this.suite.skipped.must.be.true();
+        });
+
+        it('should be inherited by children', function() {
+            this.suite.skip();
+            
+            var child = createSuite('child', this.suite);
+            child.skipped.must.be.true();
+        });
+
+        it('should accept browsers list', function() {
+            var list = [
+                {name: 'browser1', version: '1.0'},
+                {name: 'browser2', version: '2.0'}
+            ];
+
+            this.suite.skip(list);
+            this.suite.skipped.must.eql(list);
+        });
+
+        it('should merge multiple lists together', function() {
+            this.suite.skip([{name: 'browser1', version: '1.0'}]);
+            this.suite.skip([{name: 'browser2'}]);
+
+
+            this.suite.skipped.must.eql([
+                {name: 'browser1', version: '1.0'},
+                {name: 'browser2'}
+            ]);
+        });
+
+        it('should not override `true` by browser list', function() {
+            this.suite.skip();
+            this.suite.skip([{name: 'browser1', version: '1.0'}]);
+
+            this.suite.skipped.must.be.true();
+        });
+
+        it('should override browser list by `true`', function() {
+            this.suite.skip([{name: 'browser1', version: '1.0'}]);
+            this.suite.skip();
+
+            this.suite.skipped.must.be.true();
+        });
+
+        it('should merge children list with parent', function() {
+            this.suite.skip([{name: 'browser1', version: '1.0'}]);
+            var child = createSuite('child', this.suite);
+            child.skip([{name: 'browser2'}]);
+
+            child.skipped.must.eql([
+                {name: 'browser1', version: '1.0'},
+                {name: 'browser2'}
+            ]);
+
+
+        });
+
+        it('should not affect parent when calling .skip() on child', function() {
+            this.suite.skip([{name: 'browser1', version: '1.0'}]);
+            var child = createSuite('child', this.suite);
+            child.skip([{name: 'browser2'}]);
+
+            this.suite.skipped.must.eql([
+                {name: 'browser1', version: '1.0'},
+            ]);
+
+
+        });
+
+    });
+
 });
