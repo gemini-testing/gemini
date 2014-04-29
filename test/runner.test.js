@@ -24,10 +24,14 @@ describe('runner', function() {
 
         var browser = {
             fullName: 'browser',
-            open: function () { return q.resolve(); },
-            buildElementsMap: function() { return q.resolve(); },
-            captureState: function() { return q.resolve(); },
-            quit: function() { return q.resolve(); }
+            createActionSequence: this.sinon.stub().returns({
+                perform: this.sinon.stub().returns(q.resolve()) 
+            }),
+
+            open: this.sinon.stub().returns(q.resolve()),
+            buildElementsMap: this.sinon.stub().returns(q.resolve()),
+            captureState: this.sinon.stub().returns(q.resolve()),
+            quit: this.sinon.stub().returns(q.resolve())
         };
 
         this.browser = browser;
@@ -67,6 +71,34 @@ describe('runner', function() {
             });
         });
 
+        it('should call `before` hook with action sequence and find function', function() {
+            var stub = this.sinon.stub(this.suite, 'beforeHook'),
+                sequence = {
+                    stub: true,
+                    perform: this.sinon.stub().returns(q.resolve())
+                };
+
+            this.browser.createActionSequence.returns(sequence);
+
+            addState(this.suite, 'state');
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.calledWith(stub, sequence, require('../lib/find-func').find);
+            });
+        });
+
+        it('should peroform before sequence ', function() {
+            var sequence = { perform: this.sinon.stub().returns(q())};
+
+            this.browser.createActionSequence.returns(sequence);
+
+            addState(this.suite, 'state');
+
+            return this.runner.run([this.suite]).then(function() {
+                sinon.assert.called(sequence.perform);
+            });
+        });
+
+
         it('should emit `beginState` for each suite state', function() {
             var spy = this.sinon.spy();
 
@@ -82,7 +114,8 @@ describe('runner', function() {
         it('should not emit `beginState` if state is skipped', function() {
             var spy = this.sinon.spy();
             this.suite.addState({
-                name: 'state', 
+                name: 'state',
+                suite: this.suite, 
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('beginState', spy);
@@ -95,6 +128,7 @@ describe('runner', function() {
             var spy = this.sinon.spy();
             this.suite.addState({
                 name: 'state', 
+                suite: this.suite,
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('skipState', spy);
@@ -106,7 +140,8 @@ describe('runner', function() {
         it('should not emit `skipState` if state is not skipped', function() {
             var spy = this.sinon.spy();
             this.suite.addState({
-                name: 'state', 
+                name: 'state',
+                suite: this.suite,
                 shouldSkip: this.sinon.stub().returns(false)
             });
             this.runner.on('skipState', spy);
@@ -158,17 +193,13 @@ describe('runner', function() {
         it('should open suite url in browser', function() {
             addState(this.suite, 'state');
 
-            this.sinon.spy(this.browser, 'open');
             return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.browser.open, 'http://example.com/path');
             }.bind(this));
         });
 
-
         it('should capture state in browser', function() {
             addState(this.suite, 'state');
-
-            this.sinon.spy(this.browser, 'captureState');
 
             return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.browser.captureState,
@@ -178,6 +209,7 @@ describe('runner', function() {
 
         it('should emit `endState` for each suite state', function() {
             var spy = this.sinon.spy();
+
             addState(this.suite, 'state');
             this.runner.on('endState', spy);
 
@@ -190,6 +222,7 @@ describe('runner', function() {
             var spy = this.sinon.spy();
             this.suite.addState({
                 name: 'state', 
+                suite: this.suite,
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('endState', spy);

@@ -101,6 +101,17 @@ describe('public tests API', function() {
             });
         });
 
+        describe('before', function() {
+            it('should set beforeHook property', function() {
+                var func = function() {};
+                this.context.suite('name', function(suite) {
+                    suite.before(func);
+                });
+                this.suite.children[0].beforeHook.must.be(func);
+
+            });
+        });
+
         describe('capture', function() {
             it('should create named state', function() {
                 this.context.suite('name', function(suite) {
