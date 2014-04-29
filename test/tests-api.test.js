@@ -54,29 +54,52 @@ describe('public tests API', function() {
     });
 
     describe('suite builder', function() {
-        function testBuilderMethod(method, property, value) {
-            describe(method, function() {
-                it('should set ' + property + ' property', function() {
-                    this.context.suite('name', function(suite) {
-                        suite[method](value);
-                    });
 
-                    this.suite.children[0][property].must.equal(value);
+        function shouldBeChainable(method, value) {
+            it('should be chainable', function(done) {
+                this.context.suite('name', function(suite) {
+                    suite[method](value).must.be(suite);
+                    done();
                 });
-
-                it('should be chainable', function(done) {
-                    this.context.suite('name', function(suite) {
-                        suite[method](value).must.be(suite);
-                        done();
-                    });
-                });
-
             });
-        }
+        } 
 
-        testBuilderMethod('setUrl', 'url', 'http://example.com');
-        testBuilderMethod('setElements', 'elementsSelectors', {element: 'selector'});
-        testBuilderMethod('setDynamicElements', 'dynamicElementsSelectors', {element: 'selector'});
+        describe('setUrl', function() {
+            it('should set url property', function() {
+                this.context.suite('name', function(suite) {
+                    suite.setUrl('http://example.com');
+                });
+
+                this.suite.children[0].url.must.equal('http://example.com');
+            });
+
+            shouldBeChainable('setUrl', 'http://example.com');
+        });
+
+        describe('setCaptureElements', function() {
+            it('should set captureSelectors property', function() {
+                this.context.suite('name', function(suite) {
+                    suite.setCaptureElements('.selector');
+                });
+
+                this.suite.children[0].captureSelectors.must.eql(['.selector']);
+            });
+
+            it('should accept multiple arguments', function() {
+                this.context.suite('name', function(suite) {
+                    suite.setCaptureElements('.selector1', '.selector2');
+                });
+                this.suite.children[0].captureSelectors.must.eql(['.selector1', '.selector2']);
+            });
+
+            it('should accept array', function() {
+                this.context.suite('name', function(suite) {
+                    suite.setCaptureElements(['.selector1', '.selector2']);
+                });
+
+                this.suite.children[0].captureSelectors.must.eql(['.selector1', '.selector2']);
+            });
+        });
 
         describe('capture', function() {
             it('should create named state', function() {
@@ -112,6 +135,8 @@ describe('public tests API', function() {
                 sinon.assert.called(spy);
 
             });
+
+            shouldBeChainable('capture', 'state');
         });
 
         describe('skip', function() {

@@ -164,20 +164,6 @@ describe('runner', function() {
             }.bind(this));
         });
 
-        it('should search for suite elements', function() {
-            this.suite.elementsSelectors = {element: '.selector'};
-            this.suite.dynamicElementsSelectors = {element2: '.selector2'};
-
-            addState(this.suite, 'state');
-
-            this.sinon.spy(this.browser, 'buildElementsMap');
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(this.browser.buildElementsMap,
-                    this.suite.elementsSelectors,
-                    this.suite.dynamicElementsSelectors
-                );
-            }.bind(this));
-        });
 
         it('should capture state in browser', function() {
             addState(this.suite, 'state');
@@ -187,20 +173,6 @@ describe('runner', function() {
             return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.browser.captureState,
                     sinon.match.instanceOf(State).and(sinon.match.has('name', 'state')));
-            }.bind(this));
-        });
-
-        it('should pass found elements along with a state', function() {
-            var stubElements = {element: 'found'};
-
-            this.suite.elementsSelectors = {element: '.selector'};
-
-            addState(this.suite, 'state');
-
-            this.sinon.stub(this.browser, 'buildElementsMap').returns(q.resolve(stubElements));
-            this.sinon.spy(this.browser, 'captureState');
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(this.browser.captureState, sinon.match.any, stubElements);
             }.bind(this));
         });
 
