@@ -1,6 +1,6 @@
 # Changelog
 
-## Next - somewhere in a future
+## 0.3.0 -  2014-05-30
 
 * Elements to take screen shots of and elements to perform action
   on are now defined differently. `setElements` and `setDynmaicElements`

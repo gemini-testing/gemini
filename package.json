@@ -1,6 +1,6 @@
 {
   "name": "gemini",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "UI Screenshot testing utility",
   "bin": {
     "gemini": "./bin/gemini"
