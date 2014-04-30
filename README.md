@@ -82,20 +82,22 @@ Test suite is defined with `gemini.suite` method. Example:
 ```javascript
 var gemini = require('gemini');
 
-gemini.suite('name', function(suite) {
-    suite.setUrl('/path/to/page')
-        .setElements({
-            button: '.button'
+gemini.suite('button', function(suite) {
+    suite
+        .setUrl('/path/to/page')
+        .setCaptureElements('.button')
+        .before(function(actions, find) {
+            this.button = find('.buttons');
         })
         .capture('plain')
-        .capture('hovered', function(actions, elements) {
-            actions.mouseMove(elements.button);
+        .capture('hovered', function(actions, find) {
+            actions.mouseMove(this.button);
         })
-        .capture('pressed', function(actions, elements) {
-            actions.mouseDown(elements.button);
+        .capture('pressed', function(actions, find) {
+            actions.mouseDown(this.button);
         })
-        .capture('clicked', function(actions, elements) {
-            actions.mouseUp(elements.button);
+        .capture('clicked', function(actions, find) {
+            actions.mouseUp(this.button);
         });
 });
 ```
@@ -112,17 +114,20 @@ All method are chainable:
 
 * `setUrl(url)` - specifies address of web page to take screenshots from.
   URL is relative to `rootUrl` config field.
-* `setElements({name1: 'selector', name2: 'selector', ...})` - specifies elements
-  that will be used to determine a region of webpage to capture. This elements
-  will be also available by their names in state callbacks.
+* `setCaptureElements('selector1', 'selector2', ...})` - specifies css
+  selectors of the elements that will be used to determine a region of webpage 
+  to capture.
   
   Capture region determined by minimum bounding rect for all
   of theese elements plus their `box-shadow` size.
 
-* `setDynamicElements({name1: 'selector', name2: 'selector', ...})` - same as
-  `setElements`, but specifies elements that does not appear in DOM tree
-  at the moment page loaded or disappears in process. Dynamic elements will make
-  your tests slower, so don't use it for static content.
+  Can also accept an array:
+
+  ```
+  suite.setCaptureElements(['.selector1', '.selector2']);
+  ```
+
+  All tests in suite will fail if any of the elements will not be found.
 
 * `skip([browser])` - skip all tests and nested suites for all browser,
   some specified browser or specified version of a browser:
@@ -151,26 +156,51 @@ All method are chainable:
   ]);
   ```
 
-* `capture(stateName, callback(actions, element))` - defines new state to capture.
+* `capture(stateName, callback(actions, fimd))` - defines new state to capture.
   Optional callback describes a sequence of actions to bring the page to this state,
-  starting from **previous** state. States are executed one after another in order
-  of definition without browser reload in between.
+  starting from **previous** state of the suite. States are executed one after another
+  in order of definition without browser reload in between.
 
   Callback accepts two arguments:
    * `actions` - chainable object that should be used to specify a
       series of actions to perform.
-   * `elements` - hash of elements, defined by suites `setElements` call.
-      Keys of object are the same as defined in suite. Values are internal
-      objects representing browser elements.
-      
-      No method of elements should be called directly - they should be
-      used only as arguments to an `actions` calls.
+   * `find(selector)` -  use this function to search for an element to act on.
+     Search is lazy and actually will be performed the first time element
+     needed.
+     Search will be performed once for each `find` call, so if you need to perform
+     multiple actions on the same element save the result to some variable:
+
+     ```javascript
+     .capture('name', function(actions, find) {
+         var button = find('.button');
+         actions.mouseDown(button)
+                .mouseUp(button);
+     });
+     ```
+
+
+* `before(callback(actions, find))` - use this function to execute some code
+  before the first state. The arguments of callback are the same as for `capture` callback.
+  Context is shared between `before` callback and all of suite's state callbacks, so you
+  can use this hook to lookup for element only once for all suite:
+
+  ```javascript
+  suite.before(function(actions, find) {
+          this.button = find('.buttons');
+      })
+      .capture('hovered', function(actions, find) {
+          actions.mouseMove(this.button);
+      })
+      .capture('pressed', function(actions, find) {
+          actions.mouseDown(this.button);
+      })
+
+  ```
 
 ### Nested suites
 
-Suites can be nested. In this case, inner suite inherits `url`, `elements`
-and `dynamicElements` from outer. This properties can be overridden in 
-inner suites without affecting the outer.
+Suites can be nested. In this case, inner suite inherits `url`, `captureElements`
+from outer. This properties can be overridden in  inner suites without affecting the outer.
 Each new suite causes reload of the browser, even if URL was not changed.
 
 ```javascript
@@ -178,7 +208,7 @@ var gemini = require('gemini');
 
 gemin.suite('parent', function(parent) {
     parent.setUrl('/some/path')
-          .setElements({element: '.selector'});
+          .setCaptureElements('.selector1', '.selector2');
           .capture('state');
 
     gemini.suite('first child', function(child) {
@@ -189,16 +219,14 @@ gemin.suite('parent', function(parent) {
 
     gemini.suite('second child', function(child) {
         //this suite captures different elements on a same page
-        child.setElements({nextElement: '#next-selector'})
+        child.setCaptureElements('.next-selector'})
              .capture('third state', function(actions, elements) {
                  ...
              })
 
         gemini.suite('grandchild', function(grandchild) {
-            //this suite captures same elements, as a child,
-            //butt adds dynamic elements
-            grandchild.setDynamicElements({dynamic: '.dynamic-selector'})
-                      .capture('fourth state');
+            //child suites can have own childs
+            grandchild.capture('fourth state');
 
         });
     });
@@ -207,8 +235,7 @@ gemin.suite('parent', function(parent) {
         //this child uses completely different URL and set
         //of elements
         child.setUrl('/some/another/path')
-          .setElements({differentElement: '.different-selector'});
-          .setDynamicElements({yetAnotherElement: '.yet-another-selector'})
+          .setCaptureElements('.different-selector');
           .capture('fifth state');
 
     });
@@ -219,8 +246,8 @@ gemin.suite('parent', function(parent) {
 
 By calling methods of the `actions` argument of a callback you can program
 a series of steps to bring the block to desired state. All calls are chainable
-and next step is always executed after previous one has completed. The
-full list of actions:
+and next step is always executed after previous one has completed. In the following
+list `element` can be either CSS selector, or result of a `find` call:
 
 * `click(element)` - mouse click at the center of the element.
 * `doubleClick(element)` - mouse double click at the center of the element.
