@@ -2,6 +2,70 @@
 
 ## Next - somewhere in a future
 
+* Elements to take screen shots of and elements to perform action
+  on are now defined differently. `setElements` and `setDynmaicElements`
+  methods removed.
+
+  New way to define elements for screenshot:
+
+  ```javascript
+  suite.setCaptureElements('.selector1', '.selector2', ...)
+  ```
+
+  Or using array:
+
+  ```javascript
+  suite.setCaptureElements(['.selector1', '.selector2', ...])
+  ```
+
+
+  To get element to perform action on, you can now pass
+  selectors directly to the actions:
+
+  ```javascript
+  suite.capture('state', function(actions, find) {
+      actions.click('.button');
+  });
+  ```
+
+  To avoid multiple lookups for the same element you can use 
+  `find` function which is now passed to the state callback:
+
+  ```javascript
+  suite.capture('state', function(actions, find) {
+      var button = find('.button');
+      actions.mouseMove(button);
+             .click(button);
+  });
+  ```
+
+* Add `suite.before(function(action, find))` which can be used to
+  perform some actions before the first state. Context is shared
+  between before hook and all of suite's state callbacks.
+
+  You can use `before` to look for element only once for the state:
+
+  ```javascript
+  suite.before(function(actions, find) {
+      this.button = find('.buttons');
+  })
+  .capture('hovered', function(actions, find) {
+      actions.mouseMove(this.button);
+  })
+  .capture('pressed', function(actions, find) {
+      actions.mouseDown(this.button);
+  });
+  ```
+
+  Or to perform some actions before first state without taking
+  screenshot:
+
+  ```javascript
+  suite.before(function(actions, find) {
+      actions.click('.button');
+  });
+  ```
+
 * Add `suite.skip()` method which allows to skip suite in some set of
   browsers:
 
