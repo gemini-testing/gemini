@@ -74,6 +74,9 @@
   - `suite.skip({name: 'chrome', version: '33.0'})` - skip in Chrome 33.0
   - `suite.skip(['chrome', 'opera'])` - skip in Chrome and Opera
 
+* Public API now has constants for special keys to use in `sendKeys` actions
+  (i.e. `gemini.CONTROL` for `CTRL` key).
+
 ## 0.2.1 - 2014-04-23
 
 * Fix a bug with incorrect reference to the suite in states. Because of

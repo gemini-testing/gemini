@@ -257,8 +257,6 @@ list `element` can be either CSS selector, or result of a `find` call:
 * `mouseMove(element, [offset])` - move mouse to the given element. Offset is specified relatively
   to the center of the element, `{x: 0, y: 0}` by default.
 * `dragAndDrop(element, dragTo)` - drag `element` to other `dragTo` element.
-* `sendKeys([element], keys)` - send a series of keyboard strokes to the speciefied element or
-   currently active element on a page.
 * `executeJS(function(window))` - run specified function in a browser. The argument of a function
    is the browser's `window` object:
 
@@ -272,6 +270,23 @@ list `element` can be either CSS selector, or result of a `find` call:
 
 * `wait(milliseconds)` - wait for specified amount of time before next action. If it is the last action in
 sequence, delay the screenshot for this amount of time.
+* `sendKeys([element], keys)` - send a series of keyboard strokes to the speciefied element or
+   currently active element on a page.
+
+   You can send a special key using one of the provided constants, i.e:
+
+   ```javascript
+   actions.sendKeys(gemini.ARROW_DOWN);
+   ```
+
+   Full list of special keys:
+
+    `NULL`, `CANCEL`, `HELP`, `BACK_SPACE`, `TAB`, `CLEAR`, `RETURN`, `ENTER`, `SHIFT`, `LEFT_SHIFT `, `CONTROL`,
+    `LEFT_CONTROL`, `ALT`, `LEFT_ALT`, `PAUSE`, `ESCAPE`, `SPACE`, `PAGE_UP`, `PAGE_DOWN`, `END`, `HOME`, `LEFT`,
+    `ARROW_LEFT`, `UP`, `ARROW_UP`, `RIGHT`, `ARROW_RIGHT`, `DOWN,`, `ARROW_DOWN`, `INSERT`, `DELETE`, `SEMICOLON`,
+    `EQUALS`, `NUMPAD0`, `NUMPAD1`, `NUMPAD2`, `NUMPAD3`, `NUMPAD4`, `NUMPAD5`, `NUMPAD6`, `NUMPAD7`, `NUMPAD8`,
+    `NUMPAD9`, `MULTIPLY`, `ADD`, `SEPARATOR`, `SUBTRACT`, `DECIMAL`, `DIVIDE`, `F1`, `F2`, `F3`, `F4`, `F5`,
+    `F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND`, `META`, `ZENKAKU_HANKAKU`.
 
 ## Commands
 
