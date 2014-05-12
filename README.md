@@ -156,7 +156,7 @@ All method are chainable:
   ]);
   ```
 
-* `capture(stateName, callback(actions, fimd))` - defines new state to capture.
+* `capture(stateName, callback(actions, find))` - defines new state to capture.
   Optional callback describes a sequence of actions to bring the page to this state,
   starting from **previous** state of the suite. States are executed one after another
   in order of definition without browser reload in between.
