@@ -1,5 +1,13 @@
 # Changelog
 
+## Dev
+
+* Non-existent directories, passed to `gather` and `test` commands will
+  be filtered out
+* If fatal error occurs, `gemini` will always exit with 1 status code
+* If test fails or state error occurs, `gemini` will always exit with 2
+  status code.
+
 ## 0.3.0 -  2014-05-30
 
 * Elements to take screen shots of and elements to perform action
