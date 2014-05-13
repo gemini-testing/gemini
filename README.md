@@ -68,6 +68,17 @@ on selenium grid.
 
 * `screenshotsDir` - directory to save reference screenshots to. Specified
 relatively to config file directory. `gemini/screens` by default.
+* `capabilities` - additional selenium capabilities to use for all browsers:
+
+  ```yaml
+  capabilities:
+    option1: value,
+    option2: value
+  ```
+  
+  It is possible to set any capability, except `browserName` and `version` (use
+  `browsers` option instead) and `takesScreenshot` (always set to `true`
+  automatically);
 
 ## Writing tests
 
