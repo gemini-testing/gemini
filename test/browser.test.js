@@ -15,6 +15,48 @@ describe('browser', function() {
         this.sinon.restore();
     });
 
+    describe('open', function() {
+        beforeEach(function() {
+            this.wd = {
+                init: sinon.stub().returns(q({})),
+                get: sinon.stub().returns(q())
+            };
+
+            this.config = {capabilities: {}};
+            this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
+            this.browser = new Browser(this.config, 'browser', '1.0');
+        });
+
+        it('should init browser with browserName, version and takeScreenshot capabilites', function() {
+            var _this = this;
+            return this.browser.open('http://example.com').then(function() {
+                sinon.assert.calledWith(_this.wd.init, {
+                    browserName: 'browser',
+                    version: '1.0',
+                    takesScreenshot: true
+                });
+            });
+        });
+
+        it('should mix additional capabilites from config', function() {
+            var _this = this;
+            this.config.capabilities = {
+                option1: 'value1',
+                option2: 'value2'
+            };
+
+            return this.browser.open('http://example.com').then(function() {
+                sinon.assert.calledWith(_this.wd.init, {
+                    browserName: 'browser',
+                    version: '1.0',
+                    takesScreenshot: true,
+                    option1: 'value1',
+                    option2: 'value2'
+                });
+            });
+        });
+    });
+
     describe('captureState', function() {
         beforeEach(function() {
             this.wd = {

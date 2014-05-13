@@ -2,6 +2,14 @@
 
 ## Dev
 
+* Ability to set additional capabilities for all browsers, using
+  `capabilities` option in `.gemini.yml`:
+
+  ```yaml
+  capabilities:
+    option1: value,
+    option2: value
+  ```
 * Non-existent directories, passed to `gather` and `test` commands will
   be filtered out
 * If fatal error occurs, `gemini` will always exit with 1 status code
