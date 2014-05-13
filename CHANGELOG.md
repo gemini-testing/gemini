@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.3.1 - 2014-05-13
 
 * Ability to set additional capabilities for all browsers, using
   `capabilities` option in `.gemini.yml`:
@@ -18,7 +18,7 @@
 * When `gemini` is unable to launch browser, more clearer error message
   will be displayed.
 
-## 0.3.0 -  2014-05-30
+## 0.3.0 -  2014-04-30
 
 * Elements to take screen shots of and elements to perform action
   on are now defined differently. `setElements` and `setDynmaicElements`
