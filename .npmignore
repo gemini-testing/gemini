@@ -1,0 +1,5 @@
+.gitignore
+.jshintignore
+.jshintrc
+.npmignore
+test/
