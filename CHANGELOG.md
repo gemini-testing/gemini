@@ -7,6 +7,8 @@
 * If fatal error occurs, `gemini` will always exit with 1 status code
 * If test fails or state error occurs, `gemini` will always exit with 2
   status code.
+* When `gemini` is unable to launch browser, more clearer error message
+  will be displayed.
 
 ## 0.3.0 -  2014-05-30
 
