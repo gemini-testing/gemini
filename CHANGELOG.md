@@ -1,5 +1,10 @@
 # Changelog
 
+## Dev
+
+* Allow to override `gridUrl` and `rootUrl` settings with cli
+  options `--grid-url` and `--root-url`.
+
 ## 0.3.1 - 2014-05-13
 
 * Ability to set additional capabilities for all browsers, using

@@ -342,3 +342,11 @@ you can use HTML reporter:
 This will produce HTML file in `gemini-report` directory. It will
 display reference image, current image and difference between the two
 for each state in each browser.
+
+### Common cli options
+
+* `--config`, `-c` - specify config file to use.
+* `--root-url`, `-r` - use specified URL, instead of `rootUrl` setting from config file.
+* `--grid-url`, `-r` - use specified URL, instead of `gridUrl` setting from config file.
+* `--help` - display help message.
+* `--version` - display version.
