@@ -4,6 +4,7 @@
 
 * Allow to override `gridUrl` and `rootUrl` settings with cli
   options `--grid-url` and `--root-url`.
+* Correctly report error, when wrong argument passed to an action.
 
 ## 0.3.1 - 2014-05-13
 
