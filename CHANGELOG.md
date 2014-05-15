@@ -1,5 +1,9 @@
 # Changelog
 
+## Dev
+
+* Allow to use multiple reporters in `test` command.
+
 ## 0.3.2 - 2014-05-15
 
 * Allow to override `gridUrl` and `rootUrl` settings with cli

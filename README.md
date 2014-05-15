@@ -343,6 +343,17 @@ This will produce HTML file in `gemini-report` directory. It will
 display reference image, current image and difference between the two
 for each state in each browser.
 
+Other available reporters are:
+
+* `tree` (default console reporter)
+* `teamcity` (TeamCity console reporter)
+
+You can also use multiple reporters at the same time using multiple `--reporter` options:
+
+```
+gemini test --reporter tree --reporter html
+```
+
 ### Common cli options
 
 * `--config`, `-c` - specify config file to use.
