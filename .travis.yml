@@ -1,4 +1,13 @@
 language: node_js
 node_js:
-  - "0.11"
-  - "0.10"
+- '0.11'
+- '0.10'
+deploy:
+  provider: npm
+  email: sevinf@yandex-team.ru
+  api_key:
+    secure: AosNa0QYNBVp81wbw+66ho+SX9PejT4m/m0vofOZC6RWKruueE0jjzb+Pb5ZnRRIZoqFcTLS55RU3zHb6XCJ+nnOgxSfzfE6GbxJHLXIBIHI+k+fzCMCJW0XJbJn9qWjd5FTuL8YaKO4qXzW52AVpr8vd0ZQKrOdJD1SFByUhEU=
+  on:
+    tags: true
+    repo: bem/gemini
+    branch: master
