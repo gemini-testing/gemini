@@ -4,3 +4,4 @@
 .jshintrc
 .npmignore
 test/
+coverage/
