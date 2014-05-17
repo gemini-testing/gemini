@@ -4,7 +4,6 @@ var q = require('q'),
     createSuite = require('../lib/suite').create,
     State = require('../lib/state'),
     Config = require('../lib/config'),
-    Runner = require('../lib/runner'),
 
     CONFIG_TEXT = [
         'rootUrl: http://example.com',
@@ -46,7 +45,12 @@ describe('runner', function() {
         this.suite = new createSuite('suite');
         this.suite.url = '/path';
 
+        this.sinon.stub(require('child_process'), 'exec').withArgs('gm -version').callsArgWith(1, null, '', '');
+
+        //require runner here to make stub above take effect
+        var Runner = require('../lib/runner');
         this.runner = new Runner(new Config('/root', CONFIG_TEXT), this.launcher);
+
     });
 
     afterEach(function() {
