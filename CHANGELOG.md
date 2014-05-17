@@ -7,6 +7,8 @@
   the same parent.
 * Throw error when creating multiple states of the same name within
   the suite.
+* Throw error when creating suite that will be unable to run (
+  has states and hasn't url or capture region);
 * Check argument types of `SuiteBuilder` methods.
 * Check argument types of all actions methods.
 * Shorter stacktraces for invalid elements  errors.

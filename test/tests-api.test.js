@@ -62,6 +62,71 @@ describe('public tests API', function() {
 
             this.suite.children[1].name.must.be('second');
         });
+
+        it('should throw when suite has states but does not has URL', function() {
+            var _this = this;
+            (function() {
+                _this.context.suite('first', function(suite) {
+                    suite.setCaptureElements('.element')
+                         .capture('plain'); 
+                });
+            }.must.throw());
+        });
+
+        it('should throw when suite has no states nor URL', function() {
+            var _this = this;
+            (function() {
+                _this.context.suite('first', function(suite) {
+                    suite.setCaptureElements('.element');
+                });
+            }.must.not.throw());
+        });
+
+        it('should not throw when suite has states and url is inherited from parent', function() {
+            var _this = this;
+            (function() {
+                _this.context.suite('first', function(suite) {
+                    suite.setUrl('/url');
+                    _this.context.suite('child', function(suite) {
+                        suite.setCaptureElements('.element')
+                             .capture('plain'); 
+                    });
+                });
+            }.must.not.throw());
+        });
+
+        it('should throw if suite has states but does not has captureSelectors', function() {
+            var _this = this;
+            (function() {
+                _this.context.suite('first', function(suite) {
+                    suite.setUrl('/url')
+                         .capture('plain'); 
+                });
+            }.must.throw());
+        });
+
+        it('should not throw if suite has no states nor captureSelectors', function() {
+            var _this = this;
+            (function() {
+                _this.context.suite('first', function(suite) {
+                    suite.setUrl('/url');
+                });
+            }.must.not.throw());
+        });
+
+        it('should not throw when suite has states and captureSelectors are inherited from parent', function() {
+            var _this = this;
+            (function() {
+                _this.context.suite('first', function(suite) {
+                    suite.setCaptureElements('.element');
+                    _this.context.suite('child', function(suite) {
+                        suite.setUrl('/url')
+                             .capture('plain'); 
+                    });
+                });
+            }.must.not.throw());
+        });
+
     });
 
     describe('suite builder', function() {
@@ -156,10 +221,15 @@ describe('public tests API', function() {
         });
 
         describe('capture', function() {
+            function prepareSuite(suite) {
+                return suite.setUrl('/path')
+                            .setCaptureElements('.element');
+            }
+
             it('should throw if first argument is not passed', function() {
                 (function() {
                     this.context.suite('name', function(suite) {
-                        suite.capture({not: 'a string'});
+                        prepareSuite(suite).capture({not: 'a string'});
                     });
                 }.bind(this)).must.throw(TypeError);
             });
@@ -167,7 +237,7 @@ describe('public tests API', function() {
             it('should throw if second argument is not a function', function() {
                 (function() {
                     this.context.suite('name', function(suite) {
-                        suite.capture('state', 'make me a sandwich');
+                        prepareSuite(suite).capture('state', 'make me a sandwich');
                     });
                 }.bind(this)).must.throw(TypeError);
             }); 
@@ -175,14 +245,14 @@ describe('public tests API', function() {
             it('should not throw if second argument is absent', function() {
                 (function() {
                     this.context.suite('name', function(suite) {
-                        suite.capture('state');
+                        prepareSuite(suite).capture('state');
                     });
                 }.bind(this)).must.not.throw();
             });
 
             it('should create named state', function() {
                 this.context.suite('name', function(suite) {
-                    suite.capture('state');
+                    prepareSuite(suite).capture('state');
                 });
 
                 this.suite.children[0].states[0].name.must.equal('state');
@@ -200,8 +270,9 @@ describe('public tests API', function() {
 
             it('should allow to have multiple states of different names', function() {
                 this.context.suite('name', function(suite) {
-                    suite.capture('state 1');
-                    suite.capture('state 2');
+                    prepareSuite(suite)
+                        .capture('state 1')
+                        .capture('state 2');
                 });
 
 
@@ -211,7 +282,7 @@ describe('public tests API', function() {
 
             it('should make new state reference the suite', function() {
                 this.context.suite('name', function(suite) {
-                    suite.capture('state');
+                    prepareSuite(suite).capture('state');
                 });
 
                 this.suite.children[0].states[0].suite.must.equal(this.suite.children[0]);
@@ -226,7 +297,7 @@ describe('public tests API', function() {
                     };
 
                 this.context.suite('name', function(suite) {
-                    suite.capture('state', spy);
+                    prepareSuite(suite).capture('state', spy);
                 });
 
                 this.suite.children[0].states[0].activate(browser, {});
@@ -235,7 +306,12 @@ describe('public tests API', function() {
 
             });
 
-            shouldBeChainable('capture', 'state');
+            it('should be chainable', function(done) {
+                this.context.suite('name', function(suite) {
+                    prepareSuite(suite).capture('state').must.be(suite);
+                    done();
+                });
+            });
         });
 
         describe('skip', function() {
