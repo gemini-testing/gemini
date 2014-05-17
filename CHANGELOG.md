@@ -8,6 +8,7 @@
 * Throw error when creating multiple states of the same name within
   the suite.
 * Check argument types of `SuiteBuilder` methods.
+* Correctly handle offsets in `mouseMove` actions.
 * Fix error when `gridUrl` was required even if there is only
   `phantomjs` browser.
 

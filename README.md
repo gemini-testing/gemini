@@ -266,7 +266,8 @@ list `element` can be either CSS selector, or result of a `find` call:
   Possible button values are: 0 - left, 1 - middle, 2 - right. By default, left button is used.
 * `mouseUp(element)` - release previously pressed mouse button.
 * `mouseMove(element, [offset])` - move mouse to the given element. Offset is specified relatively
-  to the center of the element, `{x: 0, y: 0}` by default.
+  to the top left corner of the element. If not specified, mouse will be moved to the center of
+  the element.
 * `dragAndDrop(element, dragTo)` - drag `element` to other `dragTo` element.
 * `executeJS(function(window))` - run specified function in a browser. The argument of a function
    is the browser's `window` object:
