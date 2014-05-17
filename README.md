@@ -2,6 +2,8 @@ gemini
 =======
 
 [![Build Status](https://travis-ci.org/bem/gemini.svg?branch=master)](https://travis-ci.org/bem/gemini)
+[![Code Climate](https://codeclimate.com/github/bem/gemini.png)](https://codeclimate.com/github/bem/gemini)
+[![Coverage](https://codeclimate.com/github/bem/gemini/coverage.png)](https://codeclimate.com/github/bem/gemini)
 
 Gemini is the utility for regression testing of web pages appearance.
 
