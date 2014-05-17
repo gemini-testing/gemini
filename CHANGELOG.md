@@ -9,6 +9,7 @@
   the suite.
 * Check argument types of `SuiteBuilder` methods.
 * Check argument types of all actions methods.
+* Shorter stacktraces for invalid elements  errors.
 * Correctly handle offsets in `mouseMove` actions.
 * Fix error when `gridUrl` was required even if there is only
   `phantomjs` browser.
