@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.3.3 - 2014-05-19
 
 * Allow to use multiple reporters in `test` command.
 * Throw error when creating multiple suites of the same name within
