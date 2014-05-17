@@ -3,6 +3,7 @@
 ## Dev
 
 * Allow to use multiple reporters in `test` command.
+* Check argument types of `SuiteBuilder` methods.
 
 ## 0.3.2 - 2014-05-15
 
