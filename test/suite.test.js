@@ -211,4 +211,19 @@ describe('suite', function() {
         });
     });
 
+    describe('hasStateNamed', function() {
+        beforeEach(function() {
+            this.suite = createSuite('suite');
+            this.suite.addState({name: 'has'});
+        });
+
+        it('should return true when suite has state of a given name', function() {
+            this.suite.hasStateNamed('has').must.be.true();
+        });
+
+        it('should return true when suite has state of a given name', function() {
+            this.suite.hasStateNamed('has no').must.be.false();
+        });
+    });
+
 });

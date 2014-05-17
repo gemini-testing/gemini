@@ -5,6 +5,8 @@
 * Allow to use multiple reporters in `test` command.
 * Throw error when creating multiple suites of the same name within
   the same parent.
+* Throw error when creating multiple states of the same name within
+  the suite.
 * Check argument types of `SuiteBuilder` methods.
 * Fix error when `gridUrl` was required even if there is only
   `phantomjs` browser.

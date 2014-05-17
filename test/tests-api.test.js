@@ -188,6 +188,27 @@ describe('public tests API', function() {
                 this.suite.children[0].states[0].name.must.equal('state');
             });
 
+            it('should throw if state with such name already exists', function() {
+                var _this = this;
+                (function() {
+                    _this.context.suite('name', function(suite) {
+                        suite.capture('state');
+                        suite.capture('state');
+                    });
+                }.must.throw());
+            });
+
+            it('should allow to have multiple states of different names', function() {
+                this.context.suite('name', function(suite) {
+                    suite.capture('state 1');
+                    suite.capture('state 2');
+                });
+
+
+                this.suite.children[0].states[0].name.must.equal('state 1');
+                this.suite.children[0].states[1].name.must.equal('state 2');
+            });
+
             it('should make new state reference the suite', function() {
                 this.context.suite('name', function(suite) {
                     suite.capture('state');
