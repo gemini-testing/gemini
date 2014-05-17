@@ -45,6 +45,17 @@ describe('public tests API', function() {
             this.suite.children[0].children[0].name.must.be('child');
         });
 
+        it('should not allow create two child suites of the same name', function() {
+            var _this = this;
+
+            (function() {
+                _this.context.suite('name', function() {
+                    _this.context.suite('child', function() {});
+                    _this.context.suite('child', function() {});
+                });
+            }.must.throw());
+        });
+
         it('should create non-nested suite at the root level', function() {
             this.context.suite('first', function() {});
             this.context.suite('second', function() {});

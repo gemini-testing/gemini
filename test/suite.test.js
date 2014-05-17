@@ -196,4 +196,19 @@ describe('suite', function() {
 
     });
 
+    describe('hasChildNamed', function() {
+        beforeEach(function() {
+            this.suite = createSuite('parent');
+            createSuite('has', this.suite);
+        });
+
+        it('should return true when suite has child of a given name', function() {
+            this.suite.hasChildNamed('has').must.be.true();
+        });
+
+        it('should return fals when suite has no child of a given name', function() {
+            this.suite.hasChildNamed('has no').must.be.false();
+        });
+    });
+
 });

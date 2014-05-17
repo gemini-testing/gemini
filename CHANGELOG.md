@@ -3,6 +3,8 @@
 ## Dev
 
 * Allow to use multiple reporters in `test` command.
+* Throw error when creating multiple suite sof the same name within
+  the same parent.
 * Check argument types of `SuiteBuilder` methods.
 
 ## 0.3.2 - 2014-05-15
