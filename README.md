@@ -1,6 +1,8 @@
 gemini
 =======
 
+[![Build Status](https://travis-ci.org/bem/gemini.svg?branch=master)](https://travis-ci.org/bem/gemini)
+
 Gemini is the utility for regression testing of web pages appearance.
 
 Unlike other similar tools, tests not the whole pages, but
