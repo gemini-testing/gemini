@@ -85,6 +85,9 @@ relatively to config file directory. `gemini/screens` by default.
   automatically);
 
 * `debug` - turn on debug logging to the terminal
+* `http.timeout` - Selenium Grid request timeout, msec
+* `http.retries` - Selenium Grid request tries count
+* `http.retryDelay` - dalay before retry of Selenium Grid request, msec
 
 ## Writing tests
 
