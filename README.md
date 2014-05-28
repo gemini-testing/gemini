@@ -84,6 +84,8 @@ relatively to config file directory. `gemini/screens` by default.
   `browsers` option instead) and `takesScreenshot` (always set to `true`
   automatically);
 
+* `debug` - turn on debug logging to the terminal
+
 ## Writing tests
 
 For each block of website you need to test you need to write one or more *test suites*. 
