@@ -1,5 +1,14 @@
 # Changelog
 
+## Dev
+
+* Enhanced html report:
+  - suites are now collapsible;
+  - all but failed suites are collapsed by default;
+  - buttons to expand all, collapse all and expand only errors are added;
+  - stats of total numbers of tests run, failed, succeeded and skipped
+    are shown at the top.
+
 ## 0.3.3 - 2014-05-19
 
 * Allow to use multiple reporters in `test` command.

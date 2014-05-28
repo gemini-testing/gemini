@@ -1,44 +1,56 @@
-<h2>{{name}}</h2>
-<div class="suite">
-    {{#each states}}
-    <h3>{{name}}</h3>
-    <div class="state">
-        {{#each browsers}}
-        <h4 class="{{status}}">{{name}}</h4>
-        <div class="browser">
-            {{#if error}}
-                <pre>{{stacktrace}}</pre>
-            {{/if}}
+<div class="section {{collapse}} {{status}}">
+    <div class="section__title">{{name}}</div>
+    <div class="section__body section__body_guided">
+        {{#each states}}
+        <div class="section {{collapse}} {{status}}">
+            <div class="section__title">{{name}}</div>
+            <div class="section__body section__body_guided">
+                {{#each browsers}}
+                <div class="section {{collapse}} {{status}}">
+                    <div class="section__title">{{name}}</div>
+                    <div class="section__body">
+                        {{#if error}}
+                            <pre class="stacktrace">{{stacktrace}}</pre>
+                        {{/if}}
 
-            {{#if skipped}}
-                Test skipped
-            {{/if}}
+                        {{#if skipped}}
+                            Test skipped
+                        {{/if}}
 
-            {{#if tested}}
-                {{#if equal}}
-                    {{image "current"}}
-                {{else}}
-                    <div class="image-box">
-                        <div class="image-title">Reference</div>
-                        {{image "reference"}}
-                    </div>
-                    <div class="image-box">
-                        <div class="image-title">Current</div>
-                        {{image "current"}}
-                    </div>
-                    <div class="image-box">
-                        <div class="image-title">Diff</div>
-                        {{image "diff"}}
-                    </div>
+                        {{#if tested}}
+                            {{#if equal}}
+                                <div class="image-box">
+                                    <div class="image-box__image">
+                                        {{image "current"}}
+                                    </div>
+                                </div>
+                            {{else}}
+                                <div class="image-box">
+                                    <div class="image-box__image">
+                                        <div class="image-box__title">Reference</div>
+                                        {{image "reference"}}
+                                    </div>
+                                    <div class="image-box__image">
+                                        <div class="image-box__title">Current</div>
+                                        {{image "current"}}
+                                    </div>
+                                    <div class="image-box__image">
+                                        <div class="image-box__title">Diff</div>
+                                        {{image "diff"}}
+                                    </div>
+                                </div>
 
-                {{/if}}
-            {{/if}}
+                            {{/if}}
+                        {{/if}}
+                    </div>
+                </div>
+                {{/each}}
+            </div>
         </div>
         {{/each}}
-    </div>
-    {{/each}}
 
-    {{#each children}}
-        {{> suite}}
-    {{/each}}
+        {{#each children}}
+            {{> suite}}
+        {{/each}}
+    </div>
 </div>
