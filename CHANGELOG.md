@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.3.4 - 2014-05-28
 
 * Enhanced html report:
   - suites are now collapsible;
