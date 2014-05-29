@@ -1,5 +1,10 @@
 # Changelog
 
+## Dev
+
+* Asynchronous errors stacktraces in browser actions (such as not found
+  element) will point to users code.
+
 ## 0.3.4 - 2014-05-28
 
 * Enhanced html report:
