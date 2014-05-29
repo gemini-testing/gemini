@@ -18,7 +18,7 @@ describe('config', function() {
                     'rootUrl: http://example.com',
                     'browsers:',
                     '  - phantomjs',
-                    '  - non-phantomjs',
+                    '  - non-phantomjs'
                 ].join('\n'));
         }.must.throw(GeminiError));
     });
@@ -67,4 +67,27 @@ describe('config', function() {
         shouldNotAllowCapability('version');
         shouldNotAllowCapability('takesScreenshot');
     });
+
+    describe('http', function() {
+
+        it('should be passed only timeout, retries and retryDelay options', function() {
+            var config = new Config('/', [
+                'rootUrl: http://example.com',
+                'gridUrl: http://example.com',
+                'http:',
+                '  timeout: 1000',
+                '  retries: 5',
+                '  retryDelay: 25',
+                '  invalid: ignored'
+            ].join('\n'));
+
+            config.http.must.eql({
+                timeout: 1000,
+                retries: 5,
+                retryDelay: 25
+            });
+        });
+
+    });
+
 });

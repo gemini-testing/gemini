@@ -18,11 +18,19 @@ describe('browser', function() {
     describe('open', function() {
         beforeEach(function() {
             this.wd = {
+                configureHttp: sinon.stub().returns(q()),
                 init: sinon.stub().returns(q({})),
                 get: sinon.stub().returns(q())
             };
 
-            this.config = {capabilities: {}};
+            this.config = {
+                capabilities: {},
+                http: {
+                    timeout: 100,
+                    retries: 5,
+                    retryDelay: 25
+                }
+            };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
             this.browser = new Browser(this.config, 'browser', '1.0');
         });
@@ -34,6 +42,17 @@ describe('browser', function() {
                     browserName: 'browser',
                     version: '1.0',
                     takesScreenshot: true
+                });
+            });
+        });
+
+        it('should set http options for browser instance', function() {
+            var _this = this;
+            return this.browser.open('http://example.com').then(function() {
+                sinon.assert.calledWith(_this.wd.configureHttp, {
+                    timeout: 100,
+                    retries: 5,
+                    retryDelay: 25
                 });
             });
         });
