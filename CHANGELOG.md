@@ -2,9 +2,15 @@
 
 ## Dev
 
+* Add `debug` options to config file. If set to `true`, `gemini` will
+  print debug logs to STDOUT. (@arikon).
+* Add `http` section to config file which allows to configure HTTP
+  timeout (`http.timeout`) retry count (`http.retries`) and delay
+  between retries (`http.retryDelay`). (@arikon).
 * Asynchronous errors stacktraces in browser actions (such as not found
   element) will point to users code.
-
+* More HTTP requests to Selenium will run in parallel speeding up
+  `gather`/`test` commands (@arikon).
 ## 0.3.4 - 2014-05-28
 
 * Enhanced html report:
