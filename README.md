@@ -72,7 +72,7 @@ on selenium grid.
 
 * `screenshotsDir` - directory to save reference screenshots to. Specified
 relatively to config file directory. `gemini/screens` by default.
-* `capabilities` - additional selenium capabilities to use for all browsers:
+* `capabilities` - additional [Selenium](http://code.google.com/p/selenium/wiki/DesiredCapabilities) and [Sauce Labs](https://saucelabs.com/docs/additional-config) capabilities to use for all browsers:
 
   ```yaml
   capabilities:
