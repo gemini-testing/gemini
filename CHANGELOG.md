@@ -11,6 +11,8 @@
   element) will point to users code.
 * More HTTP requests to Selenium will run in parallel speeding up
   `gather`/`test` commands (@arikon).
+* If `gemini` is run without subcommand, help text will be shown.
+
 ## 0.3.4 - 2014-05-28
 
 * Enhanced html report:
