@@ -2,8 +2,7 @@
 var Browser = require('../lib/browser'),
     q = require('q'),
     wd = require('wd'),
-    Element = require('../lib/browser/element'),
-    elementRect = require('../lib/element-rect'),
+    StateError = require('../lib/errors/state-error'),
     sinon = require('sinon');
 
 describe('browser', function() {
@@ -20,7 +19,8 @@ describe('browser', function() {
             this.wd = {
                 configureHttp: sinon.stub().returns(q()),
                 init: sinon.stub().returns(q({})),
-                get: sinon.stub().returns(q())
+                get: sinon.stub().returns(q()),
+                execute: sinon.stub().returns(q({}))
             };
 
             this.config = {
@@ -77,13 +77,16 @@ describe('browser', function() {
                 });
             });
         });
+
+        it('should inject client script');
     });
 
     describe('captureState', function() {
         beforeEach(function() {
             this.wd = {
                 takeScreenshot: sinon.stub().returns(q('')),
-                elementByCssSelector: sinon.stub().returns(q({}))
+                eval: sinon.stub().returns(q({})),
+                execute: sinon.stub().returns(q({}))
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
 
@@ -94,7 +97,6 @@ describe('browser', function() {
                 activate: sinon.stub().returns(q())
             };
 
-            this.sinon.stub(elementRect, 'getMultiple').returns(q({x: 0, y: 0, width: 0, height: 0}));
         });
 
         it('should activate the state', function() {
@@ -112,26 +114,32 @@ describe('browser', function() {
             });
         });
 
-        it('should search state captureSelectors', function() {
+        it('should search rect for all found elements', function() {
             var _this = this;
             this.state.captureSelectors = ['.selector1', '.selector2'];
 
             return this.browser.captureState(this.state).then(function() {
-                sinon.assert.calledWith(_this.wd.elementByCssSelector, '.selector1');
-                sinon.assert.calledWith(_this.wd.elementByCssSelector, '.selector2');
+                /*jshint evil:true*/
+                sinon.assert.calledWith(_this.wd.eval, 
+                    '__gemini.getScreenshotRect([".selector1",".selector2"]);');
             });
         });
 
-        it('should search rect for all found elements', function() {
-            this.state.captureSelectors = ['.selector1', '.selector2'];
-            this.wd.elementByCssSelector.withArgs('.selector1').returns(q());
-            this.wd.elementByCssSelector.withArgs('.selector2').returns(q());
+        it('should reject with StateError if element not found', function(done) {
+            /*jshint evil:true*/
+            this.state.captureSelectors = ['.selector'];
+            this.state.suite = {name: 'suite'};
+            this.wd.eval
+                .withArgs('__gemini.getScreenshotRect([".selector"]);')
+                .returns(q({
+                    error: 'NOTFOUND',
+                    message: 'Ooops!'
+                }));
 
-            return this.browser.captureState(this.state).then(function() {
-                sinon.assert.calledWith(elementRect.getMultiple, sinon.match([
-                    sinon.match.instanceOf(Element).and(sinon.match.has('selector', '.selector1')),
-                    sinon.match.instanceOf(Element).and(sinon.match.has('selector', '.selector2')),
-                ]));
+            return this.browser.captureState(this.state).fail(function(error) {
+                error.must.be.instanceOf(StateError);
+                error.message.must.eql('Ooops!');
+                done();
             });
         });
 
