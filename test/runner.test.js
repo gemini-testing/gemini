@@ -22,7 +22,7 @@ describe('runner', function() {
         this.sinon = sinon.sandbox.create();
 
         var browser = {
-            name: 'browser',
+            id: 'browser',
             createActionSequence: this.sinon.stub().returns({
                 perform: this.sinon.stub().returns(q.resolve()) 
             }),
