@@ -63,8 +63,6 @@ describe('config', function() {
             });
         }
 
-        shouldNotAllowCapability('browserName');
-        shouldNotAllowCapability('version');
         shouldNotAllowCapability('takesScreenshot');
     });
 
