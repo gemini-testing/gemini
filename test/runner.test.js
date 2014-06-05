@@ -9,7 +9,7 @@ var q = require('q'),
         'rootUrl: http://example.com',
         'gridUrl: http://grid.example.com',
         'browsers: ',
-        '  - browser',
+        '  browser: browser'
     ].join('\n');
 
 function addState(suite, name) {
@@ -22,7 +22,7 @@ describe('runner', function() {
         this.sinon = sinon.sandbox.create();
 
         var browser = {
-            fullName: 'browser',
+            name: 'browser',
             createActionSequence: this.sinon.stub().returns({
                 perform: this.sinon.stub().returns(q.resolve()) 
             }),
@@ -155,18 +155,18 @@ describe('runner', function() {
         });
 
         it('should launch each browser in config', function() {
-            this.runner.config.browsers = [
-                {name: 'browser1', version: '1'},
-                {name: 'browser2'}
-            ];
+            this.runner.config.browsers = {
+                browser1: {browserName: 'browser1', version: '1'},
+                browser2: {browserName: 'browser2'}
+            };
 
             addState(this.suite, 'state');
 
             this.sinon.spy(this.launcher, 'launch');
 
             return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(this.launcher.launch, this.runner.config.browsers[0]);
-                sinon.assert.calledWith(this.launcher.launch, this.runner.config.browsers[1]);
+                sinon.assert.calledWith(this.launcher.launch, 'browser1');
+                sinon.assert.calledWith(this.launcher.launch, 'browser2');
             }.bind(this));
         });
 

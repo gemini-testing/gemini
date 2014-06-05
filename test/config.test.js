@@ -17,8 +17,8 @@ describe('config', function() {
             return new Config('/', [
                     'rootUrl: http://example.com',
                     'browsers:',
-                    '  - phantomjs',
-                    '  - non-phantomjs'
+                    '  phantomjs: phantomjs',
+                    '  non-phantomjs: non-phantomjs'
                 ].join('\n'));
         }.must.throw(GeminiError));
     });
@@ -28,7 +28,7 @@ describe('config', function() {
             return new Config('/', [
                     'rootUrl: http://example.com',
                     'browsers:',
-                    '  - phantomjs'
+                    '  phantomjs: phantomjs'
                 ].join('\n'));
         }.must.not.throw());
     });

@@ -55,7 +55,7 @@ describe('TeamCity reporter', function() {
         this.emitter.emit('endTest', {
             suiteName: 'someSuite',
             stateName: 'someState',
-            browserName: 'browser',
+            browserId: 'browser',
             equal: false
         });
 
@@ -70,7 +70,7 @@ describe('TeamCity reporter', function() {
         this.emitter.emit('endTest', {
             suiteName: 'someSuite',
             stateName: 'someState',
-            browserName: 'browser',
+            browserId: 'browser',
             equal: true
         });
 
