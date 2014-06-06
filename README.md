@@ -44,13 +44,16 @@ Example:
 rootUrl: http://site.example.com
 gridUrl: http://selenium-grid.example.com:4444/wd/hub
 browsers:
-  - chrome
-  - phantomjs
-  - name: opera
+  phantomjs: phantomjs
+  chrome: chrome
+  opera12:
+    browserName: opera
     version: '12.06'
-  - name: firefox
+  firefox28:
+    browserName: firefox
     version: '28.0'
-  - name: firefox
+  firefox27:
+    browserName: firefox
     version: '27.0'
 ```
 
@@ -68,7 +71,7 @@ on selenium grid.
 
    If version is omitted, any browsers of the specified name will be used.
 
-   `- browser name` is a shortcut for `- name: browser name`
+   `browser-id: name` is a shortcut for `browser-id: {browserName: name}`
 
 * `screenshotsDir` - directory to save reference screenshots to. Specified
 relatively to config file directory. `gemini/screens` by default.
@@ -153,9 +156,9 @@ All method are chainable:
   some specified browser or specified version of a browser:
 
   - `skip()` - skips tests and nested suites for all browsers;
-  - `skip(browserName)` or `skip({name: browserName})` - skips tests for all
+  - `skip(browserName)` or `skip({browserName: browserName})` - skips tests for all
     versions of specified browser;
-  - `skip({name: browserName, version: browserVersion})` - skips tests for
+  - `skip({browserName: browserName, version: browserVersion})` - skips tests for
     particular version of a browser.
   - `skip([browser1, browser2, ...])` - skip tests for multiple browsers or
     versions.
@@ -163,7 +166,7 @@ All method are chainable:
   All browsers from subsequent calls to `.skip()` are added to the skip list:
 
   ```javascript
-  suite.skip({name: 'browser1', version: '1.0'})
+  suite.skip({browserName: 'browser1', version: '1.0'})
        .skip('browser2');
   ```
 
@@ -171,7 +174,7 @@ All method are chainable:
 
   ```javascript
   suite.skip([
-      {name: 'browser1', version: '1.0'},
+      {browserName: 'browser1', version: '1.0'},
       'browser2'
   ]);
   ```

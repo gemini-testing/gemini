@@ -32,7 +32,10 @@ describe('browser', function() {
                 }
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
-            this.browser = new Browser(this.config, 'browser', '1.0');
+            this.browser = new Browser(this.config, 'browser', {
+                browserName: 'browser',
+                version: '1.0'
+            });
         });
 
         it('should init browser with browserName, version and takeScreenshot capabilites', function() {
@@ -84,7 +87,7 @@ describe('browser', function() {
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
 
-            this.browser = new Browser({}, 'browser', '1.0');
+            this.browser = new Browser({}, 'browser', {browserName: 'browser', version: '1.0'});
 
             this.state = {
                 captureSelectors: ['.some-class'],

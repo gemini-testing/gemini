@@ -341,8 +341,8 @@ describe('public tests API', function() {
 
             it('should throw if browser name is not a string', function() {
                 (function() {
-                    this.context.suite('name', function(suite) {
-                        suite.skip({name: true});
+                    this.context.suite('browserName', function(suite) {
+                        suite.skip({browserName: true});
                     });
                 }.bind(this)).must.throw(TypeError);
             });
@@ -350,7 +350,7 @@ describe('public tests API', function() {
             it('should throw if browser version is not a string', function() {
                 (function() {
                     this.context.suite('name', function(suite) {
-                        suite.skip({name: 'browser', version: {major: 42}});
+                        suite.skip({browserName: 'browser', version: {major: 42}});
                     });
                 }.bind(this)).must.throw(TypeError);
             });
@@ -367,28 +367,28 @@ describe('public tests API', function() {
                     suite.skip('opera');
                 });
 
-                this.suite.children[0].skipped[0].must.be.eql({name: 'opera'});
+                this.suite.children[0].skipped[0].must.be.eql({browserName: 'opera'});
             });
 
             it('should accept browser object', function() {
                 this.context.suite('name', function(suite) {
-                    suite.skip({name: 'opera'});
+                    suite.skip({browserName: 'opera'});
                 });
 
-                this.suite.children[0].skipped[0].must.be.eql({name: 'opera'});
+                this.suite.children[0].skipped[0].must.be.eql({browserName: 'opera'});
             });
 
             it('should accept array of objects', function() {
                 this.context.suite('name', function(suite) {
                     suite.skip([
-                        {name: 'opera'},
-                        {name: 'chrome'}
+                        {browserName: 'opera'},
+                        {browserName: 'chrome'}
                     ]);
                 });
 
                 this.suite.children[0].skipped.must.be.eql([
-                    {name: 'opera'},
-                    {name: 'chrome'}
+                    {browserName: 'opera'},
+                    {browserName: 'chrome'}
                 ]);
             });
 
@@ -401,8 +401,8 @@ describe('public tests API', function() {
                 });
 
                 this.suite.children[0].skipped.must.be.eql([
-                    {name: 'opera'},
-                    {name: 'chrome'}
+                    {browserName: 'opera'},
+                    {browserName: 'chrome'}
                 ]);
             });
 
