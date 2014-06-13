@@ -121,7 +121,7 @@ describe('browser', function() {
             return this.browser.captureState(this.state).then(function() {
                 /*jshint evil:true*/
                 sinon.assert.calledWith(_this.wd.eval, 
-                    '__gemini.getScreenshotRect([".selector1",".selector2"]);');
+                    '__gemini.prepareScreenshot([".selector1",".selector2"])');
             });
         });
 
@@ -130,7 +130,7 @@ describe('browser', function() {
             this.state.captureSelectors = ['.selector'];
             this.state.suite = {name: 'suite'};
             this.wd.eval
-                .withArgs('__gemini.getScreenshotRect([".selector"]);')
+                .withArgs('__gemini.prepareScreenshot([".selector"])')
                 .returns(q({
                     error: 'NOTFOUND',
                     message: 'Ooops!'
