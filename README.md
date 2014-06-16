@@ -64,13 +64,26 @@ be resolved relatively to it.
 you want to run test in other browsers, then `phantomjs`.
 * `browsers` - list of browsers to use for testing. Each browser should be available
 on selenium grid.
-   Each browser entry must include `name` key and may include `version` key. It is
-   possible to use multiple versions of the same browser (if all versions are
-   available on your grid instance).
 
-   If version is omitted, any browsers of the specified name will be used.
+    `browsers` field format:
 
-   `browser-id: name` is a shortcut for `browser-id: {browserName: name}`
+    ```yaml
+    browsers:
+      <browser-id>:
+        browserName: <name>
+        version: <version>
+        # ... other browser capabilities as <key>: <value>
+    ```
+
+    It is possible to use multiple versions of the same browser (if all versions are
+    available on your Selenium Grid instance).
+
+    If version is omitted, any browsers of the specified name will be used.
+
+    `<browser-id>: <name>` is a shortcut for `<browser-id>: {browserName: <name>}`.
+    
+    `<browser-id>` value is used for browser indentification in test resports and for
+    constructing screens file names.
 
 * `screenshotsDir` - directory to save reference screenshots to. Specified
 relatively to config file directory. `gemini/screens` by default.
