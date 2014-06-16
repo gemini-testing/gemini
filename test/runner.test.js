@@ -27,9 +27,18 @@ describe('runner', function() {
                 perform: this.sinon.stub().returns(q.resolve()) 
             }),
 
+            captureFullscreenImage: this.sinon.stub().returns(q({
+                getSize: this.sinon.stub().returns(q({})),
+                crop: this.sinon.stub().returns(q({}))
+            })),
+
+            prepareScreenshot: this.sinon.stub().returns(q({
+                locationInBody: {},
+                locationInViewport: {},
+                cropSize: {}
+            })),
+
             open: this.sinon.stub().returns(q.resolve()),
-            buildElementsMap: this.sinon.stub().returns(q.resolve()),
-            captureState: this.sinon.stub().returns(q.resolve()),
             quit: this.sinon.stub().returns(q.resolve())
         };
 
@@ -146,6 +155,7 @@ describe('runner', function() {
             this.suite.addState({
                 name: 'state',
                 suite: this.suite,
+                callback: function() {},
                 shouldSkip: this.sinon.stub().returns(false)
             });
             this.runner.on('skipState', spy);
@@ -199,15 +209,6 @@ describe('runner', function() {
 
             return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.browser.open, 'http://example.com/path');
-            }.bind(this));
-        });
-
-        it('should capture state in browser', function() {
-            addState(this.suite, 'state');
-
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(this.browser.captureState,
-                    sinon.match.instanceOf(State).and(sinon.match.has('name', 'state')));
             }.bind(this));
         });
 
