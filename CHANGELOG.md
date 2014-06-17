@@ -2,6 +2,13 @@
 
 ## Dev
 
+* Crop region for screenshots is calculated via client script inside
+  browser instead of `gemini`. This allows to issue fewer requests to
+  Selenium Server speeding up total tests run time. This feature breaks
+  compatibility with old browsers (`IE` < 9).
+* Correctly capture screenshots of regions out of initial browser
+  viewport in  browsers, that can't capture full page (`Opera` and
+  `Chrome` at the time of writing).
 * Add `debug` options to config file. If set to `true`, `gemini` will
   print debug logs to STDOUT. (@arikon).
 * Add `http` section to config file which allows to configure HTTP
