@@ -2,8 +2,6 @@
 var Browser = require('../lib/browser'),
     q = require('q'),
     wd = require('wd'),
-    Element = require('../lib/browser/element'),
-    elementRect = require('../lib/element-rect'),
     sinon = require('sinon');
 
 describe('browser', function() {
@@ -20,7 +18,8 @@ describe('browser', function() {
             this.wd = {
                 configureHttp: sinon.stub().returns(q()),
                 init: sinon.stub().returns(q({})),
-                get: sinon.stub().returns(q())
+                get: sinon.stub().returns(q()),
+                execute: sinon.stub().returns(q({}))
             };
 
             this.config = {
@@ -77,64 +76,55 @@ describe('browser', function() {
                 });
             });
         });
+
+        it('should inject client script');
     });
 
-    describe('captureState', function() {
+    describe('prepareScreenshot', function() {
         beforeEach(function() {
             this.wd = {
-                takeScreenshot: sinon.stub().returns(q('')),
-                elementByCssSelector: sinon.stub().returns(q({}))
+                eval: sinon.stub().returns(q({}))
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
 
             this.browser = new Browser({}, 'browser', {browserName: 'browser', version: '1.0'});
-
-            this.state = {
-                captureSelectors: ['.some-class'],
-                activate: sinon.stub().returns(q())
-            };
-
-            this.sinon.stub(elementRect, 'getMultiple').returns(q({x: 0, y: 0, width: 0, height: 0}));
         });
 
-        it('should activate the state', function() {
+        it('should execute client side method', function() {
             var _this = this;
-            return this.browser.captureState(this.state).then(function() {
-                sinon.assert.calledWith(_this.state.activate, _this.browser);
+            return this.browser.prepareScreenshot(['.selector1', '.selector2']).then(function() {
+                /*jshint evil:true*/
+                sinon.assert.calledWith(_this.wd.eval, '__gemini.prepareScreenshot([".selector1",".selector2"])');
             });
         });
 
-        it('should take the screenshot', function() {
-            var _this = this;
+        it('should reject promise if client-side method returned error', function(done) {
+            /*jshint evil:true*/
+            this.wd.eval.returns(q({
+                error: 'err',
+                message: 'message'
+            }));
 
-            return this.browser.captureState(this.state).then(function() {
-                sinon.assert.called(_this.wd.takeScreenshot);
+            return this.browser.prepareScreenshot(['.selector']).fail(function(e) {
+                e.message.must.be('message');
+                done();
             });
         });
 
-        it('should search state captureSelectors', function() {
-            var _this = this;
-            this.state.captureSelectors = ['.selector1', '.selector2'];
-
-            return this.browser.captureState(this.state).then(function() {
-                sinon.assert.calledWith(_this.wd.elementByCssSelector, '.selector1');
-                sinon.assert.calledWith(_this.wd.elementByCssSelector, '.selector2');
-            });
-        });
-
-        it('should search rect for all found elements', function() {
-            this.state.captureSelectors = ['.selector1', '.selector2'];
-            this.wd.elementByCssSelector.withArgs('.selector1').returns(q());
-            this.wd.elementByCssSelector.withArgs('.selector2').returns(q());
-
-            return this.browser.captureState(this.state).then(function() {
-                sinon.assert.calledWith(elementRect.getMultiple, sinon.match([
-                    sinon.match.instanceOf(Element).and(sinon.match.has('selector', '.selector1')),
-                    sinon.match.instanceOf(Element).and(sinon.match.has('selector', '.selector2')),
-                ]));
-            });
-        });
-
-        it('should crop screenshot to returened rect');
     });
+
+    describe('captureFullscreenImage', function() {
+        it('should call to the driver', function() {
+            var stubWd = {
+                takeScreenshot: sinon.stub().returns(q({}))
+            };
+            
+            this.sinon.stub(wd, 'promiseRemote').returns(stubWd);
+            var browser = new Browser({}, 'browser', {browserName: 'browser', version: '1.0'});
+            return browser.captureFullscreenImage().then(function() {
+                sinon.assert.called(stubWd.takeScreenshot);
+            });
+        });
+    });
+
 });

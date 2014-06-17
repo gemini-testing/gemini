@@ -288,22 +288,13 @@ describe('public tests API', function() {
                 this.suite.children[0].states[0].suite.must.equal(this.suite.children[0]);
             });
 
-            it('should call passed callback upon activation', function() {
-                var spy = sinon.spy(),
-                    browser = {
-                        createActionSequence: sinon.stub().returns({
-                            perform: sinon.stub()
-                        })
-                    };
-
+            it('should store passed callback', function() {
+                var spy = sinon.spy();
                 this.context.suite('name', function(suite) {
                     prepareSuite(suite).capture('state', spy);
                 });
 
-                this.suite.children[0].states[0].activate(browser, {});
-
-                sinon.assert.called(spy);
-
+                this.suite.children[0].states[0].callback.must.be(spy);
             });
 
             it('should be chainable', function(done) {
