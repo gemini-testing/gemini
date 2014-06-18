@@ -9,6 +9,8 @@
 * Correctly capture screenshots of regions out of initial browser
   viewport in  browsers, that can't capture full page (`Opera` and
   `Chrome` at the time of writing).
+* `outline-width` of an elements is now also taken into account when 
+  calculating crop region.
 * Add `debug` options to config file. If set to `true`, `gemini` will
   print debug logs to STDOUT. (@arikon).
 * Add `http` section to config file which allows to configure HTTP
