@@ -13,6 +13,25 @@ describe('browser', function() {
         this.sinon.restore();
     });
 
+    describe('properties', function() {
+        it('should have browserName property', function() {
+            var browser = new Browser({}, 'id', {
+                browserName: 'name'
+            });
+
+            browser.browserName.must.be('name');
+        });
+
+        it('should have version propery', function() {
+            var browser = new Browser({}, 'id', {
+                version: '1.0'
+            });
+
+            browser.version.must.be('1.0');
+
+        });
+    });
+
     describe('open', function() {
         beforeEach(function() {
             this.wd = {
