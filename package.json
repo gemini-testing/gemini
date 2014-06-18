@@ -27,7 +27,9 @@
     "sinon": "^1.10.2"
   },
   "scripts": {
-    "test": "istanbul test _mocha"
+    "test-unit": "istanbul test _mocha test",
+    "test-func": "istanbul test _mocha test/functional",
+    "test": "istanbul test _mocha test test/functional"
   },
   "author": "",
   "license": "MIT",
