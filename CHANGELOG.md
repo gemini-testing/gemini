@@ -6,6 +6,23 @@
   browser instead of `gemini`. This allows to issue fewer requests to
   Selenium Server speeding up total tests run time. This feature breaks
   compatibility with old browsers (`IE` < 9).
+* New config format, which allows to specify full set of capabilities
+  for browsers:
+
+  ```yaml
+  browsers:
+    phantomjs: phantomjs
+    opera12:
+        browserName: opera
+        version: '12.06'
+        platform: 'WINDOWS'
+    firefox28:
+        browserName: firefox
+        version: '28.0'
+    firefox27:
+        browserName: firefox
+        version: '27.0'
+  ```
 * Correctly capture screenshots of regions out of initial browser
   viewport in  browsers, that can't capture full page (`Opera` and
   `Chrome` at the time of writing).
