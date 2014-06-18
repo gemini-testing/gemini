@@ -1,6 +1,6 @@
 {
   "name": "gemini",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "UI Screenshot testing utility",
   "bin": {
     "gemini": "./bin/gemini"
@@ -31,9 +31,24 @@
     "test-func": "istanbul test _mocha test/functional",
     "test": "istanbul test _mocha test test/functional"
   },
-  "author": "",
+  "author": "Sergey Tatarintsev <sevinf@yandex-team.ru> (https://github.com/SevInf)",
   "license": "MIT",
   "directories": {
     "test": "test"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bem/gemini.git"
+  },
+  "keywords": [
+    "test",
+    "testing",
+    "screenshot",
+    "selenium",
+    "layout"
+  ],
+  "bugs": {
+    "url": "https://github.com/bem/gemini/issues"
+  },
+  "homepage": "https://github.com/bem/gemini"
 }

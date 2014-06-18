@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.4.0 - 2014-06-18
 
 * Crop region for screenshots is calculated via client script inside
   browser instead of `gemini`. This allows to issue fewer requests to
