@@ -1,5 +1,9 @@
 # Changelog
 
+## Dev
+
+* Correctly detect crop region in Firefox
+
 ## 0.4.0 - 2014-06-18
 
 * Crop region for screenshots is calculated via client script inside
