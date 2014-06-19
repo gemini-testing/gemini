@@ -7,9 +7,8 @@ gemini
 
 Gemini is the utility for regression testing of web pages appearance.
 
-Unlike other similar tools, tests not the whole pages, but
-only specified blocks. This makes such tests more reliable and
-more responsive to the changes of rest of webpage.
+It allows to test fragment of a page in multiple browsers using Selenium
+WebDriver.
 
 Tool is created at [Yandex](http://www.yandex.com/) and will be especially
 useful to UI libraries developers.
