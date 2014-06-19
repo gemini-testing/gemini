@@ -44,10 +44,7 @@ describe('runner', function() {
 
         this.browser = browser;
         this.launcher = {
-            launch: function() {
-                return browser;
-            },
-
+            launch: this.sinon.stub().returns(q(browser)),
             stop: function() {}
         };
 
@@ -172,8 +169,6 @@ describe('runner', function() {
 
             addState(this.suite, 'state');
 
-            this.sinon.spy(this.launcher, 'launch');
-
             return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledWith(this.launcher.launch, 'browser1');
                 sinon.assert.calledWith(this.launcher.launch, 'browser2');
@@ -183,7 +178,6 @@ describe('runner', function() {
         it('should launch browser only once for suite', function() {
             addState(this.suite, 'state1');
             addState(this.suite, 'state2');
-            this.sinon.spy(this.launcher, 'launch');
 
             return this.runner.run([this.suite]).then(function() {
                 sinon.assert.calledOnce(this.launcher.launch);
@@ -196,8 +190,6 @@ describe('runner', function() {
             secondSuite.url = '/hello';
             addState(this.suite, 'state');
             addState(secondSuite, 'state');
-
-            this.sinon.spy(this.launcher, 'launch');
 
             return this.runner.run([this.suite, secondSuite]).then(function() {
                 sinon.assert.calledTwice(this.launcher.launch);

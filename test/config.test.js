@@ -88,4 +88,45 @@ describe('config', function() {
 
     });
 
+    describe('parallelLimit', function() {
+        it('should not accept non-numbers', function() {
+            (function() {
+                return new Config('/', [
+                    'rootUrl: http://example.com',
+                    'gridUrl: http://example.com',
+                    'parallelLimit: so many'
+                ].join('\n'));
+            }.must.throw(GeminiError));
+        });
+
+        it('should not accept negative numbers', function() {
+            (function() {
+                return new Config('/', [
+                    'rootUrl: http://example.com',
+                    'gridUrl: http://example.com',
+                    'parallelLimit: -1'
+                ].join('\n'));
+            }.must.throw(GeminiError));
+        });
+
+        it('should not accept float numbers', function() {
+            (function() {
+                return new Config('/', [
+                    'rootUrl: http://example.com',
+                    'gridUrl: http://example.com',
+                    'parallelLimit: 1.1'
+                ].join('\n'));
+            }.must.throw(GeminiError));
+        });
+
+        it('should copy non-negative integer', function() {
+            var config = new Config('/', [
+                'rootUrl: http://example.com',
+                'gridUrl: http://example.com',
+                'parallelLimit: 3'
+            ].join('\n'));
+            config.parallelLimit.must.be(3);
+        });
+    });
+
 });

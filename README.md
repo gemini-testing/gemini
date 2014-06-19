@@ -87,6 +87,11 @@ relatively to config file directory. `gemini/screens` by default.
   automatically);
 
 * `debug` - turn on debug logging to the terminal
+* `parallelLimit` - by default, `gemini` will run all browsers in parallel.
+  Sometimes (i.e. when using cloud services, such as SauceLabs) you have a
+  limit on a number of browser that can be run once at a time. Use this
+  option to limit the number of browsers that `gemini` will try to run in
+  parallel.
 * `http.timeout` - Selenium Grid request timeout, msec
 * `http.retries` - Selenium Grid request tries count
 * `http.retryDelay` - dalay before retry of Selenium Grid request, msec
