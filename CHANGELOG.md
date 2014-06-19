@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.4.1 - 2014-06-19
 
 * Correctly detect crop region in Firefox
 
