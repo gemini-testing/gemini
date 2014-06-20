@@ -70,9 +70,11 @@ describe('BrowserLauncher', function() {
         });
 
         it('should launch next browsers after previous are released', function() {
-            var launcher = launcherWithLimit(1);
+            var _this = this,
+                launcher = launcherWithLimit(1);
             return launcher.launch('first')
                 .then(function(browser) {
+                    _this.sinon.stub(browser, 'quit').returns(q());
                     return launcher.stop(browser);
                 })
                 .then(function() {
@@ -81,10 +83,12 @@ describe('BrowserLauncher', function() {
         });
 
         it('should launch queued browser when previous are released', function() {
-            var launcher = launcherWithLimit(1);
+            var _this = this,
+                launcher = launcherWithLimit(1);
             return launcher.launch('first')
                 .then(function(browser) {
                     var secondPromise = launcher.launch('second');
+                    _this.sinon.stub(browser, 'quit').returns(q());
                     return q.delay(100)
                         .then(function() {
                             return launcher.stop(browser);
