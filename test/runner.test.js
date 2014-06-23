@@ -1,5 +1,6 @@
 'use strict';
-var q = require('q'),
+var assert = require('assert'),
+    q = require('q'),
     sinon = require('sinon'),
     createSuite = require('../lib/suite').create,
     State = require('../lib/state'),
@@ -48,7 +49,9 @@ describe('runner', function() {
             stop: function() {}
         };
 
-        this.suite = new createSuite('suite');
+
+        this.root = createSuite('root');
+        this.suite = createSuite('suite', this.root);
         this.suite.url = '/path';
 
         this.sinon.stub(require('child_process'), 'exec').withArgs('gm -version').callsArgWith(1, null, '', '');
@@ -65,19 +68,78 @@ describe('runner', function() {
 
     describe('run', function() {
         it('should emit `begin` event when tests start', function() {
-            var spy = this.sinon.spy();
+            var spy = this.sinon.spy().named('onBegin');
             this.runner.on('begin', spy);
-            return this.runner.run([]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.calledOnce(spy);
             });
         });
 
+        it('should pass total number of states when emitting `begin`', function() {
+            addState(this.suite, '1');
+            addState(this.suite, '2');
+            var child = createSuite('child', this.suite);
+            addState(child, '3');
+            
+            var spy = this.sinon.spy().named('onBegin');
+            this.runner.on('begin', spy);
+
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, sinon.match({totalStates: 3}));
+            });
+        });
+
+        it('should pass all browser names when emitting `begin`', function() {
+            this.runner.config.browsers = {
+                browser1: {browserName: 'browser1', version: '1'},
+                browser2: {browserName: 'browser2'}
+            };
+
+            var spy = this.sinon.spy().named('onBegin');
+            this.runner.on('begin', spy);
+
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, sinon.match({
+                    browserIds: ['browser1', 'browser2']
+                }));
+            });
+        });
+
+        it('should launch each browser in config', function() {
+            this.runner.config.browsers = {
+                browser1: {browserName: 'browser1', version: '1'},
+                browser2: {browserName: 'browser2'}
+            };
+
+            addState(this.suite, 'state');
+
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(this.launcher.launch, 'browser1');
+                sinon.assert.calledWith(this.launcher.launch, 'browser2');
+            }.bind(this));
+        });
+
+        it('should emit `startBrowser` event when starting browser', function() {
+            this.runner.config.browsers = {
+                browser: {browserName: 'name'}
+            };
+
+            var spy = this.sinon.spy().named('onStartBrowser');
+            this.runner.on('startBrowser', spy);
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, {browserId: 'browser'});
+            });
+        });
+
         it('should emit `beginSuite` event for each suite', function() {
-            var spy = this.sinon.spy();
+            var spy = this.sinon.spy().named('onBeginSuite');
 
             this.runner.on('beginSuite', spy);
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(spy, 'suite');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, {
+                    browserId: 'browser',
+                    suiteName: 'suite'
+                });
             });
         });
 
@@ -91,59 +153,67 @@ describe('runner', function() {
             this.browser.createActionSequence.returns(sequence);
 
             addState(this.suite, 'state');
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(stub, sequence, require('../lib/find-func').find);
             });
         });
 
-        it('should peroform before sequence ', function() {
+        it('should perform before sequence ', function() {
             var sequence = { perform: this.sinon.stub().returns(q())};
 
             this.browser.createActionSequence.returns(sequence);
 
             addState(this.suite, 'state');
 
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.called(sequence.perform);
             });
         });
 
 
         it('should emit `beginState` for each suite state', function() {
-            var spy = this.sinon.spy();
+            var spy = this.sinon.spy().named('onBeginState');
 
             addState(this.suite, 'state');
             this.runner.on('beginState', spy);
 
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(spy, 'suite', 'state', 'browser');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, {
+                    browserId: 'browser',
+                    suiteName: 'suite',
+                    stateName: 'state'
+                });
             });
 
         });
 
         it('should not emit `beginState` if state is skipped', function() {
-            var spy = this.sinon.spy();
+            var spy = this.sinon.spy().named('onBeginState');
             this.suite.addState({
                 name: 'state',
                 suite: this.suite, 
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('beginState', spy);
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.notCalled(spy);
             });
         });
 
         it('should emit `skipState` if state is skipped', function() {
-            var spy = this.sinon.spy();
+            var spy = this.sinon.spy().named('onSuiteSkip');
             this.suite.addState({
                 name: 'state', 
                 suite: this.suite,
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('skipState', spy);
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(spy, 'suite', 'state', 'browser');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, {
+                    browserId: 'browser',
+                    suiteName: 'suite',
+                    stateName: 'state'
+                });
             });
         });
 
@@ -156,50 +226,56 @@ describe('runner', function() {
                 shouldSkip: this.sinon.stub().returns(false)
             });
             this.runner.on('skipState', spy);
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.notCalled(spy);
             });
         });
 
-        it('should launch each browser in config', function() {
-            this.runner.config.browsers = {
+       it('should not emit state events in second browser when first fails', function() {
+             this.runner.config.browsers = {
                 browser1: {browserName: 'browser1', version: '1'},
                 browser2: {browserName: 'browser2'}
             };
 
+            var spy = this.sinon.spy().named('onBeginState');
+            this.runner.on('beginState', spy);
+            this.launcher.launch.withArgs('browser1').returns(q.reject(new Error('error')));
             addState(this.suite, 'state');
 
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(this.launcher.launch, 'browser1');
-                sinon.assert.calledWith(this.launcher.launch, 'browser2');
-            }.bind(this));
-        });
+            return this.runner.run(this.root)
+                .then(function() {
+                    assert.fail('Promise should not resolve');
+                })
+                .fail(function() {
+                    sinon.assert.neverCalledWith(spy, sinon.match({browserId: 'browser'}));
+                });
+       });
 
-        it('should launch browser only once for suite', function() {
+        it('should launch browser only once', function() {
             addState(this.suite, 'state1');
             addState(this.suite, 'state2');
 
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.calledOnce(this.launcher.launch);
             }.bind(this));
         });
 
-        it('should launch browser second time if there is a second suite', function() {
-            var secondSuite = createSuite('second');
+        it('should launch browser once even if there is a second suite', function() {
+            var secondSuite = createSuite('second', this.root);
 
             secondSuite.url = '/hello';
             addState(this.suite, 'state');
             addState(secondSuite, 'state');
 
-            return this.runner.run([this.suite, secondSuite]).then(function() {
-                sinon.assert.calledTwice(this.launcher.launch);
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledOnce(this.launcher.launch);
             }.bind(this));
         });
 
         it('should open suite url in browser', function() {
             addState(this.suite, 'state');
 
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(this.browser.open, 'http://example.com/path');
             }.bind(this));
         });
@@ -210,8 +286,12 @@ describe('runner', function() {
             addState(this.suite, 'state');
             this.runner.on('endState', spy);
 
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(spy, 'suite', 'state', 'browser');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, {
+                    browserId: 'browser',
+                    suiteName: 'suite',
+                    stateName: 'state'
+                });
             });
         });
 
@@ -223,7 +303,7 @@ describe('runner', function() {
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('endState', spy);
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.notCalled(spy);
             });
         });
@@ -232,26 +312,29 @@ describe('runner', function() {
             addState(this.suite, 'state1');
             addState(this.suite, 'state2');
 
-            var endState = this.sinon.spy(),
-                beginState = this.sinon.spy();
+            var endState = this.sinon.spy().named('end state 1'),
+                beginState = this.sinon.spy().named('begin state 2');
 
             this.runner.on('endState', endState);
             this.runner.on('beginState', beginState);
 
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.callOrder(
-                    endState.withArgs('suite', 'state1'),
-                    beginState.withArgs('suite', 'state2')
+                    endState.withArgs(sinon.match({stateName: 'state1'})),
+                    endState.withArgs(sinon.match({stateName: 'state2'}))
                 );
             });
             
         });
 
         it('should emit `endSuite` for each suite', function() {
-            var spy = this.sinon.spy();
+            var spy = this.sinon.spy().named('endSuite');
             this.runner.on('endSuite', spy);
-            return this.runner.run([this.suite]).then(function() {
-                sinon.assert.calledWith(spy, 'suite');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, {
+                    browserId: 'browser',
+                    suiteName: 'suite'
+                });
             });
         });
 
@@ -262,40 +345,43 @@ describe('runner', function() {
 
             this.runner.on('beginSuite', spy);
 
-            return this.runner.run([this.suite]).then(function() {
-                spy.secondCall.args.must.eql(['child']);
+            return this.runner.run(this.root).then(function() {
+                spy.secondCall.args.must.eql([{
+                    browserId: 'browser',
+                    suiteName: 'child'
+                }]);
             });
         });
 
         it('should finish parent suite only after all children', function() {
-            var spy = this.sinon.spy();
+            var spy = this.sinon.spy().named('onEndSuite');
             
             createSuite('child', this.suite);
 
             this.runner.on('endSuite', spy);
 
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.callOrder(
-                    spy.withArgs('child'),
-                    spy.withArgs('suite')
+                    spy.withArgs(sinon.match({suiteName: 'child'})),
+                    spy.withArgs(sinon.match({suiteName: 'suite'}))
                 );
             });
         });
 
         it('should execute next suite only after previous has been finished', function() {
-            var nextSuite = createSuite('next'),
-                endSuite = sinon.spy(),
-                beginSuite = sinon.spy();
+            var nextSuite = createSuite('next', this.root),
+                endSuite = sinon.spy().named('onEndFirstSuite'),
+                beginSuite = sinon.spy().named('onBeginSecondSuite');
 
             nextSuite.url = '/path2';
 
             this.runner.on('endSuite', endSuite);
             this.runner.on('beginSuite', beginSuite);
 
-            return this.runner.run([this.suite, nextSuite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.callOrder(
-                    endSuite.withArgs('suite'),
-                    beginSuite.withArgs('next')
+                    endSuite.withArgs(sinon.match({suiteName: 'suite'})),
+                    beginSuite.withArgs(sinon.match({suiteName: 'next'}))
                 );
             });
         });
@@ -308,44 +394,63 @@ describe('runner', function() {
             this.runner.on('beginSuite', beginSuite);
             this.runner.on('endSuite', endSuite);
 
-            return this.runner.run([suite]).then(function() {
-                sinon.assert.calledWith(beginSuite, 'suite');
-                sinon.assert.calledWith(endSuite, 'suite');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(beginSuite, sinon.match({suiteName: 'suite'}));
+                sinon.assert.calledWith(endSuite, sinon.match({suiteName: 'suite'}));
             });
+        });
+
+        it('should emit `stopBrowser` after all suites', function() {
+            this.runner.config.browsers = {
+                browser: {browserName: 'name'}
+            };
+
+            var spy = this.sinon.spy().named('onStartBrowser');
+            this.runner.on('stopBrowser', spy);
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, {browserId: 'browser'});
+            });
+
         });
 
         it('should emit `end` after all suites', function() {
             var spy = this.sinon.spy();
             this.runner.on('end', spy);
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy);
             });
         });
 
         it('should emit events in correct order', function() {
-            var begin = this.sinon.spy(),
-                beginSuite= this.sinon.spy(),
-                beginState = this.sinon.spy(),
-                endState = this.sinon.spy(),
-                endSuite= this.sinon.spy(),
-                end = this.sinon.spy();
+            var begin = this.sinon.spy().named('onBegin'),
+                startBrowser = this.sinon.spy().named('onStartBrowser'),
+                beginSuite = this.sinon.spy().named('onBeginSuite'),
+                beginState = this.sinon.spy().named('onBeginState'),
+                endState = this.sinon.spy().named('onEndState'),
+                endSuite= this.sinon.spy().named('onEndSuite'),
+                stopBrowser = this.sinon.spy().named('onStartBrowser'),
+                end = this.sinon.spy().named('onEnd');
 
             addState(this.suite, 'state');
 
             this.runner.on('begin', begin);
+            this.runner.on('startBrowser', startBrowser);
             this.runner.on('beginSuite', beginSuite);
             this.runner.on('beginState', beginState);
             this.runner.on('endState', endState);
             this.runner.on('endSuite', endSuite);
+            this.runner.on('stopBrowser', stopBrowser);
             this.runner.on('end', end);
 
-            return this.runner.run([this.suite]).then(function() {
+            return this.runner.run(this.root).then(function() {
                 sinon.assert.callOrder(
                     begin,
+                    startBrowser,
                     beginSuite,
                     beginState,
                     endState,
                     endSuite,
+                    stopBrowser,
                     end
                 );
             });

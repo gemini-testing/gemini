@@ -8,6 +8,7 @@ var sinon = require('sinon'),
 describe('BrowserLauncher', function() {
     beforeEach(function() {
         this.sinon = sinon.sandbox.create();
+        this.sinon.stub(Browser.prototype, 'launch').returns(q());
     });
 
     afterEach(function() {
@@ -28,6 +29,7 @@ describe('BrowserLauncher', function() {
             browser.id.must.be('some-id');
             browser.config.must.be(config);
             browser.browserName.must.be('name');
+            sinon.assert.calledOn(Browser.prototype.launch, browser);
         });
     });
 
