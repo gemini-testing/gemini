@@ -5,6 +5,10 @@
 * Add `parallelLimit` option that allows to limit number of browsers
  run in parallel.
 
+## 0.4.2 - 2014-06-25
+
+* Fix missing images in html report.
+
 ## 0.4.1 - 2014-06-19
 
 * Correctly detect crop region in Firefox
