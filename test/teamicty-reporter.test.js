@@ -5,6 +5,10 @@ var sinon = require('sinon'),
 
 describe('TeamCity reporter', function() {
 
+    var beginData = {browserIds: ['browser']},
+        suiteData = {suiteName: 'someSuite', browserId: 'browser'},
+        stateData = {suiteName: 'someSuite', stateName: 'someState', browserId: 'browser'};
+
     function assertLastWrite(string) {
         process.stdout.write.lastCall.args[0].must.be(string);
     }
@@ -20,37 +24,37 @@ describe('TeamCity reporter', function() {
     });
 
     it('should report tests start as a suite start', function() {
-        this.emitter.emit('begin');
+        this.emitter.emit('begin', beginData);
         assertLastWrite('##teamcity[testSuiteStarted name=\'gemini\']\n');
     });
 
     it('should report each suite start', function() {
-        this.emitter.emit('begin');
-        this.emitter.emit('beginSuite', 'someSuite');
-        assertLastWrite('##teamcity[testSuiteStarted name=\'someSuite\']\n');
+        this.emitter.emit('begin', beginData);
+        this.emitter.emit('beginSuite', suiteData);
+        assertLastWrite('##teamcity[testSuiteStarted name=\'browser.someSuite\' flowId=\'browser\']\n');
     });
 
     it('should report ignored state as ignored test', function() {
-        this.emitter.emit('begin');
-        this.emitter.emit('beginSuite', 'someSuite');
-        this.emitter.emit('skipState', 'someSuite', 'someState', 'browser');
+        this.emitter.emit('begin', beginData);
+        this.emitter.emit('beginSuite', suiteData);
+        this.emitter.emit('skipState', stateData);
         assertLastWrite(
-            '##teamcity[testIgnored name=\'someState.browser\' flowId=\'someSuite.someState.browser\']\n');
+            '##teamcity[testIgnored name=\'someState\' flowId=\'browser\']\n');
     });
 
     it('should report state start as test start', function() {
-        this.emitter.emit('begin');
-        this.emitter.emit('beginSuite', 'someSuite');
-        this.emitter.emit('beginState', 'someSuite', 'someState', 'browser');
+        this.emitter.emit('begin', beginData);
+        this.emitter.emit('beginSuite', suiteData);
+        this.emitter.emit('beginState', stateData);
 
         assertLastWrite(
-            '##teamcity[testStarted name=\'someState.browser\' flowId=\'someSuite.someState.browser\']\n');
+            '##teamcity[testStarted name=\'someState\' flowId=\'browser\']\n');
     });
 
     it('should report test fail', function() {
-        this.emitter.emit('begin');
-        this.emitter.emit('beginSuite', 'someSuite');
-        this.emitter.emit('beginState', 'someSuite', 'someState', 'browser');
+        this.emitter.emit('begin', beginData);
+        this.emitter.emit('beginSuite', suiteData);
+        this.emitter.emit('beginState', stateData);
 
         this.emitter.emit('endTest', {
             suiteName: 'someSuite',
@@ -60,13 +64,13 @@ describe('TeamCity reporter', function() {
         });
 
         assertLastWrite(
-            '##teamcity[testFailed name=\'someState.browser\' message=\'Images does not match\' flowId=\'someSuite.someState.browser\']\n');
+            '##teamcity[testFailed name=\'someState\' message=\'Images does not match\' flowId=\'browser\']\n');
     });
 
     it('should not report fail if test succeeded', function() {
-        this.emitter.emit('begin');
-        this.emitter.emit('beginSuite', 'someSuite');
-        this.emitter.emit('beginState', 'someSuite', 'someState', 'browser');
+        this.emitter.emit('begin', beginData);
+        this.emitter.emit('beginSuite', suiteData);
+        this.emitter.emit('beginState', stateData);
         this.emitter.emit('endTest', {
             suiteName: 'someSuite',
             stateName: 'someState',
@@ -78,30 +82,20 @@ describe('TeamCity reporter', function() {
     });
 
     it('should report state end as test end', function() {
-        this.emitter.emit('begin');
-        this.emitter.emit('beginSuite', 'someSuite');
-        this.emitter.emit('endState', 'someSuite', 'someState', 'browser');
+        this.emitter.emit('begin', beginData);
+        this.emitter.emit('beginSuite', suiteData);
+        this.emitter.emit('endState', stateData);
 
         assertLastWrite(
-            '##teamcity[testFinished name=\'someState.browser\' flowId=\'someSuite.someState.browser\']\n');
+            '##teamcity[testFinished name=\'someState\' flowId=\'browser\']\n');
     });
 
-    it('should combine all nested suites to get flowId for ', function() {
-        this.emitter.emit('begin');
-        this.emitter.emit('beginSuite', 'first');
-        this.emitter.emit('beginSuite', 'second');
-        this.emitter.emit('beginState', 'second', 'someState', 'browser');
-
-        assertLastWrite(
-            '##teamcity[testStarted name=\'someState.browser\' flowId=\'first.second.someState.browser\']\n'
-        );
-    });
 
     it('should report suite end', function() {
-        this.emitter.emit('begin');
-        this.emitter.emit('beginSuite', 'someSuite');
-        this.emitter.emit('endSuite', 'someSuite');
-        assertLastWrite('##teamcity[testSuiteFinished name=\'someSuite\']\n');
+        this.emitter.emit('begin', beginData);
+        this.emitter.emit('beginSuite', suiteData);
+        this.emitter.emit('endSuite', suiteData);
+        assertLastWrite('##teamcity[testSuiteFinished name=\'someSuite\' flowId=\'browser\']\n');
     });
 
     it('should report tests end as a suite end', function() {
