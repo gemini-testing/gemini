@@ -25,7 +25,7 @@ describe('runner', function() {
         var browser = {
             id: 'browser',
             createActionSequence: this.sinon.stub().returns({
-                perform: this.sinon.stub().returns(q.resolve()) 
+                perform: this.sinon.stub().returns(q.resolve())
             }),
 
             captureFullscreenImage: this.sinon.stub().returns(q({
@@ -49,7 +49,6 @@ describe('runner', function() {
             stop: function() {}
         };
 
-
         this.root = createSuite('root');
         this.suite = createSuite('suite', this.root);
         this.suite.url = '/path';
@@ -59,7 +58,6 @@ describe('runner', function() {
         //require runner here to make stub above take effect
         var Runner = require('../lib/runner');
         this.runner = new Runner(new Config('/root', CONFIG_TEXT), this.launcher);
-
     });
 
     afterEach(function() {
@@ -80,7 +78,7 @@ describe('runner', function() {
             addState(this.suite, '2');
             var child = createSuite('child', this.suite);
             addState(child, '3');
-            
+
             var spy = this.sinon.spy().named('onBegin');
             this.runner.on('begin', spy);
 
@@ -159,7 +157,7 @@ describe('runner', function() {
         });
 
         it('should perform before sequence ', function() {
-            var sequence = { perform: this.sinon.stub().returns(q())};
+            var sequence = {perform: this.sinon.stub().returns(q())};
 
             this.browser.createActionSequence.returns(sequence);
 
@@ -169,7 +167,6 @@ describe('runner', function() {
                 sinon.assert.called(sequence.perform);
             });
         });
-
 
         it('should emit `beginState` for each suite state', function() {
             var spy = this.sinon.spy().named('onBeginState');
@@ -184,14 +181,13 @@ describe('runner', function() {
                     stateName: 'state'
                 });
             });
-
         });
 
         it('should not emit `beginState` if state is skipped', function() {
             var spy = this.sinon.spy().named('onBeginState');
             this.suite.addState({
                 name: 'state',
-                suite: this.suite, 
+                suite: this.suite,
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('beginState', spy);
@@ -203,7 +199,7 @@ describe('runner', function() {
         it('should emit `skipState` if state is skipped', function() {
             var spy = this.sinon.spy().named('onSuiteSkip');
             this.suite.addState({
-                name: 'state', 
+                name: 'state',
                 suite: this.suite,
                 shouldSkip: this.sinon.stub().returns(true)
             });
@@ -231,8 +227,8 @@ describe('runner', function() {
             });
         });
 
-       it('should not emit state events in second browser when first fails', function() {
-             this.runner.config.browsers = {
+        it('should not emit state events in second browser when first fails', function() {
+            this.runner.config.browsers = {
                 browser1: {browserName: 'browser1', version: '1'},
                 browser2: {browserName: 'browser2'}
             };
@@ -249,7 +245,7 @@ describe('runner', function() {
                 .fail(function() {
                     sinon.assert.neverCalledWith(spy, sinon.match({browserId: 'browser'}));
                 });
-       });
+        });
 
         it('should launch browser only once', function() {
             addState(this.suite, 'state1');
@@ -298,7 +294,7 @@ describe('runner', function() {
         it('should not emit `endState` if state is skipped', function() {
             var spy = this.sinon.spy();
             this.suite.addState({
-                name: 'state', 
+                name: 'state',
                 suite: this.suite,
                 shouldSkip: this.sinon.stub().returns(true)
             });
@@ -324,7 +320,6 @@ describe('runner', function() {
                     endState.withArgs(sinon.match({stateName: 'state2'}))
                 );
             });
-            
         });
 
         it('should emit `endSuite` for each suite', function() {
@@ -340,7 +335,7 @@ describe('runner', function() {
 
         it('should also run child suites automatically', function() {
             var spy = this.sinon.spy();
-            
+
             createSuite('child', this.suite);
 
             this.runner.on('beginSuite', spy);
@@ -355,7 +350,7 @@ describe('runner', function() {
 
         it('should finish parent suite only after all children', function() {
             var spy = this.sinon.spy().named('onEndSuite');
-            
+
             createSuite('child', this.suite);
 
             this.runner.on('endSuite', spy);
@@ -389,7 +384,7 @@ describe('runner', function() {
         it('should allow to run a suite without url and states', function() {
             var beginSuite = sinon.spy(),
                 endSuite = sinon.spy();
-            
+
             createSuite('suite', this.root);
 
             this.runner.on('beginSuite', beginSuite);
@@ -411,7 +406,6 @@ describe('runner', function() {
             return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy, {browserId: 'browser'});
             });
-
         });
 
         it('should emit `end` after all suites', function() {
@@ -428,7 +422,7 @@ describe('runner', function() {
                 beginSuite = this.sinon.spy().named('onBeginSuite'),
                 beginState = this.sinon.spy().named('onBeginState'),
                 endState = this.sinon.spy().named('onEndState'),
-                endSuite= this.sinon.spy().named('onEndSuite'),
+                endSuite = this.sinon.spy().named('onEndSuite'),
                 stopBrowser = this.sinon.spy().named('onStartBrowser'),
                 end = this.sinon.spy().named('onEnd');
 

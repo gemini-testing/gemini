@@ -8,7 +8,6 @@ var sinon = require('sinon'),
     StateError = require('../lib/errors/state-error');
 
 describe('capture session', function() {
-
     describe('runHook', function() {
         beforeEach(function() {
             this.seq = sinon.createStubInstance(Actions);
@@ -39,7 +38,8 @@ describe('capture session', function() {
 
         it('should share same context between calls', function() {
             var _this = this;
-            return this.session.runHook(function() {
+            return this.session
+                .runHook(function() {
                     this.x = 'something';
                 })
                 .then(function() {
@@ -58,7 +58,6 @@ describe('capture session', function() {
                 done();
             });
         });
-
     });
 
     describe('capture', function() {
@@ -146,7 +145,6 @@ describe('capture session', function() {
             });
         });
 
-
         it('should crop screenshoot basing on body if image is greater then body', function() {
             this.browser.prepareScreenshot.returns({
                 bodyHeight: 100,
@@ -201,5 +199,4 @@ describe('capture session', function() {
             });
         });
     });
-
 });

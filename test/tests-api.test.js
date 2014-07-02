@@ -13,7 +13,7 @@ describe('public tests API', function() {
 
     describe('.suite method', function() {
         it('should throw an error if first argument is not a string', function() {
-            (function () {
+            (function() {
                 this.context.suite(123, function() {});
             }.must.throw(TypeError));
         });
@@ -68,7 +68,7 @@ describe('public tests API', function() {
             (function() {
                 _this.context.suite('first', function(suite) {
                     suite.setCaptureElements('.element')
-                         .capture('plain'); 
+                         .capture('plain');
                 });
             }.must.throw());
         });
@@ -89,7 +89,7 @@ describe('public tests API', function() {
                     suite.setUrl('/url');
                     _this.context.suite('child', function(suite) {
                         suite.setCaptureElements('.element')
-                             .capture('plain'); 
+                             .capture('plain');
                     });
                 });
             }.must.not.throw());
@@ -100,7 +100,7 @@ describe('public tests API', function() {
             (function() {
                 _this.context.suite('first', function(suite) {
                     suite.setUrl('/url')
-                         .capture('plain'); 
+                         .capture('plain');
                 });
             }.must.throw());
         });
@@ -121,16 +121,14 @@ describe('public tests API', function() {
                     suite.setCaptureElements('.element');
                     _this.context.suite('child', function(suite) {
                         suite.setUrl('/url')
-                             .capture('plain'); 
+                             .capture('plain');
                     });
                 });
             }.must.not.throw());
         });
-
     });
 
     describe('suite builder', function() {
-
         function shouldBeChainable(method, value) {
             it('should be chainable', function(done) {
                 this.context.suite('name', function(suite) {
@@ -138,7 +136,7 @@ describe('public tests API', function() {
                     done();
                 });
             });
-        } 
+        }
 
         describe('setUrl', function() {
             it('should throw if argument is not a string', function() {
@@ -208,14 +206,13 @@ describe('public tests API', function() {
                     suite.before(func);
                 });
                 this.suite.children[0].beforeHook.must.be(func);
-
             });
 
             it('should throw if hook is not a function', function() {
                 (function() {
                     this.context.suite('name', function(suite) {
                         suite.before('the dawn');
-                    }); 
+                    });
                 }.bind(this)).must.throw(TypeError);
             });
         });
@@ -240,7 +237,7 @@ describe('public tests API', function() {
                         prepareSuite(suite).capture('state', 'make me a sandwich');
                     });
                 }.bind(this)).must.throw(TypeError);
-            }); 
+            });
 
             it('should not throw if second argument is absent', function() {
                 (function() {
@@ -274,7 +271,6 @@ describe('public tests API', function() {
                         .capture('state 1')
                         .capture('state 2');
                 });
-
 
                 this.suite.children[0].states[0].name.must.equal('state 1');
                 this.suite.children[0].states[1].name.must.equal('state 2');
@@ -313,7 +309,7 @@ describe('public tests API', function() {
                     });
                 }.bind(this)).must.throw(TypeError);
             });
-            
+
             it('should throw if argument is array with non-string or non-object', function() {
                 (function() {
                     this.context.suite('name', function(suite) {
@@ -396,7 +392,6 @@ describe('public tests API', function() {
                     {browserName: 'chrome'}
                 ]);
             });
-
         });
     });
 });

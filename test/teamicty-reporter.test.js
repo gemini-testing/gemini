@@ -4,7 +4,6 @@ var sinon = require('sinon'),
     teamictyReporter = require('../lib/reporters/teamcity');
 
 describe('TeamCity reporter', function() {
-
     var beginData = {browserIds: ['browser']},
         suiteData = {suiteName: 'someSuite', browserId: 'browser'},
         stateData = {suiteName: 'someSuite', stateName: 'someState', browserId: 'browser'};
@@ -90,7 +89,6 @@ describe('TeamCity reporter', function() {
             '##teamcity[testFinished name=\'someState\' flowId=\'browser\']\n');
     });
 
-
     it('should report suite end', function() {
         this.emitter.emit('begin', beginData);
         this.emitter.emit('beginSuite', suiteData);
@@ -102,5 +100,4 @@ describe('TeamCity reporter', function() {
         this.emitter.emit('end');
         assertLastWrite('##teamcity[testSuiteFinished name=\'gemini\']\n');
     });
-
 });

@@ -26,7 +26,6 @@ describe('suite', function() {
             child.url = 'http://example2.com';
 
             child.url.must.not.equal(parent.url);
-
         });
 
         it('should set `parent` property of a parent suite', function() {
@@ -42,8 +41,6 @@ describe('suite', function() {
 
             parent.children.must.contain(child);
         });
-
-
     });
 
     describe('states', function() {
@@ -99,7 +96,6 @@ describe('suite', function() {
     });
 
     describe('isRoot', function() {
-
         it('should be true for root suites', function() {
             var suite = createSuite('suite');
             suite.isRoot.must.be.true();
@@ -117,7 +113,7 @@ describe('suite', function() {
         beforeEach(function() {
             this.suite = createSuite('suite');
         });
-        
+
         it('should be false by default', function() {
             this.suite.skipped.must.be.false();
         });
@@ -129,7 +125,7 @@ describe('suite', function() {
 
         it('should be inherited by children', function() {
             this.suite.skip();
-            
+
             var child = createSuite('child', this.suite);
             child.skipped.must.be.true();
         });
@@ -147,7 +143,6 @@ describe('suite', function() {
         it('should merge multiple lists together', function() {
             this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
             this.suite.skip([{browserName: 'browser2'}]);
-
 
             this.suite.skipped.must.eql([
                 {browserName: 'browser1', version: '1.0'},
@@ -178,8 +173,6 @@ describe('suite', function() {
                 {browserName: 'browser1', version: '1.0'},
                 {browserName: 'browser2'}
             ]);
-
-
         });
 
         it('should not affect parent when calling .skip() on child', function() {
@@ -188,12 +181,9 @@ describe('suite', function() {
             child.skip([{browserName: 'browser2'}]);
 
             this.suite.skipped.must.eql([
-                {browserName: 'browser1', version: '1.0'},
+                {browserName: 'browser1', version: '1.0'}
             ]);
-
-
         });
-
     });
 
     describe('hasChildNamed', function() {
@@ -249,5 +239,4 @@ describe('suite', function() {
             this.suite.deepStatesCount.must.be(3);
         });
     });
-
 });

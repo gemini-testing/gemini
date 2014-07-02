@@ -4,7 +4,7 @@ var fs = require('fs'),
     path = require('path'),
     temp = require('temp'),
     Image = require('../../lib/image');
-    
+
 function imagePath(name) {
     return path.join(__dirname, 'data', 'image', name);
 }
@@ -14,13 +14,12 @@ function withTempFile(func) {
     return func(filePath).fin(function() {
         try {
             fs.unlinkSync(filePath);
-        } catch(e) {
+        } catch (e) {
         }
     });
 }
 
 describe('image', function() {
-
     describe('compare', function() {
         it('should resolve to `true` for equal images', function() {
             return Image.compare(imagePath('image1.png'), imagePath('image2.png'))
@@ -80,7 +79,6 @@ describe('image', function() {
         it('should crop image', function() {
             var _this = this;
             return withTempFile(function(filePath) {
-
                 return _this.image.crop({top: 1, left:1, width: 19, height: 19})
                     .then(function(image) {
                         return image.save(filePath);

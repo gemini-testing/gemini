@@ -45,7 +45,6 @@ describe('BrowserLauncher', function() {
     });
 
     describe('with parallelLimit', function() {
-
         function launcherWithLimit(limit) {
             var config = sinon.createStubInstance(Config);
             config.parallelLimit = limit;

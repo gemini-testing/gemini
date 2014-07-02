@@ -3,7 +3,6 @@ var State = require('../lib/state'),
     Browser = require('../lib/browser');
 
 describe('state', function() {
-
     describe('shouldSkip()', function() {
         function makeBrowser(capabilities) {
             return new Browser({}, 'id', capabilities);
@@ -56,5 +55,4 @@ describe('state', function() {
     });
 
     //describe('the rest of state functionality');
-
 });

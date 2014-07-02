@@ -28,7 +28,6 @@ describe('browser', function() {
             });
 
             browser.version.must.be('1.0');
-
         });
     });
 
@@ -93,7 +92,6 @@ describe('browser', function() {
                 });
             });
         });
-
     });
 
     describe('open', function() {
@@ -149,7 +147,6 @@ describe('browser', function() {
                 done();
             });
         });
-
     });
 
     describe('captureFullscreenImage', function() {
@@ -157,7 +154,7 @@ describe('browser', function() {
             var stubWd = {
                 takeScreenshot: sinon.stub().returns(q({}))
             };
-            
+
             this.sinon.stub(wd, 'promiseRemote').returns(stubWd);
             var browser = new Browser({}, 'browser', {browserName: 'browser', version: '1.0'});
             return browser.captureFullscreenImage().then(function() {
@@ -165,5 +162,4 @@ describe('browser', function() {
             });
         });
     });
-
 });
