@@ -375,13 +375,13 @@ for each state in each browser.
 
 Other available reporters are:
 
-* `tree` (default console reporter)
+* `flat` (default console reporter)
 * `teamcity` (TeamCity console reporter)
 
 You can also use multiple reporters at the same time using multiple `--reporter` options:
 
 ```
-gemini test --reporter tree --reporter html
+gemini test --reporter flat --reporter html
 ```
 
 ### Common cli options

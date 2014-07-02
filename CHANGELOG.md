@@ -2,6 +2,14 @@
 
 ## Dev
 
+* Browsers are now launched once for each run (previously, they were
+  launched once per suite). This greatly reduces total tests run time,
+  but can break some of your code, i.e. each `mouseDown` should always
+  be closed by `mouseUp`.
+  Previously, this was not required if `mouseDown` was used once for
+  suite.
+* `flat` reporter replaces `tree`. Tree reporter can not work with new
+  browser launch model.
 * Add `parallelLimit` option that allows to limit number of browsers
  run in parallel.
 
