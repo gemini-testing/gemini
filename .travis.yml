@@ -3,11 +3,11 @@ node_js:
 - '0.11'
 - '0.10'
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install graphicsmagick
-script: 
-  - npm run lint
-  - npm test --coverage
+- sudo apt-get update -qq
+- sudo apt-get install graphicsmagick
+script:
+- npm run lint
+- npm test --coverage
 after_success: cat ${TRAVIS_BUILD_DIR}/coverage/lcov.info | codeclimate
 addons:
   code_climate:
@@ -16,8 +16,7 @@ deploy:
   provider: npm
   email: sevinf@yandex-team.ru
   api_key:
-    secure: AosNa0QYNBVp81wbw+66ho+SX9PejT4m/m0vofOZC6RWKruueE0jjzb+Pb5ZnRRIZoqFcTLS55RU3zHb6XCJ+nnOgxSfzfE6GbxJHLXIBIHI+k+fzCMCJW0XJbJn9qWjd5FTuL8YaKO4qXzW52AVpr8vd0ZQKrOdJD1SFByUhEU=
+    secure: YQj/i4PM/pqm/ODlEXrXpsSfkCs7FsCMk9rmpvEqKsVP0BbcV/pLe2Gw6r6yywN4TxYIJaABBEViTaoO5EjBfAh70knUSB9sMJ5jiMOvxh/UHlR7YDWT1/Eb/vKXKSzzQbnIM/6Zkqyan2UWPPo4X2AfuII3hEBzB2hMZHoGbys=
   on:
     tags: true
     repo: bem/gemini
-    branch: master
