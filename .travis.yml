@@ -5,7 +5,9 @@ node_js:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install graphicsmagick
-script: npm test --coverage
+script: 
+  - npm run lint
+  - npm test --coverage
 after_success: cat ${TRAVIS_BUILD_DIR}/coverage/lcov.info | codeclimate
 addons:
   code_climate:

@@ -23,6 +23,7 @@
     "codeclimate-test-reporter": "0.0.3",
     "istanbul": "^0.2.10",
     "jscs": "^1.5.7",
+    "jshint": "^2.5.1",
     "mocha": "^1.20.1",
     "must": "~0.12.0",
     "sinon": "^1.10.2"
@@ -30,7 +31,8 @@
   "scripts": {
     "test-unit": "istanbul test _mocha test",
     "test-func": "istanbul test _mocha test/functional",
-    "test": "istanbul test _mocha test test/functional"
+    "test": "istanbul test _mocha test test/functional",
+    "lint": "jshint . && jscs ."
   },
   "author": "Sergey Tatarintsev <sevinf@yandex-team.ru> (https://github.com/SevInf)",
   "license": "MIT",
