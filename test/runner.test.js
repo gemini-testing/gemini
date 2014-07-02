@@ -388,8 +388,9 @@ describe('runner', function() {
 
         it('should allow to run a suite without url and states', function() {
             var beginSuite = sinon.spy(),
-                endSuite = sinon.spy(),
-                suite = createSuite('suite');
+                endSuite = sinon.spy();
+            
+            createSuite('suite', this.root);
 
             this.runner.on('beginSuite', beginSuite);
             this.runner.on('endSuite', endSuite);
