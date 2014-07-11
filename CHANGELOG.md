@@ -12,6 +12,7 @@
   browser launch model.
 * Add `parallelLimit` option that allows to limit number of browsers
  run in parallel.
+* Fix `--version` option.
 
 ## 0.4.2 - 2014-06-25
 
