@@ -1,5 +1,9 @@
 # Changelog
 
+# Dev
+
+* Global installations of `gemini` now runs local one, if available.
+
 ## 0.5.0 - 2014-07-17
 
 * Browsers are now launched once for each run (previously, they were
@@ -8,6 +12,7 @@
   be closed by `mouseUp`.
   Previously, this was not required if `mouseDown` was used once for
   suite.
+  It will show warning if versions of the modules does not match.
 * `flat` reporter replaces `tree`. Tree reporter can not work with new
   browser launch model.
 * Add `parallelLimit` option that allows to limit number of browsers

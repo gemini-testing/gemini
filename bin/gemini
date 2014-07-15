@@ -1,3 +1,33 @@
 #!/usr/bin/env node
+'use strict';
+var path = require('path'),
+    resolve = require('resolve'),
+    chalk = require('chalk'),
+    ownVersion = require('../package.json').version;
 
-require('../lib/cli').run();
+function getCliModule() {
+    var localPackage;
+    try {
+        // try local module first
+        localPackage = resolve.sync('gemini/package.json', {
+            basedir: process.cwd()
+        });
+    } catch (e) {
+        // if fails, use global package
+        return '../lib/cli';
+    }
+
+    var localModule = path.dirname(localPackage),
+        localVersion = require(localPackage).version;
+
+    if (ownVersion !== localVersion) {
+        console.error(chalk.yellow('WARNING'));
+        console.error('Running local gemini from %s', chalk.cyan(localModule));
+        console.error('Version: %s', chalk.red(localVersion));
+        console.error('Global: %s', chalk.green(ownVersion));
+        console.error('');
+    }
+    return path.join(localModule, 'lib', 'cli');
+}
+
+require(getCliModule()).run();
