@@ -12,6 +12,8 @@
   browser launch model.
 * Add `parallelLimit` option that allows to limit number of browsers
  run in parallel.
+* Add `suite.after()` which can be used to perform some action after all
+  of the states without taking screenshot.
 * Unknown errors, returned by Selenium have more detailed report.
 * Fix `--version` option.
 

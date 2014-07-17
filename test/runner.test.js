@@ -322,6 +322,21 @@ describe('runner', function() {
             });
         });
 
+        it('should call `after` hook with sequence and find function', function() {
+            var stub = this.sinon.stub(this.suite, 'afterHook'),
+                sequence = {
+                    stub: true,
+                    perform: this.sinon.stub().returns(q.resolve())
+                };
+
+            this.browser.createActionSequence.returns(sequence);
+
+            addState(this.suite, 'state');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(stub, sequence, require('../lib/find-func').find);
+            });
+        });
+
         it('should emit `endSuite` for each suite', function() {
             var spy = this.sinon.spy().named('endSuite');
             this.runner.on('endSuite', spy);

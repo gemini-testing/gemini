@@ -199,23 +199,29 @@ describe('public tests API', function() {
             });
         });
 
-        describe('before', function() {
-            it('should set beforeHook property', function() {
-                var func = function() {};
-                this.context.suite('name', function(suite) {
-                    suite.before(func);
-                });
-                this.suite.children[0].beforeHook.must.be(func);
-            });
-
-            it('should throw if hook is not a function', function() {
-                (function() {
+        function testHook(name) {
+            var hookProperty = name + 'Hook';
+            describe(name, function() {
+                it('should set ' + hookProperty + ' property', function() {
+                    var func = function() {};
                     this.context.suite('name', function(suite) {
-                        suite.before('the dawn');
+                        suite[name](func);
                     });
-                }.bind(this)).must.throw(TypeError);
+                    this.suite.children[0][hookProperty].must.be(func);
+                });
+
+                it('should throw if hook is not a function', function() {
+                    (function() {
+                        this.context.suite('name', function(suite) {
+                            suite[name]('the dawn');
+                        });
+                    }.bind(this)).must.throw(TypeError);
+                });
             });
-        });
+        }
+
+        testHook('before');
+        testHook('after');
 
         describe('capture', function() {
             function prepareSuite(suite) {

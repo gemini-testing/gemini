@@ -236,6 +236,9 @@ All method are chainable:
       })
 
   ```
+* `after(callback(actions, find))` - use this function to execute some code
+  after the last state. The arguments of callback are the same as for 
+  `capture` and `before` callbacks and context is shared between all of them.
 
 ### Nested suites
 
