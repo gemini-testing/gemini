@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.5.0 - 2014-07-17
 
 * Browsers are now launched once for each run (previously, they were
   launched once per suite). This greatly reduces total tests run time,
