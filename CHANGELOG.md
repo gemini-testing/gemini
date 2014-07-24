@@ -2,6 +2,11 @@
 
 # Dev
 
+* `:before` and `:after` pseudo-elements outline and shadow are now
+  taken into account when calculating capture region(@incorp).
+
+  This change can break some of your tests. Re-gather reference images
+  to fix the problem.
 * Changed default tolerance to 0. Now every, even slightest difference
   between reference and current images will fail tests.
 
