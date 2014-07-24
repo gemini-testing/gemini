@@ -18,9 +18,8 @@
     "q-io": "~1.11.0",
     "resolve": "^0.7.1",
     "temp": "~0.8.0",
-    "wd": "git://github.com/SevInf/wd.git#9dea967ae987f5b2ea8fd59d48fa324e34dfe0cc"
+    "wd": "^0.3.4"
   },
-  "bundleDependencies": ["wd"],
   "devDependencies": {
     "codeclimate-test-reporter": "0.0.3",
     "istanbul": "^0.2.10",
