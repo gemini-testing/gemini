@@ -2,6 +2,13 @@
 
 # Dev
 
+* Changed default tolerance to 0. Now every, even slightest difference
+  between reference and current images will fail tests.
+
+  This can break some previous tests. Set `tolerance` to 0.001 in 
+  `.gemini.yml` to restore 0.5.x behavior.
+* Added `tolerance` config option which can be used to specify maximum
+  error rate before images will be treated as unequal.
 * Global installations of `gemini` now runs local one, if available.
 
 ## 0.5.0 - 2014-07-17

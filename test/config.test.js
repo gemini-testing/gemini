@@ -124,4 +124,55 @@ describe('config', function() {
             config.parallelLimit.must.be(3);
         });
     });
+
+    describe('tolerance', function() {
+        it('should not accept non-numbers', function() {
+            (function() {
+                return new Config('/', [
+                    'rootUrl: http://example.com',
+                    'gridUrl: http://example.com',
+                    'tolerance: zero!'
+                ].join('\n'));
+            }.must.throw(GeminiError));
+        });
+
+        it('should not accept number higher then 1', function() {
+            (function() {
+                return new Config('/', [
+                    'rootUrl: http://example.com',
+                    'gridUrl: http://example.com',
+                    'tolerance: 1.1'
+                ].join('\n'));
+            }.must.throw(GeminiError));
+        });
+
+        it('should not accept number lower then 0', function() {
+            (function() {
+                return new Config('/', [
+                    'rootUrl: http://example.com',
+                    'gridUrl: http://example.com',
+                    'tolerance: -0.1'
+                ].join('\n'));
+            }.must.throw(GeminiError));
+        });
+
+        it('should accept numbers between 0 and 1', function() {
+            var config = new Config('/', [
+                'rootUrl: http://example.com',
+                'gridUrl: http://example.com',
+                'tolerance: 0.01'
+            ].join('\n'));
+
+            config.tolerance.must.be(0.01);
+        });
+
+        it('should be Number.MIN_VALUE by default', function() {
+            var config = new Config('/', [
+                'rootUrl: http://example.com',
+                'gridUrl: http://example.com'
+            ].join('\n'));
+
+            config.tolerance.must.be(Number.MIN_VALUE);
+        });
+    });
 });

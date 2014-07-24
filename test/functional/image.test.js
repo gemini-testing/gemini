@@ -34,6 +34,27 @@ describe('image', function() {
                     result.must.be.false();
                 });
         });
+
+        it('should resolve to `true` for non-equal images if tolerance is 1', function() {
+            return Image.compare(imagePath('image1.png'), imagePath('image3.png'), 1.0)
+                .then(function(result) {
+                    result.must.be.true();
+                });
+        });
+
+        it('should resolve to `false` for non-equal images if tolerance is lower then error', function() {
+            return Image.compare(imagePath('image1.png'), imagePath('image3.png'), 0.10)
+                .then(function(result) {
+                    result.must.be.false();
+                });
+        });
+
+        it('should resolve to `true` for non-equal images if tolerance is higher then error', function() {
+            return Image.compare(imagePath('image1.png'), imagePath('image3.png'), 0.15)
+                .then(function(result) {
+                    result.must.be.true();
+                });
+        });
     });
 
     describe('buildDiff', function() {

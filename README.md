@@ -105,6 +105,9 @@ relatively to config file directory. `gemini/screens` by default.
   limit on a number of browser that can be run once at a time. Use this
   option to limit the number of browsers that `gemini` will try to run in
   parallel.
+* `tolerance` - specify maximum allowed image error before test will be reported
+  as invalid. By default, any slightest difference will be treated as failure.
+  To get pre-0.6 behavior, specify 0.001 as a tolerance.
 * `http.timeout` - Selenium Grid request timeout, msec
 * `http.retries` - Selenium Grid request tries count
 * `http.retryDelay` - dalay before retry of Selenium Grid request, msec
