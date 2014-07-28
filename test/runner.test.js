@@ -103,6 +103,18 @@ describe('runner', function() {
             });
         });
 
+        it('should pass config when emitting `begin`', function() {
+            var spy = this.sinon.spy().named('onBegin');
+            this.runner.on('begin', spy);
+
+            var _this = this;
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledWith(spy, sinon.match({
+                    config: _this.runner.config
+                }));
+            });
+        });
+
         it('should launch each browser in config', function() {
             this.runner.config.browsers = {
                 browser1: {browserName: 'browser1', version: '1'},

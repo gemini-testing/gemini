@@ -175,4 +175,43 @@ describe('config', function() {
             config.tolerance.must.be(Number.MIN_VALUE);
         });
     });
+
+    describe('diffColor', function() {
+        it('should be magenta by default', function() {
+            var config = new Config('/', [
+                'rootUrl: http://example.com',
+                'gridUrl: http://example.com'
+            ].join('\n'));
+            config.diffColor.must.be('#ff00ff');
+        });
+
+        it('should not accept non-strings', function() {
+            (function() {
+                return new Config('/', [
+                    'rootUrl: http://example.com',
+                    'gridUrl: http://example.com',
+                    'diffColor: 123'
+                ].join('\n'));
+            }.must.throw(GeminiError));
+        });
+
+        it('should not accept non-colors', function() {
+            (function() {
+                return new Config('/', [
+                    'rootUrl: http://example.com',
+                    'gridUrl: http://example.com',
+                    'diffColor: purple'
+                ].join('\n'));
+            }.must.throw(GeminiError));
+        });
+
+        it('should accept hexadecimal colors', function() {
+            var config = new Config('/', [
+                'rootUrl: http://example.com',
+                'gridUrl: http://example.com',
+                'diffColor: "#ff0000"'
+            ].join('\n'));
+            config.diffColor.must.be('#ff0000');
+        });
+    });
 });

@@ -107,6 +107,9 @@ relatively to config file directory. `gemini/screens` by default.
   parallel.
 * `tolerance` - specify maximum allowed image error before test will be reported
   as invalid. By default, any slightest difference will be treated as failure.
+* `diffColor` - specifies color which will be used to highlight differences
+  between images. Specified in hexadecimal RGB (`#RRGGBB`). Magenta by default
+  (`#FF00FF`).
   To get pre-0.6 behavior, specify 0.001 as a tolerance.
 * `http.timeout` - Selenium Grid request timeout, msec
 * `http.retries` - Selenium Grid request tries count

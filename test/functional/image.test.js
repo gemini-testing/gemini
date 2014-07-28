@@ -60,9 +60,32 @@ describe('image', function() {
     describe('buildDiff', function() {
         it('should build diff image', function() {
             return withTempFile(function(fileName) {
-                return Image.buildDiff(imagePath('image1.png'), imagePath('image3.png'), fileName)
+                var opts = {
+                    reference: imagePath('image1.png'),
+                    current: imagePath('image3.png'),
+                    diff: fileName
+                };
+                return Image.buildDiff(opts)
                     .then(function() {
                         return Image.compare(imagePath('image_diff.png'), fileName);
+                    })
+                    .then(function(equal) {
+                        equal.must.be.true();
+                    });
+            });
+        });
+
+        it('should allow to set diff color', function() {
+            return withTempFile(function(fileName) {
+                var opts = {
+                    reference: imagePath('image1.png'),
+                    current: imagePath('image3.png'),
+                    diff: fileName,
+                    diffColor: '#0000ff'
+                };
+                return Image.buildDiff(opts)
+                    .then(function() {
+                        return Image.compare(imagePath('image_diff_blue.png'), fileName);
                     })
                     .then(function(equal) {
                         equal.must.be.true();

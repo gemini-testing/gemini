@@ -19,6 +19,9 @@
   This change can break some of your tests. Re-gather reference images
   to fix the problem.
 
+* Added ability to change diff highlight color in config file.
+* Change diff highlight style 
+
 * Global installations of `gemini` now runs local one, if available.
 
 ## 0.5.0 - 2014-07-17
