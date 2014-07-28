@@ -1,6 +1,6 @@
 # Changelog
 
-# Dev
+## 0.6.0 - 2014-07-28
 
 * `:before` and `:after` pseudo-elements outline and shadow are now
   taken into account when calculating capture region(@incorp).
