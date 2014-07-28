@@ -7,6 +7,10 @@
 
   This can break some previous tests. Set `tolerance` to 0.001 in 
   `.gemini.yml` to restore 0.5.x behavior.
+* Coordinates of capture region are now rounded to capture maximal area.
+  Previously, border pixels could be cropped, due to rounding error.
+  This change can break some of your tests. Re-gather reference images
+  to fix the problem.
 * Added `tolerance` config option which can be used to specify maximum
   error rate before images will be treated as unequal.
 * Global installations of `gemini` now runs local one, if available.
