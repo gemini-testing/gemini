@@ -19,4 +19,5 @@ deploy:
     secure: YQj/i4PM/pqm/ODlEXrXpsSfkCs7FsCMk9rmpvEqKsVP0BbcV/pLe2Gw6r6yywN4TxYIJaABBEViTaoO5EjBfAh70knUSB9sMJ5jiMOvxh/UHlR7YDWT1/Eb/vKXKSzzQbnIM/6Zkqyan2UWPPo4X2AfuII3hEBzB2hMZHoGbys=
   on:
     tags: true
+    all_branches: true
     repo: bem/gemini
