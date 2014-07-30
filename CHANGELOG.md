@@ -1,5 +1,11 @@
 # Changelog
 
+## Dev
+
+* Fix incorrect capture region rounding, causing bottom row
+  of the element to be cropped sometimes.
+  
+
 ## 0.6.0 - 2014-07-28
 
 * `:before` and `:after` pseudo-elements outline and shadow are now
