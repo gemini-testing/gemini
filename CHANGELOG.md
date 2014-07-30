@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.6.1 - 2014-07-30
 
 * Fix incorrect capture region rounding, causing bottom row
   of the element to be cropped sometimes.
