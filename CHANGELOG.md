@@ -1,5 +1,12 @@
 # Changelog
 
+## Dev
+
+* Reset mouse position for each suite. Previously, cursor
+  may stay at the position left from a previous suite and
+  some elements was captured with hover effect when there
+  shouldn't be any.
+
 ## 0.6.1 - 2014-07-30
 
 * Fix incorrect capture region rounding, causing bottom row

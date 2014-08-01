@@ -98,7 +98,9 @@ describe('browser', function() {
         beforeEach(function() {
             this.wd = {
                 execute: sinon.stub().returns(q({})),
-                get: sinon.stub().returns(q({}))
+                get: sinon.stub().returns(q({})),
+                elementByCssSelector: sinon.stub().returns(q()),
+                moveTo: sinon.stub().returns(q())
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
@@ -115,6 +117,16 @@ describe('browser', function() {
         });
 
         it('should execute client script');
+
+        it('should reset mouse position', function() {
+            var _this = this,
+                elem = {};
+            this.wd.elementByCssSelector.returns(q(elem));
+            return this.browser.open('http://www.example.com')
+                .then(function() {
+                    sinon.assert.calledWith(_this.wd.moveTo, elem, 0, 0);
+                });
+        });
     });
 
     describe('prepareScreenshot', function() {
