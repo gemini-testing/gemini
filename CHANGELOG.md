@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.6.2 - 2014-08-01
 
 * Reset mouse position for each suite. Previously, cursor
   may stay at the position left from a previous suite and
