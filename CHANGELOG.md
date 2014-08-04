@@ -1,5 +1,9 @@
 # Changelog
 
+## Dev
+
+* Add command line completion (@unlok).
+
 ## 0.6.2 - 2014-08-01
 
 * Reset mouse position for each suite. Previously, cursor

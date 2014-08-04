@@ -400,3 +400,8 @@ gemini test --reporter flat --reporter html
 * `--grid-url`, `-r` - use specified URL, instead of `gridUrl` setting from config file.
 * `--help` - display help message.
 * `--version` - display version.
+
+### Shell completion
+
+To enable tab-completion of the shell commands add `. <(gemini completion)` to your shell rc-file (
+for example `~/.bashrc` for `bash` or `~/.zshrc` for `zsh`).
