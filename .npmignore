@@ -5,3 +5,4 @@
 .npmignore
 test/
 coverage/
+CONTRIBUTING.md
