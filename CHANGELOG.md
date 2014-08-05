@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.3 - 2014-08-05
+
+* Allow to use empty string with `sendKeys`. It can be used
+  to focus on an element without changing states.
+
 ## 0.6.2 - 2014-08-01
 
 * Reset mouse position for each suite. Previously, cursor
