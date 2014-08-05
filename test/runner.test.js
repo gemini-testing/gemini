@@ -4,14 +4,7 @@ var assert = require('assert'),
     sinon = require('sinon'),
     createSuite = require('../lib/suite').create,
     State = require('../lib/state'),
-    Config = require('../lib/config'),
-
-    CONFIG_TEXT = [
-        'rootUrl: http://example.com',
-        'gridUrl: http://grid.example.com',
-        'browsers: ',
-        '  browser: browser'
-    ].join('\n');
+    Config = require('../lib/config');
 
 function addState(suite, name) {
     var state = new State(suite, name, function() {});
@@ -56,8 +49,15 @@ describe('runner', function() {
         this.sinon.stub(require('child_process'), 'exec').withArgs('gm -version').callsArgWith(1, null, '', '');
 
         //require runner here to make stub above take effect
-        var Runner = require('../lib/runner');
-        this.runner = new Runner(new Config('/root', CONFIG_TEXT), this.launcher);
+        var Runner = require('../lib/runner'),
+            config = new Config('/root', {
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://grid.example.com',
+                browsers: {
+                    browser: 'browser'
+                }
+            });
+        this.runner = new Runner(new Config('/root', config), this.launcher);
     });
 
     afterEach(function() {
