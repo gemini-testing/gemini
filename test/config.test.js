@@ -1,8 +1,16 @@
 'use strict';
 var Config = require('../lib/config'),
-    GeminiError = require('../lib/errors/gemini-error');
+    GeminiError = require('../lib/errors/gemini-error'),
+    createSuite = require('../lib/suite').create;
 
 describe('config', function() {
+    describe('root', function() {
+        it('should be the directory containing config file', function() {
+            var config = new Config('/path/to/config.yml', 'rootUrl: http://example.com');
+            config.root.must.be('/path/to');
+        });
+    });
+
     describe('rootUrl', function() {
         it('should be required', function() {
             (function() {
@@ -435,6 +443,57 @@ describe('config', function() {
                 'gridUrl: http://example.com'
             ].join('\n'));
             config.screenshotsDir.must.be('/some/path/gemini/screens');
+        });
+    });
+
+    describe('getAbsoluteUrl', function() {
+        it('should resolve url relative to root', function() {
+            var config = new Config('/', 'rootUrl: http://example.com/path/');
+            config.getAbsoluteUrl('sub/path').must.be('http://example.com/path/sub/path');
+        });
+    });
+
+    describe('getScreenshotsDir', function() {
+        beforeEach(function() {
+            this.config = new Config('/root/config.yml', 'rootUrl: http://example.com');
+        });
+
+        it('should return path for simple suite and state', function() {
+            var suite = createSuite('suite');
+
+            this.config.getScreenshotsDir(suite, 'state').must.be('/root/gemini/screens/suite/state');
+        });
+
+        it('should return path for nested suite and state', function() {
+            var parent = createSuite('parent'),
+                child = createSuite('child', parent);
+
+            this.config.getScreenshotsDir(child, 'state').must.be('/root/gemini/screens/parent/child/state');
+        });
+
+        it('should take "screenshotsDir" setting into account', function() {
+            var config = new Config('/root/config.yml', [
+                'rootUrl: http://example.com',
+                'screenshotsDir: myscreens'
+            ].join('\n'));
+
+            var suite = createSuite('suite');
+
+            config.getScreenshotsDir(suite, 'state').must.be('/root/myscreens/suite/state');
+        });
+    });
+
+    describe('getScreenshotPath', function() {
+        beforeEach(function() {
+            this.config = new Config('/root/config.yml', 'rootUrl: http://example.com');
+        });
+
+        it('should return path to the image', function() {
+            var suite = createSuite('suite');
+
+            this.config.getScreenshotPath(suite, 'state', 'browser').must.be(
+                '/root/gemini/screens/suite/state/browser.png'
+            );
         });
     });
 });
