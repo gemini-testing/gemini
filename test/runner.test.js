@@ -57,7 +57,7 @@ describe('runner', function() {
                     browser: 'browser'
                 }
             });
-        this.runner = new Runner(new Config('/root', config), this.launcher);
+        this.runner = new Runner(config, this.launcher);
     });
 
     afterEach(function() {

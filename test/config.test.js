@@ -506,4 +506,15 @@ describe('config', function() {
             );
         });
     });
+
+    describe('unknown option', function() {
+        it('should be reported as error', function() {
+            (function() {
+                return new Config('/', {
+                    rootUrl: 'http://example.com',
+                    unknownOption: 'value'
+                });
+            }.must.throw(GeminiError));
+        });
+    });
 });

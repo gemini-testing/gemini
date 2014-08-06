@@ -3,6 +3,8 @@
 ## Dev
 
 * Add command line completion (@unlok).
+* Show an error, when config file has unknown
+  options.
 
 ## 0.6.3 - 2014-08-05
 
