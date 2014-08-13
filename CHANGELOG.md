@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.6.4 - 2014-08-13
 
 * Add command line completion (@unlok).
 * Show an error, when config file has unknown
