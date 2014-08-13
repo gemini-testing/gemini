@@ -338,6 +338,8 @@ sequence, delay the screenshot for this amount of time.
     `NUMPAD9`, `MULTIPLY`, `ADD`, `SEPARATOR`, `SUBTRACT`, `DECIMAL`, `DIVIDE`, `F1`, `F2`, `F3`, `F4`, `F5`,
     `F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND`, `META`, `ZENKAKU_HANKAKU`.
 
+* `focus(element)` - set a focus to a specified element.
+
 ## Commands
 
 You need `selenium-server` up and running if you want to run tests in real browsers.

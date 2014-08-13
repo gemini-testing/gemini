@@ -5,6 +5,7 @@
 * Add command line completion (@unlok).
 * Show an error, when config file has unknown
   options.
+* Add `focus(element)` action (@arikon).
 
 ## 0.6.3 - 2014-08-05
 
