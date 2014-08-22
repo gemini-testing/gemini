@@ -1,9 +1,19 @@
 'use strict';
 var Config = require('../lib/config'),
     GeminiError = require('../lib/errors/gemini-error'),
-    createSuite = require('../lib/suite').create;
+    createSuite = require('../lib/suite').create,
+    sinon = require('sinon'),
+    extend = require('node.extend');
 
 describe('config', function() {
+    beforeEach(function() {
+        this.sinon = sinon.sandbox.create();
+    });
+
+    afterEach(function() {
+        this.sinon.restore();
+    });
+
     describe('root', function() {
         it('should be the directory containing config file', function() {
             var config = new Config('/path/to/config.yml', {rootUrl: 'http://example.com'});
@@ -38,6 +48,16 @@ describe('config', function() {
                 rootUrl: 'http://example.org'
             });
 
+            config.rootUrl.must.be('http://example.org');
+        });
+
+        it('should be settable via environment variable GEMINI_ROOT_URL', function() {
+            stubProcessEnv(this.sinon, {GEMINI_ROOT_URL: 'http://example.org'});
+
+            var config = new Config('/', {
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com'
+            });
             config.rootUrl.must.be('http://example.org');
         });
     });
@@ -91,6 +111,16 @@ describe('config', function() {
                 gridUrl: 'http://grid.example.org'
             });
             config.gridUrl.must.be('http://grid.example.org');
+        });
+
+        it('should be settable via environment variable GEMINI_GRID_URL', function() {
+            stubProcessEnv(this.sinon, {GEMINI_GRID_URL: 'http://example.org'});
+
+            var config = new Config('/', {
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com'
+            });
+            config.gridUrl.must.be('http://example.org');
         });
     });
 
@@ -425,6 +455,17 @@ describe('config', function() {
             });
             config.debug.must.be(false);
         });
+
+        it('should be settable via environment variable GEMINI_DEBUG', function() {
+            stubProcessEnv(this.sinon, {GEMINI_DEBUG: true});
+
+            var config = new Config('/', {
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com',
+                debug: false
+            });
+            config.debug.must.be(true);
+        });
     });
 
     describe('screenshotsDir', function() {
@@ -451,6 +492,17 @@ describe('config', function() {
             var config = new Config('/some/path/config.yml', {
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com'
+            });
+            config.screenshotsDir.must.be('/some/path/gemini/screens');
+        });
+
+        it('should be settable via environment variable GEMINI_SCREENSHOTS_DIR', function() {
+            stubProcessEnv(this.sinon, {GEMINI_SCREENSHOTS_DIR: '/some/path/gemini/screens'});
+
+            var config = new Config('/', {
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com',
+                screenshotsDir: '/root'
             });
             config.screenshotsDir.must.be('/some/path/gemini/screens');
         });
@@ -518,3 +570,7 @@ describe('config', function() {
         });
     });
 });
+
+function stubProcessEnv(sinon, props) {
+    sinon.stub(process, 'env', extend({}, process.env, props));
+}
