@@ -92,6 +92,7 @@ describe('runner', function() {
                 browser1: {browserName: 'browser1', version: '1'},
                 browser2: {browserName: 'browser2'}
             };
+            this.runner.config.useBrowsers = Object.keys(this.runner.config.browsers);
 
             var spy = this.sinon.spy().named('onBegin');
             this.runner.on('begin', spy);
@@ -120,6 +121,7 @@ describe('runner', function() {
                 browser1: {browserName: 'browser1', version: '1'},
                 browser2: {browserName: 'browser2'}
             };
+            this.runner.config.useBrowsers = Object.keys(this.runner.config.browsers);
 
             addState(this.suite, 'state');
 
@@ -133,6 +135,7 @@ describe('runner', function() {
             this.runner.config.browsers = {
                 browser: {browserName: 'name'}
             };
+            this.runner.config.useBrowsers = Object.keys(this.runner.config.browsers);
 
             var spy = this.sinon.spy().named('onStartBrowser');
             this.runner.on('startBrowser', spy);
@@ -244,6 +247,7 @@ describe('runner', function() {
                 browser1: {browserName: 'browser1', version: '1'},
                 browser2: {browserName: 'browser2'}
             };
+            this.runner.config.useBrowsers = Object.keys(this.runner.config.browsers);
 
             var spy = this.sinon.spy().named('onBeginState');
             this.runner.on('beginState', spy);
@@ -427,6 +431,7 @@ describe('runner', function() {
             this.runner.config.browsers = {
                 browser: {browserName: 'name'}
             };
+            this.runner.config.useBrowsers = Object.keys(this.runner.config.browsers);
 
             var spy = this.sinon.spy().named('onStartBrowser');
             this.runner.on('stopBrowser', spy);
