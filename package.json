@@ -9,6 +9,7 @@
   "dependencies": {
     "chalk": "~0.4.0",
     "coa": "~0.4.0",
+    "css": "^2.1.0",
     "gm": "~1.16.0",
     "handlebars": "~1.3.0",
     "inherit": "~2.2.1",
