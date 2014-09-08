@@ -141,9 +141,11 @@ describe('browser', function() {
 
         it('should execute client side method', function() {
             var _this = this;
-            return this.browser.prepareScreenshot(['.selector1', '.selector2']).then(function() {
+            return this.browser.prepareScreenshot(['.selector1', '.selector2'], {}).then(function() {
                 /*jshint evil:true*/
-                sinon.assert.calledWith(_this.wd.eval, '__gemini.prepareScreenshot([".selector1",".selector2"])');
+                sinon.assert.calledWith(
+                    _this.wd.eval,
+                    '__gemini.prepareScreenshot([".selector1",".selector2"], {})');
             });
         });
 
