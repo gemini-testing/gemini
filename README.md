@@ -81,7 +81,7 @@ on selenium grid.
     If version is omitted, any browsers of the specified name will be used.
 
     `<browser-id>: <name>` is a shortcut for `<browser-id>: {browserName: <name>}`.
-    
+
     `<browser-id>` value is used for browser indentification in test resports and for
     constructing screens file names.
 
@@ -94,7 +94,7 @@ relatively to config file directory. `gemini/screens` by default.
     option1: value,
     option2: value
   ```
-  
+
   It is possible to set any capability, except `browserName` and `version` (use
   `browsers` option instead) and `takesScreenshot` (always set to `true`
   automatically);
@@ -117,7 +117,7 @@ relatively to config file directory. `gemini/screens` by default.
 
 ## Writing tests
 
-For each block of website you need to test you need to write one or more *test suites*. 
+For each block of website you need to test you need to write one or more *test suites*.
 Suite consists of few *states* that needs to be verified. For each state you need to
 specify *action sequence* that gets block to this state.
 
@@ -161,9 +161,9 @@ All method are chainable:
 * `setUrl(url)` - specifies address of web page to take screenshots from.
   URL is relative to `rootUrl` config field.
 * `setCaptureElements('selector1', 'selector2', ...})` - specifies css
-  selectors of the elements that will be used to determine a region of webpage 
+  selectors of the elements that will be used to determine a region of webpage
   to capture.
-  
+
   Capture region determined by minimum bounding rect for all
   of theese elements plus their `box-shadow` size.
 
@@ -243,7 +243,7 @@ All method are chainable:
 
   ```
 * `after(callback(actions, find))` - use this function to execute some code
-  after the last state. The arguments of callback are the same as for 
+  after the last state. The arguments of callback are the same as for
   `capture` and `before` callbacks and context is shared between all of them.
 
 ### Nested suites
@@ -300,7 +300,7 @@ list `element` can be either CSS selector, or result of a `find` call:
 
 * `click(element)` - mouse click at the center of the element.
 * `doubleClick(element)` - mouse double click at the center of the element.
-* `mouseDown(element, [button])` - press a mouse button at the center of the element. 
+* `mouseDown(element, [button])` - press a mouse button at the center of the element.
   Possible button values are: 0 - left, 1 - middle, 2 - right. By default, left button is used.
 * `mouseUp(element)` - release previously pressed mouse button.
 * `mouseMove(element, [offset])` - move mouse to the given element. Offset is specified relatively
@@ -372,7 +372,7 @@ gemini test [paths to suites]
 
 Paths and configuration are treated the same way as in `gather` command.
 
-Each state with appearance different from reference image will be treated 
+Each state with appearance different from reference image will be treated
 as the failed test.
 
 By default, you'll see only names of the states. To get more information
@@ -399,7 +399,7 @@ gemini test --reporter flat --reporter html
 
 * `--config`, `-c` - specify config file to use.
 * `--root-url`, `-r` - use specified URL, instead of `rootUrl` setting from config file.
-* `--grid-url`, `-r` - use specified URL, instead of `gridUrl` setting from config file.
+* `--grid-url`, `-g` - use specified URL, instead of `gridUrl` setting from config file.
 * `--help` - display help message.
 * `--version` - display version.
 
