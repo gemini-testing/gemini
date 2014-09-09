@@ -181,6 +181,46 @@ describe('capture session', function() {
             });
         });
 
+        it('should fail when crop area is not located within body area', function(done) {
+            this.state.name = 'state';
+            this.state.suite = {name: 'suite'};
+            this.browser.id = 'bro';
+
+            this.browser.prepareScreenshot.returns({
+                bodyHeight: 100,
+                locationInViewport: {
+                    top: 0,
+                    left: 0
+                },
+                locationInBody: {
+                    top: 50,
+                    left: 0
+                },
+                cropSize: {
+                    width: 100,
+                    height: 100
+                }
+            });
+            var image = {
+                getSize: sinon.stub().returns(q({
+                    width: 100,
+                    height: 90
+                })),
+
+                crop: sinon.stub().returns(q())
+            };
+            this.browser.captureFullscreenImage.returns(q(image));
+
+            return this.session.capture(this.state)
+               .then(function() {
+                   done(new Error());
+               })
+               .fail(function(err) {
+                   err.must.be.instanceOf(StateError);
+                   done();
+               });
+        });
+
         it('should extend any StateErrors with suite, state and browser names', function(done) {
             var error = new StateError('state error');
 
