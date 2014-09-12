@@ -4,10 +4,11 @@ var assert = require('assert'),
     sinon = require('sinon'),
     createSuite = require('../lib/suite').create,
     State = require('../lib/state'),
+    StateError = require('../lib/errors/state-error'),
     Config = require('../lib/config');
 
-function addState(suite, name) {
-    var state = new State(suite, name, function() {});
+function addState(suite, name, cb) {
+    var state = new State(suite, name, cb || function() {});
     suite.addState(state);
 }
 
@@ -44,13 +45,15 @@ describe('runner', function() {
 
         this.root = createSuite('root');
         this.suite = createSuite('suite', this.root);
+        this.suite.id = 0;
         this.suite.url = '/path';
 
         this.sinon.stub(require('child_process'), 'exec').withArgs('gm -version').callsArgWith(1, null, '', '');
 
         //require runner here to make stub above take effect
         var Runner = require('../lib/runner'),
-            config = new Config('/root', {
+            config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://grid.example.com',
                 browsers: {
@@ -77,6 +80,7 @@ describe('runner', function() {
             addState(this.suite, '1');
             addState(this.suite, '2');
             var child = createSuite('child', this.suite);
+            child.id = 1;
             addState(child, '3');
 
             var spy = this.sinon.spy().named('onBegin');
@@ -148,7 +152,8 @@ describe('runner', function() {
             return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
-                    suiteName: 'suite'
+                    suiteName: 'suite',
+                    suiteId: 0
                 });
             });
         });
@@ -190,6 +195,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteId: 0,
                     stateName: 'state'
                 });
             });
@@ -220,6 +226,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteId: 0,
                     stateName: 'state'
                 });
             });
@@ -270,6 +277,7 @@ describe('runner', function() {
 
         it('should launch browser once even if there is a second suite', function() {
             var secondSuite = createSuite('second', this.root);
+            secondSuite.id = 1;
 
             secondSuite.url = '/hello';
             addState(this.suite, 'state');
@@ -298,6 +306,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteId: 0,
                     stateName: 'state'
                 });
             });
@@ -355,22 +364,24 @@ describe('runner', function() {
             return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
-                    suiteName: 'suite'
+                    suiteName: 'suite',
+                    suiteId: 0
                 });
             });
         });
 
         it('should also run child suites automatically', function() {
-            var spy = this.sinon.spy();
-
-            createSuite('child', this.suite);
+            var spy = this.sinon.spy(),
+                child = createSuite('child', this.suite);
+            child.id = 1;
 
             this.runner.on('beginSuite', spy);
 
             return this.runner.run(this.root).then(function() {
                 spy.secondCall.args.must.eql([{
                     browserId: 'browser',
-                    suiteName: 'child'
+                    suiteName: 'child',
+                    suiteId: 1
                 }]);
             });
         });
@@ -475,6 +486,36 @@ describe('runner', function() {
                     stopBrowser,
                     end
                 );
+            });
+        });
+
+        it('should report total number of tests run', function() {
+            addState(this.suite, 'state');
+            return this.runner.run(this.root).then(function(stats) {
+                stats.total.must.be(1);
+            });
+        });
+
+        it('should report number of skipped suites', function() {
+            this.suite.addState({
+                name: 'state',
+                suite: this.suite,
+                shouldSkip: this.sinon.stub().returns(true)
+            });
+
+            return this.runner.run(this.root).then(function(stats) {
+                stats.skipped.must.be(1);
+            });
+        });
+
+        it('should report error to count when resolved', function() {
+            addState(this.suite, 'state', function() {
+                throw new StateError('example');
+            });
+
+            this.runner.on('error', function() {}); //supress failure on unhandled error event
+            return this.runner.run(this.root).then(function(stats) {
+                stats.errored.must.be(1);
             });
         });
     });
