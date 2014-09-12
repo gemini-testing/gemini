@@ -56,12 +56,22 @@ browsers:
     version: '27.0'
 ```
 
-Config file fields:
+Some of the options can also be overridden via command-line options or environment variables.
+Priorities are the following:
 
-* `rootUrl` - the root URL of your website. Target URLs of your test suites will
-be resolved relatively to it.
-* `gridUrl` - Selenium Grid URL to use for taking screenshots. Required, if
-you want to run test in other browsers, then `phantomjs`.
+* command-line option has highest priority. It overrides environment variable
+  and config file value.
+* environment variable has second priority. It overrides config file value.
+* config file value has the lowest priority.
+* if no command line option, environment variable or config file option specified, default is
+  used.
+
+Config file options:
+
+* `rootUrl` (CLI: `--root-url`, env: 'GEMINI_ROOT_URL') - the root URL of your website. Target URLs of 
+  your test suites will be resolved relatively to it.
+* `gridUrl` (CLI: `--grid-url`, env: 'GEMINI_GRID_URL') - Selenium Grid URL to use for taking 
+   screenshots. Required, if you want to run test in other browsers, then `phantomjs`.
 * `browsers` - list of browsers to use for testing. Each browser should be available
 on selenium grid.
 
@@ -85,8 +95,9 @@ on selenium grid.
     `<browser-id>` value is used for browser indentification in test resports and for
     constructing screens file names.
 
-* `screenshotsDir` - directory to save reference screenshots to. Specified
-relatively to config file directory. `gemini/screens` by default.
+* `screenshotsDir` (CLI: `--screenshots-dir`, env: `GEMINI_SCREENSHOTS_DIR`) - directory
+  to save reference screenshots to. Specified relatively to config file directory.
+  `gemini/screens` by default.
 * `capabilities` - additional [Selenium](http://code.google.com/p/selenium/wiki/DesiredCapabilities) and [Sauce Labs](https://saucelabs.com/docs/additional-config) capabilities to use for all browsers:
 
   ```yaml
@@ -99,7 +110,7 @@ relatively to config file directory. `gemini/screens` by default.
   `browsers` option instead) and `takesScreenshot` (always set to `true`
   automatically);
 
-* `debug` - turn on debug logging to the terminal
+* `debug` (CLI: `--debug`, env: `GEMINI_DEBUG`) - turn on debug logging to the terminal
 * `parallelLimit` - by default, `gemini` will run all browsers in parallel.
   Sometimes (i.e. when using cloud services, such as SauceLabs) you have a
   limit on a number of browser that can be run once at a time. Use this
@@ -114,7 +125,9 @@ relatively to config file directory. `gemini/screens` by default.
 * `http.timeout` - Selenium Grid request timeout, msec
 * `http.retries` - Selenium Grid request tries count
 * `http.retryDelay` - dalay before retry of Selenium Grid request, msec
-* `windowSize` - specify browser window dimensions (i.e. `1600x1200`).
+* `coverage` (CLI: `--coverage`, env: `GEMINI_COVERAGE`) - set to true, to enable experimental
+  coverage reporting. Report will be saved to `gemini-coverage` directory.
+* `windowSize` (env: `GEMINI_WINDOW_SIZE`) - specify browser window dimensions (i.e. `1600x1200`).
 
 ## Writing tests
 
@@ -396,6 +409,13 @@ You can also use multiple reporters at the same time using multiple `--reporter`
 ```
 gemini test --reporter flat --reporter html
 ```
+
+#### CSS Code Coverage (Experimental)
+
+Path `--coverage` (or set `coverage` option in config file) to enable code coverage reporter.
+`gemini` will examine your CSS files and report CSS rules that had been captured by at least
+one test completely (green color in report), particularly (yellow) or was not captured at all
+(red).
 
 ### Common cli options
 
