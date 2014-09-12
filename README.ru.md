@@ -81,6 +81,7 @@ browsers:
 * `http.timeout` - таймаут запроса к Selenium Grid, мсек
 * `http.retries` - количество попыток отправки запроса в Selenium Grid
 * `http.retryDelay` - пауза перед повторной отправкой запроса в Selenium Grid, мсек
+* `windowSize` - размеры окна браузера. Например, `1600x1200`.
 
 ## Создание тестов
 
@@ -272,6 +273,7 @@ browsers:
     `F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND`, `META`, `ZENKAKU_HANKAKU`.
 
 * `focus(element)` - устанавливается фокус на указанный элемент.
+* `setWindowSize(width, height)` - устанавливает размера окна браузера.
 
 ## Команды
 

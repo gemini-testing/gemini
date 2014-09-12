@@ -114,6 +114,7 @@ relatively to config file directory. `gemini/screens` by default.
 * `http.timeout` - Selenium Grid request timeout, msec
 * `http.retries` - Selenium Grid request tries count
 * `http.retryDelay` - dalay before retry of Selenium Grid request, msec
+* `windowSize` - specify browser window dimensions (i.e. `1600x1200`).
 
 ## Writing tests
 
@@ -339,6 +340,7 @@ sequence, delay the screenshot for this amount of time.
     `F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND`, `META`, `ZENKAKU_HANKAKU`.
 
 * `focus(element)` - set a focus to a specified element.
+* `setWindowSize(width, height)` - change browser window dimensions.
 
 ## Commands
 

@@ -569,6 +569,42 @@ describe('config', function() {
             }.must.throw(GeminiError));
         });
     });
+
+    describe('windowSize', function() {
+        it('should not accept non-string value', function() {
+            (function() {
+                return new Config('/', {
+                    windowSize: 100
+                });
+            }.must.throw(GeminiError));
+        });
+
+        it('should not accept string in invalid format', function() {
+            (function() {
+                return new Config('/', {
+                    windowSize: 'abc'
+                });
+            }.must.throw(GeminiError));
+        });
+
+        it('should be {width: x, height: y} object', function() {
+            var config = new Config('/', {
+                rootUrl: 'http://example.com',
+                windowSize: '1000x2000'
+            });
+            config.windowSize.must.eql({width: 1000, height: 2000});
+        });
+
+        it('should be settable via environment variable GEMINI_WINDOW_SIZE', function() {
+            stubProcessEnv(this.sinon, {GEMINI_WINDOW_SIZE: '1000x2000'});
+
+            var config = new Config('/', {
+                rootUrl: 'http://example.com',
+                windowSize: '100x200'
+            });
+            config.windowSize.must.eql({width: 1000, height: 2000});
+        });
+    });
 });
 
 function stubProcessEnv(sinon, props) {
