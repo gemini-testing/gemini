@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.4 - 2014-09-12
+
+* Add experimental CSS-coverage report. Enable
+  with `--coverage` CLI flag or `coverage: true` in
+  config (@scf2k).
+* Add ability to override `gridUrl`,`rootUrl`, `screenshotsDir`,
+  `debug` config options by their respective CLI options or
+  environment variables (@arikon).
+* Add config option `windowSize` to specify default
+  size of the browser windows (@scf2k).
+* Add action `setWindowSize` to specify browser
+  window size during the tests (@scf2k).
+* Show meaningful error when capture area origin
+  does not fit to full-page screenshot (@scf2k).
+
 ## 0.6.4 - 2014-08-13
 
 * Add command line completion (@unlok).
