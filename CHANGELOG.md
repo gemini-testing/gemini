@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.4 - 2014-09-12
+## 0.6.5 - 2014-09-12
 
 * Add experimental CSS-coverage report. Enable
   with `--coverage` CLI flag or `coverage: true` in
