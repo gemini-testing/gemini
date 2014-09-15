@@ -1,7 +1,10 @@
 # Changelog
 
-## 0.6.5 - 2014-09-12
+## 0.7.0 - 2014-09-15
 
+* Show meaningful error when capture area origin
+  does not fit to full-page screenshot. This change
+  can break some of your tests (@scf2k).
 * Add experimental CSS-coverage report. Enable
   with `--coverage` CLI flag or `coverage: true` in
   config (@scf2k).
@@ -12,8 +15,11 @@
   size of the browser windows (@scf2k).
 * Add action `setWindowSize` to specify browser
   window size during the tests (@scf2k).
-* Show meaningful error when capture area origin
-  does not fit to full-page screenshot (@scf2k).
+
+
+## 0.6.5 - 2014-09-12
+
+Was republished as 0.7.0 due to a breaking change.
 
 ## 0.6.4 - 2014-08-13
 
