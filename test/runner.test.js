@@ -4,10 +4,11 @@ var assert = require('assert'),
     sinon = require('sinon'),
     createSuite = require('../lib/suite').create,
     State = require('../lib/state'),
+    StateError = require('../lib/errors/state-error'),
     Config = require('../lib/config');
 
-function addState(suite, name) {
-    var state = new State(suite, name, function() {});
+function addState(suite, name, cb) {
+    var state = new State(suite, name, cb || function() {});
     suite.addState(state);
 }
 
@@ -484,6 +485,23 @@ describe('runner', function() {
                     stopBrowser,
                     end
                 );
+            });
+        });
+
+        it('should resolve to `success` status if no errors occurred', function() {
+            return this.runner.run(this.root).then(function(status) {
+                status.must.be('success');
+            });
+        });
+
+        it('should resolve to `error` status if errors occurred', function() {
+            addState(this.suite, 'state', function() {
+                throw new StateError('example');
+            });
+
+            this.runner.on('error', function() {}); //supress failure on unhandled error event
+            return this.runner.run(this.root).then(function(status) {
+                status.must.be('error');
             });
         });
     });
