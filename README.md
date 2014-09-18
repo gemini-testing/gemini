@@ -399,10 +399,10 @@ This will produce HTML file in `gemini-report` directory. It will
 display reference image, current image and difference between the two
 for each state in each browser.
 
-Other available reporters are:
+Available reporters are:
 
 * `flat` (default console reporter)
-* `teamcity` (TeamCity console reporter)
+* `html` for html report
 
 You can also use multiple reporters at the same time using multiple `--reporter` options:
 
