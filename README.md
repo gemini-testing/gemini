@@ -95,6 +95,9 @@ on selenium grid.
     `<browser-id>` value is used for browser indentification in test resports and for
     constructing screens file names.
 
+* `projectRoot` – root directory of a project. All relative paths in config or options
+  will be resolved relative to it. By default it is the directory config file is placed
+  in.
 * `screenshotsDir` (CLI: `--screenshots-dir`, env: `GEMINI_SCREENSHOTS_DIR`) - directory
   to save reference screenshots to. Specified relatively to config file directory.
   `gemini/screens` by default.
@@ -429,3 +432,8 @@ one test completely (green color in report), particularly (yellow) or was not ca
 
 To enable tab-completion of the shell commands add `. <(gemini completion)` to your shell rc-file (
 for example `~/.bashrc` for `bash` or `~/.zshrc` for `zsh`).
+
+## Programmatic API
+
+To use `gemini` in your scripts or build tools plugins you can use experimental 
+[programmatic API](docs/programmatic-api.md).
