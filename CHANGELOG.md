@@ -1,5 +1,11 @@
 # Changelog
 
+## Dev
+
+* Remove built-in TeamCity reporter. If you really want
+it, you can adapt 0.7.x reporter to the current version
+of `gemini` and publish it in separate package.
+
 ## 0.7.0 - 2014-09-15
 
 * Show meaningful error when capture area origin
