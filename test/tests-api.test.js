@@ -126,6 +126,37 @@ describe('public tests API', function() {
                 });
             }.must.not.throw());
         });
+
+        it('should assign suite ids', function() {
+            this.context.suite('suite', function() {});
+            this.suite.children[0].id.must.be(1);
+        });
+
+        it('should assign incrementing suite ids for following suites', function() {
+            this.context.suite('suite', function() {});
+            this.context.suite('suite2', function() {});
+            this.suite.children[1].id.must.be(2);
+        });
+
+        it('should assign incrementing suite ids for child suites', function() {
+            var _this = this;
+            this.context.suite('suite', function() {
+                _this.context.suite('suite2', function() {});
+            });
+            this.suite.children[0].children[0].id.must.be(2);
+        });
+
+        it('should assign child suite ids before siblings', function() {
+            var _this = this;
+            this.context.suite('suite', function() {
+                _this.context.suite('suite2', function() {});
+            });
+
+            this.context.suite('suite3', function() {});
+
+            this.suite.children[0].children[0].id.must.be(2);
+            this.suite.children[1].id.must.be(3);
+        });
     });
 
     describe('suite builder', function() {

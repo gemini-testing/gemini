@@ -14,29 +14,57 @@ describe('config', function() {
         this.sinon.restore();
     });
 
-    describe('root', function() {
-        it('should be the directory containing config file', function() {
-            var config = new Config('/path/to/config.yml', {rootUrl: 'http://example.com'});
-            config.root.must.be('/path/to');
+    describe('projectRoot', function() {
+        it('should be required when creating config from object', function() {
+            (function() {
+                return new Config({
+                    rootUrl: 'http://example.com'
+                });
+            }.must.throw(GeminiError));
+        });
+
+        it('should resolve relative paths relatively to cwd', function() {
+            this.sinon.stub(process, 'cwd').returns('/some/path');
+            var config = new Config({
+                projectRoot: './rel/path',
+                rootUrl: 'http://example.com'
+            });
+            config.projectRoot.must.be('/some/path/rel/path');
+        });
+
+        it('should leave absolute path unchanged', function() {
+            var config = new Config({
+                projectRoot: '/some/absolute/path',
+                rootUrl: 'http://example.com'
+            });
+
+            config.projectRoot.must.be('/some/absolute/path');
         });
     });
 
     describe('rootUrl', function() {
         it('should be required', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     gridUrl: 'http://example.com'
                 });
             }.must.throw(GeminiError));
         });
 
         it('should accept strings', function() {
-            var config = new Config('/', {rootUrl: 'http://example.com'});
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com'
+            });
             config.rootUrl.must.be('http://example.com');
         });
 
         it('should be overridable', function() {
-            var config = new Config('/', {rootUrl: 'http://example.com'}, {
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com'
+            }, {
                 rootUrl: 'http://example.org'
             });
 
@@ -44,7 +72,11 @@ describe('config', function() {
         });
 
         it('should be settable via overrides', function() {
-            var config = new Config('/', {gridUrl: 'http://example.com'}, {
+            var config = new Config({
+                projectRoot: '/',
+                gridUrl: 'http://example.com'
+            }, {
+                projectRoot: '/',
                 rootUrl: 'http://example.org'
             });
 
@@ -54,7 +86,8 @@ describe('config', function() {
         it('should be settable via environment variable GEMINI_ROOT_URL', function() {
             stubProcessEnv(this.sinon, {GEMINI_ROOT_URL: 'http://example.org'});
 
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com'
             });
@@ -65,7 +98,8 @@ describe('config', function() {
     describe('gridUrl', function() {
         it('should be required is there are non-phantomjs browsers', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     browsers: {
                         phantomjs: 'phantomjs',
@@ -77,7 +111,8 @@ describe('config', function() {
 
         it('should not be required if there are only phantomjs browser', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     browsers: {
                         phantomjs: 'phantomjs'
@@ -87,7 +122,8 @@ describe('config', function() {
         });
 
         it('should accept string', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 gridUrl: 'http://grid.example.com',
                 rootUrl: 'http://example.com'
             });
@@ -95,7 +131,8 @@ describe('config', function() {
         });
 
         it('should be overridable', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 gridUrl: 'http://grid.example.com',
                 rootUrl: 'http://example.com'
             }, {
@@ -105,7 +142,8 @@ describe('config', function() {
         });
 
         it('should be settable with overrides', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com'
             }, {
                 gridUrl: 'http://grid.example.org'
@@ -116,7 +154,8 @@ describe('config', function() {
         it('should be settable via environment variable GEMINI_GRID_URL', function() {
             stubProcessEnv(this.sinon, {GEMINI_GRID_URL: 'http://example.org'});
 
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com'
             });
@@ -126,7 +165,8 @@ describe('config', function() {
 
     describe('browsers', function() {
         it('should accept objects', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 browsers: {
@@ -146,7 +186,8 @@ describe('config', function() {
         });
 
         it('should transform "id: name" to valid capabilites', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 browsers: {
@@ -161,7 +202,8 @@ describe('config', function() {
         });
 
         it('should accept legacy array', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 browsers: [
@@ -186,7 +228,8 @@ describe('config', function() {
         });
 
         it('should be phantomjs by default', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com'
             });
@@ -199,7 +242,8 @@ describe('config', function() {
 
         it('should throw if not object nor array', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     browsers: 'yep!'
@@ -210,7 +254,8 @@ describe('config', function() {
 
     describe('capabilities', function() {
         it('should be copied as is', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 capabilities: {
@@ -230,7 +275,8 @@ describe('config', function() {
                 (function() {
                     var capabilites = {};
                     capabilites[name] = 'value';
-                    return new Config('/', {
+                    return new Config({
+                        projectRoot: '/',
                         rootUrl: 'http://example.com',
                         gridUrl: 'http://example.com',
                         capabilities: capabilites
@@ -244,7 +290,8 @@ describe('config', function() {
 
     describe('http', function() {
         it('should be passed only timeout, retries and retryDelay options', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 http: {
@@ -264,7 +311,8 @@ describe('config', function() {
 
         it('should not accept non-number timeout', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     http: {
                         timeout: 'not a number'
@@ -275,7 +323,8 @@ describe('config', function() {
 
         it('should not accept non-number retires', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     http: {
                         retries: 'not a number'
@@ -286,7 +335,8 @@ describe('config', function() {
 
         it('should not accept non-number retryDelay', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     http: {
                         retryDelay: 'not a number'
@@ -299,7 +349,8 @@ describe('config', function() {
     describe('parallelLimit', function() {
         it('should not accept non-numbers', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     parallelLimit: 'so many'
@@ -309,7 +360,8 @@ describe('config', function() {
 
         it('should not accept negative numbers', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     parallelLimit: -1
@@ -319,7 +371,8 @@ describe('config', function() {
 
         it('should not accept float numbers', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     parallelLimit: 1.1
@@ -328,7 +381,8 @@ describe('config', function() {
         });
 
         it('should copy non-negative integer', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 parallelLimit: 3
@@ -340,7 +394,8 @@ describe('config', function() {
     describe('tolerance', function() {
         it('should not accept non-numbers', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     tolerance: 'zero!'
@@ -350,7 +405,8 @@ describe('config', function() {
 
         it('should not accept number higher then 1', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     tolerance: 1.1
@@ -360,7 +416,8 @@ describe('config', function() {
 
         it('should not accept number lower then 0', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     tolerance: -0.1
@@ -369,7 +426,8 @@ describe('config', function() {
         });
 
         it('should accept numbers between 0 and 1', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 tolerance: 0.01
@@ -379,7 +437,8 @@ describe('config', function() {
         });
 
         it('should be Number.MIN_VALUE by default', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com'
             });
@@ -390,7 +449,8 @@ describe('config', function() {
 
     describe('diffColor', function() {
         it('should be magenta by default', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com'
             });
@@ -399,7 +459,8 @@ describe('config', function() {
 
         it('should not accept non-strings', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     diffColor: 123
@@ -409,7 +470,8 @@ describe('config', function() {
 
         it('should not accept non-colors', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     diffColor: 'purple'
@@ -418,7 +480,8 @@ describe('config', function() {
         });
 
         it('should accept hexadecimal colors', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 diffColor: '#ff0000'
@@ -430,7 +493,8 @@ describe('config', function() {
     describe('debug', function() {
         it('should not accept non-boolean', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     debug: 'very much'
@@ -439,7 +503,8 @@ describe('config', function() {
         });
 
         it('should accept true', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 debug: true
@@ -448,7 +513,8 @@ describe('config', function() {
         });
 
         it('should accept false', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 debug: false
@@ -459,7 +525,8 @@ describe('config', function() {
         it('should be settable via environment variable GEMINI_DEBUG', function() {
             stubProcessEnv(this.sinon, {GEMINI_DEBUG: true});
 
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 debug: false
@@ -471,7 +538,8 @@ describe('config', function() {
     describe('screenshotsDir', function() {
         it('should not accept non-string value', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
                     screenshotsDir: 12.5
@@ -480,7 +548,8 @@ describe('config', function() {
         });
 
         it('should be a file path resolved relative to root', function() {
-            var config = new Config('/some/path/config.yml', {
+            var config = new Config({
+                projectRoot: '/some/path',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 screenshotsDir: 'screens'
@@ -489,7 +558,8 @@ describe('config', function() {
         });
 
         it('should be gemini/screens by default', function() {
-            var config = new Config('/some/path/config.yml', {
+            var config = new Config({
+                projectRoot: '/some/path',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com'
             });
@@ -499,7 +569,8 @@ describe('config', function() {
         it('should be settable via environment variable GEMINI_SCREENSHOTS_DIR', function() {
             stubProcessEnv(this.sinon, {GEMINI_SCREENSHOTS_DIR: '/some/path/gemini/screens'});
 
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/some/path',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
                 screenshotsDir: '/root'
@@ -510,14 +581,20 @@ describe('config', function() {
 
     describe('getAbsoluteUrl', function() {
         it('should resolve url relative to root', function() {
-            var config = new Config('/', {rootUrl: 'http://example.com/path/'});
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com/path/'
+            });
             config.getAbsoluteUrl('sub/path').must.be('http://example.com/path/sub/path');
         });
     });
 
     describe('getScreenshotsDir', function() {
         beforeEach(function() {
-            this.config = new Config('/root/config.yml', {rootUrl: 'http://example.com'});
+            this.config = new Config({
+                projectRoot: '/root',
+                rootUrl: 'http://example.com'
+            });
         });
 
         it('should return path for simple suite and state', function() {
@@ -534,7 +611,8 @@ describe('config', function() {
         });
 
         it('should take "screenshotsDir" setting into account', function() {
-            var config = new Config('/root/config.yml', {
+            var config = new Config({
+                projectRoot: '/root',
                 rootUrl: 'http://example.com',
                 screenshotsDir: 'myscreens'
             });
@@ -547,7 +625,10 @@ describe('config', function() {
 
     describe('getScreenshotPath', function() {
         beforeEach(function() {
-            this.config = new Config('/root/config.yml', {rootUrl: 'http://example.com'});
+            this.config = new Config({
+                projectRoot: '/root',
+                rootUrl: 'http://example.com'
+            });
         });
 
         it('should return path to the image', function() {
@@ -562,7 +643,8 @@ describe('config', function() {
     describe('unknown option', function() {
         it('should be reported as error', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     rootUrl: 'http://example.com',
                     unknownOption: 'value'
                 });
@@ -573,7 +655,8 @@ describe('config', function() {
     describe('windowSize', function() {
         it('should not accept non-string value', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     windowSize: 100
                 });
             }.must.throw(GeminiError));
@@ -581,14 +664,16 @@ describe('config', function() {
 
         it('should not accept string in invalid format', function() {
             (function() {
-                return new Config('/', {
+                return new Config({
+                    projectRoot: '/',
                     windowSize: 'abc'
                 });
             }.must.throw(GeminiError));
         });
 
         it('should be {width: x, height: y} object', function() {
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 windowSize: '1000x2000'
             });
@@ -598,7 +683,8 @@ describe('config', function() {
         it('should be settable via environment variable GEMINI_WINDOW_SIZE', function() {
             stubProcessEnv(this.sinon, {GEMINI_WINDOW_SIZE: '1000x2000'});
 
-            var config = new Config('/', {
+            var config = new Config({
+                projectRoot: '/',
                 rootUrl: 'http://example.com',
                 windowSize: '100x200'
             });
