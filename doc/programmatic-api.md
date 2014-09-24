@@ -90,6 +90,9 @@ Options:
 * `reporters` – array of reporter to use. Each element can be either string
 (to use corresponding built-in reporter) or reporter function (to use custom 
 reporter).
+* `grep` - regular expression to filter suites to run. By default, all tests
+will be executed. If this option is set, only suites with name matching the
+pattern will be executed.
 
 Returns promise, that resolve to a stats object with following keys:
 
@@ -111,6 +114,9 @@ Options:
 reporter).
 * `tempDir` - directory to save temporary images (current states) to. By default,
 new temp directory will be created.
+* `grep` - regular expression to filter suites to run. By default, all tests
+will be executed. If this option is set, only suites with name matching the
+pattern will be executed.
 
 Returns promise, that resolve to a stats object with following keys:
 

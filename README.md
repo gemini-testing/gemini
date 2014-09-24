@@ -425,6 +425,7 @@ one test completely (green color in report), particularly (yellow) or was not ca
 * `--config`, `-c` - specify config file to use.
 * `--root-url`, `-r` - use specified URL, instead of `rootUrl` setting from config file.
 * `--grid-url`, `-g` - use specified URL, instead of `gridUrl` setting from config file.
+* `--grep PATTERN` – execute only suites with names, matching the regular expression pattern.
 * `--help` - display help message.
 * `--version` - display version.
 
