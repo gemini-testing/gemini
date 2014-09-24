@@ -6,6 +6,8 @@
 it, you can adapt 0.7.x reporter to the current version
 of `gemini` and publish it in separate package.
 * Add experimental [programmatic API](doc/programmatic-api.md).
+* Add `--grep` option to `gather` and `test` commands, which
+  allows to execute only suites, matching the pattern (@scf2k).
 
 ## 0.7.0 - 2014-09-15
 

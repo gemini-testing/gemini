@@ -239,4 +239,19 @@ describe('suite', function() {
             this.suite.deepStatesCount.must.be(3);
         });
     });
+
+    describe('fullName', function() {
+        beforeEach(function() {
+            this.parent = createSuite('parent');
+            this.child = createSuite('child', this.parent);
+        });
+
+        it('should return name for top level suite', function() {
+            this.parent.fullName.must.be('parent');
+        });
+
+        it('should concat own name with parents', function() {
+            this.child.fullName.must.be('parent child');
+        });
+    });
 });
