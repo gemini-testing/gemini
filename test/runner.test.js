@@ -266,6 +266,54 @@ describe('runner', function() {
                 });
         });
 
+        it('should not emit state events if suite does not match grep pattern', function() {
+            this.runner.setGrepPattern(/not match/);
+            var onBeginState = this.sinon.spy().named('onBeginState'),
+                onEndState = this.sinon.spy().named('onEndState');
+
+            this.runner.on('beginState', onBeginState);
+            this.runner.on('endState', onEndState);
+            addState(this.suite, 'state');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.notCalled(onBeginState);
+                sinon.assert.notCalled(onEndState);
+            });
+        });
+
+        it('should not call state callback if suite does not match grep pattern', function() {
+            this.runner.setGrepPattern(/not match/);
+            var stateCallback = this.sinon.spy().named('state callback');
+
+            addState(this.suite, 'state', stateCallback);
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.notCalled(stateCallback);
+            });
+        });
+
+        it('should emit state events if suite matches grep pattern', function() {
+            this.runner.setGrepPattern(/sui/);
+            var onBeginState = this.sinon.spy().named('onBeginState'),
+                onEndState = this.sinon.spy().named('onEndState');
+
+            this.runner.on('beginState', onBeginState);
+            this.runner.on('endState', onEndState);
+            addState(this.suite, 'state');
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledOnce(onBeginState);
+                sinon.assert.calledOnce(onEndState);
+            });
+        });
+
+        it('should call state callback if suite matches grep pattern', function() {
+            this.runner.setGrepPattern(/uite/);
+            var stateCallback = this.sinon.spy().named('state callback');
+
+            addState(this.suite, 'state', stateCallback);
+            return this.runner.run(this.root).then(function() {
+                sinon.assert.calledOnce(stateCallback);
+            });
+        });
+
         it('should launch browser only once', function() {
             addState(this.suite, 'state1');
             addState(this.suite, 'state2');
