@@ -201,30 +201,19 @@ describe('config', function() {
             });
         });
 
-        it('should accept legacy array', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
-                browsers: [
-                    {name: 'bro'},
-                    {name: 'bro2', version: '12.0'},
-                    'bro3'
-                ]
-            });
-            config.browsers.must.eql({
-                bro: {
-                    browserName: 'bro'
-                },
-                'bro2-v12.0': {
-                    browserName: 'bro2',
-                    version: '12.0'
-                },
-
-                bro3: {
-                    browserName: 'bro3'
-                }
-            });
+        it('should throw on legacy array', function() {
+            (function() {
+                return new Config({
+                    projectRoot: '/',
+                    rootUrl: 'http://example.com',
+                    gridUrl: 'http://example.com',
+                    browsers: [
+                        {name: 'bro'},
+                        {name: 'bro2', version: '12.0'},
+                        'bro3'
+                    ]
+                });
+            }.must.throw(GeminiError));
         });
 
         it('should be phantomjs by default', function() {
