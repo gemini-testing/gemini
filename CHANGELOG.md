@@ -5,7 +5,7 @@
 * Remove built-in TeamCity reporter. If you really want
 it, you can adapt 0.7.x reporter to the current version
 of `gemini` and publish it in separate package.
-* Add experimental [programmatic API](docs/programmatic-api.md).
+* Add experimental [programmatic API](doc/programmatic-api.md).
 
 ## 0.7.0 - 2014-09-15
 
