@@ -24,7 +24,7 @@ brew install graphicsmagick
 ```
 
 Requires local or remote [selenium-grid](https://code.google.com/p/selenium/wiki/Grid2)
-installation to test in other browsers, then [phantomjs](http://phantomjs.org/).
+installation to test in other browsers, than [phantomjs](http://phantomjs.org/).
 
 ## Installation
 
