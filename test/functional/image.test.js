@@ -35,24 +35,24 @@ describe('image', function() {
                 });
         });
 
-        it('should resolve to `true` for non-equal images if tolerance is 1', function() {
-            return Image.compare(imagePath('image1.png'), imagePath('image3.png'), 1.0)
+        it('should resolve to `true` for images with unnoticable difference', function() {
+            return Image.compare(
+                    imagePath('image1.png'),
+                    imagePath('image4.png')
+                )
                 .then(function(result) {
-                    result.must.be.true();
+                    result.must.be(true);
                 });
         });
 
-        it('should resolve to `false` for non-equal images if tolerance is lower then error', function() {
-            return Image.compare(imagePath('image1.png'), imagePath('image3.png'), 0.10)
+        it('should resolve to `false` for images with unnoticable difference if strictComparison=true', function() {
+            return Image.compare(
+                    imagePath('image1.png'),
+                    imagePath('image4.png'),
+                    {strictComparison: true}
+                )
                 .then(function(result) {
-                    result.must.be.false();
-                });
-        });
-
-        it('should resolve to `true` for non-equal images if tolerance is higher then error', function() {
-            return Image.compare(imagePath('image1.png'), imagePath('image3.png'), 0.15)
-                .then(function(result) {
-                    result.must.be.true();
+                    result.must.be(false);
                 });
         });
     });
@@ -63,7 +63,8 @@ describe('image', function() {
                 var opts = {
                     reference: imagePath('image1.png'),
                     current: imagePath('image3.png'),
-                    diff: fileName
+                    diff: fileName,
+                    diffColor: '#f0001c'
                 };
                 return Image.buildDiff(opts)
                     .then(function() {
@@ -75,7 +76,7 @@ describe('image', function() {
             });
         });
 
-        it('should allow to set diff color', function() {
+        it('should allow to change diff color', function() {
             return withTempFile(function(fileName) {
                 var opts = {
                     reference: imagePath('image1.png'),
@@ -123,7 +124,7 @@ describe('image', function() {
         it('should crop image', function() {
             var _this = this;
             return withTempFile(function(filePath) {
-                return _this.image.crop({top: 1, left:1, width: 19, height: 19})
+                return _this.image.crop({top: 1, left:1, width: 18, height: 18})
                     .then(function(image) {
                         return image.save(filePath);
                     })
