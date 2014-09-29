@@ -2,6 +2,16 @@
 
 ## Dev
 
+* New image comparison algorithm is implemented:
+  - `gm compare` replaced with custom diff. For now, GraphicsMagick
+  is still required for other image manipulations.
+  - `tolerance` setting is removed in favor of "strict mode": by default,
+  only noticable changes (according to ciede2000 metric) will be treated
+  as failure, to treat all changes that way user can enable
+  `strictComparison` option.
+  - in case if some element in focus during test can potentially have
+  blinking caret displayed, diff will try to ignore caret.
+
 * Remove built-in TeamCity reporter. If you really want
 it, you can adapt 0.7.x reporter to the current version
 of `gemini` and publish it in separate package.
