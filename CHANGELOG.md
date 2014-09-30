@@ -1,5 +1,9 @@
 # Changelog
 
+## Dev
+
+* `test` command will exit with correct codes
+
 ## 0.8.0 - 2014-09-30
 
 * New image comparison algorithm is implemented:
