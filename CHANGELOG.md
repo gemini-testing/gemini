@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.8.1 – 2014-09-30
 
 * `test` command will exit with correct codes
 
