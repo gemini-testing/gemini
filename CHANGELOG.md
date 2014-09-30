@@ -20,6 +20,8 @@ of `gemini` and publish it in separate package.
 * Add experimental [programmatic API](doc/programmatic-api.md).
 * Add `--grep` option to `gather` and `test` commands, which
   allows to execute only suites, matching the pattern (@scf2k).
+* Show required dimensions in error message when origin does
+  not fir to full-page screenshot (@scf2k)
 
 ## 0.7.0 - 2014-09-15
 
