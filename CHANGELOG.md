@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.8.0 - 2014-09-30
 
 * New image comparison algorithm is implemented:
   - `gm compare` replaced with custom diff. For now, GraphicsMagick
