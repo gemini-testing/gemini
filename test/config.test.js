@@ -381,58 +381,47 @@ describe('config', function() {
     });
 
     describe('tolerance', function() {
-        it('should not accept non-numbers', function() {
+        it('should throw error if set', function() {
             (function() {
                 return new Config({
                     projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
-                    tolerance: 'zero!'
+                    tolerance: 0.01
                 });
             }.must.throw(GeminiError));
         });
+    });
 
-        it('should not accept number higher then 1', function() {
+    describe('strictComparison', function() {
+        it('should not accept non-boolean', function() {
             (function() {
                 return new Config({
                     projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
-                    tolerance: 1.1
+                    strictComparison: 'of course!'
                 });
             }.must.throw(GeminiError));
         });
 
-        it('should not accept number lower then 0', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
-                    tolerance: -0.1
-                });
-            }.must.throw(GeminiError));
-        });
-
-        it('should accept numbers between 0 and 1', function() {
+        it('should accept boolean', function() {
             var config = new Config({
                 projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com',
-                tolerance: 0.01
+                strictComparison: true
             });
-
-            config.tolerance.must.be(0.01);
+            config.strictComparison.must.be(true);
         });
 
-        it('should be Number.MIN_VALUE by default', function() {
+        it('should be false by default', function() {
             var config = new Config({
                 projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://example.com'
             });
-
-            config.tolerance.must.be(Number.MIN_VALUE);
+            config.strictComparison.must.be(false);
         });
     });
 
