@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.8.2 - 2014-10-06
 
 * Reset cursor position before reloading the page.
 When resetting it just after page load, old cursor position
