@@ -1,5 +1,12 @@
 # Changelog
 
+## Dev
+
+* Reset cursor position before reloading the page.
+When resetting it just after page load, old cursor position
+may trigger some transitions which will not be finished before
+first screenshot.
+
 ## 0.8.1 – 2014-09-30
 
 * `test` command will exit with correct codes
