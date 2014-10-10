@@ -42,6 +42,36 @@ describe('config', function() {
         });
     });
 
+    describe('sourceRoot', function() {
+        it('should be equal to projectRoot by default', function() {
+            var config = new Config({
+                projectRoot: '/some/absolute/path',
+                rootUrl: 'http://example.com'
+            });
+
+            config.sourceRoot.must.be('/some/absolute/path');
+        });
+
+        it('should resolve relative paths relatively to projectRoot', function() {
+            var config = new Config({
+                projectRoot: '/root',
+                sourceRoot: './rel/path',
+                rootUrl: 'http://example.com'
+            });
+            config.sourceRoot.must.be('/root/rel/path');
+        });
+
+        it('should leave absolute path unchanged', function() {
+            var config = new Config({
+                projectRoot: '/root',
+                sourceRoot: '/some/absolute/path',
+                rootUrl: 'http://example.com'
+            });
+
+            config.sourceRoot.must.be('/some/absolute/path');
+        });
+    });
+
     describe('rootUrl', function() {
         it('should be required', function() {
             (function() {

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="coverage.css"/>
+    <meta charset="utf-8"> 
+</head>
+<body>
+<div class="report">
+    <h3>Gemini tests CSS coverage report</h3>
+    <h4>Summary: <b
+                    title="Total percentage of the covered rules">{{percent}}%</b> (<b
+                    title="Total number of the covered rules">{{covered}}</b>/<b
+                    title="Total number of the rules in all files">{{total}}</b>)</h4>
+    <ul class="report-list">
+    {{#each reports}}
+        <li class="report-list__item"><a href="{{report}}">{{source}}</a>: <b
+                title="Percentage of the covered rules">{{stat.percent}}%</b> (<b
+                title="Covered rules">{{stat.covered}}</b>/<b
+                title="Total rules in this file">{{stat.total}}</b>)</li>
+    {{/each}}
+    </ul>
+</div>
+</body>
+</html>
