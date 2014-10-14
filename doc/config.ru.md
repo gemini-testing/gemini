@@ -51,7 +51,7 @@ browsers:
 * `projectRoot` - корневой каталог проекта. Относительно этого каталога будут назначены все относительные
   пути в других настройках и опциях. По умолчанию, это каталог, в котором раположен конфигурационный файл.
 * `screenshotsDir` (CLI: `--screenshots-dir`, env: `GEMINI_SCREENSHOTS_DIR`) - каталог для хранения файлов со снимками экрана, указанный относительно директории конфигурационного файла. По умолчанию – `gemini/screens`.
-* `capabilities` - дополнительные возможности [Selenium](http://code.google.com/p/selenium/wiki/DesiredCapabilities) и [Sauce Labs](https://saucelabs.com/docs/additional-config) для всех браузеров:
+* `capabilities` - дополнительные параметры [Selenium](http://code.google.com/p/selenium/wiki/DesiredCapabilities) и [Sauce Labs](https://saucelabs.com/docs/additional-config) для всех браузеров:
 
   ```yaml
   capabilities:
@@ -61,13 +61,12 @@ browsers:
 
   Можно настроить любой параметр за исключением `browserName`/`version` (вместо этого используйте
   `browsers`) и `takesScreenshot` (автоматически заявлено как `true`).
-* `debug` (CLI: `--debug`, env: `GEMINI_DEBUG`) - включить debug-вывод в терминал.
+* `debug` (CLI: `--debug`, env: `GEMINI_DEBUG`) - включить отладочный вывод в терминал.
 * `parallelLimit` - число браузеров запускаемых `Gemini` параллельно.  
 По умолчанию запускаются все, но 
 иногда (например, при использовании облачных сервисов вроде Sauce Labs) это число необходимо контролировать.
 * `strictComparison` - по умолчанию, только заметные различия считаются провалом теста. Опция задаёт подобное поведение для ошибок любого масштаба.
 * `diffColor` - определяет цвет выделения различий между изображениями. Задаётся в`#RRGGBB`-формате. По умолчанию, magenta (`#FF00FF`).
-  Для pre-0.6 поведения, задайте погрешность 0.001.
 * `http.timeout` - таймаут запроса к Selenium Grid (мс).
 * `http.retries` - количество попыток отправки запроса в Selenium Grid.
 * `http.retryDelay` - пауза перед повторной отправкой запроса в Selenium Grid (мс).
