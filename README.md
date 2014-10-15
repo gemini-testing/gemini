@@ -27,7 +27,7 @@ Required software:
 1. [GraphicsMagick](http://www.graphicsmagick.org/) - image processing system.  
 Install on Mac OS X using [Homebrew](http://brew.sh/) command `brew install graphicsmagick`.
 2. [Selenium Server](http://docs.seleniumhq.org/download/) - for testing in different browsers.
-3. [PhantomJS](http://phantomjs.org/) - shell version of a WebKit-browser.
+3. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit browser.
 
 ## Installation
 ### Global Installation
@@ -114,7 +114,7 @@ gemini.suite('yandex-search', function(suite) {
 });
 ```
 
-We create a new test suite `yandex-search` and assume that we will read the `.main-table` element from a root URL `http://yandex.com`. We know that the block has two states:
+We create a new test suite `yandex-search` and assume that we will capture the `.main-table` element from a root URL `http://yandex.com`. We know that the block has two states:
 
 * `plain` – right after the page is loaded;
 * `with text` - with an inserted `.input__control` text `hello gemini`.
