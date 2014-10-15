@@ -437,4 +437,4 @@ for example `~/.bashrc` for `bash` or `~/.zshrc` for `zsh`).
 ## Programmatic API
 
 To use `gemini` in your scripts or build tools plugins you can use experimental 
-[programmatic API](doc/programmatic-api.md).
+[programmatic API](https://github.com/bem/gemini/blob/master/doc/programmatic-api.md).
