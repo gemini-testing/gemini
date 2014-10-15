@@ -27,7 +27,11 @@ Required software:
 1. [GraphicsMagick](http://www.graphicsmagick.org/) - image processing system.  
 Install on Mac OS X using [Homebrew](http://brew.sh/) command `brew install graphicsmagick`.
 2. [Selenium Server](http://docs.seleniumhq.org/download/) - for testing in different browsers.
+<<<<<<< HEAD
 3. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit-browser.
+=======
+3. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit browser.
+>>>>>>> FETCH_HEAD
 
 ## Installation
 ### Global Installation
