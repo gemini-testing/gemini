@@ -125,13 +125,13 @@
                 .capture('state');
 
             gemini.suite('first child', function(child) {
-                //данный набор фиксирует один и тот же элемент на разных страницах
+                //данный набор захватывает один и тот же элемент на разных страницах
                 child.setUrl('/other/path')
                     .capture('other state');
             });
 
             gemini.suite('second child', function(child) {
-                //данный набор фиксирует разные элементы на одной и той же странице
+                //данный набор захватывает разные элементы на одной и той же странице
                 child.setCaptureElements('.next-selector'})
                     .capture('third state', function(actions, elements) {
                         // ...

@@ -27,7 +27,7 @@ Required software:
 1. [GraphicsMagick](http://www.graphicsmagick.org/) - image processing system.  
 Install on Mac OS X using [Homebrew](http://brew.sh/) command `brew install graphicsmagick`.
 2. [Selenium Server](http://docs.seleniumhq.org/download/) - for testing in different browsers.
-3. [PhantomJS](http://phantomjs.org/) - shell version of a WebKit-browser.
+3. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit-browser.
 
 ## Installation
 ### Global Installation
@@ -52,7 +52,7 @@ npm install gemini
 
 **Gemini** is configured using `.gemini.yml` file at the root of the project.
 ### Usage with PhantomJS
-In case only local `PhantomJS` copy is installed, the configuration is as simple as declaring the website `rootUrl` option.
+In case only local `PhantomJS` copy is being used for testing, the configuration is as simple as declaring the website `rootUrl` option.
 
 For example,
 
@@ -114,10 +114,10 @@ gemini.suite('yandex-search', function(suite) {
 });
 ```
 
-We create a new test suite `yandex-search` and assume that we will read the `.main-table` element from a root URL `http://yandex.com`. We know that the block has two states:
+We create a new test suite `yandex-search` and assume that we will capture the `.main-table` element from a root URL `http://yandex.com`. We know that the block has two states:
 
 * `plain` – right after the page is loaded;
-* `with text` - with an inserted `.input__control` text `hello gemini`.
+* `with text` - with `hello gemini` text inserted into `.input__control`.
 
 States are executed one after another in order of definition without browser reload in between.
 
@@ -135,6 +135,19 @@ For test launch (to compare current state of a block with a reference shot) use 
 ```
 gemini test [path to test suites]
 ```
+
+To see the difference between current state of a block and a reference picture more clearly, use HTML reporter:
+
+```
+gemini test --reporter html [paths to suites]
+```
+
+You can use both console and HTML reporters at the same time:
+
+```
+gemini test --reporter html --reporter flat [путь к файлам с тестами]
+```
+
 [See the details](doc/commands.md) of interaction with CLI and available options.
 
 ## GUI
