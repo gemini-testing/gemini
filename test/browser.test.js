@@ -2,6 +2,8 @@
 var Browser = require('../lib/browser'),
     q = require('q'),
     wd = require('wd'),
+    fs = require('fs'),
+    path = require('path'),
     sinon = require('sinon');
 
 describe('browser', function() {
@@ -165,9 +167,11 @@ describe('browser', function() {
 
     describe('captureFullscreenImage', function() {
         it('should call to the driver', function() {
-            var stubWd = {
-                takeScreenshot: sinon.stub().returns(q({}))
-            };
+            var img = path.join(__dirname, 'functional', 'data', 'image', 'image1.png'),
+                imgData = fs.readFileSync(img),
+                stubWd = {
+                    takeScreenshot: sinon.stub().returns(q(imgData))
+                };
 
             this.sinon.stub(wd, 'promiseRemote').returns(stubWd);
             var browser = new Browser({}, 'browser', {browserName: 'browser', version: '1.0'});

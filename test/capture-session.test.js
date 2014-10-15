@@ -72,7 +72,7 @@ describe('capture session', function() {
                 createActionSequence: sinon.stub().returns(this.seq),
                 captureFullscreenImage: sinon.stub().returns(q({
                     crop: sinon.stub().returns(q()),
-                    getSize: sinon.stub().returns(q({}))
+                    getSize: sinon.stub().returns({})
                 })),
                 prepareScreenshot: sinon.stub().returns(q({
                     locationInBody: {},
@@ -126,10 +126,10 @@ describe('capture session', function() {
                 }
             });
             var image = {
-                getSize: sinon.stub().returns(q({
+                getSize: sinon.stub().returns({
                     width: 100,
                     height: 90
-                })),
+                }),
 
                 crop: sinon.stub().returns(q())
             };
@@ -162,10 +162,10 @@ describe('capture session', function() {
                 }
             });
             var image = {
-                getSize: sinon.stub().returns(q({
+                getSize: sinon.stub().returns({
                     width: 100,
                     height: 150
-                })),
+                }),
 
                 crop: sinon.stub().returns(q())
             };
@@ -202,10 +202,10 @@ describe('capture session', function() {
                 }
             });
             var image = {
-                getSize: sinon.stub().returns(q({
+                getSize: sinon.stub().returns({
                     width: 100,
                     height: 90
-                })),
+                }),
 
                 crop: sinon.stub().returns(q())
             };

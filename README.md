@@ -24,10 +24,8 @@ Current document is a quick step-by-step guide that describes installation, conf
 
 Required software:
 
-1. [GraphicsMagick](http://www.graphicsmagick.org/) - image processing system.  
-Install on Mac OS X using [Homebrew](http://brew.sh/) command `brew install graphicsmagick`.
-2. [Selenium Server](http://docs.seleniumhq.org/download/) - for testing in different browsers.
-3. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit browser.
+1. [Selenium Server](http://docs.seleniumhq.org/download/) - for testing in different browsers.
+2. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit browser.
 
 ## Installation
 ### Global Installation
@@ -88,7 +86,7 @@ browsers:
   firefox:
     browserName: firefox
     version: "31.0"
-        
+
 ```
 
 In `browsers` section, *keys* are unique browser ids (chosen by user) and *values* are [DesiredCapabilites](https://code.google.com/p/selenium/wiki/DesiredCapabilities) of a corresponding browser.
@@ -167,5 +165,5 @@ GUI advantages:
 
 ## Programmatic API
 
-To use **Gemini** in your scripts or build tools plugins you can use experimental 
+To use **Gemini** in your scripts or build tools plugins you can use experimental
 [programmatic API](doc/programmatic-api.md).
