@@ -1,23 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        .covered {
-            background-color: green
-        }
-
-        .none {
-            background-color: indianred
-        }
-
-        .partial {
-            background-color: yellow
-        }
-    </style>
+    <link rel="stylesheet" href="coverage.css"/>
+    <meta charset="utf-8"> 
 </head>
 <body>
-{{#each blocks}}
-    <pre class="{{type}}">{{content}}</pre>
-{{/each}}
+    <div class="link-index">
+        <span><b>{{projectSource}}</b>: Rules covered: <b
+                title="Percentage of the covered rules">{{stat.percent}}%</b> (<b
+                title="Covered rules">{{stat.covered}}</b>/<b
+                title="Total rules in this file">{{stat.total}}</b>)</span><br/>
+        <a href="index.html">&lt;&lt;Index</a>&nbsp;
+        <span>(<a href="{{source}}">File</a>/<a href="{{url}}">URL</a>)</span>
+    </div>
+    <div class="content">
+        {{{content}}}
+    </div>
 </body>
 </html>
