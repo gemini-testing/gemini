@@ -17,7 +17,7 @@ Once you have few suites written you need to capture reference images:
 gemini gather [paths to suites]
 ```
 
-If no paths are specified, every `.js` file from `gemini` directory will be read.
+If no paths are specified, each `.js` file from `gemini` directory will be processed.
 By default, configuration will be loaded from `.gemini.yml` in the current directory.
 To specify other config, use `--config` or `-c` option.
 
@@ -39,8 +39,8 @@ you can use HTML reporter:
 
 `gemini test --reporter html [paths to suites]`
 
-This will produce HTML file in `gemini-report` directory. It will
-display reference image, current image and difference between them,
+This will produce an HTML file in `gemini-report` directory. It will
+display reference image, current image and differences between them,
 for each state in each browser.
 
 Available reporters are:
@@ -58,14 +58,14 @@ gemini test --reporter flat --reporter html
 
 Path `--coverage` (or set `coverage` option in config file) to enable code coverage reporter.
 **Gemini** will examine your CSS files and report CSS rules that had been captured by at least
-one test completely (green color in report), particularly (yellow) or was not captured at all
+one test completely (green color in report), partially (yellow) or was not captured at all
 (red).
 
 ### Common CLI Options
 
 * `--config`, `-c` - specify config file to use.
-* `--root-url`, `-r` - use specified URL, instead of `rootUrl` setting from config file.
-* `--grid-url`, `-g` - use specified URL, instead of `gridUrl` setting from config file.
+* `--root-url`, `-r` - use specified URL instead of `rootUrl` setting from config file.
+* `--grid-url`, `-g` - use specified URL instead of `gridUrl` setting from config file.
 * `--grep PATTERN` – execute only suites with names that match the regular expression pattern.
 * `--help` - display help message.
 * `--version` - display version.

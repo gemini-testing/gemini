@@ -84,8 +84,8 @@ on Selenium Grid.
   limit on a number of browser that can be run once at a time. Use this
   option to limit the number of browsers that `gemini` will try to run in
   parallel.
-* `strictComparison` - by default, only noticeable differences will be treated
-as test failure. Enable this option to treat all errors this way.
+* `strictComparison` - test will be considered as failed in case of any kind of error. By default, only noticeable differences are treated
+as test failure.
 * `diffColor` - specifies color which will be used to highlight differences
   between images. Specified in hexadecimal RGB (`#RRGGBB`). Magenta by default
   (`#FF00FF`).

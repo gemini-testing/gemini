@@ -11,8 +11,8 @@ Its key features are:
 
 * Compatibility with different browsers;
 * Ability to test separate sections of a web page;
-* Position of an element is calculated including its `box-shadow` and `outline` properties;
-* Non-error differences between images (rendering artifacts, text caret, etc.) are ignored;
+* Position and size of an element are calculated including its `box-shadow` and `outline` properties;
+* Some special case differences between images (rendering artifacts, text caret, etc.) are ignored;
 * CSS test coverage statistics.
 
 **Gemini** is created at [Yandex](http://www.yandex.com/) and will be especially
@@ -27,11 +27,7 @@ Required software:
 1. [GraphicsMagick](http://www.graphicsmagick.org/) - image processing system.  
 Install on Mac OS X using [Homebrew](http://brew.sh/) command `brew install graphicsmagick`.
 2. [Selenium Server](http://docs.seleniumhq.org/download/) - for testing in different browsers.
-<<<<<<< HEAD
-3. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit-browser.
-=======
 3. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit browser.
->>>>>>> FETCH_HEAD
 
 ## Installation
 ### Global Installation
@@ -55,6 +51,7 @@ npm install gemini
 ## Configuration
 
 **Gemini** is configured using `.gemini.yml` file at the root of the project.
+
 ### Usage with PhantomJS
 In case only local `PhantomJS` copy is being used for testing, the configuration is as simple as declaring the website `rootUrl` option.
 
@@ -72,7 +69,7 @@ phantomjs --webdriver=4444
 
 ### Usage with Selenium
 
-In order to run tests in different browsers use `Selenium`. You may choose remote `Selenium Grid`, a cloud service (such as [SauceLabs](http://saucelabs.com/) or [BrowserStack](http://www.browserstack.com/)), or run a server locally:
+In order to run tests in different browsers use `Selenium`. You may choose remote `Selenium Grid`, a cloud service (such as [SauceLabs](http://saucelabs.com/) or [BrowserStack](http://www.browserstack.com/)), or run a local server:
 
 ```
 java -jar selenium-server-standalone.jar
@@ -94,7 +91,7 @@ browsers:
         
 ```
 
-In `browsers`, *keys* are unique browser ids (chosen by user) and *values* are [DesiredCapabilites](https://code.google.com/p/selenium/wiki/DesiredCapabilities) of a corresponding browser.
+In `browsers` section, *keys* are unique browser ids (chosen by user) and *values* are [DesiredCapabilites](https://code.google.com/p/selenium/wiki/DesiredCapabilities) of a corresponding browser.
 
 ### Other Configuration Options
 [See the details](doc/config.md) of a config file structure.
@@ -132,24 +129,24 @@ States are executed one after another in order of definition without browser rel
 To complete the test creation procedure you need to take reference shots using the following command:
 
 ```
-gemini gather [path to test suites]
+gemini gather [paths to test suites]
 ```
 For test launch (to compare current state of a block with a reference shot) use the command:
 
 ```
-gemini test [path to test suites]
+gemini test [paths to test suites]
 ```
 
 To see the difference between current state of a block and a reference picture more clearly, use HTML reporter:
 
 ```
-gemini test --reporter html [paths to suites]
+gemini test --reporter html [paths to test suites]
 ```
 
 You can use both console and HTML reporters at the same time:
 
 ```
-gemini test --reporter html --reporter flat [путь к файлам с тестами]
+gemini test --reporter html --reporter flat [paths to test suites]
 ```
 
 [See the details](doc/commands.md) of interaction with CLI and available options.

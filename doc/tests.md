@@ -42,7 +42,7 @@ builder instance (described below).
 
 ### Suite Builder Methods
 
-All method are chainable:
+All methods are chainable:
 
 * `setUrl(url)` - specifies address of a web page to take screenshots from.
   URL is relative to `rootUrl` config field.
@@ -55,9 +55,9 @@ All method are chainable:
 
   Can also accept an array:
 
-  ```
-  suite.setCaptureElements(['.selector1', '.selector2']);
-  ```
+```
+suite.setCaptureElements(['.selector1', '.selector2']);
+```
 
   All tests in a suite will fail if none of the elements will be found.
 
@@ -67,24 +67,24 @@ All method are chainable:
   - `skip(browserName)` or `skip({browserName: browserName})` - all
     versions of specified browser;
   - `skip({browserName: browserName, version: browserVersion})` - particular version of a browser.
-  - `skip([browser1, browser2, ...])` - multiple browsers or
-    versions.
+  - `skip([browser1, browser2, ...])` - multiple browsers or versions.
 
   All browsers from subsequent calls to `.skip()` are added to the skip list:
 
-  ```javascript
-  suite.skip({browserName: 'browser1', version: '1.0'})
-       .skip('browser2');
-  ```
+```javascript
+suite
+    .skip({browserName: 'browser1', version: '1.0'})
+    .skip('browser2');
+```
 
   is equivalent to
 
-  ```javascript
-  suite.skip([
-      {browserName: 'browser1', version: '1.0'},
-      'browser2'
-  ]);
-  ```
+```javascript
+    suite.skip([
+        {browserName: 'browser1', version: '1.0'},
+        'browser2'
+    ]);
+```
 
 * `capture(stateName, callback(actions, find))` - defines a new state to capture.
   Optional callback describes a sequence of actions to bring the page to this state,
@@ -100,22 +100,22 @@ All method are chainable:
      Search will be performed once for each `find` call, so if you need to perform
      multiple actions on the same element, save the result to some variable:
 
-     ```javascript
-     .capture('name', function(actions, find) {
-         var button = find('.button');
-         actions.mouseDown(button)
+```javascript
+    .capture('name', function(actions, find) {
+        var button = find('.button');
+            actions.mouseDown(button)
                 .mouseUp(button);
-     });
-     ```
+    });
+```
 
 
 * `before(callback(actions, find))` - use this function to execute some code
   before the first state. The arguments of a callback are the same as for `capture` callback.
   Context is shared between `before` callback and all of suite's state callbacks, so you
-  can use this hook to lookup for element only once for all suite:
+  can use this hook to lookup for an element only once for the whole suite:
 
-  ```javascript
-  suite.before(function(actions, find) {
+```javascript
+   suite.before(function(actions, find) {
           this.button = find('.buttons');
       })
       .capture('hovered', function(actions, find) {
@@ -123,8 +123,7 @@ All method are chainable:
       })
       .capture('pressed', function(actions, find) {
           actions.mouseDown(this.button);
-      })
-
+      });
   ```
   
 * `after(callback(actions, find))` - use this function to execute some code
@@ -140,38 +139,36 @@ Each new suite causes reload of the browser, even if URL was not changed.
 ```javascript
 var gemini = require('gemini');
 
-gemin.suite('parent', function(parent) {
+gemini.suite('parent', function(parent) {
     parent.setUrl('/some/path')
-          .setCaptureElements('.selector1', '.selector2');
-          .capture('state');
+        .setCaptureElements('.selector1', '.selector2');
+        .capture('state');
 
-    gemini.suite('first child', function(child) {
-        //this suite captures same elements on different page
+gemini.suite('first child', function(child) {
+//this  suite captures same elements on different page
         child.setUrl('/other/path')
             .capture('other state');
     });
 
-    gemini.suite('second child', function(child) {
-        //this suite captures different elements on a same page
+gemini.suite('second child', function(child) {
+//this suite captures different elements on a same page
         child.setCaptureElements('.next-selector'})
              .capture('third state', function(actions, elements) {
                  ...
-             })
+             });
 
-        gemini.suite('grandchild', function(grandchild) {
-            //child suites can have own childs
-            grandchild.capture('fourth state');
-
+gemini.suite('grandchild', function(grandchild) {
+//child suites can have own childs
+        grandchild.capture('fourth state');
         });
     });
 
-    gemini.suite('third child', function(child) {
-        //this child uses completely different URL and set
-        //of elements
+gemini.suite('third child', function(child) {
+//this child uses completely different URL and set
+//of elements
         child.setUrl('/some/another/path')
-          .setCaptureElements('.different-selector');
-          .capture('fifth state');
-
+            .setCaptureElements('.different-selector');
+            .capture('fifth state');
     });
 });
 ```
@@ -195,11 +192,11 @@ list `element` can be either CSS selector or result of a `find` call:
 * `executeJS(function(window))` - run specified function in a browser. The argument of a function
    is the browser's `window` object:
 
-   ```javascript
+```javascript
    actions.executeJS(function(window) {
        window.alert('Hello!');
-   });
-   ```
+    });
+```
 
    Note that function is executed in a browser context, so any references to outer scope of callback won't work.
 
@@ -210,9 +207,9 @@ sequence, delay the screenshot for this amount of time.
 
    You can send a special key using one of the provided constants, i.e:
 
-   ```javascript
+```javascript
    actions.sendKeys(gemini.ARROW_DOWN);
-   ```
+```
 
    Full list of special keys:
 
