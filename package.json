@@ -21,7 +21,8 @@
     "resolve": "^0.7.1",
     "source-map": "^0.1.40",
     "temp": "~0.8.0",
-    "wd": "^0.3.4"
+    "wd": "^0.3.4",
+    "minimatch": "~1.0.0"
   },
   "devDependencies": {
     "codeclimate-test-reporter": "0.0.3",

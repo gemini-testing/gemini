@@ -699,6 +699,51 @@ describe('config', function() {
             config.windowSize.must.eql({width: 1000, height: 2000});
         });
     });
+
+    describe('coverageExclude', function() {
+        it('should be empty array by default', function() {
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com'
+            });
+
+            config.coverageExclude.must.eql([]);
+        });
+
+        it('should not accept non array values', function() {
+            (function() {
+                return new Config({
+                    projectRoot: '/',
+                    coverageExclude: {}
+                });
+            }.must.throw(GeminiError));
+
+            (function() {
+                return new Config({
+                    projectRoot: '/',
+                    coverageExclude: ''
+                });
+            }.must.throw(GeminiError));
+
+            (function() {
+                return new Config({
+                    projectRoot: '/',
+                    coverageExclude: true
+                });
+            }.must.throw(GeminiError));
+        });
+
+        it('should accept array values', function() {
+            var exclude = ['libs/**', 'examples/**'],
+                config = new Config({
+                    projectRoot: '/',
+                    rootUrl: 'http://example.com',
+                    coverageExclude: exclude
+                });
+
+            config.coverageExclude.must.eql(exclude);
+        });
+    });
 });
 
 function stubProcessEnv(sinon, props) {
