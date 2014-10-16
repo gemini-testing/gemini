@@ -25,7 +25,7 @@
   "devDependencies": {
     "codeclimate-test-reporter": "0.0.3",
     "istanbul": "^0.2.10",
-    "jscs": "^1.5.7",
+    "jscs": "~1.6.2",
     "jshint": "^2.5.1",
     "mocha": "^1.20.1",
     "must": "~0.12.0",
