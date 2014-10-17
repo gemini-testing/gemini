@@ -2,8 +2,7 @@ Gemini Quick Start
 =======
 
 [![Build Status](https://travis-ci.org/bem/gemini.svg?branch=master)](https://travis-ci.org/bem/gemini)
-[![Code Climate](http://img.shields.io/codeclimate/github/bem/gemini.svg)](https://codeclimate.com/github/bem/gemini)
-[![Coverage](http://img.shields.io/codeclimate/coverage/github/bem/gemini.svg)](https://codeclimate.com/github/bem/gemini)
+[![Coverage Status](https://img.shields.io/coveralls/bem/gemini.svg)](https://coveralls.io/r/bem/gemini)
 
 [Gemini](https://github.com/bem/gemini) is the utility for regression testing of web pages appearance.
 

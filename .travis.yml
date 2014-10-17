@@ -7,10 +7,7 @@ before_install:
 script:
 - npm run lint
 - npm test --coverage
-after_success: cat ${TRAVIS_BUILD_DIR}/coverage/lcov.info | codeclimate
-addons:
-  code_climate:
-    repo_token: e530b4958df125177f497dc6e2eb11080ce4b640eba7a4856e7b4932fe2d8997
+after_success: cat ${TRAVIS_BUILD_DIR}/coverage/lcov.info | coveralls
 deploy:
   provider: npm
   email: sevinf@yandex-team.ru

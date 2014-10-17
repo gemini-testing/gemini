@@ -25,7 +25,7 @@
     "minimatch": "~1.0.0"
   },
   "devDependencies": {
-    "codeclimate-test-reporter": "0.0.3",
+    "coveralls": "^2.11.2",
     "istanbul": "^0.2.10",
     "jscs": "~1.6.2",
     "jshint": "^2.5.1",
