@@ -4,6 +4,7 @@ var assert = require('assert'),
     sinon = require('sinon'),
     createSuite = require('../lib/suite').create,
     State = require('../lib/state'),
+    Runner = require('../lib/runner'),
     StateError = require('../lib/errors/state-error'),
     Config = require('../lib/config');
 
@@ -23,7 +24,7 @@ describe('runner', function() {
             }),
 
             captureFullscreenImage: this.sinon.stub().returns(q({
-                getSize: this.sinon.stub().returns(q({})),
+                getSize: this.sinon.stub().returns({}),
                 crop: this.sinon.stub().returns(q({}))
             })),
 
@@ -48,11 +49,7 @@ describe('runner', function() {
         this.suite.id = 0;
         this.suite.url = '/path';
 
-        this.sinon.stub(require('child_process'), 'exec').withArgs('gm -version').callsArgWith(1, null, '', '');
-
-        //require runner here to make stub above take effect
-        var Runner = require('../lib/runner'),
-            config = new Config({
+        var config = new Config({
                 projectRoot: '/',
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://grid.example.com',

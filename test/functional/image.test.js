@@ -102,10 +102,9 @@ describe('image', function() {
         });
 
         it('should return correct size', function() {
-            return this.image.getSize().then(function(size) {
-                size.width.must.equal(20);
-                size.height.must.equal(20);
-            });
+            var size = this.image.getSize();
+            size.width.must.equal(20);
+            size.height.must.equal(20);
         });
 
         it('should save the image', function() {
