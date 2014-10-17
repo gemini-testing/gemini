@@ -69,5 +69,18 @@ browsers:
 * `http.timeout` - таймаут запроса к Selenium Grid (мс).
 * `http.retries` - количество попыток отправки запроса в Selenium Grid.
 * `http.retryDelay` - пауза перед повторной отправкой запроса в Selenium Grid (мс).
-* `coverage` (CLI: `--coverage`, env: `GEMINI_COVERAGE`) - присвойте значение `true` для включения экспериментального отчёта о покрытии. Отчёт сохраняется в папку `gemini-coverage`.
+* `coverage` (CLI: `--coverage`, env: `GEMINI_COVERAGE`) - присвойте значение `true` для включения экспериментального отчёта о покрытии CSS-кода
+тестами. HTML-отчёт сохраняется в папку `gemini-coverage`. В случае, если CSS на тестируемых страницах есть source map, отчет будет составлен по
+исходным файлам.
+* `sourceRoot` (CLI: `--source-root`, env: `GEMINI_SOURCE_ROOT`) – папка, в которой располагаются исходные файлы.
+Локальные исходные файлы будут использваны для построения отчета о покрытии при использовании source map в том случае, 
+если не удастся скачать их с тестируемого URL. По умолчанию, совпадает с `projectRoot`.
+* `coverageExclude` - массив путей или glob-масок, которые следуют исключить из отчета о покрытии. Напрмер:
+
+  ```yaml
+  coverageExclude:
+    - libs/**
+    - path/to/some.css
+    - path/to/other.{css,less}
+  ```
 * `windowSize` (env: `GEMINI_WINDOW_SIZE`) - размеры окна браузера. Например, `1600x1200`.

@@ -92,6 +92,18 @@ as test failure.
 * `http.timeout` - Selenium Grid request timeout, msec.
 * `http.retries` - Selenium Grid request tries count.
 * `http.retryDelay` - delay before retry of Selenium Grid request, msec.
-* `coverage` (CLI: `--coverage`, env: `GEMINI_COVERAGE`) - set to `true` to enable experimental
-  coverage reporting. Report will be saved to `gemini-coverage` directory.
+* `coverage` (CLI: `--coverage`, env: `GEMINI_COVERAGE`) - set to `true` to enable experimental 
+   coverage reporting. Report will be saved to `gemini-coverage` directory. If CSS on a pages under
+   tests has source map, original files will be shown in report.
+* `sourceRoot` (CLI: `--source-root`, env: `GEMINI_SOURCE_ROOT`) – directory which contains the source files.
+  Local sources will be used in coverage report when source map is available, but sources can not be downladed
+  from URL under tests. By default, it is equal to `projectRoot`.
+* `coverageExclude` – array of file paths or glob patterns to exclude from coverage report. For example:
+  
+  ```yaml
+  coverageExclude:
+    - libs/**
+    - path/to/some.css
+    - 
+  ```
 * `windowSize` (env: `GEMINI_WINDOW_SIZE`) - specify browser window dimensions (i.e. `1600x1200`).

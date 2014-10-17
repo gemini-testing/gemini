@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.0 - 2014-10-22
+
+* Replace `GraphicsMagick` with lightweight `png-img` library (@j0tunn).
+  As for this version, `gemini` no longer requires any external tool for
+  image processing.
+* CSS coverage now supports source maps (@scf2k).
+  If your CSS has the sourcemap, coverage report will show original files.
+
+  You can use `sourceRoot` option to tell `gemini` where are your sources
+  located on a filesystem.
+* CSS coverages statistics will now also be written to `coverage.json`
+  file (@scf2k).
+* Add `coverageExclude` option to allow exclude certain files from coverage
+  report (@scf2k).
+* Add index page to coverage report and improve appearance of a the coverage
+  pages (@scf2k).
+* Restructure documentation and add quick start guide in russian and english
+  (@jk708).
+
 ## 0.8.2 - 2014-10-06
 
 * Reset cursor position before reloading the page.
