@@ -16,4 +16,4 @@ build
 .grunt
 
 node_modules
-coverage
+/coverage

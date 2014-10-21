@@ -1,7 +1,8 @@
 {
     "excludeFiles": [
         "node_modules",
-        "coverage"
+        "/coverage",
+        "lib/coverage/tinytable.sorter.js"
     ],
     "requireCurlyBraces": [
         "if",
