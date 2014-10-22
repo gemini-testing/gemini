@@ -5,7 +5,7 @@
 
 ## Определение тестовых наборов
 
-Наборы тестов определяются методом `gemini.suite`. 
+Наборы тестов определяются методом `gemini.suite`.
 
 **Пример**:
 
@@ -75,7 +75,7 @@
     ```
 
 * `capture(stateName, callback(actions, find))` - определяет новое состояние снимка.
-  
+
   Опциональная функция обратного вызова описывает последовательность действий, которая приводит страницу к данному состоянию. Новый цикл действий, приводящий к новому состоянию, всегда начинается от **предыдущего** и выполняется последовательно в порядке объявления, без перезапуска браузера между этапами выполнения.
 
   Функция обратного вызова принимает два аргумента:
@@ -93,7 +93,7 @@
     ```
 
 * `before(callback(actions, find))` - используйте данную функцию для выполнения кода до первого состояния. Аргументы функции аналогичны аргументам `capture`.
-  
+
   Контекст является общим для обратного вызова `before` и всех других обратных вызовов состояния набора, что позволяет производить поиск нужного элемента один раз для всего набора. При этом результат будет всегда актуален.
 
     ```javascript
@@ -119,7 +119,7 @@
     ```javascript
         var gemini = require('gemini');
 
-        gemin.suite('parent', function(parent) {
+        gemini.suite('parent', function(parent) {
             parent.setUrl('/some/path')
                 .setCaptureElements('.selector1', '.selector2');
                 .capture('state');
@@ -173,20 +173,20 @@
 **NB**: Функция выполняется в контексте браузера, поэтому любые ссылки на её внешний контекст работать не будут.
 
 * `wait(milliseconds)` - ожидание указанного времени до выполнения следующего действия. Если действие является последним в списке, откладывает снятие скриншота на этот период времени.
-* `sendKeys([element], keys)` - отправляет серию нажатий на клавиатуру к указанному или к активному в данный момент элементу страницы.  
+* `sendKeys([element], keys)` - отправляет серию нажатий на клавиатуру к указанному или к активному в данный момент элементу страницы.
 Вы можете отправить специальную клавишу, используя одну из предусмотренных констант, а именно:
 
     ```javascript
         actions.sendKeys(gemini.ARROW_DOWN);
     ```
-Полный список специальных ключей:
+Полный список специальных ключей (у некоторых ключей есть сокращенная запись):
 
-    `NULL`, `CANCEL`, `HELP`, `BACK_SPACE`, `TAB`, `CLEAR`, `RETURN`, `ENTER`, `SHIFT`, `LEFT_SHIFT `, `CONTROL`,
-    `LEFT_CONTROL`, `ALT`, `LEFT_ALT`, `PAUSE`, `ESCAPE`, `SPACE`, `PAGE_UP`, `PAGE_DOWN`, `END`, `HOME`, `LEFT`,
-    `ARROW_LEFT`, `UP`, `ARROW_UP`, `RIGHT`, `ARROW_RIGHT`, `DOWN,`, `ARROW_DOWN`, `INSERT`, `DELETE`, `SEMICOLON`,
-    `EQUALS`, `NUMPAD0`, `NUMPAD1`, `NUMPAD2`, `NUMPAD3`, `NUMPAD4`, `NUMPAD5`, `NUMPAD6`, `NUMPAD7`, `NUMPAD8`,
-    `NUMPAD9`, `MULTIPLY`, `ADD`, `SEPARATOR`, `SUBTRACT`, `DECIMAL`, `DIVIDE`, `F1`, `F2`, `F3`, `F4`, `F5`,
-    `F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND`, `META`, `ZENKAKU_HANKAKU`.
+`NULL`, `CANCEL`, `HELP`, `BACK_SPACE`, `TAB`, `CLEAR`, `RETURN`, `ENTER`, `LEFT_SHIFT` ⇔ `SHIFT`,
+`LEFT_CONTROL` ⇔ `CONTROL`, `LEFT_ALT` ⇔ `ALT`, `PAUSE`, `ESCAPE`, `SPACE`, `PAGE_UP`, `PAGE_DOWN`, `END`, `HOME`,
+`ARROW_LEFT` ⇔ `LEFT`, `ARROW_UP` ⇔ `UP`, `ARROW_RIGHT` ⇔ `RIGHT`, `ARROW_DOWN` ⇔ `DOWN`, `INSERT`, `DELETE`,
+`SEMICOLON`, `EQUALS`, `NUMPAD0`, `NUMPAD1`, `NUMPAD2`, `NUMPAD3`, `NUMPAD4`, `NUMPAD5`, `NUMPAD6`, `NUMPAD7`,
+`NUMPAD8`, `NUMPAD9`, `MULTIPLY`, `ADD`, `SEPARATOR`, `SUBTRACT`, `DECIMAL`, `DIVIDE`, `F1`, `F2`, `F3`, `F4`, `F5`,
+`F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND` ⇔ `META`, `ZENKAKU_HANKAKU`.
 
 * `focus(element)` - устанавливает фокус на указанный элемент.
 * `setWindowSize(width, height)` - устанавливает размера окна браузера.
