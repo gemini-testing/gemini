@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1 - 2014-10-23
+
+* Ignore ``@keyframes` at-rule while collecting coverage (@scf2k).
+
 ## 0.9.0 - 2014-10-22
 
 * Replace `GraphicsMagick` with lightweight `png-img` library (@j0tunn).
