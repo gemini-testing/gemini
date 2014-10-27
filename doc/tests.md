@@ -10,7 +10,7 @@ Test suite is defined with `gemini.suite` method.
 
 **Example**:
 
-```javascript
+```js
 var gemini = require('gemini');
 
 gemini.suite('button', function(suite) {
@@ -55,7 +55,7 @@ All methods are chainable:
 
   Can also accept an array:
 
-```
+```js
 suite.setCaptureElements(['.selector1', '.selector2']);
 ```
 
@@ -71,7 +71,7 @@ suite.setCaptureElements(['.selector1', '.selector2']);
 
   All browsers from subsequent calls to `.skip()` are added to the skip list:
 
-```javascript
+```js
 suite
     .skip({browserName: 'browser1', version: '1.0'})
     .skip('browser2');
@@ -79,11 +79,11 @@ suite
 
   is equivalent to
 
-```javascript
-    suite.skip([
-        {browserName: 'browser1', version: '1.0'},
-        'browser2'
-    ]);
+```js
+suite.skip([
+    {browserName: 'browser1', version: '1.0'},
+    'browser2'
+]);
 ```
 
 * `capture(stateName, callback(actions, find))` - defines a new state to capture.
@@ -100,32 +100,32 @@ suite
      Search will be performed once for each `find` call, so if you need to perform
      multiple actions on the same element, save the result to some variable:
 
-```javascript
-    .capture('name', function(actions, find) {
-        var button = find('.button');
-            actions.mouseDown(button)
-                .mouseUp(button);
-    });
+```js
+.capture('name', function(actions, find) {
+    var button = find('.button');
+    actions.mouseDown(button)
+        .mouseUp(button);
+});
 ```
-
 
 * `before(callback(actions, find))` - use this function to execute some code
   before the first state. The arguments of a callback are the same as for `capture` callback.
   Context is shared between `before` callback and all of suite's state callbacks, so you
   can use this hook to lookup for an element only once for the whole suite:
 
-```javascript
-   suite.before(function(actions, find) {
-          this.button = find('.buttons');
-      })
-      .capture('hovered', function(actions, find) {
-          actions.mouseMove(this.button);
-      })
-      .capture('pressed', function(actions, find) {
-          actions.mouseDown(this.button);
-      });
-  ```
-  
+```js
+suite
+    .before(function(actions, find) {
+        this.button = find('.buttons');
+    })
+    .capture('hovered', function(actions, find) {
+        actions.mouseMove(this.button);
+    })
+    .capture('pressed', function(actions, find) {
+        actions.mouseDown(this.button);
+    });
+```
+
 * `after(callback(actions, find))` - use this function to execute some code
   after the last state. The arguments of a callback are the same as for
   `capture` and `before` callbacks and context is shared between all of them.
@@ -136,7 +136,7 @@ Suites can be nested. In this case, inner suite inherits `url`, `captureElements
 from outer. This properties can be overridden in inner suites without affecting the outer.
 Each new suite causes reload of the browser, even if URL was not changed.
 
-```javascript
+```js
 var gemini = require('gemini');
 
 gemini.suite('parent', function(parent) {
@@ -144,28 +144,28 @@ gemini.suite('parent', function(parent) {
         .setCaptureElements('.selector1', '.selector2');
         .capture('state');
 
-gemini.suite('first child', function(child) {
-//this  suite captures same elements on different page
+    gemini.suite('first child', function(child) {
+        //this suite captures same elements on different pages
         child.setUrl('/other/path')
             .capture('other state');
     });
 
-gemini.suite('second child', function(child) {
-//this suite captures different elements on a same page
+    gemini.suite('second child', function(child) {
+        //this suite captures different elements on the same page
         child.setCaptureElements('.next-selector'})
-             .capture('third state', function(actions, elements) {
-                 ...
-             });
+            .capture('third state', function(actions, elements) {
+                // ...
+            })
 
-gemini.suite('grandchild', function(grandchild) {
-//child suites can have own childs
-        grandchild.capture('fourth state');
+        gemini.suite('grandchild', function(grandchild) {
+            //child suites can have own childs
+            grandchild.capture('fourth state');
+
         });
     });
 
-gemini.suite('third child', function(child) {
-//this child uses completely different URL and set
-//of elements
+    gemini.suite('third child', function(child) {
+        //this suite uses completely different URL and set of elements
         child.setUrl('/some/another/path')
             .setCaptureElements('.different-selector');
             .capture('fifth state');
@@ -192,10 +192,10 @@ list `element` can be either CSS selector or result of a `find` call:
 * `executeJS(function(window))` - run specified function in a browser. The argument of a function
    is the browser's `window` object:
 
-```javascript
-   actions.executeJS(function(window) {
-       window.alert('Hello!');
-    });
+```js
+actions.executeJS(function(window) {
+    window.alert('Hello!');
+});
 ```
 
    Note that function is executed in a browser context, so any references to outer scope of callback won't work.
@@ -207,18 +207,18 @@ sequence, delay the screenshot for this amount of time.
 
    You can send a special key using one of the provided constants, i.e:
 
-```javascript
-   actions.sendKeys(gemini.ARROW_DOWN);
+```js
+actions.sendKeys(gemini.ARROW_DOWN);
 ```
 
-   Full list of special keys:
+Full list of special keys (there are shortcuts for commonly used keys):
 
-    `NULL`, `CANCEL`, `HELP`, `BACK_SPACE`, `TAB`, `CLEAR`, `RETURN`, `ENTER`, `SHIFT`, `LEFT_SHIFT `, `CONTROL`,
-    `LEFT_CONTROL`, `ALT`, `LEFT_ALT`, `PAUSE`, `ESCAPE`, `SPACE`, `PAGE_UP`, `PAGE_DOWN`, `END`, `HOME`, `LEFT`,
-    `ARROW_LEFT`, `UP`, `ARROW_UP`, `RIGHT`, `ARROW_RIGHT`, `DOWN,`, `ARROW_DOWN`, `INSERT`, `DELETE`, `SEMICOLON`,
-    `EQUALS`, `NUMPAD0`, `NUMPAD1`, `NUMPAD2`, `NUMPAD3`, `NUMPAD4`, `NUMPAD5`, `NUMPAD6`, `NUMPAD7`, `NUMPAD8`,
-    `NUMPAD9`, `MULTIPLY`, `ADD`, `SEPARATOR`, `SUBTRACT`, `DECIMAL`, `DIVIDE`, `F1`, `F2`, `F3`, `F4`, `F5`,
-    `F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND`, `META`, `ZENKAKU_HANKAKU`.
+`NULL`, `CANCEL`, `HELP`, `BACK_SPACE`, `TAB`, `CLEAR`, `RETURN`, `ENTER`, `LEFT_SHIFT` ⇔ `SHIFT`,
+`LEFT_CONTROL` ⇔ `CONTROL`, `LEFT_ALT` ⇔ `ALT`, `PAUSE`, `ESCAPE`, `SPACE`, `PAGE_UP`, `PAGE_DOWN`, `END`, `HOME`,
+`ARROW_LEFT` ⇔ `LEFT`, `ARROW_UP` ⇔ `UP`, `ARROW_RIGHT` ⇔ `RIGHT`, `ARROW_DOWN` ⇔ `DOWN`, `INSERT`, `DELETE`,
+`SEMICOLON`, `EQUALS`, `NUMPAD0`, `NUMPAD1`, `NUMPAD2`, `NUMPAD3`, `NUMPAD4`, `NUMPAD5`, `NUMPAD6`, `NUMPAD7`,
+`NUMPAD8`, `NUMPAD9`, `MULTIPLY`, `ADD`, `SEPARATOR`, `SUBTRACT`, `DECIMAL`, `DIVIDE`, `F1`, `F2`, `F3`, `F4`, `F5`,
+`F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND` ⇔ `META`, `ZENKAKU_HANKAKU`.
 
 * `focus(element)` - set a focus to a specified element.
 * `setWindowSize(width, height)` - change browser window dimensions.
