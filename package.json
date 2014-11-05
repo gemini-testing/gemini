@@ -22,7 +22,8 @@
     "source-map": "^0.1.40",
     "temp": "~0.8.0",
     "wd": "^0.3.4",
-    "minimatch": "~1.0.0"
+    "minimatch": "~1.0.0",
+    "gemini-coverage": "~0.3.0"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
