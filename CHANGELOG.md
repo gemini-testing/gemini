@@ -1,5 +1,11 @@
 # Changelog
 
+## Dev
+
+* Detailed error message when capture region exceeds screenshot
+area. Such error also will now fail only single state instead of
+a whole testing process (@SevInf).
+
 ## 0.9.1 - 2014-10-23
 
 * Ignore ``@keyframes` at-rule while collecting coverage (@scf2k).
