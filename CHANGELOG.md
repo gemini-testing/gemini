@@ -2,7 +2,12 @@
 
 ## Dev
 
-## 0.9.2 - 2013-11-07
+## 0.9.3 - 2014-11-07
+
+* Coverage generator now follows symlinks while resolving the paths to CSS
+  files. So the final report will have real paths but not pointing to symlinks.
+
+## 0.9.2 - 2014-11-07
 
 * Move the coverage HTML templating code to separate module (gemini-coverage).
 * Detailed error message when capture region exceeds screenshot
