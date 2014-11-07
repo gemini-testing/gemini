@@ -744,6 +744,63 @@ describe('config', function() {
             config.coverageExclude.must.eql(exclude);
         });
     });
+
+    describe('coverageNoHtml', function() {
+        it('should not accept non-boolean', function() {
+            (function() {
+                return new Config({
+                    projectRoot: '/',
+                    rootUrl: 'http://example.com',
+                    gridUrl: 'http://example.com',
+                    coverageNoHtml: 'of course!'
+                });
+            }.must.throw(GeminiError));
+        });
+
+        it('should accept boolean', function() {
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com',
+                coverageNoHtml: true
+            });
+            config.coverageNoHtml.must.be(true);
+        });
+
+        it('should be false by default', function() {
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com'
+            });
+            config.coverageNoHtml.must.be(false);
+        });
+
+        it('should be settable via overrides', function() {
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com',
+                coverageNoHtml: true
+            }, {
+                coverageNoHtml: false
+            });
+
+            config.coverageNoHtml.must.be(false);
+        });
+
+        it('should be settable via environment variable GEMINI_COVERAGE_NO_HTML', function() {
+            stubProcessEnv(this.sinon, {GEMINI_COVERAGE_NO_HTML: true});
+
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com',
+                coverageNoHtml: false
+            });
+            config.coverageNoHtml.must.be(true);
+        });
+    });
 });
 
 function stubProcessEnv(sinon, props) {
