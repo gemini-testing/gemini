@@ -2,6 +2,9 @@
 
 ## Dev
 
+## 0.9.2 - 2013-11-07
+
+* Move the coverage HTML templating code to separate module (gemini-coverage).
 * Detailed error message when capture region exceeds screenshot
 area. Such error also will now fail only single state instead of
 a whole testing process (@SevInf).
