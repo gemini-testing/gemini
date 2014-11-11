@@ -220,23 +220,5 @@ describe('capture session', function() {
                    done();
                });
         });
-
-        it('should extend any StateErrors with suite, state and browser names', function(done) {
-            var error = new StateError('state error');
-
-            this.state.name = 'state';
-            this.state.suite = {name: 'suite'};
-            this.browser.id = 'bro';
-
-            this.seq.perform.returns(q.reject(error));
-
-            return this.session.capture(this.state).fail(function(e) {
-                e.must.be(error);
-                e.stateName.must.be('state');
-                e.suiteName.must.be('suite');
-                e.browserId.must.be('bro');
-                done();
-            });
-        });
     });
 });

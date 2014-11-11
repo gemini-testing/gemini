@@ -403,6 +403,20 @@ describe('runner', function() {
             });
         });
 
+        it('should extend state errors with metadata', function(done) {
+            addState(this.suite, 'state', function() {
+                throw new StateError('error');
+            });
+            this.runner.on('error', function(e) {
+                e.suiteId.must.be(0);
+                e.suiteName.must.be('suite');
+                e.stateName.must.be('state');
+                e.browserId.must.be('browser');
+                done();
+            });
+            this.runner.run(this.root).done();
+        });
+
         it('should emit `endSuite` for each suite', function() {
             var spy = this.sinon.spy().named('endSuite');
             this.runner.on('endSuite', spy);
