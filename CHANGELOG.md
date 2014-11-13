@@ -2,6 +2,8 @@
 
 ## Dev
 
+* Fail only single test if reference image is not found (@SevInf).
+
 ## 0.9.3 - 2014-11-07
 
 * Coverage generator now follows symlinks while resolving the paths to CSS
