@@ -188,5 +188,7 @@
 `NUMPAD8`, `NUMPAD9`, `MULTIPLY`, `ADD`, `SEPARATOR`, `SUBTRACT`, `DECIMAL`, `DIVIDE`, `F1`, `F2`, `F3`, `F4`, `F5`,
 `F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND` ⇔ `META`, `ZENKAKU_HANKAKU`.
 
+* `sendFile(element, path)` - выбор файла в заданном элементе `input[type=file]`. `path` должен существовать 
+  в локальной системе (там же, где запущен `gemini`).
 * `focus(element)` - устанавливает фокус на указанный элемент.
 * `setWindowSize(width, height)` - устанавливает размера окна браузера.

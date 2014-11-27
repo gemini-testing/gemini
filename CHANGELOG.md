@@ -2,6 +2,8 @@
 
 ## Dev
 
+* Add `sendFile` action which now should be used instead of
+  `sendKeys` to set a file to `input[type=file]` elements (@SevInf).
 * Fail only single test if reference image is not found (@SevInf).
 
 ## 0.9.3 - 2014-11-07
