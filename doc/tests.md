@@ -220,5 +220,7 @@ Full list of special keys (there are shortcuts for commonly used keys):
 `NUMPAD8`, `NUMPAD9`, `MULTIPLY`, `ADD`, `SEPARATOR`, `SUBTRACT`, `DECIMAL`, `DIVIDE`, `F1`, `F2`, `F3`, `F4`, `F5`,
 `F6`, `F7`, `F8`, `F9`, `F10`, `F11`, `F12`, `COMMAND` ⇔ `META`, `ZENKAKU_HANKAKU`.
 
+* `sendFile(element, path)` - send file to the specified `input[type=file]` element. `path` must exist at
+  local system (the one which `gemini` is executed on).
 * `focus(element)` - set a focus to a specified element.
 * `setWindowSize(width, height)` - change browser window dimensions.
