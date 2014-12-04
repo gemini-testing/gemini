@@ -17,13 +17,14 @@
     "looks-same": "^1.1.1",
     "node.extend": "^1.1.3",
     "q": "^1.1.2",
+    "gemini-coverage": "~0.3.0",
+    "polyfill-service": "~1.1.0",
     "q-io": "~1.11.0",
     "resolve": "^1.1.0",
     "source-map": "^0.2.0",
     "temp": "~0.8.0",
-    "wd": "^0.3.4",
     "minimatch": "^2.0.1",
-    "gemini-coverage": "~0.3.0"
+    "wd": "^0.3.4"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
