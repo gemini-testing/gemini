@@ -1,4 +1,4 @@
-## Gemini Commands
+# Gemini commands
 
 You need [Selenium-server](http://www.seleniumhq.org/download/) up and running if you want to run tests in real browsers.
 
@@ -9,7 +9,7 @@ PhantomJS in webdriver mode before executing **Gemini**:
 phantomjs --webdriver=4444
 ```
 
-### Gathering Reference Images
+## Gathering reference images
 
 Once you have few suites written you need to capture reference images:
 
@@ -21,7 +21,7 @@ If no paths are specified, each `.js` file from `gemini` directory will be proce
 By default, configuration will be loaded from `.gemini.yml` in the current directory.
 To specify other config, use `--config` or `-c` option.
 
-### Running Tests
+## Running tests
 
 To compare you reference screenshots with current state of blocks, use:
 
@@ -54,23 +54,23 @@ You can also use multiple reporters at the same time using multiple `--reporter`
 gemini test --reporter flat --reporter html
 ```
 
-#### CSS Code Coverage (experimental)
+### CSS code coverage (experimental)
 
 Path `--coverage` (or set `coverage` option in config file) to enable code coverage reporter.
 **Gemini** will examine your CSS files and report CSS rules that had been captured by at least
 one test completely (green color in report), partially (yellow) or was not captured at all
 (red).
 
-### Common CLI Options
+## Common CLI options
 
-* `--config`, `-c` - specify config file to use.
-* `--root-url`, `-r` - use specified URL instead of `rootUrl` setting from config file.
-* `--grid-url`, `-g` - use specified URL instead of `gridUrl` setting from config file.
+* `--config`, `-c` – specify config file to use.
+* `--root-url`, `-r` – use specified URL instead of `rootUrl` setting from config file.
+* `--grid-url`, `-g` – use specified URL instead of `gridUrl` setting from config file.
 * `--grep PATTERN` – execute only suites with names that match the regular expression pattern.
-* `--help` - display help message.
-* `--version` - display version.
+* `--help` – display help message.
+* `--version` – display version.
 
-### Shell Completion
+## Shell completion
 
 To enable Tab-completion of the shell commands add `. <(gemini completion)` to your shell rc-file (
 for example `~/.bashrc` for `bash` or `~/.zshrc` for `zsh`).

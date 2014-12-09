@@ -1,4 +1,4 @@
-Gemini Quick Start
+Gemini quick start
 =======
 
 [![Build Status](https://travis-ci.org/bem/gemini.svg?branch=master)](https://travis-ci.org/bem/gemini)
@@ -23,11 +23,11 @@ Current document is a quick step-by-step guide that describes installation, conf
 
 Required software:
 
-1. [Selenium Server](http://docs.seleniumhq.org/download/) - for testing in different browsers.
-2. [PhantomJS](http://phantomjs.org/) - headless version of a WebKit browser.
+1. [Selenium Server](http://docs.seleniumhq.org/download/) – for testing in different browsers.
+2. [PhantomJS](http://phantomjs.org/) – headless version of a WebKit browser.
 
 ## Installation
-### Global Installation
+### Global installation
 
 To install the utility use [npm](https://www.npmjs.org/) command `install`:
 
@@ -36,7 +36,7 @@ To install the utility use [npm](https://www.npmjs.org/) command `install`:
 ```
 Global installation is used for commands launch.
 
-### Local Installation
+### Local installation
 
 To write the tests you will also need local installation of `Gemini`. Run the following command in project directory:
 
@@ -90,10 +90,10 @@ browsers:
 
 In `browsers` section, *keys* are unique browser ids (chosen by user) and *values* are [DesiredCapabilites](https://code.google.com/p/selenium/wiki/DesiredCapabilities) of a corresponding browser.
 
-### Other Configuration Options
+### Other configuration options
 [See the details](doc/config.md) of a config file structure.
 
-## Writing Tests
+## Writing tests
 
 Each of the blocks that are being tested may be in one of the determined states. States are tested with the help of chains of step-by-step actions declared in test suites of a block.
 
@@ -115,7 +115,7 @@ gemini.suite('yandex-search', function(suite) {
 We create a new test suite `yandex-search` and assume that we will capture the `.main-table` element from a root URL `http://yandex.com`. We know that the block has two states:
 
 * `plain` – right after the page is loaded;
-* `with text` - with `hello gemini` text inserted into `.input__control`.
+* `with text` – with `hello gemini` text inserted into `.input__control`.
 
 States are executed one after another in order of definition without browser reload in between.
 
