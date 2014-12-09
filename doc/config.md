@@ -1,4 +1,4 @@
-## Gemini Configuration
+# Gemini configuration
 
 **Gemini** is configured using `.gemini.yml` file at the root of the project.
 
@@ -33,11 +33,11 @@ Priorities are the following:
 
 Config file options:
 
-* `rootUrl` (CLI: `--root-url`, env: 'GEMINI_ROOT_URL') - the root URL of your website. Target URLs of 
+* `rootUrl` (CLI: `--root-url`, env: 'GEMINI_ROOT_URL') – the root URL of your website. Target URLs of
   your test suites will be resolved relatively to it.
-* `gridUrl` (CLI: `--grid-url`, env: 'GEMINI_GRID_URL') - Selenium Grid URL to use for taking 
+* `gridUrl` (CLI: `--grid-url`, env: 'GEMINI_GRID_URL') – Selenium Grid URL to use for taking
    screenshots. Required, if you want to run test in other browsers then `phantomjs`.
-* `browsers` - list of browsers to use for testing. Each browser should be available
+* `browsers` – list of browsers to use for testing. Each browser should be available
 on Selenium Grid.
 
     `browsers` field format:
@@ -63,10 +63,10 @@ on Selenium Grid.
 * `projectRoot` – root directory of a project. All relative paths in config or options
   will be resolved relatively to it. By default it is the directory config file is placed
   in.
-* `screenshotsDir` (CLI: `--screenshots-dir`, env: `GEMINI_SCREENSHOTS_DIR`) - directory
+* `screenshotsDir` (CLI: `--screenshots-dir`, env: `GEMINI_SCREENSHOTS_DIR`) – directory
   to save reference screenshots to. Specified relatively to config file directory.
   `gemini/screens` by default.
-* `capabilities` - additional [Selenium](http://code.google.com/p/selenium/wiki/DesiredCapabilities) and [Sauce Labs](https://saucelabs.com/docs/additional-config) capabilities to use for all browsers:
+* `capabilities` – additional [Selenium](http://code.google.com/p/selenium/wiki/DesiredCapabilities) and [Sauce Labs](https://saucelabs.com/docs/additional-config) capabilities to use for all browsers:
 
   ```yaml
   capabilities:
@@ -78,32 +78,32 @@ on Selenium Grid.
   `browsers` option instead) and `takesScreenshot` (always set to `true`
   automatically).
 
-* `debug` (CLI: `--debug`, env: `GEMINI_DEBUG`) - turn on debug logging to the terminal.
-* `parallelLimit` - by default, `gemini` will run all browsers in parallel.
+* `debug` (CLI: `--debug`, env: `GEMINI_DEBUG`) – turn on debug logging to the terminal.
+* `parallelLimit` – by default, `gemini` will run all browsers in parallel.
   Sometimes (i.e. when using cloud services, such as SauceLabs) you have a
   limit on a number of browser that can be run once at a time. Use this
   option to limit the number of browsers that `gemini` will try to run in
   parallel.
-* `strictComparison` - test will be considered as failed in case of any kind of error. By default, only noticeable differences are treated
+* `strictComparison` – test will be considered as failed in case of any kind of error. By default, only noticeable differences are treated
 as test failure.
-* `diffColor` - specifies color which will be used to highlight differences
+* `diffColor` – specifies color which will be used to highlight differences
   between images. Specified in hexadecimal RGB (`#RRGGBB`). Magenta by default
   (`#FF00FF`).
-* `http.timeout` - Selenium Grid request timeout, msec.
-* `http.retries` - Selenium Grid request tries count.
-* `http.retryDelay` - delay before retry of Selenium Grid request, msec.
-* `coverage` (CLI: `--coverage`, env: `GEMINI_COVERAGE`) - set to `true` to enable experimental 
+* `http.timeout` – Selenium Grid request timeout, msec.
+* `http.retries` – Selenium Grid request tries count.
+* `http.retryDelay` – delay before retry of Selenium Grid request, msec.
+* `coverage` (CLI: `--coverage`, env: `GEMINI_COVERAGE`) – set to `true` to enable experimental
    coverage reporting. Report will be saved to `gemini-coverage` directory. If CSS on a pages under
    tests has source map, original files will be shown in report.
 * `sourceRoot` (CLI: `--source-root`, env: `GEMINI_SOURCE_ROOT`) – directory which contains the source files.
   Local sources will be used in coverage report when source map is available, but sources can not be downladed
   from URL under tests. By default, it is equal to `projectRoot`.
 * `coverageExclude` – array of file paths or glob patterns to exclude from coverage report. For example:
-  
+
   ```yaml
   coverageExclude:
     - libs/**
     - path/to/some.css
-    - 
+    -
   ```
-* `windowSize` (env: `GEMINI_WINDOW_SIZE`) - specify browser window dimensions (i.e. `1600x1200`).
+* `windowSize` (env: `GEMINI_WINDOW_SIZE`) – specify browser window dimensions (i.e. `1600x1200`).
