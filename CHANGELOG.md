@@ -1,5 +1,9 @@
 # Changelog
 
+## Dev
+
+* Works on Windows again (@SevInf).
+
 ## 0.9.4 - 2014-12-03
 
 * Add `sendFile` action which now should be used instead of
