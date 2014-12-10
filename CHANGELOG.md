@@ -1,6 +1,6 @@
 # Changelog
 
-## Dev
+## 0.9.5 - 2014-12-10
 
 * Works on Windows again (@SevInf).
 
