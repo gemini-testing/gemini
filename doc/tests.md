@@ -61,6 +61,9 @@ suite.setCaptureElements(['.selector1', '.selector2']);
 
   All tests in a suite will fail if none of the elements will be found.
 
+* `ignoreElements('selector1', 'selector2', ...)` - elements, matching
+   specified selectors will be ignored when comparing images.
+
 * `skip([browser])` – skip all tests and nested suites for:
 
   - `skip()` – all browsers;

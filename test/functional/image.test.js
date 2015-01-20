@@ -135,5 +135,19 @@ describe('image', function() {
                     });
             });
         });
+
+        it('should clear a region of an image', function() {
+            var _this = this;
+            return withTempFile(function(filePath) {
+                _this.image.clear({top: 2, left: 4, width: 8, height: 6});
+                return _this.image.save(filePath)
+                    .then(function() {
+                        return Image.compare(imagePath('image1_cleared.png'), filePath);
+                    })
+                    .then(function(equal) {
+                        equal.must.be.true();
+                    });
+            });
+        });
     });
 });

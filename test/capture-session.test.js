@@ -61,6 +61,44 @@ describe('capture session', function() {
     });
 
     describe('capture', function() {
+        function setupImageLessThenBody(ctx) {
+            return setupImage(ctx, 90);
+        }
+
+        function setupImageGreaterThenBody(ctx) {
+            return setupImage(ctx, 150);
+        }
+
+        function setupImage(ctx, height) {
+            ctx.browser.prepareScreenshot.returns({
+                bodyHeight: 100,
+                captureArea: {
+                    top: 80,
+                    left: 30,
+                    width: 20,
+                    height: 30
+                },
+                viewportOffset: {
+                    top: 70,
+                    left: 10
+                },
+                ignoreAreas: [
+                    {top: 90, left: 40, width: 5, height: 8}
+                ]
+            });
+
+            var image = {
+                getSize: sinon.stub().returns({
+                    width: 100,
+                    height: height
+                }),
+
+                crop: sinon.stub().returns(q()),
+                clear: sinon.stub().returns(q())
+            };
+            ctx.browser.captureFullscreenImage.returns(q(image));
+            return image;
+        }
         beforeEach(function() {
             this.seq = sinon.createStubInstance(Actions);
             this.seq.perform.returns(q());
@@ -75,9 +113,9 @@ describe('capture session', function() {
                     getSize: sinon.stub().returns({})
                 })),
                 prepareScreenshot: sinon.stub().returns(q({
-                    locationInBody: {},
-                    locationInViewport: {},
-                    cropSize: {}
+                    captureArea: {},
+                    viewportOffset: {},
+                    ignoreAreas: []
                 }))
             };
             this.session = new CaptureSession(this.browser);
@@ -110,31 +148,7 @@ describe('capture session', function() {
         });
 
         it('should crop screenshoot basing on viewport if image is less then body', function() {
-            this.browser.prepareScreenshot.returns({
-                bodyHeight: 100,
-                locationInViewport: {
-                    top: 10,
-                    left: 20
-                },
-                locationInBody: {
-                    top: 80,
-                    left: 30
-                },
-                cropSize: {
-                    width: 20,
-                    height: 30
-                }
-            });
-            var image = {
-                getSize: sinon.stub().returns({
-                    width: 100,
-                    height: 90
-                }),
-
-                crop: sinon.stub().returns(q())
-            };
-            this.browser.captureFullscreenImage.returns(q(image));
-
+            var image = setupImageLessThenBody(this);
             return this.session.capture(this.state).then(function() {
                 sinon.assert.calledWith(image.crop, {
                     top: 10,
@@ -145,31 +159,20 @@ describe('capture session', function() {
             });
         });
 
-        it('should crop screenshoot basing on body if image is greater then body', function() {
-            this.browser.prepareScreenshot.returns({
-                bodyHeight: 100,
-                locationInViewport: {
-                    top: 10,
-                    left: 20
-                },
-                locationInBody: {
-                    top: 80,
-                    left: 30
-                },
-                cropSize: {
-                    width: 20,
-                    height: 30
-                }
+        it('should clear ignored areas basing on viewport if image is less then body', function() {
+            var image = setupImageLessThenBody(this);
+            return this.session.capture(this.state).then(function() {
+                sinon.assert.calledWith(image.clear, {
+                    top: 20,
+                    left: 30,
+                    width: 5,
+                    height: 8
+                });
             });
-            var image = {
-                getSize: sinon.stub().returns({
-                    width: 100,
-                    height: 150
-                }),
+        });
 
-                crop: sinon.stub().returns(q())
-            };
-            this.browser.captureFullscreenImage.returns(q(image));
+        it('should crop screenshoot basing on body if image is greater then body', function() {
+            var image = setupImageGreaterThenBody(this);
 
             return this.session.capture(this.state).then(function() {
                 sinon.assert.calledWith(image.crop, {
@@ -181,6 +184,19 @@ describe('capture session', function() {
             });
         });
 
+        it('should clear ignored areas basing on body if image is greater then body', function() {
+            var image = setupImageGreaterThenBody(this);
+
+            return this.session.capture(this.state).then(function() {
+                sinon.assert.calledWith(image.clear, {
+                    top: 90,
+                    left: 40,
+                    width: 5,
+                    height: 8
+                });
+            });
+        });
+
         it('should fail when crop area is not located within body area', function(done) {
             this.state.name = 'state';
             this.state.suite = {name: 'suite'};
@@ -188,18 +204,17 @@ describe('capture session', function() {
 
             this.browser.prepareScreenshot.returns({
                 bodyHeight: 100,
-                locationInViewport: {
-                    top: 0,
-                    left: 0
-                },
-                locationInBody: {
+                viewportOffset: {
                     top: 50,
                     left: 0
                 },
-                cropSize: {
+                captureArea: {
+                    top: 50,
+                    left: 0,
                     width: 100,
                     height: 100
-                }
+                },
+                ignoreAreas: []
             });
             var image = {
                 getSize: sinon.stub().returns({
@@ -212,13 +227,13 @@ describe('capture session', function() {
             this.browser.captureFullscreenImage.returns(q(image));
 
             return this.session.capture(this.state)
-               .then(function() {
-                   done(new Error());
-               })
-               .fail(function(err) {
-                   err.must.be.instanceOf(StateError);
-                   done();
-               });
+                .then(function() {
+                    done(new Error('.capture() must not complete successfully'));
+                })
+                .fail(function(err) {
+                    err.must.be.instanceOf(StateError);
+                    done();
+                });
         });
     });
 });
