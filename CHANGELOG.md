@@ -1,5 +1,11 @@
 # Changelog
 
+## Dev
+
+* Add ability to ignore certain elements when comparing screenshots.
+  Use `suite.ignoreElements(selector1, selector2, ...)` to specify
+  the selectors to ignore (@SevInf).
+
 ## 0.9.5 - 2014-12-10
 
 * Works on Windows again (@SevInf).
@@ -25,7 +31,7 @@ a whole testing process (@SevInf).
 
 ## 0.9.1 - 2014-10-23
 
-* Ignore ``@keyframes` at-rule while collecting coverage (@scf2k).
+* Ignore `@keyframes` at-rule while collecting coverage (@scf2k).
 
 ## 0.9.0 - 2014-10-22
 

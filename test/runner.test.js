@@ -29,9 +29,9 @@ describe('runner', function() {
             })),
 
             prepareScreenshot: this.sinon.stub().returns(q({
-                locationInBody: {},
-                locationInViewport: {},
-                cropSize: {}
+                captureArea: {},
+                viewportOffset: {},
+                ignoreAreas: []
             })),
 
             open: this.sinon.stub().returns(q.resolve()),

@@ -189,46 +189,50 @@ describe('public tests API', function() {
             shouldBeChainable('setUrl', 'http://example.com');
         });
 
-        describe('setCaptureElements', function() {
-            it ('should throw if selector is not a string', function() {
-                (function() {
-                    this.context.suite('name', function(suite) {
-                        suite.setCaptureElements({everything: true});
-                    });
-                }.bind(this)).must.throw(TypeError);
-            });
-
-            it ('should throw if selector in array is not a string', function() {
-                (function() {
-                    this.context.suite('name', function(suite) {
-                        suite.setCaptureElements([{everything: true}, '.selector']);
-                    });
-                }.bind(this)).must.throw(TypeError);
-            });
-
-            it('should set captureSelectors property', function() {
-                this.context.suite('name', function(suite) {
-                    suite.setCaptureElements('.selector');
+        function testSelectorListProperty(method, property) {
+            describe(method, function() {
+                beforeEach(function() {
+                    this.callTestMethod = function() {
+                        var args = Array.prototype.slice.call(arguments);
+                        this.context.suite('name', function(suite) {
+                            suite[method].apply(suite, args);
+                        });
+                    }.bind(this);
                 });
 
-                this.suite.children[0].captureSelectors.must.eql(['.selector']);
-            });
-
-            it('should accept multiple arguments', function() {
-                this.context.suite('name', function(suite) {
-                    suite.setCaptureElements('.selector1', '.selector2');
-                });
-                this.suite.children[0].captureSelectors.must.eql(['.selector1', '.selector2']);
-            });
-
-            it('should accept array', function() {
-                this.context.suite('name', function(suite) {
-                    suite.setCaptureElements(['.selector1', '.selector2']);
+                it ('should throw if selector is not a string', function() {
+                    (function() {
+                        this.callTestMethod({everything: true});
+                    }.bind(this)).must.throw(TypeError);
                 });
 
-                this.suite.children[0].captureSelectors.must.eql(['.selector1', '.selector2']);
+                it ('should throw if selector in array is not a string', function() {
+                    (function() {
+                        this.callTestMethod([{everything: true}, '.selector']);
+                    }.bind(this)).must.throw(TypeError);
+                });
+
+                it('should set ' + property + ' property', function() {
+                    this.callTestMethod('.selector');
+
+                    this.suite.children[0][property].must.eql(['.selector']);
+                });
+
+                it('should accept multiple arguments', function() {
+                    this.callTestMethod('.selector1', '.selector2');
+                    this.suite.children[0][property].must.eql(['.selector1', '.selector2']);
+                });
+
+                it('should accept array', function() {
+                    this.callTestMethod(['.selector1', '.selector2']);
+
+                    this.suite.children[0][property].must.eql(['.selector1', '.selector2']);
+                });
             });
-        });
+        }
+
+        testSelectorListProperty('setCaptureElements', 'captureSelectors');
+        testSelectorListProperty('ignoreElements', 'ignoreSelectors');
 
         function testHook(name) {
             var hookProperty = name + 'Hook';
