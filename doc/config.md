@@ -78,6 +78,11 @@ on Selenium Grid.
   `browsers` option instead) and `takesScreenshot` (always set to `true`
   automatically).
 
+  gemini supports custom capability option `--noCalibrate`. By default it's false and this enables browser calibration.
+  It is required for such cases when web driver captures screenshots with some area outside of the browser view.
+  Calibration makes browser to render a special page which allows to determine html body bounds and crop the screenshot
+  accordingly. If needed you can disable calibration for particular browser by setting `--noCalibrate` to `true`.
+
 * `debug` (CLI: `--debug`, env: `GEMINI_DEBUG`) – turn on debug logging to the terminal.
 * `parallelLimit` – by default, `gemini` will run all browsers in parallel.
   Sometimes (i.e. when using cloud services, such as SauceLabs) you have a

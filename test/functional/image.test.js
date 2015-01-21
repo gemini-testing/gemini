@@ -149,5 +149,11 @@ describe('image', function() {
                     });
             });
         });
+
+        describe('getRGBA', function() {
+            it('should return proper color values', function() {
+                this.image.getRGBA(0, 0).must.eql({r: 9, g: 9, b: 9, a: 255});
+            });
+        });
     });
 });
