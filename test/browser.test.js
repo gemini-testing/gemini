@@ -1,5 +1,6 @@
 'use strict';
 var Browser = require('../lib/browser'),
+    GeminiError = require('../lib/errors/gemini-error'),
     q = require('q'),
     wd = require('wd'),
     fs = require('fs'),
@@ -230,6 +231,23 @@ describe('browser', function() {
             return this.browser.calibrate()
                 .then(function(rs) {
                     rs.must.eql({top: 24, left: 6, right: 2, bottom: 0});
+                });
+        });
+
+        it('should fail on broken calibration page', function(done) {
+            this.wd.takeScreenshot = sinon.stub().returns(q(
+                fs.readFileSync(path.join(__dirname, 'functional', 'data', 'image', 'calibrate-broken.png'))
+            ));
+
+            this.browser.calibrate()
+                .then(function(rs) {
+                    done(new Error('Promise must be rejected'));
+                })
+                .fail(function(err) {
+                    if (err instanceof GeminiError) {
+                        return done();
+                    }
+                    done(new Error('Promise must be rejected with GeminiError'));
                 });
         });
 
