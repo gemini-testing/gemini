@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.6 - 2015-01-27
+
+* Work on a pages that modify `Array.prototype` (@SevInf).
+
 ## 0.9.5 - 2014-12-10
 
 * Works on Windows again (@SevInf).
