@@ -227,3 +227,4 @@ Full list of special keys (there are shortcuts for commonly used keys):
   local system (the one which `gemini` is executed on).
 * `focus(element)` – set a focus to a specified element.
 * `setWindowSize(width, height)` – change browser window dimensions.
+* `tap(element)` - tap specified element on touch enabled device.
