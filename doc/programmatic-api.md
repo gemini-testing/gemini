@@ -62,7 +62,7 @@ Suite objects have the following properties:
   suites.
 * `name` – the name of the suite.
 * `children` – array of subsuites of the current suite.
-* `state` – array of the `State` objects, defined in a suite.
+* `states` – array of the `State` objects, defined in a suite.
 
 ### State
 
@@ -133,8 +133,8 @@ Rejects promise if critical error occurred.
 
 * `gemini.getScreenshotPath(suite, stateName, browserId)` – returns path to the reference screenshot
 of the specified state for specified browser.
-* `buildDiff(referencePath, currentPath, diffPath)` – creates a diff image between `referencePath` and
+* `gemini.buildDiff(referencePath, currentPath, diffPath)` – creates a diff image between `referencePath` and
 `currentPath` and stores the result at `diffPath`.
-* `getBrowserCapabilites(browserId)` – returns WebDriver capabilities for specified `browserId`.
-* `browserIds` – list of all browser identificators to use for tests.
+* `gemini.getBrowserCapabilites(browserId)` – returns WebDriver capabilities for specified `browserId`.
+* `gemini.browserIds` – list of all browser identificators to use for tests.
 
