@@ -202,6 +202,14 @@ actions.executeJS(function(window) {
 
 * `wait(milliseconds)` - wait for specified amount of time before next action. If it is the last action in
 sequence, delay the screenshot for this amount of time.
+* `waitForElementToShow(selector, [timeout])` - waits unitl element, matched by `selector` will become visible.
+  Fails if element does not appear after `timeout` milliseconds (1000 by default).
+* `waitForElementToHide(selector, [timeout])` - waits until element, matched by `selector` will become invisible
+   or will be completely removed from DOM. Fails if element still visible after `timeout`
+   milliseconds (1000 by default).
+* `waitForJSCondition(function(window), timeout)` - waits until specified function return `true`. Function will be
+  executed in browser context, so any references to outer scope won't work. Fails if after `timeout` milliseconds
+  function still returns `false` (1000 by default).
 * `sendKeys([element], keys)` - send a series of keyboard strokes to the specified element or
    currently active element on a page.
 
