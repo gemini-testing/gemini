@@ -55,7 +55,7 @@ gemini.readTests()
 * `id` – уникальный идентификатор набора. Генерируется автоматически про загрузке набора.
 * `name` – название набора.
 * `children` – массив дочерних наборов.
-* `state` – массив `State`-объектов, определенных в наборе.
+* `states` – массив `State`-объектов, определенных в наборе.
 
 ### Состояние (State-объект)
 
@@ -109,8 +109,8 @@ state.shouldSkip({browserName: 'firefox', version: '25.0'});
 ## Утилиты
 
 * `gemini.getScreenshotPath(suite, stateName, browserId)` – возвращает путь к эталонному изображению указанного состояния, для указанного браузера.
-* `buildDiff(referencePath, currentPath, diffPath)` – создаёт  diff-изображение между файлами, указанными в `referencePath` и
+* `gemini.buildDiff(referencePath, currentPath, diffPath)` – создаёт  diff-изображение между файлами, указанными в `referencePath` и
 `currentPath`, и сохраняет результат по пути `diffPath`.
-* `getBrowserCapabilites(browserId)` – возвращает свойства WebDriver для указанного `browserId`.
-* `browserIds` – возвращает список идентификаторов всех браузеров, используемых для тестов.
+* `gemini.getBrowserCapabilites(browserId)` – возвращает свойства WebDriver для указанного `browserId`.
+* `gemini.browserIds` – возвращает список идентификаторов всех браузеров, используемых для тестов.
 
