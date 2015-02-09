@@ -6,6 +6,13 @@
   Use `suite.ignoreElements(selector1, selector2, ...)` to specify
   the selectors to ignore (@SevInf).
 
+## 0.9.7 - 2015-02-09
+
+* Add new wait methods (@SevInf):
+  - `waitForElementToShow`
+  - `waitForElementToHide`
+  - `waitForJSCondition`
+
 ## 0.9.6 - 2015-01-27
 
 * Work on a pages that modify `Array.prototype` (@SevInf).
