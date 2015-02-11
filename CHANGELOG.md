@@ -1,10 +1,17 @@
 # Changelog
 
-## Dev
+## 0.9.8 - 2015-02-11
 
+* Work correctly if WebDriver implementation returns screenshot with
+  a browser chrome. This is done via calibration step after first launch
+  of the browsers (@scf2k).
 * Add ability to ignore certain elements when comparing screenshots.
   Use `suite.ignoreElements(selector1, selector2, ...)` to specify
   the selectors to ignore (@SevInf).
+* Add `tap` action for touch devices (@scf2k).
+* `gemini` is now works correctly if page changes during the test (@scf2k).
+* Correctly handle missing timeout in waitForElementXXX (@SevInf).
+* Correctly report image path in `gather` API (@SevInf).
 
 ## 0.9.7 - 2015-02-09
 
