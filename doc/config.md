@@ -91,6 +91,10 @@ on Selenium Grid.
   parallel.
 * `strictComparison` – test will be considered as failed in case of any kind of error. By default, only noticeable differences are treated
 as test failure.
+* `tolerance` - indicates maximum allowed [CIEDE2000](http://en.wikipedia.org/wiki/Color_difference#CIEDE2000)
+  difference between colors. Used only in non-strict mode. By default its 2.3 which should be enough for the
+  most cases. Increasing global default is not recommended, prefer changing tolerance for particular suites or
+  states instead.
 * `diffColor` – specifies color which will be used to highlight differences
   between images. Specified in hexadecimal RGB (`#RRGGBB`). Magenta by default
   (`#FF00FF`).
