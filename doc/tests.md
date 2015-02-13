@@ -64,6 +64,9 @@ suite.setCaptureElements(['.selector1', '.selector2']);
 * `ignoreElements('selector1', 'selector2', ...)` - elements, matching
    specified selectors will be ignored when comparing images.
 
+* `setTolerance(value)` - overrides global tolerance value for the whole suite
+  (See `tolerance`option description in [config](config.md) documentation for details).
+
 * `skip([browser])` – skip all tests and nested suites for:
 
   - `skip()` – all browsers;
@@ -89,7 +92,7 @@ suite.skip([
 ]);
 ```
 
-* `capture(stateName, callback(actions, find))` – defines a new state to capture.
+* `capture(stateName, [options], callback(actions, find))` – defines a new state to capture.
   Optional callback describes a sequence of actions to bring the page to this state,
   starting from a **previous** state of the suite. States are executed one after another
   in order of definition without browser reload in between.
@@ -110,6 +113,14 @@ suite.skip([
         .mouseUp(button);
 });
 ```
+   Options parameter allows you to override a `tolerance` value for one test:
+
+```js
+.capture('name', {tolerance: 30}, function(actions, find) {
+
+});
+```
+   See `tolerance`option description in [config](config.md) documentation for details.
 
 * `before(callback(actions, find))` – use this function to execute some code
   before the first state. The arguments of a callback are the same as for `capture` callback.

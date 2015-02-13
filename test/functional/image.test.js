@@ -35,6 +35,17 @@ describe('image', function() {
                 });
         });
 
+        it('should resolve to `true` for non-equal images if tolerance is high enough', function() {
+            return Image.compare(
+                    imagePath('image1.png'),
+                    imagePath('image3.png'),
+                    {tolerance: 50}
+                )
+                .then(function(result) {
+                    result.must.be.true();
+                });
+        });
+
         it('should resolve to `true` for images with unnoticable difference', function() {
             return Image.compare(
                     imagePath('image1.png'),

@@ -189,6 +189,25 @@ describe('public tests API', function() {
             shouldBeChainable('setUrl', 'http://example.com');
         });
 
+        describe('setTolerance', function() {
+            it('should throw if argument is not a string', function() {
+                (function() {
+                    this.context.suite('name', function(suite) {
+                        suite.setTolerance('so much');
+                    });
+                }.bind(this)).must.throw(TypeError);
+            });
+
+            it('should throw if argument is not a string', function() {
+                this.context.suite('name', function(suite) {
+                    suite.setTolerance(25);
+                });
+                this.suite.children[0].tolerance.must.equal(25);
+            });
+
+            shouldBeChainable('setTolerance', 25);
+        });
+
         function testSelectorListProperty(method, property) {
             describe(method, function() {
                 beforeEach(function() {
@@ -332,6 +351,21 @@ describe('public tests API', function() {
                 });
 
                 this.suite.children[0].states[0].callback.must.be(spy);
+            });
+
+            it('should allow to set tolerance', function() {
+                this.context.suite('name', function(suite) {
+                    prepareSuite(suite).capture('state', {tolerance: 25}, function() {});
+                });
+                this.suite.children[0].states[0].tolerance.must.be(25);
+            });
+
+            it('should throw if tolerance is not a number', function() {
+                (function() {
+                    this.context.suite('name', function(suite) {
+                        prepareSuite(suite).capture('state', {tolerance: 'so much'}, function() {});
+                    });
+                }.must.throw(TypeError));
             });
 
             it('should be chainable', function(done) {

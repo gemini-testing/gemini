@@ -411,15 +411,34 @@ describe('config', function() {
     });
 
     describe('tolerance', function() {
-        it('should throw error if set', function() {
+        it('should not accept non-numbers', function() {
             (function() {
                 return new Config({
                     projectRoot: '/',
                     rootUrl: 'http://example.com',
                     gridUrl: 'http://example.com',
-                    tolerance: 0.01
+                    tolerance: 'very tolerant'
                 });
             }.must.throw(GeminiError));
+        });
+
+        it('should accept numbers', function() {
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com',
+                tolerance: 2.8
+            });
+            config.tolerance.must.be(2.8);
+        });
+
+        it('should be 2.3 by default', function() {
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com',
+                gridUrl: 'http://example.com'
+            });
+            config.tolerance.must.be(2.3);
         });
     });
 

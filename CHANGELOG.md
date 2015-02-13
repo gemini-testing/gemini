@@ -1,5 +1,22 @@
 # Changelog
 
+## Dev
+
+* Re-add `tolerance` setting, which now sets max allowed
+  CIEDE2000 difference between image colors. It is now
+  configurable on 3 levels:
+  - `tolerance` option in config
+  - `setTolerance` method for a suite
+  - optional parameter to `capture` method:
+    ```javascript
+    suite.capture('name', {tolerance: 20}, function() {});
+    ```
+* Programmatic API method `buildDiff` is now deprecated: it 
+  has access only to global tolerance, so diff it produces might not show
+  exactly what caused test to fail. Method is kept for backward compatibility, 
+  but users of a programmatic API now encouraged to use `saveDiffTo` method of
+  test result (passed to reporter) instead.
+
 ## 0.9.8 - 2015-02-11
 
 * Work correctly if WebDriver implementation returns screenshot with
