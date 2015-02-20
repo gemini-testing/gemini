@@ -12,7 +12,11 @@
                     <div class="section__title">{{name}}</div>
                     <div class="section__body">
                         {{#if error}}
-                            <pre class="stacktrace">{{stacktrace}}</pre>
+                            <pre class="reason">{{reason}}</pre>
+                        {{/if}}
+
+                        {{#if warning}}
+                            <pre class="reason">{{reason}}</pre>
                         {{/if}}
 
                         {{#if skipped}}
