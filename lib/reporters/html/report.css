@@ -1,6 +1,6 @@
 .report {
     font: 14px Helvetica Neue, Arial, sans-serif;
-} 
+}
 
 .summary__key {
     font-weight: bold;
@@ -74,6 +74,10 @@
     color: #c00;
 }
 
+.section_status_warning > .section__title {
+    color: #f6a828;
+}
+
 .section_status_skip > .section__title {
     color: #ccc;
 }
@@ -102,7 +106,7 @@
     transform: rotate(-90deg);
 }
 
-.stacktrace {
+.reason {
     background: #f6f5f3;
     border: 1px solid #ccc;
     padding: 5px;

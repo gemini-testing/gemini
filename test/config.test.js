@@ -820,6 +820,36 @@ describe('config', function() {
             config.coverageNoHtml.must.be(true);
         });
     });
+    describe('referenceImageAbsence', function() {
+        it('should not accept invalid values', function() {
+            (function() {
+                return new Config({
+                    projectRoot: '/',
+                    rootUrl: 'http://example.com',
+                    referenceImageAbsence: 'invalid value'
+                });
+            }.must.throw(GeminiError));
+        });
+
+        ['error', 'warning'].forEach(function(value) {
+            it('should accept ' + value, function() {
+                var config = new Config({
+                    projectRoot: '/',
+                    rootUrl: 'http://example.com',
+                    referenceImageAbsence: value
+                });
+                config.referenceImageAbsence.must.be(value);
+            });
+        });
+
+        it('should be error by default', function() {
+            var config = new Config({
+                projectRoot: '/',
+                rootUrl: 'http://example.com'
+            });
+            config.referenceImageAbsence.must.be('error');
+        });
+    });
 });
 
 function stubProcessEnv(sinon, props) {
