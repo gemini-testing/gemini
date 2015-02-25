@@ -8,7 +8,7 @@ Gemini quick start
 
 Its key features are:
 
-* Compatibility with different browsers;
+* Compatibility with different browsers (see [notes about IE](doc/ie-support.md));
 * Ability to test separate sections of a web page;
 * Position and size of an element are calculated including its `box-shadow` and `outline` properties;
 * Some special case differences between images (rendering artifacts, text caret, etc.) are ignored;
