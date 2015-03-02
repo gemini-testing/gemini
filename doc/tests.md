@@ -65,7 +65,7 @@ suite.setCaptureElements(['.selector1', '.selector2']);
    specified selectors will be ignored when comparing images.
 
 * `setTolerance(value)` - overrides global tolerance value for the whole suite
-  (See `tolerance`option description in [config](config.md) documentation for details).
+  (See `tolerance`option description in [config](/doc/config.md) documentation for details).
 
 * `skip([browser])` – skip all tests and nested suites for:
 
@@ -120,7 +120,7 @@ suite.skip([
 
 });
 ```
-   See `tolerance`option description in [config](config.md) documentation for details.
+   See `tolerance`option description in [config](/doc/config.md) documentation for details.
 
 * `before(callback(actions, find))` – use this function to execute some code
   before the first state. The arguments of a callback are the same as for `capture` callback.
