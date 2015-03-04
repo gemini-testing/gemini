@@ -16,6 +16,8 @@
   exactly what caused test to fail. Method is kept for backward compatibility, 
   but users of a programmatic API now encouraged to use `saveDiffTo` method of
   test result (passed to reporter) instead.
+* Warn if coverage for CSS file cannot be calculated due to
+  same-origin policy (@SevInf)
 
 ## 0.9.8 - 2015-02-11
 
