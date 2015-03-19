@@ -1,7 +1,17 @@
 # Changelog
 
-## Dev
+## 0.10-beta.1 - 2015-03-19
 
+* Basic support for IE8 browser (@SevInf).
+  This change required a large rewrite of the all client-side
+  scripts which can cause some breaking changes. For example,
+  bounds of a capture region are calculated more precisely now.
+  You'll probably need to re-gather your screenshots.
+* Calibration now correctly works in IE9 (@SevInf).
+* Added an option `referenceImageAbsence` (@hatroman).
+  This option allows to change default behaviour of the tests
+  to produce the warning if there is no reference image.
+  Default behaviour is still the test failure.
 * Re-add `tolerance` setting, which now sets max allowed
   CIEDE2000 difference between image colors. It is now
   configurable on 3 levels:
