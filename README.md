@@ -1,6 +1,8 @@
 Gemini quick start
 =======
 
+[![Join the chat at https://gitter.im/bem/gemini](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bem/gemini?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/bem/gemini.svg?branch=master)](https://travis-ci.org/bem/gemini)
 [![Coverage Status](https://img.shields.io/coveralls/bem/gemini.svg)](https://coveralls.io/r/bem/gemini)
 
