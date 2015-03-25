@@ -71,7 +71,7 @@ describe('capture session', function() {
 
         function setupImage(ctx, height) {
             ctx.browser.prepareScreenshot.returns({
-                bodyHeight: 100,
+                documentHeight: 100,
                 captureArea: {
                     top: 80,
                     left: 30,
@@ -147,7 +147,7 @@ describe('capture session', function() {
             });
         });
 
-        it('should crop screenshoot basing on viewport if image is less then body', function() {
+        it('should crop screenshoot basing on viewport if image is less then document', function() {
             var image = setupImageLessThenBody(this);
             return this.session.capture(this.state).then(function() {
                 sinon.assert.calledWith(image.crop, {
@@ -159,7 +159,7 @@ describe('capture session', function() {
             });
         });
 
-        it('should clear ignored areas basing on viewport if image is less then body', function() {
+        it('should clear ignored areas basing on viewport if image is less then document', function() {
             var image = setupImageLessThenBody(this);
             return this.session.capture(this.state).then(function() {
                 sinon.assert.calledWith(image.clear, {
@@ -171,7 +171,7 @@ describe('capture session', function() {
             });
         });
 
-        it('should crop screenshoot basing on body if image is greater then body', function() {
+        it('should crop screenshoot basing on document if image is greater then document', function() {
             var image = setupImageGreaterThenBody(this);
 
             return this.session.capture(this.state).then(function() {
@@ -184,7 +184,7 @@ describe('capture session', function() {
             });
         });
 
-        it('should clear ignored areas basing on body if image is greater then body', function() {
+        it('should clear ignored areas basing on document if image is greater then document', function() {
             var image = setupImageGreaterThenBody(this);
 
             return this.session.capture(this.state).then(function() {
@@ -197,13 +197,13 @@ describe('capture session', function() {
             });
         });
 
-        it('should fail when crop area is not located within body area', function(done) {
+        it('should fail when crop area is not located within document area', function(done) {
             this.state.name = 'state';
             this.state.suite = {name: 'suite'};
             this.browser.id = 'bro';
 
             this.browser.prepareScreenshot.returns({
-                bodyHeight: 100,
+                documentHeight: 100,
                 viewportOffset: {
                     top: 50,
                     left: 0
