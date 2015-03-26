@@ -1,6 +1,11 @@
 # Changelog
 
-## 0.10-beta.1 - 2015-03-19
+## 0.10.0-beta.2 - 2015-03-26
+
+* Use document height instead of body height to determine
+whether webdriver returns document or viewport screenshot (@SevInf)
+
+## 0.10.0-beta.1 - 2015-03-19
 
 * Basic support for IE8 browser (@SevInf).
   This change required a large rewrite of the all client-side
