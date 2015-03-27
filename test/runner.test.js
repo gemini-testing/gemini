@@ -206,6 +206,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteFullName: 'root suite',
                     suiteId: 0,
                     stateName: 'state'
                 });
@@ -237,6 +238,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteFullName: 'root suite',
                     suiteId: 0,
                     stateName: 'state'
                 });
@@ -365,6 +367,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteFullName: 'root suite',
                     suiteId: 0,
                     stateName: 'state'
                 });
@@ -424,6 +427,7 @@ describe('runner', function() {
             this.runner.on('error', function(e) {
                 e.suiteId.must.be(0);
                 e.suiteName.must.be('suite');
+                e.suiteFullName.must.be('root suite');
                 e.stateName.must.be('state');
                 e.browserId.must.be('browser');
                 done();
