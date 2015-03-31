@@ -203,6 +203,9 @@ list `element` can be either CSS selector or result of a `find` call:
   to the top left corner of the element. If not specified, mouse will be moved to the center of
   the element.
 * `dragAndDrop(element, dragTo)` – drag `element` to other `dragTo` element.
+* `flick(speed, swipe)` - flick starting anywhere on the screen using `speed.x` and `speed.y` speed.
+* `flick(offsets, speed, element)` - flick element with starting point at its center by
+   `offsets.x` and `offset.y` offsets.
 * `executeJS(function(window))` – run specified function in a browser. The argument of a function
    is the browser's `window` object:
 
