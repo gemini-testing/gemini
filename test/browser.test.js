@@ -260,4 +260,20 @@ describe('browser', function() {
                 });
         });
     });
+
+    describe('buildScripts', function() {
+        it('should include coverage script when coverage is on', function() {
+            var browser = new Browser({coverage: true}, 'browser', {browserName: 'browser', version: '1.0'});
+            return browser.buildScripts().then(function(scripts) {
+                scripts.indexOf('exports.collectCoverage').must.not.be(-1);
+            });
+        });
+
+        it('should not include coverage script when coverage is off', function() {
+            var browser = new Browser({coverage: false}, 'browser', {browserName: 'browser', version: '1.0'});
+            return browser.buildScripts().then(function(scripts) {
+                scripts.indexOf('exports.collectCoverage').must.be(-1);
+            });
+        });
+    });
 });
