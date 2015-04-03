@@ -4,16 +4,14 @@
         <title>Gemini report</title>
         <link rel="stylesheet" type="text/css" href="report.css">
     </head>
-    
+
     <body class="report">
-        {{#with stats}}
         <dl class="summary">
             <dt class="summary__key">Total Tests</dt><dd class="summary__value">{{total}}</dd>
             <dt class="summary__key">Passed</dt><dd class="summary__value">{{passed}}</dd>
             <dt class="summary__key {{has-fails}}">Failed</dt><dd class="summary__value">{{failed}}</dd>
             <dt class="summary__key">Skipped</dt><dd class="summary__value">{{skipped}}</dd>
         </dl>
-        {{/with}}
 
         <button id="expandAll" class="button">Expand all</button>
         <button id="collapseAll" class="button">Collapse all</button>

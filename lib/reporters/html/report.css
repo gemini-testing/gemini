@@ -78,8 +78,14 @@
     color: #f6a828;
 }
 
-.section_status_skip > .section__title {
+.section_status_skip > .section__title,
+.section_status_skip > .section__title:hover {
     color: #ccc;
+    cursor: default;
+}
+
+.section_status_skip > .section__title::before {
+    content: none;
 }
 
 .section__title:hover {
@@ -112,4 +118,3 @@
     padding: 5px;
     font: 12px Consolas, Monaco, monospace;
 }
-
