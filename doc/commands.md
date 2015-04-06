@@ -67,6 +67,9 @@ one test completely (green color in report), partially (yellow) or was not captu
 * `--root-url`, `-r` – use specified URL instead of `rootUrl` setting from config file.
 * `--grid-url`, `-g` – use specified URL instead of `gridUrl` setting from config file.
 * `--grep PATTERN` – execute only suites with names that match the regular expression pattern.
+* `--browser ID` — execute suite only for specified browser id. Can be used multiple times.
+  Can be also specified with `GEMINI_BROWSERS` environment variable. If both CLI option
+  and env variable are set, CLI has precedence.
 * `--help` – display help message.
 * `--version` – display version.
 
