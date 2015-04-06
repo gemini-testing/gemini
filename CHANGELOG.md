@@ -34,6 +34,11 @@ whether webdriver returns document or viewport screenshot (@SevInf)
 * Warn if coverage for CSS file cannot be calculated due to
   same-origin policy (@SevInf)
 
+## 0.9.9 - 2015-04-96
+
+* Adds new option `--browser` to the CLI and `browsers` to the API which
+  allows to run tests in a subset of browsers (@SevInf).
+
 ## 0.9.8 - 2015-02-11
 
 * Work correctly if WebDriver implementation returns screenshot with
