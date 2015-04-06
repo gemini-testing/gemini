@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.0 - 2015-04-06
+
+* Fix calibration to work in IE8 again (@SevInf)
+* Client scripts which gemini injects into page
+  are now bundled together and minified (@scf2k).
+* Update `png-img` version bringing support for node `v0.12`
+  and `iojs` (@j0tunn).
+* Don't inject main client script twice (@scf2k)
+* Ported 0.9.9 changes (@SevInf)
+
 ## 0.10.0-beta.2 - 2015-03-26
 
 * Use document height instead of body height to determine
@@ -34,7 +44,7 @@ whether webdriver returns document or viewport screenshot (@SevInf)
 * Warn if coverage for CSS file cannot be calculated due to
   same-origin policy (@SevInf)
 
-## 0.9.9 - 2015-04-96
+## 0.9.9 - 2015-04-06
 
 * Adds new option `--browser` to the CLI and `browsers` to the API which
   allows to run tests in a subset of browsers (@SevInf).
