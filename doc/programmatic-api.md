@@ -93,6 +93,8 @@ reporter).
 * `grep` – regular expression to filter suites to run. By default, all tests
 will be executed. If this option is set, only suites with name matching the
 pattern will be executed.
+* `browsers` — array of browser ids to execute tests in. By default, tests are
+  executed in all browsers, specified in config.
 
 Returns promise that resolve to a stats object with following keys:
 
@@ -118,6 +120,8 @@ new temp directory will be created.
 * `grep` – regular expression to filter suites to run. By default, all tests
 will be executed. If this option is set, only suites with name matching the
 pattern will be executed.
+* `browsers` — array of browser ids to execute tests in. By default, tests are
+  executed in all browsers, specified in config.
 
 Returns promise that resolve to a stats object with following keys:
 
