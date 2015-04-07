@@ -6,6 +6,7 @@ var assert = require('assert'),
     State = require('../lib/state'),
     Runner = require('../lib/runner'),
     StateError = require('../lib/errors/state-error'),
+    NoRefImageError = require('../lib/errors/no-ref-image-error'),
     Config = require('../lib/config');
 
 function addState(suite, name, cb) {
@@ -206,6 +207,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteFullName: 'root suite',
                     suiteId: 0,
                     stateName: 'state'
                 });
@@ -237,6 +239,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteFullName: 'root suite',
                     suiteId: 0,
                     stateName: 'state'
                 });
@@ -365,6 +368,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suiteFullName: 'root suite',
                     suiteId: 0,
                     stateName: 'state'
                 });
@@ -424,6 +428,58 @@ describe('runner', function() {
             this.runner.on('error', function(e) {
                 e.suiteId.must.be(0);
                 e.suiteName.must.be('suite');
+                e.suiteFullName.must.be('root suite');
+                e.stateName.must.be('state');
+                e.browserId.must.be('browser');
+                done();
+            });
+            this.runner.run(this.root).done();
+        });
+
+        it('should extend no ref image errors with metadata', function(done) {
+            this.runner._processCapture = function(cb) {
+                throw new NoRefImageError('path', {
+                    suiteName: 'suite',
+                    suiteFullName: 'root suite',
+                    suiteId: 0,
+                    stateName: 'state',
+                    browserId: 'browser'
+                });
+            };
+
+            addState(this.suite, 'state', function() {
+            });
+
+            this.runner.on('error', function(e) {
+                e.suiteId.must.be(0);
+                e.suiteName.must.be('suite');
+                e.suiteFullName.must.be('root suite');
+                e.stateName.must.be('state');
+                e.browserId.must.be('browser');
+                done();
+            });
+            this.runner.run(this.root).done();
+        });
+
+        it('should extend no ref image warnings with metadata', function(done) {
+            this.runner.config.referenceImageAbsence = 'warning';
+            this.runner._processCapture = function(cb) {
+                throw new NoRefImageError('path', {
+                    suiteName: 'suite',
+                    suiteFullName: 'root suite',
+                    suiteId: 0,
+                    stateName: 'state',
+                    browserId: 'browser'
+                });
+            };
+
+            addState(this.suite, 'state', function() {
+            });
+
+            this.runner.on('warning', function(e) {
+                e.suiteId.must.be(0);
+                e.suiteName.must.be('suite');
+                e.suiteFullName.must.be('root suite');
                 e.stateName.must.be('state');
                 e.browserId.must.be('browser');
                 done();
