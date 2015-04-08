@@ -1,58 +1,50 @@
-{{#if filtered}}
-{{else}}
 <div class="section {{collapse}} {{status}}">
     <div class="section__title">{{name}}</div>
     <div class="section__body section__body_guided">
-        {{#each states}}
-        <div class="section {{collapse}} {{status}}">
-            <div class="section__title">{{name}}</div>
-            <div class="section__body section__body_guided">
-                {{#each browsers}}
-                <div class="section {{collapse}} {{status}}">
+        {{#each browsers}}
+            <div class="section {{collapse}} {{status}}">
+                {{#if skipped}}
+                    <div class="section__title">[skipped] {{name}}</div>
+                {{/if}}
+                {{#unless skipped}}
                     <div class="section__title">{{name}}</div>
                     <div class="section__body">
                         {{#if error}}
-                            <pre class="reason">{{reason}}</pre>
+                            <pre class="reason">{{{reason}}}</pre>
                         {{/if}}
 
                         {{#if warning}}
-                            <pre class="reason">{{reason}}</pre>
+                            <pre class="reason">{{{reason}}}</pre>
                         {{/if}}
 
-                        {{#if skipped}}
-                            Test skipped
+                        {{#if success}}
+                            <div class="image-box">
+                                <div class="image-box__image">
+                                    {{image "actual"}}
+                                </div>
+                            </div>
                         {{/if}}
-
-                        {{#if tested}}
-                            {{#if equal}}
-                                <div class="image-box">
-                                    <div class="image-box__image">
-                                        {{image "current"}}
-                                    </div>
+                        {{#if fail}}
+                            <div class="image-box">
+                                <div class="image-box__image">
+                                    <div class="image-box__title">Expected</div>
+                                    {{image "expected"}}
                                 </div>
-                            {{else}}
-                                <div class="image-box">
-                                    <div class="image-box__image">
-                                        <div class="image-box__title">Reference</div>
-                                        {{image "reference"}}
-                                    </div>
-                                    <div class="image-box__image">
-                                        <div class="image-box__title">Current</div>
-                                        {{image "current"}}
-                                    </div>
-                                    <div class="image-box__image">
-                                        <div class="image-box__title">Diff</div>
-                                        {{image "diff"}}
-                                    </div>
+                                <div class="image-box__image">
+                                    <div class="image-box__title">Actual</div>
+                                    {{image "actual"}}
                                 </div>
+                                <div class="image-box__image">
+                                    <div class="image-box__title">Diff</div>
+                                    {{image "diff"}}
+                                </div>
+                            </div>
 
-                            {{/if}}
                         {{/if}}
                     </div>
-                </div>
-                {{/each}}
+                {{/unless}}
+
             </div>
-        </div>
         {{/each}}
 
         {{#each children}}
@@ -60,4 +52,3 @@
         {{/each}}
     </div>
 </div>
-{{/if}}
