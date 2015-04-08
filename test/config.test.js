@@ -1,5 +1,6 @@
 'use strict';
 var Config = require('../lib/config'),
+    assert = require('chai').assert,
     GeminiError = require('../lib/errors/gemini-error'),
     createSuite = require('../lib/suite').create,
     sinon = require('sinon'),
@@ -7,6 +8,14 @@ var Config = require('../lib/config'),
     _ = require('lodash');
 
 describe('config', function() {
+    function createConfig(props) {
+        return new Config(_.extend({
+            projectRoot: './',
+            rootUrl: 'http://example.com/root',
+            gridUrl: 'http://example.com/root'
+        }, props));
+    }
+
     beforeEach(function() {
         this.sinon = sinon.sandbox.create();
     });
@@ -408,6 +417,35 @@ describe('config', function() {
                 parallelLimit: 3
             });
             config.parallelLimit.must.be(3);
+        });
+    });
+
+    describe('sessionMode', function() {
+        it('should be "perBrowser" by default', function() {
+            var config = createConfig();
+            assert.equal(config.sessionMode, 'perBrowser');
+        });
+
+        it('should accept "perBrowser" value', function() {
+            var config = createConfig({
+                sessionMode: 'perBrowser'
+            });
+            assert.equal(config.sessionMode, 'perBrowser');
+        });
+
+        it('should accept "perSuite" value', function() {
+            var config = createConfig({
+                sessionMode: 'perSuite'
+            });
+            assert.equal(config.sessionMode, 'perSuite');
+        });
+
+        it('should not accept any other value', function() {
+            assert.throws(function() {
+                createConfig({
+                    sessionMode: 'other'
+                });
+            }, GeminiError);
         });
     });
 
