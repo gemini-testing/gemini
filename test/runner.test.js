@@ -164,6 +164,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suitePath: ['suite'],
                     suiteId: 0
                 });
             });
@@ -207,7 +208,8 @@ describe('runner', function() {
                     browserId: 'browser',
                     suiteName: 'suite',
                     suiteId: 0,
-                    stateName: 'state'
+                    stateName: 'state',
+                    suitePath: ['suite']
                 });
             });
         });
@@ -238,7 +240,8 @@ describe('runner', function() {
                     browserId: 'browser',
                     suiteName: 'suite',
                     suiteId: 0,
-                    stateName: 'state'
+                    stateName: 'state',
+                    suitePath: ['suite']
                 });
             });
         });
@@ -366,7 +369,8 @@ describe('runner', function() {
                     browserId: 'browser',
                     suiteName: 'suite',
                     suiteId: 0,
-                    stateName: 'state'
+                    stateName: 'state',
+                    suitePath: ['suite']
                 });
             });
         });
@@ -426,6 +430,7 @@ describe('runner', function() {
                 e.suiteName.must.be('suite');
                 e.stateName.must.be('state');
                 e.browserId.must.be('browser');
+                e.suitePath.must.be.eql(['suite']);
                 done();
             });
             this.runner.run(this.root).done();
@@ -438,6 +443,7 @@ describe('runner', function() {
                 sinon.assert.calledWith(spy, {
                     browserId: 'browser',
                     suiteName: 'suite',
+                    suitePath: ['suite'],
                     suiteId: 0
                 });
             });
@@ -454,6 +460,7 @@ describe('runner', function() {
                 spy.secondCall.args.must.eql([{
                     browserId: 'browser',
                     suiteName: 'child',
+                    suitePath: ['suite', 'child'],
                     suiteId: 1
                 }]);
             });
