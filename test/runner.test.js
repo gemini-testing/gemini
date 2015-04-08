@@ -11,6 +11,7 @@ var assert = require('assert'),
 function addState(suite, name, cb) {
     var state = new State(suite, name, cb || function() {});
     suite.addState(state);
+    return state;
 }
 
 describe('runner', function() {
@@ -157,11 +158,13 @@ describe('runner', function() {
         });
 
         it('should emit `beginSuite` event for each suite', function() {
-            var spy = this.sinon.spy().named('onBeginSuite');
+            var spy = this.sinon.spy().named('onBeginSuite'),
+                _this = this;
 
             this.runner.on('beginSuite', spy);
             return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy, {
+                    suite: _this.suite,
                     browserId: 'browser',
                     suiteName: 'suite',
                     suitePath: ['suite'],
@@ -198,13 +201,15 @@ describe('runner', function() {
         });
 
         it('should emit `beginState` for each suite state', function() {
-            var spy = this.sinon.spy().named('onBeginState');
-
-            addState(this.suite, 'state');
+            var spy = this.sinon.spy().named('onBeginState'),
+                _this = this,
+                state = addState(this.suite, 'state');
             this.runner.on('beginState', spy);
 
             return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy, {
+                    suite: _this.suite,
+                    state: state,
                     browserId: 'browser',
                     suiteName: 'suite',
                     suiteId: 0,
@@ -228,15 +233,20 @@ describe('runner', function() {
         });
 
         it('should emit `skipState` if state is skipped', function() {
-            var spy = this.sinon.spy().named('onSuiteSkip');
-            this.suite.addState({
-                name: 'state',
-                suite: this.suite,
-                shouldSkip: this.sinon.stub().returns(true)
-            });
+            var spy = this.sinon.spy().named('onSuiteSkip'),
+                _this = this,
+                state = {
+                    name: 'state',
+                    suite: this.suite,
+                    shouldSkip: this.sinon.stub().returns(true)
+                };
+
+            this.suite.addState(state);
             this.runner.on('skipState', spy);
             return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy, {
+                    suite: _this.suite,
+                    state: state,
                     browserId: 'browser',
                     suiteName: 'suite',
                     suiteId: 0,
@@ -359,13 +369,15 @@ describe('runner', function() {
         });
 
         it('should emit `endState` for each suite state', function() {
-            var spy = this.sinon.spy();
-
-            addState(this.suite, 'state');
+            var spy = this.sinon.spy(),
+                _this = this,
+                state = addState(this.suite, 'state');
             this.runner.on('endState', spy);
 
             return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy, {
+                    suite: _this.suite,
+                    state: state,
                     browserId: 'browser',
                     suiteName: 'suite',
                     suiteId: 0,
@@ -437,10 +449,12 @@ describe('runner', function() {
         });
 
         it('should emit `endSuite` for each suite', function() {
-            var spy = this.sinon.spy().named('endSuite');
+            var spy = this.sinon.spy().named('endSuite'),
+                _this = this;
             this.runner.on('endSuite', spy);
             return this.runner.run(this.root).then(function() {
                 sinon.assert.calledWith(spy, {
+                    suite: _this.suite,
                     browserId: 'browser',
                     suiteName: 'suite',
                     suitePath: ['suite'],
@@ -458,6 +472,7 @@ describe('runner', function() {
 
             return this.runner.run(this.root).then(function() {
                 spy.secondCall.args.must.eql([{
+                    suite: child,
                     browserId: 'browser',
                     suiteName: 'child',
                     suitePath: ['suite', 'child'],
