@@ -27,7 +27,7 @@ Required software:
 
 1. [Selenium Server](http://docs.seleniumhq.org/download/) – for testing in different browsers.
 2. [PhantomJS](http://phantomjs.org/) – headless version of a WebKit browser.
-3. Compiler with full support of C++11 (`GCC@4.7` or higher). This is a [png-img](https://github.com/bem/png-img) requirement.
+3. Compiler with support of C++11 (`GCC@4.6` or higher). This is a [png-img](https://github.com/bem/png-img) requirement.
 
 ## Installation
 ### Global installation
