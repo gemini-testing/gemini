@@ -39,8 +39,7 @@
 .image-box {
     padding: 5px;
     border: 1px solid #ccc;
-    background-image: url("data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"><path fill="#cecece" d="m0 0h35c0 11.67 0 23.33 0 35-11.67 0-23.33 0-35 0v-35"/><g fill="#fff"><path d="m35 0h35v35c-11.67 0-23.33 0-35 0 0-11.67 0-23.33 0-35"/><path d="m0 35c11.67 0 23.33 0 35 0 0 11.67 0 23.33 0 35h-35v-35"/></g><path fill="#cecece" d="m35 35c11.67 0 23.33 0 35 0v35h-35c0-11.67 0-23.33 0-35"/></svg>
-");
+    background: #c9c9c9;
 }
 
 .image-box__image {
@@ -118,4 +117,40 @@
     border: 1px solid #ccc;
     padding: 5px;
     font: 12px Consolas, Monaco, monospace;
+}
+
+.cswitcher {
+    padding: 5px;
+}
+
+.cswitcher__item {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    box-shadow: 0 0 1px #000;
+    border: 1px solid #fff;
+}
+
+.cswitcher__item_selected.cswitcher__item::before {
+    content: '';
+    position: absolute;
+    background: rgba(4, 4, 4, 0.3) no-repeat 3px 2px url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 97.619 97.618" fill="#eee" fill-opacity="0.8"><path d="m96.94 17.358l-12.971-11.399c-.398-.352-.927-.531-1.449-.494-.529.035-1.023.278-1.373.677l-47.05 53.55-16.728-22.14c-.319-.422-.794-.701-1.319-.773-.524-.078-1.059.064-1.481.385l-13.778 10.408c-.881.666-1.056 1.92-.39 2.801l30.974 40.996c.362.479.922.771 1.522.793.024 0 .049 0 .073 0 .574 0 1.122-.246 1.503-.68l62.64-71.3c.73-.829.649-2.094-.181-2.822"/></svg>');
+    height: 20px;
+    width: 20px;
+}
+
+.cswitcher__item:hover {
+    cursor: pointer;
+}
+
+.cswitcher_color_1 {
+    background: #c9c9c9;
+}
+
+.cswitcher_color_2 {
+    background: #d5ff09;
+}
+
+.cswitcher_color_3 {
+    background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"><path fill="#cecece" d="m0 0h35c0 11.67 0 23.33 0 35-11.67 0-23.33 0-35 0v-35"/><g fill="#fff"><path d="m35 0h35v35c-11.67 0-23.33 0-35 0 0-11.67 0-23.33 0-35"/><path d="m0 35c11.67 0 23.33 0 35 0 0 11.67 0 23.33 0 35h-35v-35"/></g><path fill="#cecece" d="m35 35c11.67 0 23.33 0 35 0v35h-35c0-11.67 0-23.33 0-35"/></svg>');
 }
