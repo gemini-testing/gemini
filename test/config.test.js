@@ -3,7 +3,8 @@ var Config = require('../lib/config'),
     GeminiError = require('../lib/errors/gemini-error'),
     createSuite = require('../lib/suite').create,
     sinon = require('sinon'),
-    extend = require('node.extend');
+    extend = require('node.extend'),
+    _ = require('lodash');
 
 describe('config', function() {
     beforeEach(function() {
@@ -607,12 +608,23 @@ describe('config', function() {
     });
 
     describe('getAbsoluteUrl', function() {
+        function mkConfig(data) {
+            return new Config(_.extend({projectRoot: '/'}, data));
+        }
+
         it('should resolve url relative to root', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com/path/'
-            });
+            var config = mkConfig({rootUrl: 'http://example.com/path/'});
             config.getAbsoluteUrl('sub/path').must.be('http://example.com/path/sub/path');
+        });
+
+        it('should ignore slash at the end of the root', function() {
+            var config = mkConfig({rootUrl: 'http://example.com/path'});
+            config.getAbsoluteUrl('sub/path').must.be('http://example.com/path/sub/path');
+        });
+
+        it('should ignore slash at the begining of the passed relUrl', function() {
+            var config = mkConfig({rootUrl: 'http://example.com/path/'});
+            config.getAbsoluteUrl('/sub/path').must.be('http://example.com/path/sub/path');
         });
     });
 
