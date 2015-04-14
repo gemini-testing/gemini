@@ -89,6 +89,9 @@ on Selenium Grid.
   limit on a number of browser that can be run once at a time. Use this
   option to limit the number of browsers that `gemini` will try to run in
   parallel.
+* `sessionMode` — allows to choose how to launch new WebDriver sessions:
+  - `perBrowser` (default) — launch 1 session per browser. This session will be reused for all of the suites.
+  - `perSuite` — launch 1 new session for each browser per suite and finish the session when the suite ends.
 * `strictComparison` – test will be considered as failed in case of any kind of error. By default, only noticeable differences are treated
 as test failure.
 * `referenceImageAbsence` – treat reference image as `error` or `warning`. Default value is `error`.
