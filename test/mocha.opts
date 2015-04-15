@@ -1,1 +1,2 @@
 --require must
+--require ./test/setup
