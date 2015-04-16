@@ -54,7 +54,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bem/gemini.git"
+    "url": "https://github.com/gemini-testing/gemini.git"
   },
   "keywords": [
     "test",
@@ -64,7 +64,7 @@
     "layout"
   ],
   "bugs": {
-    "url": "https://github.com/bem/gemini/issues"
+    "url": "https://github.com/gemini-testing/gemini/issues"
   },
-  "homepage": "https://github.com/bem/gemini"
+  "homepage": "https://github.com/gemini-testing/gemini"
 }

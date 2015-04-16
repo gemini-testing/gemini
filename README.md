@@ -1,12 +1,12 @@
 Gemini quick start
 =======
 
-[![Join the chat at https://gitter.im/bem/gemini](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bem/gemini?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/gemini-testing/gemini](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gemini-testing/gemini?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build Status](https://travis-ci.org/bem/gemini.svg?branch=master)](https://travis-ci.org/bem/gemini)
-[![Coverage Status](https://img.shields.io/coveralls/bem/gemini.svg)](https://coveralls.io/r/bem/gemini)
+[![Build Status](https://travis-ci.org/gemini-testing/gemini.svg?branch=master)](https://travis-ci.org/gemini-testing/gemini)
+[![Coverage Status](https://img.shields.io/coveralls/gemini-testing/gemini.svg)](https://coveralls.io/r/gemini-testing/gemini)
 
-[Gemini](https://github.com/bem/gemini) is the utility for regression testing of web pages appearance.
+[Gemini](https://github.com/gemini-testing/gemini) is the utility for regression testing of web pages appearance.
 
 Its key features are:
 
@@ -27,7 +27,7 @@ Required software:
 
 1. [Selenium Server](http://docs.seleniumhq.org/download/) – for testing in different browsers.
 2. [PhantomJS](http://phantomjs.org/) – headless version of a WebKit browser.
-3. Compiler with support of C++11 (`GCC@4.6` or higher). This is a [png-img](https://github.com/bem/png-img) requirement.
+3. Compiler with support of C++11 (`GCC@4.6` or higher). This is a [png-img](https://github.com/gemini-testing/png-img) requirement.
 
 ## Installation
 ### Global installation
@@ -154,7 +154,7 @@ gemini test --reporter html --reporter flat [paths to test suites]
 ## GUI
 
 Instead of a command line you can use graphical user interface of `Gemini`. It is located in
-[gemini-gui](https://github.com/bem/gemini-gui) package and must be installed additionally:
+[gemini-gui](https://github.com/gemini-testing/gemini-gui) package and must be installed additionally:
 
 ```
 npm install -g gemini-gui
