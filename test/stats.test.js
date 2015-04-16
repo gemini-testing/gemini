@@ -1,5 +1,6 @@
 'use strict';
-var Stats = require('../lib/stats');
+var assert = require('chai').assert,
+    Stats = require('../lib/stats');
 
 describe('stats', function() {
     beforeEach(function() {
@@ -8,12 +9,12 @@ describe('stats', function() {
 
     it('should allow to add new key', function() {
         this.stats.add('counter');
-        this.stats.data.counter.must.be(1);
+        assert.equal(this.stats.data.counter, 1);
     });
 
     it('should increment existing keys', function() {
         this.stats.add('counter');
         this.stats.add('counter');
-        this.stats.data.counter.must.be(2);
+        assert.equal(this.stats.data.counter, 2);
     });
 });
