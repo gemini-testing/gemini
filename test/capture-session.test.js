@@ -1,5 +1,6 @@
 'use strict';
 var sinon = require('sinon'),
+    assert = require('chai').assert,
     q = require('q'),
     find = require('../lib/find-func').find,
 
@@ -24,7 +25,7 @@ describe('capture session', function() {
                 _this = this;
 
             return this.session.runHook(cb).then(function() {
-                sinon.assert.calledWith(cb, _this.seq, find);
+                assert.calledWith(cb, _this.seq, find);
             });
         });
 
@@ -32,7 +33,7 @@ describe('capture session', function() {
             var cb = sinon.stub(),
                 _this = this;
             return this.session.runHook(cb).then(function() {
-                sinon.assert.called(_this.seq.perform);
+                assert.called(_this.seq.perform);
             });
         });
 
@@ -44,18 +45,17 @@ describe('capture session', function() {
                 })
                 .then(function() {
                     return _this.session.runHook(function() {
-                        this.x.must.be('something');
+                        assert.equal(this.x, 'something');
                     });
                 });
         });
 
-        it('should throw StateError if callback throws', function(done) {
+        it('should throw StateError if callback throws', function() {
             var error = new Error('example'),
                 cb = sinon.stub().throws(error);
-            return this.session.runHook(cb).fail(function(e) {
-                e.must.be.instanceOf(StateError);
-                e.originalError.must.be(error);
-                done();
+            return assert.isRejected(this.session.runHook(cb)).then(function(e) {
+                assert.instanceOf(e, StateError);
+                assert.equal(e.originalError, error);
             });
         });
     });
@@ -124,7 +124,7 @@ describe('capture session', function() {
         it('should call state callback', function() {
             var _this = this;
             return this.session.capture(this.state).then(function() {
-                sinon.assert.calledWith(_this.state.callback, _this.seq, find);
+                assert.calledWith(_this.state.callback, _this.seq, find);
             });
         });
 
@@ -132,7 +132,7 @@ describe('capture session', function() {
             var _this = this;
             this.state.captureSelectors = ['.selector1', '.selector2'];
             return this.session.capture(this.state).then(function() {
-                sinon.assert.calledWith(_this.browser.prepareScreenshot, [
+                assert.calledWith(_this.browser.prepareScreenshot, [
                     '.selector1',
                     '.selector2'
                 ]);
@@ -143,14 +143,14 @@ describe('capture session', function() {
             var _this = this;
 
             return _this.session.capture(this.state).then(function() {
-                sinon.assert.called(_this.browser.captureFullscreenImage);
+                assert.called(_this.browser.captureFullscreenImage);
             });
         });
 
         it('should crop screenshoot basing on viewport if image is less then document', function() {
             var image = setupImageLessThenBody(this);
             return this.session.capture(this.state).then(function() {
-                sinon.assert.calledWith(image.crop, {
+                assert.calledWith(image.crop, {
                     top: 10,
                     left: 20,
                     width: 20,
@@ -162,7 +162,7 @@ describe('capture session', function() {
         it('should clear ignored areas basing on viewport if image is less then document', function() {
             var image = setupImageLessThenBody(this);
             return this.session.capture(this.state).then(function() {
-                sinon.assert.calledWith(image.clear, {
+                assert.calledWith(image.clear, {
                     top: 20,
                     left: 30,
                     width: 5,
@@ -175,7 +175,7 @@ describe('capture session', function() {
             var image = setupImageGreaterThenBody(this);
 
             return this.session.capture(this.state).then(function() {
-                sinon.assert.calledWith(image.crop, {
+                assert.calledWith(image.crop, {
                     top: 80,
                     left: 30,
                     width: 20,
@@ -188,7 +188,7 @@ describe('capture session', function() {
             var image = setupImageGreaterThenBody(this);
 
             return this.session.capture(this.state).then(function() {
-                sinon.assert.calledWith(image.clear, {
+                assert.calledWith(image.clear, {
                     top: 90,
                     left: 40,
                     width: 5,
@@ -197,7 +197,7 @@ describe('capture session', function() {
             });
         });
 
-        it('should fail when crop area is not located within document area', function(done) {
+        it('should fail when crop area is not located within document area', function() {
             this.state.name = 'state';
             this.state.suite = {name: 'suite'};
             this.browser.id = 'bro';
@@ -226,14 +226,7 @@ describe('capture session', function() {
             };
             this.browser.captureFullscreenImage.returns(q(image));
 
-            return this.session.capture(this.state)
-                .then(function() {
-                    done(new Error('.capture() must not complete successfully'));
-                })
-                .fail(function(err) {
-                    err.must.be.instanceOf(StateError);
-                    done();
-                });
+            return assert.isRejected(this.session.capture(this.state), StateError);
         });
     });
 });
