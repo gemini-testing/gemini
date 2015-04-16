@@ -1,6 +1,7 @@
 'use strict';
 
 var sinon = require('sinon'),
+    assert = require('chai').assert,
     testsApi = require('../lib/tests-api'),
     Suite = require('../lib/suite');
 
@@ -13,21 +14,21 @@ describe('public tests API', function() {
 
     describe('.suite method', function() {
         it('should throw an error if first argument is not a string', function() {
-            (function() {
+            assert.throws(function() {
                 this.context.suite(123, function() {});
-            }.must.throw(TypeError));
+            }, TypeError);
         });
 
         it('should throw an error if second argument is not a function', function() {
-            (function() {
+            assert.throws(function() {
                 this.context.suite('name');
-            }.must.throw(TypeError));
+            }, TypeError);
         });
 
         it('should create new suite with corresponding name', function() {
             this.context.suite('name', function() {});
 
-            this.suite.children[0].name.must.equal('name');
+            assert.equal(this.suite.children[0].name, 'name');
         });
 
         it('should call callback', function() {
@@ -42,49 +43,49 @@ describe('public tests API', function() {
                 _this.context.suite('child', function() {});
             });
 
-            this.suite.children[0].children[0].name.must.be('child');
+            assert.equal(this.suite.children[0].children[0].name, 'child');
         });
 
         it('should not allow create two child suites of the same name', function() {
             var _this = this;
 
-            (function() {
+            assert.throws(function() {
                 _this.context.suite('name', function() {
                     _this.context.suite('child', function() {});
                     _this.context.suite('child', function() {});
                 });
-            }.must.throw());
+            });
         });
 
         it('should create non-nested suite at the root level', function() {
             this.context.suite('first', function() {});
             this.context.suite('second', function() {});
 
-            this.suite.children[1].name.must.be('second');
+            assert.equal(this.suite.children[1].name, 'second');
         });
 
         it('should throw when suite has states but does not has URL', function() {
             var _this = this;
-            (function() {
+            assert.throws(function() {
                 _this.context.suite('first', function(suite) {
                     suite.setCaptureElements('.element')
                          .capture('plain');
                 });
-            }.must.throw());
+            });
         });
 
         it('should throw when suite has no states nor URL', function() {
             var _this = this;
-            (function() {
+            assert.doesNotThrow(function() {
                 _this.context.suite('first', function(suite) {
                     suite.setCaptureElements('.element');
                 });
-            }.must.not.throw());
+            });
         });
 
         it('should not throw when suite has states and url is inherited from parent', function() {
             var _this = this;
-            (function() {
+            assert.doesNotThrow(function() {
                 _this.context.suite('first', function(suite) {
                     suite.setUrl('/url');
                     _this.context.suite('child', function(suite) {
@@ -92,31 +93,31 @@ describe('public tests API', function() {
                              .capture('plain');
                     });
                 });
-            }.must.not.throw());
+            });
         });
 
         it('should throw if suite has states but does not has captureSelectors', function() {
             var _this = this;
-            (function() {
+            assert.throws(function() {
                 _this.context.suite('first', function(suite) {
                     suite.setUrl('/url')
                          .capture('plain');
                 });
-            }.must.throw());
+            });
         });
 
         it('should not throw if suite has no states nor captureSelectors', function() {
             var _this = this;
-            (function() {
+            assert.doesNotThrow(function() {
                 _this.context.suite('first', function(suite) {
                     suite.setUrl('/url');
                 });
-            }.must.not.throw());
+            });
         });
 
         it('should not throw when suite has states and captureSelectors are inherited from parent', function() {
             var _this = this;
-            (function() {
+            assert.doesNotThrow(function() {
                 _this.context.suite('first', function(suite) {
                     suite.setCaptureElements('.element');
                     _this.context.suite('child', function(suite) {
@@ -124,18 +125,18 @@ describe('public tests API', function() {
                              .capture('plain');
                     });
                 });
-            }.must.not.throw());
+            });
         });
 
         it('should assign suite ids', function() {
             this.context.suite('suite', function() {});
-            this.suite.children[0].id.must.be(1);
+            assert.equal(this.suite.children[0].id, 1);
         });
 
         it('should assign incrementing suite ids for following suites', function() {
             this.context.suite('suite', function() {});
             this.context.suite('suite2', function() {});
-            this.suite.children[1].id.must.be(2);
+            assert.equal(this.suite.children[1].id, 2);
         });
 
         it('should assign incrementing suite ids for child suites', function() {
@@ -143,7 +144,7 @@ describe('public tests API', function() {
             this.context.suite('suite', function() {
                 _this.context.suite('suite2', function() {});
             });
-            this.suite.children[0].children[0].id.must.be(2);
+            assert.equal(this.suite.children[0].children[0].id, 2);
         });
 
         it('should assign child suite ids before siblings', function() {
@@ -154,8 +155,8 @@ describe('public tests API', function() {
 
             this.context.suite('suite3', function() {});
 
-            this.suite.children[0].children[0].id.must.be(2);
-            this.suite.children[1].id.must.be(3);
+            assert.equal(this.suite.children[0].children[0].id, 2);
+            assert.equal(this.suite.children[1].id, 3);
         });
     });
 
@@ -163,7 +164,7 @@ describe('public tests API', function() {
         function shouldBeChainable(method, value) {
             it('should be chainable', function(done) {
                 this.context.suite('name', function(suite) {
-                    suite[method](value).must.be(suite);
+                    assert.equal(suite[method](value), suite);
                     done();
                 });
             });
@@ -171,11 +172,11 @@ describe('public tests API', function() {
 
         describe('setUrl', function() {
             it('should throw if argument is not a string', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.setUrl({not: 'a string'});
                     });
-                }.bind(this)).must.throw(TypeError);
+                }.bind(this), TypeError);
             });
 
             it('should set url property', function() {
@@ -183,7 +184,7 @@ describe('public tests API', function() {
                     suite.setUrl('http://example.com');
                 });
 
-                this.suite.children[0].url.must.equal('http://example.com');
+                assert.equal(this.suite.children[0].url, 'http://example.com');
             });
 
             shouldBeChainable('setUrl', 'http://example.com');
@@ -191,18 +192,18 @@ describe('public tests API', function() {
 
         describe('setTolerance', function() {
             it('should throw if argument is not a string', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.setTolerance('so much');
                     });
-                }.bind(this)).must.throw(TypeError);
+                }.bind(this), TypeError);
             });
 
             it('should throw if argument is not a string', function() {
                 this.context.suite('name', function(suite) {
                     suite.setTolerance(25);
                 });
-                this.suite.children[0].tolerance.must.equal(25);
+                assert.equal(this.suite.children[0].tolerance, 25);
             });
 
             shouldBeChainable('setTolerance', 25);
@@ -220,32 +221,32 @@ describe('public tests API', function() {
                 });
 
                 it ('should throw if selector is not a string', function() {
-                    (function() {
+                    assert.throws(function() {
                         this.callTestMethod({everything: true});
-                    }.bind(this)).must.throw(TypeError);
+                    }.bind(this), TypeError);
                 });
 
                 it ('should throw if selector in array is not a string', function() {
-                    (function() {
+                    assert.throws(function() {
                         this.callTestMethod([{everything: true}, '.selector']);
-                    }.bind(this)).must.throw(TypeError);
+                    }.bind(this), TypeError);
                 });
 
                 it('should set ' + property + ' property', function() {
                     this.callTestMethod('.selector');
 
-                    this.suite.children[0][property].must.eql(['.selector']);
+                    assert.deepEqual(this.suite.children[0][property], ['.selector']);
                 });
 
                 it('should accept multiple arguments', function() {
                     this.callTestMethod('.selector1', '.selector2');
-                    this.suite.children[0][property].must.eql(['.selector1', '.selector2']);
+                    assert.deepEqual(this.suite.children[0][property], ['.selector1', '.selector2']);
                 });
 
                 it('should accept array', function() {
                     this.callTestMethod(['.selector1', '.selector2']);
 
-                    this.suite.children[0][property].must.eql(['.selector1', '.selector2']);
+                    assert.deepEqual(this.suite.children[0][property], ['.selector1', '.selector2']);
                 });
             });
         }
@@ -261,15 +262,15 @@ describe('public tests API', function() {
                     this.context.suite('name', function(suite) {
                         suite[name](func);
                     });
-                    this.suite.children[0][hookProperty].must.be(func);
+                    assert.equal(this.suite.children[0][hookProperty], func);
                 });
 
                 it('should throw if hook is not a function', function() {
-                    (function() {
+                    assert.throws(function() {
                         this.context.suite('name', function(suite) {
                             suite[name]('the dawn');
                         });
-                    }.bind(this)).must.throw(TypeError);
+                    }.bind(this), TypeError);
                 });
             });
         }
@@ -284,27 +285,27 @@ describe('public tests API', function() {
             }
 
             it('should throw if first argument is not passed', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         prepareSuite(suite).capture({not: 'a string'});
                     });
-                }.bind(this)).must.throw(TypeError);
+                }.bind(this), TypeError);
             });
 
             it('should throw if second argument is not a function', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         prepareSuite(suite).capture('state', 'make me a sandwich');
                     });
-                }.bind(this)).must.throw(TypeError);
+                }.bind(this), TypeError);
             });
 
             it('should not throw if second argument is absent', function() {
-                (function() {
+                assert.doesNotThrow(function() {
                     this.context.suite('name', function(suite) {
                         prepareSuite(suite).capture('state');
                     });
-                }.bind(this)).must.not.throw();
+                }.bind(this));
             });
 
             it('should create named state', function() {
@@ -312,17 +313,17 @@ describe('public tests API', function() {
                     prepareSuite(suite).capture('state');
                 });
 
-                this.suite.children[0].states[0].name.must.equal('state');
+                assert.equal(this.suite.children[0].states[0].name, 'state');
             });
 
             it('should throw if state with such name already exists', function() {
                 var _this = this;
-                (function() {
+                assert.throws(function() {
                     _this.context.suite('name', function(suite) {
                         suite.capture('state');
                         suite.capture('state');
                     });
-                }.must.throw());
+                });
             });
 
             it('should allow to have multiple states of different names', function() {
@@ -332,8 +333,8 @@ describe('public tests API', function() {
                         .capture('state 2');
                 });
 
-                this.suite.children[0].states[0].name.must.equal('state 1');
-                this.suite.children[0].states[1].name.must.equal('state 2');
+                assert.equal(this.suite.children[0].states[0].name, 'state 1');
+                assert.equal(this.suite.children[0].states[1].name, 'state 2');
             });
 
             it('should make new state reference the suite', function() {
@@ -341,7 +342,7 @@ describe('public tests API', function() {
                     prepareSuite(suite).capture('state');
                 });
 
-                this.suite.children[0].states[0].suite.must.equal(this.suite.children[0]);
+                assert.equal(this.suite.children[0].states[0].suite, this.suite.children[0]);
             });
 
             it('should store passed callback', function() {
@@ -350,27 +351,27 @@ describe('public tests API', function() {
                     prepareSuite(suite).capture('state', spy);
                 });
 
-                this.suite.children[0].states[0].callback.must.be(spy);
+                assert.equal(this.suite.children[0].states[0].callback, spy);
             });
 
             it('should allow to set tolerance', function() {
                 this.context.suite('name', function(suite) {
                     prepareSuite(suite).capture('state', {tolerance: 25}, function() {});
                 });
-                this.suite.children[0].states[0].tolerance.must.be(25);
+                assert.equal(this.suite.children[0].states[0].tolerance, 25);
             });
 
             it('should throw if tolerance is not a number', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         prepareSuite(suite).capture('state', {tolerance: 'so much'}, function() {});
                     });
-                }.must.throw(TypeError));
+                }, TypeError);
             });
 
             it('should be chainable', function(done) {
                 this.context.suite('name', function(suite) {
-                    prepareSuite(suite).capture('state').must.be(suite);
+                    assert.equal(prepareSuite(suite).capture('state'), suite);
                     done();
                 });
             });
@@ -378,50 +379,50 @@ describe('public tests API', function() {
 
         describe('skip', function() {
             it('should throw if argument is not a string nor object', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.skip(123);
                     });
-                }.bind(this)).must.throw(TypeError);
+                }.bind(this), TypeError);
             });
 
             it('should throw if argument is array with non-string or non-object', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.skip([123]);
                     });
-                }.bind(this)).must.throw(TypeError);
+                }.bind(this), TypeError);
             });
 
             it('should throw if argument is an object and browser name is not specified', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.skip({iHaveNo: 'name'});
                     });
-                }.bind(this)).must.throw(Error);
+                }.bind(this), Error);
             });
 
             it('should throw if browser name is not a string', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('browserName', function(suite) {
                         suite.skip({browserName: true});
                     });
-                }.bind(this)).must.throw(TypeError);
+                }.bind(this), TypeError);
             });
 
             it('should throw if browser version is not a string', function() {
-                (function() {
+                assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.skip({browserName: 'browser', version: {major: 42}});
                     });
-                }.bind(this)).must.throw(TypeError);
+                }.bind(this), TypeError);
             });
 
             it('should mark suite as skipped', function() {
                 this.context.suite('name', function(suite) {
                     suite.skip();
                 });
-                this.suite.children[0].skipped.must.be.true();
+                assert.isTrue(this.suite.children[0].skipped);
             });
 
             it('should accept skipped browser name', function() {
@@ -429,7 +430,7 @@ describe('public tests API', function() {
                     suite.skip('opera');
                 });
 
-                this.suite.children[0].skipped[0].must.be.eql({browserName: 'opera'});
+                assert.deepEqual(this.suite.children[0].skipped[0], {browserName: 'opera'});
             });
 
             it('should accept browser object', function() {
@@ -437,7 +438,7 @@ describe('public tests API', function() {
                     suite.skip({browserName: 'opera'});
                 });
 
-                this.suite.children[0].skipped[0].must.be.eql({browserName: 'opera'});
+                assert.deepEqual(this.suite.children[0].skipped[0], {browserName: 'opera'});
             });
 
             it('should accept array of objects', function() {
@@ -448,7 +449,7 @@ describe('public tests API', function() {
                     ]);
                 });
 
-                this.suite.children[0].skipped.must.be.eql([
+                assert.deepEqual(this.suite.children[0].skipped, [
                     {browserName: 'opera'},
                     {browserName: 'chrome'}
                 ]);
@@ -462,7 +463,7 @@ describe('public tests API', function() {
                     ]);
                 });
 
-                this.suite.children[0].skipped.must.be.eql([
+                assert.deepEqual(this.suite.children[0].skipped, [
                     {browserName: 'opera'},
                     {browserName: 'chrome'}
                 ]);
