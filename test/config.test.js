@@ -7,12 +7,13 @@ var Config = require('../lib/config'),
     _ = require('lodash');
 
 describe('config', function() {
-    function createConfig(props) {
-        return new Config(_.extend({
+    function createConfig(props, overrides) {
+        var validProps = _.extend({
             projectRoot: './',
             rootUrl: 'http://example.com/root',
             gridUrl: 'http://example.com/root'
-        }, props));
+        }, props);
+        return new Config(validProps, overrides);
     }
 
     beforeEach(function() {
@@ -25,118 +26,98 @@ describe('config', function() {
 
     describe('projectRoot', function() {
         it('should be required when creating config from object', function() {
-            (function() {
+            assert.throws(function() {
                 return new Config({
-                    rootUrl: 'http://example.com'
+                    rootUrl: 'http://example.com',
+                    gridUrl: 'http://example.com'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should resolve relative paths relatively to cwd', function() {
             this.sinon.stub(process, 'cwd').returns('/some/path');
-            var config = new Config({
-                projectRoot: './rel/path',
-                rootUrl: 'http://example.com'
+            var config = createConfig({
+                projectRoot: './rel/path'
             });
-            config.projectRoot.must.be('/some/path/rel/path');
+            assert.equal(config.projectRoot, '/some/path/rel/path');
         });
 
         it('should leave absolute path unchanged', function() {
-            var config = new Config({
-                projectRoot: '/some/absolute/path',
-                rootUrl: 'http://example.com'
+            var config = createConfig({
+                projectRoot: '/some/absolute/path'
             });
 
-            config.projectRoot.must.be('/some/absolute/path');
+            assert.equal(config.projectRoot, '/some/absolute/path');
         });
     });
 
     describe('sourceRoot', function() {
         it('should be equal to projectRoot by default', function() {
-            var config = new Config({
-                projectRoot: '/some/absolute/path',
-                rootUrl: 'http://example.com'
+            var config = createConfig({
+                projectRoot: '/some/absolute/path'
             });
 
-            config.sourceRoot.must.be('/some/absolute/path');
+            assert.equal(config.sourceRoot, '/some/absolute/path');
         });
 
         it('should resolve relative paths relatively to projectRoot', function() {
-            var config = new Config({
+            var config = createConfig({
                 projectRoot: '/root',
-                sourceRoot: './rel/path',
-                rootUrl: 'http://example.com'
+                sourceRoot: './rel/path'
             });
-            config.sourceRoot.must.be('/root/rel/path');
+            assert.equal(config.sourceRoot, '/root/rel/path');
         });
 
         it('should leave absolute path unchanged', function() {
-            var config = new Config({
+            var config = createConfig({
                 projectRoot: '/root',
-                sourceRoot: '/some/absolute/path',
-                rootUrl: 'http://example.com'
+                sourceRoot: '/some/absolute/path'
             });
 
-            config.sourceRoot.must.be('/some/absolute/path');
+            assert.equal(config.sourceRoot, '/some/absolute/path');
         });
     });
 
     describe('rootUrl', function() {
         it('should be required', function() {
-            (function() {
+            assert.throws(function() {
                 return new Config({
                     projectRoot: '/',
                     gridUrl: 'http://example.com'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should accept strings', function() {
-            var config = new Config({
-                projectRoot: '/',
+            var config = createConfig({
                 rootUrl: 'http://example.com'
             });
-            config.rootUrl.must.be('http://example.com');
+            assert.equal(config.rootUrl, 'http://example.com');
         });
 
         it('should be overridable', function() {
-            var config = new Config({
-                projectRoot: '/',
+            var config = createConfig({
                 rootUrl: 'http://example.com'
             }, {
                 rootUrl: 'http://example.org'
             });
 
-            config.rootUrl.must.be('http://example.org');
-        });
-
-        it('should be settable via overrides', function() {
-            var config = new Config({
-                projectRoot: '/',
-                gridUrl: 'http://example.com'
-            }, {
-                projectRoot: '/',
-                rootUrl: 'http://example.org'
-            });
-
-            config.rootUrl.must.be('http://example.org');
+            assert.equal(config.rootUrl, 'http://example.org');
         });
 
         it('should be settable via environment variable GEMINI_ROOT_URL', function() {
             stubProcessEnv(this.sinon, {GEMINI_ROOT_URL: 'http://example.org'});
 
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com'
+            var config = createConfig({
+                rootUrl: 'http://example.com'
             });
-            config.rootUrl.must.be('http://example.org');
+            assert.equal(config.rootUrl, 'http://example.org');
         });
     });
 
     describe('gridUrl', function() {
         it('should be required is there are non-phantomjs browsers', function() {
-            (function() {
+            assert.throws(function() {
                 return new Config({
                     projectRoot: '/',
                     rootUrl: 'http://example.com',
@@ -145,11 +126,11 @@ describe('config', function() {
                         nonPhantomjs: 'non-phantomjs'
                     }
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should not be required if there are only phantomjs browser', function() {
-            (function() {
+            assert.doesNotThrow(function() {
                 return new Config({
                     projectRoot: '/',
                     rootUrl: 'http://example.com',
@@ -157,57 +138,38 @@ describe('config', function() {
                         phantomjs: 'phantomjs'
                     }
                 });
-            }.must.not.throw());
+            });
         });
 
         it('should accept string', function() {
-            var config = new Config({
-                projectRoot: '/',
-                gridUrl: 'http://grid.example.com',
-                rootUrl: 'http://example.com'
+            var config = createConfig({
+                gridUrl: 'http://grid.example.com'
             });
-            config.gridUrl.must.be('http://grid.example.com');
+            assert.equal(config.gridUrl, 'http://grid.example.com');
         });
 
         it('should be overridable', function() {
-            var config = new Config({
-                projectRoot: '/',
-                gridUrl: 'http://grid.example.com',
-                rootUrl: 'http://example.com'
+            var config = createConfig({
+                gridUrl: 'http://grid.example.com'
             }, {
                 gridUrl: 'http://grid.example.org'
             });
-            config.gridUrl.must.be('http://grid.example.org');
-        });
-
-        it('should be settable with overrides', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com'
-            }, {
-                gridUrl: 'http://grid.example.org'
-            });
-            config.gridUrl.must.be('http://grid.example.org');
+            assert.equal(config.gridUrl, 'http://grid.example.org');
         });
 
         it('should be settable via environment variable GEMINI_GRID_URL', function() {
             stubProcessEnv(this.sinon, {GEMINI_GRID_URL: 'http://example.org'});
 
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
+            var config = createConfig({
                 gridUrl: 'http://example.com'
             });
-            config.gridUrl.must.be('http://example.org');
+            assert.equal(config.gridUrl, 'http://example.org');
         });
     });
 
     describe('browsers', function() {
         it('should accept objects', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 browsers: {
                     someBrowser: {
                         browserName: 'bro',
@@ -216,7 +178,7 @@ describe('config', function() {
                 }
             });
 
-            config.browsers.must.eql({
+            assert.deepEqual(config.browsers, {
                 someBrowser: {
                     browserName: 'bro',
                     capability: 'cap'
@@ -225,15 +187,13 @@ describe('config', function() {
         });
 
         it('should transform "id: name" to valid capabilites', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 browsers: {
                     someBrowser: 'bro'
                 }
             });
-            config.browsers.must.eql({
+
+            assert.deepEqual(config.browsers, {
                 someBrowser: {
                     browserName: 'bro'
                 }
@@ -241,27 +201,20 @@ describe('config', function() {
         });
 
         it('should throw on legacy array', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     browsers: [
                         {name: 'bro'},
                         {name: 'bro2', version: '12.0'},
                         'bro3'
                     ]
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should be phantomjs by default', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com'
-            });
-            config.browsers.must.eql({
+            var config = createConfig();
+            assert.deepEqual(config.browsers, {
                 phantomjs: {
                     browserName: 'phantomjs'
                 }
@@ -269,59 +222,43 @@ describe('config', function() {
         });
 
         it('should throw if not object nor array', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     browsers: 'yep!'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
     });
 
     describe('capabilities', function() {
         it('should be copied as is', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 capabilities: {
                     option: 'value',
                     option2: 'other value'
                 }
             });
 
-            config.capabilities.must.eql({
+            assert.deepEqual(config.capabilities, {
                 option: 'value',
                 option2: 'other value'
             });
         });
 
-        function shouldNotAllowCapability(name) {
-            it('should not allow set `' + name + '` capability', function() {
-                (function() {
-                    var capabilites = {};
-                    capabilites[name] = 'value';
-                    return new Config({
-                        projectRoot: '/',
-                        rootUrl: 'http://example.com',
-                        gridUrl: 'http://example.com',
-                        capabilities: capabilites
-                    });
-                }.must.throw());
-            });
-        }
-
-        shouldNotAllowCapability('takesScreenshot');
+        it('should not allow set `takesScreenshot` capability', function() {
+            assert.throws(function() {
+                createConfig({
+                    capabilities: {
+                        takesScreenshot: true
+                    }
+                });
+            }, GeminiError);
+        });
     });
 
     describe('http', function() {
         it('should be passed only timeout, retries and retryDelay options', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 http: {
                     timeout: 1000,
                     retries: 5,
@@ -330,7 +267,7 @@ describe('config', function() {
                 }
             });
 
-            config.http.must.eql({
+            assert.deepEqual(config.http, {
                 timeout: 1000,
                 retries: 5,
                 retryDelay: 25
@@ -338,84 +275,66 @@ describe('config', function() {
         });
 
         it('should not accept non-number timeout', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     http: {
                         timeout: 'not a number'
                     }
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should not accept non-number retires', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     http: {
                         retries: 'not a number'
                     }
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should not accept non-number retryDelay', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     http: {
                         retryDelay: 'not a number'
                     }
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
     });
 
     describe('parallelLimit', function() {
         it('should not accept non-numbers', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     parallelLimit: 'so many'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should not accept negative numbers', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     parallelLimit: -1
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should not accept float numbers', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     parallelLimit: 1.1
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should copy non-negative integer', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 parallelLimit: 3
             });
-            config.parallelLimit.must.be(3);
+            assert.equal(config.parallelLimit, 3);
         });
     });
 
@@ -450,453 +369,345 @@ describe('config', function() {
 
     describe('tolerance', function() {
         it('should not accept non-numbers', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     tolerance: 'very tolerant'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should accept numbers', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 tolerance: 2.8
             });
-            config.tolerance.must.be(2.8);
+            assert.equal(config.tolerance, 2.8);
         });
 
         it('should be 2.3 by default', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com'
-            });
-            config.tolerance.must.be(2.3);
+            var config = createConfig();
+            assert.equal(config.tolerance, 2.3);
         });
     });
 
     describe('strictComparison', function() {
         it('should not accept non-boolean', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     strictComparison: 'of course!'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should accept boolean', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 strictComparison: true
             });
-            config.strictComparison.must.be(true);
+            assert.equal(config.strictComparison, true);
         });
 
         it('should be false by default', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com'
-            });
-            config.strictComparison.must.be(false);
+            var config = createConfig();
+            assert.equal(config.strictComparison, false);
         });
     });
 
     describe('diffColor', function() {
         it('should be magenta by default', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com'
-            });
-            config.diffColor.must.be('#ff00ff');
+            var config = createConfig();
+            assert.equal(config.diffColor, '#ff00ff');
         });
 
         it('should not accept non-strings', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     diffColor: 123
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should not accept non-colors', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     diffColor: 'purple'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should accept hexadecimal colors', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 diffColor: '#ff0000'
             });
-            config.diffColor.must.be('#ff0000');
+            assert.equal(config.diffColor, '#ff0000');
         });
     });
 
     describe('debug', function() {
         it('should not accept non-boolean', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     debug: 'very much'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should accept true', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 debug: true
             });
-            config.debug.must.be(true);
+            assert.equal(config.debug, true);
         });
 
         it('should accept false', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 debug: false
             });
-            config.debug.must.be(false);
+            assert.equal(config.debug, false);
         });
 
         it('should be settable via environment variable GEMINI_DEBUG', function() {
             stubProcessEnv(this.sinon, {GEMINI_DEBUG: true});
 
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 debug: false
             });
-            config.debug.must.be(true);
+            assert.equal(config.debug, true);
         });
     });
 
     describe('screenshotsDir', function() {
         it('should not accept non-string value', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     screenshotsDir: 12.5
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should be a file path resolved relative to root', function() {
-            var config = new Config({
+            var config = createConfig({
                 projectRoot: '/some/path',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
                 screenshotsDir: 'screens'
             });
-            config.screenshotsDir.must.be('/some/path/screens');
+            assert.equal(config.screenshotsDir, '/some/path/screens');
         });
 
         it('should be gemini/screens by default', function() {
-            var config = new Config({
-                projectRoot: '/some/path',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com'
-            });
-            config.screenshotsDir.must.be('/some/path/gemini/screens');
+            var config = createConfig({projectRoot: '/some/path'});
+            assert.equal(config.screenshotsDir, '/some/path/gemini/screens');
         });
 
         it('should be settable via environment variable GEMINI_SCREENSHOTS_DIR', function() {
             stubProcessEnv(this.sinon, {GEMINI_SCREENSHOTS_DIR: '/some/path/gemini/screens'});
 
-            var config = new Config({
-                projectRoot: '/some/path',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 screenshotsDir: '/root'
             });
-            config.screenshotsDir.must.be('/some/path/gemini/screens');
+            assert.equal(config.screenshotsDir, '/some/path/gemini/screens');
         });
     });
 
     describe('getAbsoluteUrl', function() {
-        function mkConfig(data) {
-            return new Config(_.extend({projectRoot: '/'}, data));
-        }
-
         it('should resolve url relative to root', function() {
-            var config = mkConfig({rootUrl: 'http://example.com/path/'});
-            config.getAbsoluteUrl('sub/path').must.be('http://example.com/path/sub/path');
+            var config = createConfig({rootUrl: 'http://example.com/path/'}),
+                url = config.getAbsoluteUrl('sub/path');
+            assert.equal(url, 'http://example.com/path/sub/path');
         });
 
         it('should ignore slash at the end of the root', function() {
-            var config = mkConfig({rootUrl: 'http://example.com/path'});
-            config.getAbsoluteUrl('sub/path').must.be('http://example.com/path/sub/path');
+            var config = createConfig({rootUrl: 'http://example.com/path'}),
+                url = config.getAbsoluteUrl('sub/path');
+            assert.equal(url, 'http://example.com/path/sub/path');
         });
 
         it('should ignore slash at the begining of the passed relUrl', function() {
-            var config = mkConfig({rootUrl: 'http://example.com/path/'});
-            config.getAbsoluteUrl('/sub/path').must.be('http://example.com/path/sub/path');
+            var config = createConfig({rootUrl: 'http://example.com/path/'}),
+                url = config.getAbsoluteUrl('/sub/path');
+            assert.equal(url, 'http://example.com/path/sub/path');
         });
     });
 
     describe('getScreenshotsDir', function() {
-        beforeEach(function() {
-            this.config = new Config({
-                projectRoot: '/root',
-                rootUrl: 'http://example.com'
-            });
-        });
-
         it('should return path for simple suite and state', function() {
-            var suite = createSuite('suite');
+            var config = createConfig({projectRoot: '/root'}),
+                suite = createSuite('suite'),
+                dir = config.getScreenshotsDir(suite, 'state');
 
-            this.config.getScreenshotsDir(suite, 'state').must.be('/root/gemini/screens/suite/state');
+            assert.equal(dir, '/root/gemini/screens/suite/state');
         });
 
         it('should return path for nested suite and state', function() {
-            var parent = createSuite('parent'),
-                child = createSuite('child', parent);
+            var config = createConfig({projectRoot: '/root'}),
+                parent = createSuite('parent'),
+                child = createSuite('child', parent),
+                dir = config.getScreenshotsDir(child, 'state');
 
-            this.config.getScreenshotsDir(child, 'state').must.be('/root/gemini/screens/parent/child/state');
+            assert.equal(dir, '/root/gemini/screens/parent/child/state');
         });
 
         it('should take "screenshotsDir" setting into account', function() {
-            var config = new Config({
+            var config = createConfig({
                 projectRoot: '/root',
-                rootUrl: 'http://example.com',
                 screenshotsDir: 'myscreens'
             });
 
-            var suite = createSuite('suite');
+            var suite = createSuite('suite'),
+                dir = config.getScreenshotsDir(suite, 'state');
 
-            config.getScreenshotsDir(suite, 'state').must.be('/root/myscreens/suite/state');
+            assert.equal(dir, '/root/myscreens/suite/state');
         });
     });
 
     describe('getScreenshotPath', function() {
-        beforeEach(function() {
-            this.config = new Config({
-                projectRoot: '/root',
-                rootUrl: 'http://example.com'
-            });
-        });
-
         it('should return path to the image', function() {
-            var suite = createSuite('suite');
-
-            this.config.getScreenshotPath(suite, 'state', 'browser').must.be(
-                '/root/gemini/screens/suite/state/browser.png'
-            );
+            var config = createConfig({projectRoot: '/root'}),
+                suite = createSuite('suite'),
+                path = config.getScreenshotPath(suite, 'state', 'browser');
+            assert.equal(path, '/root/gemini/screens/suite/state/browser.png');
         });
     });
 
     describe('unknown option', function() {
         it('should be reported as error', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     unknownOption: 'value'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
     });
 
     describe('windowSize', function() {
         it('should not accept non-string value', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
+            assert.throws(function() {
+                createConfig({
                     windowSize: 100
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should not accept string in invalid format', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
+            assert.throws(function() {
+                createConfig({
                     windowSize: 'abc'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should be {width: x, height: y} object', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
+            var config = createConfig({
                 windowSize: '1000x2000'
             });
-            config.windowSize.must.eql({width: 1000, height: 2000});
+            assert.deepEqual(config.windowSize, {width: 1000, height: 2000});
         });
 
         it('should be settable via environment variable GEMINI_WINDOW_SIZE', function() {
             stubProcessEnv(this.sinon, {GEMINI_WINDOW_SIZE: '1000x2000'});
 
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
+            var config = createConfig({
                 windowSize: '100x200'
             });
-            config.windowSize.must.eql({width: 1000, height: 2000});
+            assert.deepEqual(config.windowSize, {width: 1000, height: 2000});
         });
     });
 
     describe('coverageExclude', function() {
         it('should be empty array by default', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com'
-            });
+            var config = createConfig();
 
-            config.coverageExclude.must.eql([]);
+            assert.deepEqual(config.coverageExclude, []);
         });
 
         it('should not accept non array values', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
+            assert.throws(function() {
+                createConfig({
                     coverageExclude: {}
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
 
-            (function() {
-                return new Config({
-                    projectRoot: '/',
+            assert.throws(function() {
+                createConfig({
                     coverageExclude: ''
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
 
-            (function() {
-                return new Config({
-                    projectRoot: '/',
+            assert.throws(function() {
+                createConfig({
                     coverageExclude: true
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should accept array values', function() {
             var exclude = ['libs/**', 'examples/**'],
-                config = new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
+                config = createConfig({
                     coverageExclude: exclude
                 });
 
-            config.coverageExclude.must.eql(exclude);
+            assert.deepEqual(config.coverageExclude, exclude);
         });
     });
 
     describe('coverageNoHtml', function() {
         it('should not accept non-boolean', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
-                    gridUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     coverageNoHtml: 'of course!'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should accept boolean', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 coverageNoHtml: true
             });
-            config.coverageNoHtml.must.be(true);
+            assert.isTrue(config.coverageNoHtml);
         });
 
         it('should be false by default', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com'
-            });
-            config.coverageNoHtml.must.be(false);
+            var config = createConfig({});
+            assert.isFalse(config.coverageNoHtml);
         });
 
         it('should be settable via overrides', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 coverageNoHtml: true
             }, {
                 coverageNoHtml: false
             });
 
-            config.coverageNoHtml.must.be(false);
+            assert.isFalse(config.coverageNoHtml);
         });
 
         it('should be settable via environment variable GEMINI_COVERAGE_NO_HTML', function() {
             stubProcessEnv(this.sinon, {GEMINI_COVERAGE_NO_HTML: true});
 
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com',
-                gridUrl: 'http://example.com',
+            var config = createConfig({
                 coverageNoHtml: false
             });
-            config.coverageNoHtml.must.be(true);
+            assert.isTrue(config.coverageNoHtml);
         });
     });
     describe('referenceImageAbsence', function() {
         it('should not accept invalid values', function() {
-            (function() {
-                return new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
+            assert.throws(function() {
+                createConfig({
                     referenceImageAbsence: 'invalid value'
                 });
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         ['error', 'warning'].forEach(function(value) {
             it('should accept ' + value, function() {
-                var config = new Config({
-                    projectRoot: '/',
-                    rootUrl: 'http://example.com',
+                var config = createConfig({
                     referenceImageAbsence: value
                 });
-                config.referenceImageAbsence.must.be(value);
+                assert.equal(config.referenceImageAbsence, value);
             });
         });
 
         it('should be error by default', function() {
-            var config = new Config({
-                projectRoot: '/',
-                rootUrl: 'http://example.com'
-            });
-            config.referenceImageAbsence.must.be('error');
+            var config = createConfig();
+            assert.equal(config.referenceImageAbsence, 'error');
         });
     });
 });
