@@ -1,12 +1,13 @@
 'use strict';
 
-var createSuite = require('../lib/suite').create;
+var assert = require('chai').assert,
+    createSuite = require('../lib/suite').create;
 
 describe('suite', function() {
     describe('create', function() {
         it('should create named suite', function() {
             var suite = createSuite('some name');
-            suite.name.must.equal('some name');
+            assert.equal(suite.name, 'some name');
         });
 
         it('should inherit properties from parent, if any', function() {
@@ -15,7 +16,7 @@ describe('suite', function() {
 
             parent.url = 'http://example.com';
 
-            child.url.must.equal(parent.url);
+            assert.equal(child.url, parent.url);
         });
 
         it('should allow to overwrite parent properties', function() {
@@ -25,21 +26,21 @@ describe('suite', function() {
             parent.url = 'http://example.com';
             child.url = 'http://example2.com';
 
-            child.url.must.not.equal(parent.url);
+            assert.notEqual(child.url, parent.url);
         });
 
         it('should set `parent` property of a parent suite', function() {
             var parent = createSuite('parent'),
                 child = createSuite('child', parent);
 
-            child.parent.must.be(parent);
+            assert.equal(child.parent, parent);
         });
 
         it('should add new suite to the parent\'s children', function() {
             var parent = createSuite('parent'),
                 child = createSuite('child', parent);
 
-            parent.children.must.contain(child);
+            assert.include(parent.children, child);
         });
     });
 
@@ -49,21 +50,21 @@ describe('suite', function() {
         });
 
         it('should be empty by default', function() {
-            this.suite.states.length.must.be(0);
+            assert.lengthOf(this.suite.states, 0);
         });
 
         it('should not be writable', function() {
             var suite = this.suite;
 
-            (function() {
+            assert.throws(function() {
                 suite.states = [];
-            }.must.throw());
+            });
         });
 
         it('should not be inherited', function() {
             var child = createSuite('child', this.suite);
             this.suite.addState({});
-            child.states.length.must.be(0);
+            assert.lengthOf(child.states, 0);
         });
     });
 
@@ -75,7 +76,7 @@ describe('suite', function() {
         it('should modify states property', function() {
             var state = {name: 'some state'};
             this.suite.addState(state);
-            this.suite.states[0].must.be(state);
+            assert.equal(this.suite.states[0], state);
         });
     });
 
@@ -85,27 +86,27 @@ describe('suite', function() {
         });
 
         it('should be false if there is no states', function() {
-            this.suite.hasStates.must.be.false();
+            assert.isFalse(this.suite.hasStates);
         });
 
         it('should be true if there are states', function() {
             this.suite.addState({name: 'state'});
 
-            this.suite.hasStates.must.be.true();
+            assert.isTrue(this.suite.hasStates);
         });
     });
 
     describe('isRoot', function() {
         it('should be true for root suites', function() {
             var suite = createSuite('suite');
-            suite.isRoot.must.be.true();
+            assert.isTrue(suite.isRoot);
         });
 
         it('should be false for child suites', function() {
             var parent = createSuite('parent'),
                 child = createSuite('child', parent);
 
-            child.isRoot.must.be.false();
+            assert.isFalse(child.isRoot);
         });
     });
 
@@ -115,19 +116,19 @@ describe('suite', function() {
         });
 
         it('should be false by default', function() {
-            this.suite.skipped.must.be.false();
+            assert.isFalse(this.suite.skipped);
         });
 
         it('should be changed by skip() method', function() {
             this.suite.skip();
-            this.suite.skipped.must.be.true();
+            assert.isTrue(this.suite.skipped);
         });
 
         it('should be inherited by children', function() {
             this.suite.skip();
 
             var child = createSuite('child', this.suite);
-            child.skipped.must.be.true();
+            assert.isTrue(child.skipped);
         });
 
         it('should accept browsers list', function() {
@@ -137,14 +138,14 @@ describe('suite', function() {
             ];
 
             this.suite.skip(list);
-            this.suite.skipped.must.eql(list);
+            assert.deepEqual(this.suite.skipped, list);
         });
 
         it('should merge multiple lists together', function() {
             this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
             this.suite.skip([{browserName: 'browser2'}]);
 
-            this.suite.skipped.must.eql([
+            assert.deepEqual(this.suite.skipped, [
                 {browserName: 'browser1', version: '1.0'},
                 {browserName: 'browser2'}
             ]);
@@ -154,14 +155,14 @@ describe('suite', function() {
             this.suite.skip();
             this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
 
-            this.suite.skipped.must.be.true();
+            assert.isTrue(this.suite.skipped);
         });
 
         it('should override browser list by `true`', function() {
             this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
             this.suite.skip();
 
-            this.suite.skipped.must.be.true();
+            assert.isTrue(this.suite.skipped);
         });
 
         it('should merge children list with parent', function() {
@@ -169,7 +170,7 @@ describe('suite', function() {
             var child = createSuite('child', this.suite);
             child.skip([{browserName: 'browser2'}]);
 
-            child.skipped.must.eql([
+            assert.deepEqual(child.skipped, [
                 {browserName: 'browser1', version: '1.0'},
                 {browserName: 'browser2'}
             ]);
@@ -180,7 +181,7 @@ describe('suite', function() {
             var child = createSuite('child', this.suite);
             child.skip([{browserName: 'browser2'}]);
 
-            this.suite.skipped.must.eql([
+            assert.deepEqual(this.suite.skipped, [
                 {browserName: 'browser1', version: '1.0'}
             ]);
         });
@@ -193,11 +194,11 @@ describe('suite', function() {
         });
 
         it('should return true when suite has child of a given name', function() {
-            this.suite.hasChildNamed('has').must.be.true();
+            assert.isTrue(this.suite.hasChildNamed('has'));
         });
 
         it('should return fals when suite has no child of a given name', function() {
-            this.suite.hasChildNamed('has no').must.be.false();
+            assert.isFalse(this.suite.hasChildNamed('has no'));
         });
     });
 
@@ -208,11 +209,11 @@ describe('suite', function() {
         });
 
         it('should return true when suite has state of a given name', function() {
-            this.suite.hasStateNamed('has').must.be.true();
+            assert.isTrue(this.suite.hasStateNamed('has'));
         });
 
         it('should return true when suite has state of a given name', function() {
-            this.suite.hasStateNamed('has no').must.be.false();
+            assert.isFalse(this.suite.hasStateNamed('has no'));
         });
     });
 
@@ -223,11 +224,11 @@ describe('suite', function() {
         });
 
         it('should return name for top level suite', function() {
-            this.parent.fullName.must.be('parent');
+            assert.equal(this.parent.fullName, 'parent');
         });
 
         it('should concat own name with parents', function() {
-            this.child.fullName.must.be('parent child');
+            assert.equal(this.child.fullName, 'parent child');
         });
     });
 });
