@@ -11,7 +11,10 @@ var _ = require('lodash'),
 describe('suite-util', function() {
     describe('shouldSkip()', function() {
         function makeBrowser(capabilities) {
-            return new Browser({}, 'id', capabilities);
+            var config = {
+                browsers: {id: capabilities}
+            };
+            return new Browser(config, 'id');
         }
 
         it('should not skip any browser if skipped=false', function() {

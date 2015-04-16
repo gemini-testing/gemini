@@ -7,6 +7,7 @@ var assert = require('assert'),
     State = require('../lib/state'),
     Runner = require('../lib/runner'),
     StateError = require('../lib/errors/state-error'),
+    pool = require('../lib/browser-pool'),
     Config = require('../lib/config');
 
 function addState(suite, name, cb) {
@@ -41,10 +42,13 @@ describe('runner', function() {
         };
 
         this.browser = browser;
-        this.launcher = {
-            launch: this.sinon.stub().returns(q(browser)),
-            stop: function() {}
+        this.pool = {
+            getBrowser: this.sinon.stub().returns(q(browser)),
+            freeBrowser: this.sinon.stub().returns(q()),
+            finalizeBrowsers: this.sinon.stub().returns(q())
         };
+
+        this.sinon.stub(pool, 'create').returns(this.pool);
 
         this.root = createSuite('root');
         this.suite = createSuite('suite', this.root);
@@ -59,7 +63,7 @@ describe('runner', function() {
                     browser: 'browser'
                 }
             });
-        this.runner = new Runner(config, this.launcher);
+        this.runner = new Runner(config);
 
         this.runSuites = function() {
             return this.runner.run(flatSuites(this.root));
@@ -131,8 +135,8 @@ describe('runner', function() {
             addState(this.suite, 'state');
 
             return this.runSuites().then(function() {
-                sinon.assert.calledWith(this.launcher.launch, 'browser1');
-                sinon.assert.calledWith(this.launcher.launch, 'browser2');
+                sinon.assert.calledWith(this.pool.getBrowser, 'browser1');
+                sinon.assert.calledWith(this.pool.getBrowser, 'browser2');
             }.bind(this));
         });
 
@@ -145,8 +149,8 @@ describe('runner', function() {
 
             addState(this.suite, 'state');
             return this.runSuites().then(function() {
-                sinon.assert.calledWith(this.launcher.launch, 'browser1');
-                sinon.assert.neverCalledWith(this.launcher.launch, 'browser2');
+                sinon.assert.calledWith(this.pool.getBrowser, 'browser1');
+                sinon.assert.neverCalledWith(this.pool.getBrowser, 'browser2');
             }.bind(this));
         });
 
@@ -282,8 +286,8 @@ describe('runner', function() {
             };
 
             var spy = this.sinon.spy().named('onBeginState');
-            this.runner.on('beginState', spy);
-            this.launcher.launch.withArgs('browser1').returns(q.reject(new Error('error')));
+            this.runner.on('endState', spy);
+            this.pool.getBrowser.withArgs('browser1').returns(q.reject(new Error('error')));
             addState(this.suite, 'state');
 
             return this.runSuites()
@@ -293,28 +297,6 @@ describe('runner', function() {
                 .fail(function() {
                     sinon.assert.neverCalledWith(spy, sinon.match({browserId: 'browser'}));
                 });
-        });
-
-        it('should launch browser only once', function() {
-            addState(this.suite, 'state1');
-            addState(this.suite, 'state2');
-
-            return this.runSuites().then(function() {
-                sinon.assert.calledOnce(this.launcher.launch);
-            }.bind(this));
-        });
-
-        it('should launch browser once even if there is a second suite', function() {
-            var secondSuite = createSuite('second', this.rok);
-            secondSuite.id = 1;
-
-            secondSuite.url = '/hello';
-            addState(this.suite, 'state');
-            addState(secondSuite, 'state');
-
-            return this.runSuites().then(function() {
-                sinon.assert.calledOnce(this.launcher.launch);
-            }.bind(this));
         });
 
         it('should open suite url in browser', function() {
