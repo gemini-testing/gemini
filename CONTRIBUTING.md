@@ -7,15 +7,15 @@ New contributions are welcomed. Follow this guide if you want to make one.
 Follow [Github guide](https://help.github.com/articles/creating-a-pull-request) to fork a repo
 and create a pull request.
 
-Generally, bug fixes should go to the [`stable`](https://github.com/bem/gemini/tree/stable) branch
-and new features should go to [`master`](https://github.com/bem/gemini/tree/master).
+Generally, bug fixes should go to the [`stable`](https://github.com/gemini-testing/gemini/tree/stable) branch
+and new features should go to [`master`](https://github.com/gemini-testing/gemini/tree/master).
 
 ## Commit messages
 
 Commit messages should describe what have been changed and why. The first line should be wrapped
 to 50 characters, the second one should be blank. All other lines should be wrapped to 72 characters.
 
-[Example of a good commit message](https://github.com/bem/gemini/commit/1096ee26d79be6e580e90146dbe161fb5a662d80).
+[Example of a good commit message](https://github.com/gemini-testing/gemini/commit/1096ee26d79be6e580e90146dbe161fb5a662d80).
 
 ## Code style and static analysis
 
