@@ -1,6 +1,7 @@
 'use strict';
 
 var fs = require('fs'),
+    assert = require('chai').assert,
     path = require('path'),
     temp = require('temp'),
     Image = require('../../lib/image');
@@ -19,52 +20,50 @@ function withTempFile(func) {
     });
 }
 
+function assertSameImages(refName, filePath) {
+    return assert.eventually.isTrue(Image.compare(
+        imagePath(refName),
+        filePath
+    ), 'expected image to be equal to ' + refName);
+}
+
 describe('image', function() {
     describe('compare', function() {
         it('should resolve to `true` for equal images', function() {
-            return Image.compare(imagePath('image1.png'), imagePath('image2.png'))
-                .then(function(result) {
-                    result.must.be.true();
-                });
+            return assert.eventually.isTrue(Image.compare(
+                imagePath('image1.png'),
+                imagePath('image2.png')
+            ));
         });
 
         it('should resolve to `false` for non-equal images', function() {
-            return Image.compare(imagePath('image1.png'), imagePath('image3.png'))
-                .then(function(result) {
-                    result.must.be.false();
-                });
+            return assert.eventually.isFalse(Image.compare(
+                imagePath('image1.png'),
+                imagePath('image3.png')
+            ));
         });
 
         it('should resolve to `true` for non-equal images if tolerance is high enough', function() {
-            return Image.compare(
-                    imagePath('image1.png'),
-                    imagePath('image3.png'),
-                    {tolerance: 50}
-                )
-                .then(function(result) {
-                    result.must.be.true();
-                });
+            return assert.eventually.isTrue(Image.compare(
+                imagePath('image1.png'),
+                imagePath('image3.png'),
+                {tolerance: 50}
+            ));
         });
 
         it('should resolve to `true` for images with unnoticable difference', function() {
-            return Image.compare(
-                    imagePath('image1.png'),
-                    imagePath('image4.png')
-                )
-                .then(function(result) {
-                    result.must.be(true);
-                });
+            return assert.eventually.isTrue(Image.compare(
+                imagePath('image1.png'),
+                imagePath('image4.png')
+            ));
         });
 
         it('should resolve to `false` for images with unnoticable difference if strictComparison=true', function() {
-            return Image.compare(
-                    imagePath('image1.png'),
-                    imagePath('image4.png'),
-                    {strictComparison: true}
-                )
-                .then(function(result) {
-                    result.must.be(false);
-                });
+            return assert.eventually.isFalse(Image.compare(
+                imagePath('image1.png'),
+                imagePath('image4.png'),
+                {strictComparison: true}
+            ));
         });
     });
 
@@ -79,10 +78,7 @@ describe('image', function() {
                 };
                 return Image.buildDiff(opts)
                     .then(function() {
-                        return Image.compare(imagePath('image_diff.png'), fileName);
-                    })
-                    .then(function(equal) {
-                        equal.must.be.true();
+                        return assertSameImages('image_diff.png', fileName);
                     });
             });
         });
@@ -97,10 +93,7 @@ describe('image', function() {
                 };
                 return Image.buildDiff(opts)
                     .then(function() {
-                        return Image.compare(imagePath('image_diff_blue.png'), fileName);
-                    })
-                    .then(function(equal) {
-                        equal.must.be.true();
+                        return assertSameImages('image_diff_blue.png', fileName);
                     });
             });
         });
@@ -114,8 +107,8 @@ describe('image', function() {
 
         it('should return correct size', function() {
             var size = this.image.getSize();
-            size.width.must.equal(20);
-            size.height.must.equal(20);
+            assert.equal(size.width, 20);
+            assert.equal(size.height, 20);
         });
 
         it('should save the image', function() {
@@ -123,10 +116,7 @@ describe('image', function() {
             return withTempFile(function(filePath) {
                 return _this.image.save(filePath)
                     .then(function() {
-                        return Image.compare(imagePath('image1.png'), filePath);
-                    })
-                    .then(function(equal) {
-                        equal.must.be.true();
+                        return assertSameImages('image1.png', filePath);
                     });
             });
         });
@@ -139,10 +129,7 @@ describe('image', function() {
                         return image.save(filePath);
                     })
                     .then(function() {
-                        return Image.compare(imagePath('image1_cropped.png'), filePath);
-                    })
-                    .then(function(equal) {
-                        equal.must.be.true();
+                        return assertSameImages('image1_cropped.png', filePath);
                     });
             });
         });
@@ -153,17 +140,14 @@ describe('image', function() {
                 _this.image.clear({top: 2, left: 4, width: 8, height: 6});
                 return _this.image.save(filePath)
                     .then(function() {
-                        return Image.compare(imagePath('image1_cleared.png'), filePath);
-                    })
-                    .then(function(equal) {
-                        equal.must.be.true();
+                        return assertSameImages('image1_cleared.png', filePath);
                     });
             });
         });
 
         describe('getRGBA', function() {
             it('should return proper color values', function() {
-                this.image.getRGBA(0, 0).must.eql({r: 9, g: 9, b: 9, a: 255});
+                assert.deepEqual(this.image.getRGBA(0, 0), {r: 9, g: 9, b: 9, a: 255});
             });
         });
     });
