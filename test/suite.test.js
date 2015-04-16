@@ -216,30 +216,6 @@ describe('suite', function() {
         });
     });
 
-    describe('deepStatesCount', function() {
-        beforeEach(function() {
-            this.suite = createSuite('suite');
-        });
-
-        it('should be 0 for suite without children and states', function() {
-            this.suite.deepStatesCount.must.be(0);
-        });
-
-        it('should equal to number of states for suite without children', function() {
-            this.suite.addState({});
-            this.suite.addState({});
-            this.suite.deepStatesCount.must.be(2);
-        });
-
-        it('should equal to own number of states plus number of states in children', function() {
-            this.suite.addState({});
-            this.suite.addState({});
-            var child = createSuite('child', this.suite);
-            child.addState({});
-            this.suite.deepStatesCount.must.be(3);
-        });
-    });
-
     describe('fullName', function() {
         beforeEach(function() {
             this.parent = createSuite('parent');

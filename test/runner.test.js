@@ -3,6 +3,7 @@ var assert = require('assert'),
     q = require('q'),
     sinon = require('sinon'),
     createSuite = require('../lib/suite').create,
+    flatSuites = require('../lib/suite-util').flattenSuites,
     State = require('../lib/state'),
     Runner = require('../lib/runner'),
     StateError = require('../lib/errors/state-error'),
@@ -59,6 +60,10 @@ describe('runner', function() {
                 }
             });
         this.runner = new Runner(config, this.launcher);
+
+        this.runSuites = function() {
+            return this.runner.run(flatSuites(this.root));
+        };
     });
 
     afterEach(function() {
@@ -69,7 +74,7 @@ describe('runner', function() {
         it('should emit `begin` event when tests start', function() {
             var spy = this.sinon.spy().named('onBegin');
             this.runner.on('begin', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledOnce(spy);
             });
         });
@@ -84,7 +89,7 @@ describe('runner', function() {
             var spy = this.sinon.spy().named('onBegin');
             this.runner.on('begin', spy);
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, sinon.match({totalStates: 3}));
             });
         });
@@ -98,7 +103,7 @@ describe('runner', function() {
             var spy = this.sinon.spy().named('onBegin');
             this.runner.on('begin', spy);
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, sinon.match({
                     browserIds: ['browser1', 'browser2']
                 }));
@@ -110,7 +115,7 @@ describe('runner', function() {
             this.runner.on('begin', spy);
 
             var _this = this;
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, sinon.match({
                     config: _this.runner.config
                 }));
@@ -125,7 +130,7 @@ describe('runner', function() {
 
             addState(this.suite, 'state');
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(this.launcher.launch, 'browser1');
                 sinon.assert.calledWith(this.launcher.launch, 'browser2');
             }.bind(this));
@@ -139,7 +144,7 @@ describe('runner', function() {
             this.runner.setTestBrowsers(['browser1']);
 
             addState(this.suite, 'state');
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(this.launcher.launch, 'browser1');
                 sinon.assert.neverCalledWith(this.launcher.launch, 'browser2');
             }.bind(this));
@@ -152,7 +157,7 @@ describe('runner', function() {
 
             var spy = this.sinon.spy().named('onStartBrowser');
             this.runner.on('startBrowser', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, {browserId: 'browser'});
             });
         });
@@ -162,7 +167,7 @@ describe('runner', function() {
                 _this = this;
 
             this.runner.on('beginSuite', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, {
                     suite: _this.suite,
                     browserId: 'browser',
@@ -183,7 +188,7 @@ describe('runner', function() {
             this.browser.createActionSequence.returns(sequence);
 
             addState(this.suite, 'state');
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(stub, sequence, require('../lib/find-func').find);
             });
         });
@@ -195,7 +200,7 @@ describe('runner', function() {
 
             addState(this.suite, 'state');
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.called(sequence.perform);
             });
         });
@@ -206,7 +211,7 @@ describe('runner', function() {
                 state = addState(this.suite, 'state');
             this.runner.on('beginState', spy);
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
@@ -227,7 +232,7 @@ describe('runner', function() {
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('beginState', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.notCalled(spy);
             });
         });
@@ -243,7 +248,7 @@ describe('runner', function() {
 
             this.suite.addState(state);
             this.runner.on('skipState', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
@@ -265,7 +270,7 @@ describe('runner', function() {
                 shouldSkip: this.sinon.stub().returns(false)
             });
             this.runner.on('skipState', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.notCalled(spy);
             });
         });
@@ -281,7 +286,7 @@ describe('runner', function() {
             this.launcher.launch.withArgs('browser1').returns(q.reject(new Error('error')));
             addState(this.suite, 'state');
 
-            return this.runner.run(this.root)
+            return this.runSuites()
                 .then(function() {
                     assert.fail('Promise should not resolve');
                 })
@@ -290,72 +295,24 @@ describe('runner', function() {
                 });
         });
 
-        it('should not emit state events if suite does not match grep pattern', function() {
-            this.runner.setGrepPattern(/not match/);
-            var onBeginState = this.sinon.spy().named('onBeginState'),
-                onEndState = this.sinon.spy().named('onEndState');
-
-            this.runner.on('beginState', onBeginState);
-            this.runner.on('endState', onEndState);
-            addState(this.suite, 'state');
-            return this.runner.run(this.root).then(function() {
-                sinon.assert.notCalled(onBeginState);
-                sinon.assert.notCalled(onEndState);
-            });
-        });
-
-        it('should not call state callback if suite does not match grep pattern', function() {
-            this.runner.setGrepPattern(/not match/);
-            var stateCallback = this.sinon.spy().named('state callback');
-
-            addState(this.suite, 'state', stateCallback);
-            return this.runner.run(this.root).then(function() {
-                sinon.assert.notCalled(stateCallback);
-            });
-        });
-
-        it('should emit state events if suite matches grep pattern', function() {
-            this.runner.setGrepPattern(/sui/);
-            var onBeginState = this.sinon.spy().named('onBeginState'),
-                onEndState = this.sinon.spy().named('onEndState');
-
-            this.runner.on('beginState', onBeginState);
-            this.runner.on('endState', onEndState);
-            addState(this.suite, 'state');
-            return this.runner.run(this.root).then(function() {
-                sinon.assert.calledOnce(onBeginState);
-                sinon.assert.calledOnce(onEndState);
-            });
-        });
-
-        it('should call state callback if suite matches grep pattern', function() {
-            this.runner.setGrepPattern(/uite/);
-            var stateCallback = this.sinon.spy().named('state callback');
-
-            addState(this.suite, 'state', stateCallback);
-            return this.runner.run(this.root).then(function() {
-                sinon.assert.calledOnce(stateCallback);
-            });
-        });
-
         it('should launch browser only once', function() {
             addState(this.suite, 'state1');
             addState(this.suite, 'state2');
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledOnce(this.launcher.launch);
             }.bind(this));
         });
 
         it('should launch browser once even if there is a second suite', function() {
-            var secondSuite = createSuite('second', this.root);
+            var secondSuite = createSuite('second', this.rok);
             secondSuite.id = 1;
 
             secondSuite.url = '/hello';
             addState(this.suite, 'state');
             addState(secondSuite, 'state');
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledOnce(this.launcher.launch);
             }.bind(this));
         });
@@ -363,7 +320,7 @@ describe('runner', function() {
         it('should open suite url in browser', function() {
             addState(this.suite, 'state');
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(this.browser.open, 'http://example.com/path');
             }.bind(this));
         });
@@ -374,7 +331,7 @@ describe('runner', function() {
                 state = addState(this.suite, 'state');
             this.runner.on('endState', spy);
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
@@ -395,7 +352,7 @@ describe('runner', function() {
                 shouldSkip: this.sinon.stub().returns(true)
             });
             this.runner.on('endState', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.notCalled(spy);
             });
         });
@@ -410,7 +367,7 @@ describe('runner', function() {
             this.runner.on('endState', endState);
             this.runner.on('beginState', beginState);
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.callOrder(
                     endState.withArgs(sinon.match({stateName: 'state1'})),
                     endState.withArgs(sinon.match({stateName: 'state2'}))
@@ -428,7 +385,7 @@ describe('runner', function() {
             this.browser.createActionSequence.returns(sequence);
 
             addState(this.suite, 'state');
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(stub, sequence, require('../lib/find-func').find);
             });
         });
@@ -445,14 +402,14 @@ describe('runner', function() {
                 e.suitePath.must.be.eql(['suite']);
                 done();
             });
-            this.runner.run(this.root).done();
+            this.runSuites().done();
         });
 
         it('should emit `endSuite` for each suite', function() {
             var spy = this.sinon.spy().named('endSuite'),
                 _this = this;
             this.runner.on('endSuite', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, {
                     suite: _this.suite,
                     browserId: 'browser',
@@ -470,29 +427,14 @@ describe('runner', function() {
 
             this.runner.on('beginSuite', spy);
 
-            return this.runner.run(this.root).then(function() {
-                spy.secondCall.args.must.eql([{
+            return this.runSuites().then(function() {
+                spy.thirdCall.args.must.eql([{
                     suite: child,
                     browserId: 'browser',
                     suiteName: 'child',
                     suitePath: ['suite', 'child'],
                     suiteId: 1
                 }]);
-            });
-        });
-
-        it('should finish parent suite only after all children', function() {
-            var spy = this.sinon.spy().named('onEndSuite');
-
-            createSuite('child', this.suite);
-
-            this.runner.on('endSuite', spy);
-
-            return this.runner.run(this.root).then(function() {
-                sinon.assert.callOrder(
-                    spy.withArgs(sinon.match({suiteName: 'child'})),
-                    spy.withArgs(sinon.match({suiteName: 'suite'}))
-                );
             });
         });
 
@@ -506,7 +448,7 @@ describe('runner', function() {
             this.runner.on('endSuite', endSuite);
             this.runner.on('beginSuite', beginSuite);
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.callOrder(
                     endSuite.withArgs(sinon.match({suiteName: 'suite'})),
                     beginSuite.withArgs(sinon.match({suiteName: 'next'}))
@@ -523,7 +465,7 @@ describe('runner', function() {
             this.runner.on('beginSuite', beginSuite);
             this.runner.on('endSuite', endSuite);
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(beginSuite, sinon.match({suiteName: 'suite'}));
                 sinon.assert.calledWith(endSuite, sinon.match({suiteName: 'suite'}));
             });
@@ -536,7 +478,7 @@ describe('runner', function() {
 
             var spy = this.sinon.spy().named('onStartBrowser');
             this.runner.on('stopBrowser', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy, {browserId: 'browser'});
             });
         });
@@ -544,7 +486,7 @@ describe('runner', function() {
         it('should emit `end` after all suites', function() {
             var spy = this.sinon.spy();
             this.runner.on('end', spy);
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.calledWith(spy);
             });
         });
@@ -570,7 +512,7 @@ describe('runner', function() {
             this.runner.on('stopBrowser', stopBrowser);
             this.runner.on('end', end);
 
-            return this.runner.run(this.root).then(function() {
+            return this.runSuites().then(function() {
                 sinon.assert.callOrder(
                     begin,
                     startBrowser,
@@ -586,7 +528,7 @@ describe('runner', function() {
 
         it('should report total number of tests run', function() {
             addState(this.suite, 'state');
-            return this.runner.run(this.root).then(function(stats) {
+            return this.runSuites().then(function(stats) {
                 stats.total.must.be(1);
             });
         });
@@ -598,7 +540,7 @@ describe('runner', function() {
                 shouldSkip: this.sinon.stub().returns(true)
             });
 
-            return this.runner.run(this.root).then(function(stats) {
+            return this.runSuites().then(function(stats) {
                 stats.skipped.must.be(1);
             });
         });
@@ -609,7 +551,7 @@ describe('runner', function() {
             });
 
             this.runner.on('error', function() {}); //supress failure on unhandled error event
-            return this.runner.run(this.root).then(function(stats) {
+            return this.runSuites().then(function(stats) {
                 stats.errored.must.be(1);
             });
         });
