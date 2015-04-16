@@ -1,6 +1,7 @@
 'use strict';
 var Browser = require('../lib/browser'),
     Calibrator = require('../lib/calibrator'),
+    assert = require('chai').assert,
     q = require('q'),
     wd = require('wd'),
     fs = require('fs'),
@@ -28,7 +29,7 @@ describe('browser', function() {
                 browserName: 'name'
             });
 
-            browser.browserName.must.be('name');
+            assert.equal(browser.browserName, 'name');
         });
 
         it('should have version propery', function() {
@@ -36,7 +37,7 @@ describe('browser', function() {
                 version: '1.0'
             });
 
-            browser.version.must.be('1.0');
+            assert.equal(browser.version, '1.0');
         });
     });
 
@@ -70,7 +71,7 @@ describe('browser', function() {
         it('should init browser with browserName, version and takeScreenshot capabilites', function() {
             var _this = this;
             return this.browser.launch(this.calibrator).then(function() {
-                sinon.assert.calledWith(_this.wd.init, {
+                assert.calledWith(_this.wd.init, {
                     browserName: 'browser',
                     version: '1.0',
                     takesScreenshot: true,
@@ -82,7 +83,7 @@ describe('browser', function() {
         it('should set http options for browser instance', function() {
             var _this = this;
             return this.browser.launch(this.calibrator).then(function() {
-                sinon.assert.calledWith(_this.wd.configureHttp, {
+                assert.calledWith(_this.wd.configureHttp, {
                     timeout: 100,
                     retries: 5,
                     retryDelay: 25
@@ -98,7 +99,7 @@ describe('browser', function() {
             };
 
             return this.browser.launch(this.calibrator).then(function() {
-                sinon.assert.calledWith(_this.wd.init, {
+                assert.calledWith(_this.wd.init, {
                     browserName: 'browser',
                     version: '1.0',
                     takesScreenshot: true,
@@ -118,14 +119,14 @@ describe('browser', function() {
 
             this.calibrator.calibrate.returns(q());
             return this.browser.launch(this.calibrator).then(function() {
-                sinon.assert.calledWith(_this.calibrator.calibrate);
+                assert.calledWith(_this.calibrator.calibrate);
             });
         });
 
         it('should not call calibrate() when --noCalibrate is true', function() {
             var _this = this;
             return this.browser.launch(this.calibrator).then(function() {
-                sinon.assert.notCalled(_this.calibrator.calibrate);
+                assert.notCalled(_this.calibrator.calibrate);
             });
         });
     });
@@ -145,7 +146,7 @@ describe('browser', function() {
             var _this = this;
             return this.browser.open('http://www.example.com')
                 .then(function() {
-                    sinon.assert.calledWith(_this.wd.get, 'http://www.example.com');
+                    assert.calledWith(_this.wd.get, 'http://www.example.com');
                 });
         });
 
@@ -170,7 +171,7 @@ describe('browser', function() {
             this.wd.elementByCssSelector.returns(q(elem));
             return this.browser.reset()
                 .then(function() {
-                    sinon.assert.calledWith(_this.wd.moveTo, elem, 0, 0);
+                    assert.calledWith(_this.wd.moveTo, elem, 0, 0);
                 });
         });
     });
@@ -189,21 +190,19 @@ describe('browser', function() {
             var _this = this;
             return this.browser.prepareScreenshot(['.selector1', '.selector2'], {}).then(function() {
                 /*jshint evil:true*/
-                sinon.assert.called(_this.wd.eval);
+                assert.called(_this.wd.eval);
             });
         });
 
-        it('should reject promise if client-side method returned error', function(done) {
+        it('should reject promise if client-side method returned error', function() {
             /*jshint evil:true*/
             this.wd.eval.returns(q({
                 error: 'err',
                 message: 'message'
             }));
 
-            return this.browser.prepareScreenshot(['.selector']).fail(function(e) {
-                e.message.must.be('message');
-                done();
-            });
+            var result = this.browser.prepareScreenshot(['.selector']);
+            return assert.isRejected(result, /^message$/);
         });
     });
 
@@ -218,7 +217,7 @@ describe('browser', function() {
             this.sinon.stub(wd, 'promiseRemote').returns(stubWd);
             var browser = makeBrowser({browserName: 'browser', version: '1.0'});
             return browser.captureFullscreenImage().then(function() {
-                sinon.assert.called(stubWd.takeScreenshot);
+                assert.called(stubWd.takeScreenshot);
             });
         });
     });
@@ -244,28 +243,30 @@ describe('browser', function() {
                 calibrator = {
                     calibrate: sinon.stub().returns(q({top: 24, left: 6, right: 2, bottom: 0}))
                 };
-            return this.browser.launch(calibrator)
+
+            var size = this.browser.launch(calibrator)
                 .then(function() {
-                    return _this.browser.captureFullscreenImage().then(function(img) {
-                        img.getSize().must.eql({width: 572, height: 311});
-                    });
+                    return _this.browser.captureFullscreenImage();
+                })
+                .then(function(image) {
+                    return image.getSize();
                 });
+
+            return assert.eventually.deepEqual(size, {width: 572, height: 311});
         });
     });
 
     describe('buildScripts', function() {
         it('should include coverage script when coverage is on', function() {
-            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: true});
-            return browser.buildScripts().then(function(scripts) {
-                scripts.indexOf('exports.collectCoverage').must.not.be(-1);
-            });
+            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: true}),
+                scripts = browser.buildScripts();
+            return assert.eventually.include(scripts, 'exports.collectCoverage');
         });
 
         it('should not include coverage script when coverage is off', function() {
-            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: false});
-            return browser.buildScripts().then(function(scripts) {
-                scripts.indexOf('exports.collectCoverage').must.be(-1);
-            });
+            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: false}),
+                scripts = browser.buildScripts();
+            return assert.eventually.notInclude(scripts, 'exports.collectCoverage');
         });
     });
 });
