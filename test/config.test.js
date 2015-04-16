@@ -4,7 +4,6 @@ var Config = require('../lib/config'),
     GeminiError = require('../lib/errors/gemini-error'),
     createSuite = require('../lib/suite').create,
     sinon = require('sinon'),
-    extend = require('node.extend'),
     _ = require('lodash');
 
 describe('config', function() {
@@ -903,5 +902,5 @@ describe('config', function() {
 });
 
 function stubProcessEnv(sinon, props) {
-    sinon.stub(process, 'env', extend({}, process.env, props));
+    sinon.stub(process, 'env', _.extend({}, process.env, props));
 }
