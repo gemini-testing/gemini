@@ -1,5 +1,6 @@
 'use strict';
 var path = require('path'),
+    assert = require('chai').assert,
     Config = require('../../lib/config'),
     GeminiError = require('../../lib/errors/gemini-error'),
 
@@ -12,37 +13,37 @@ function configPath(name) {
 describe('config', function() {
     describe('constructor with file path', function() {
         it('should throw when reading non-existant file', function() {
-            (function() {
+            assert.throws(function() {
                 return new Config(configPath('notExists.yml'));
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should throw when reading non-YAML file', function() {
-            (function() {
+            assert.throws(function() {
                 return new Config(configPath('invalidConfig.yml'));
-            }.must.throw(GeminiError));
+            }, GeminiError);
         });
 
         it('should read valid config', function() {
             var config = new Config(configPath('validConfig.yml'));
-            config.gridUrl.must.be('http://grid.example.com');
+            assert.propertyVal(config, 'gridUrl', 'http://grid.example.com');
         });
 
         it('should set correct root', function() {
             var config = new Config(configPath('validConfig.yml'));
-            config.projectRoot.must.be(DATA_ROOT);
+            assert.propertyVal(config, 'projectRoot', DATA_ROOT);
         });
 
         it('should set realtive root relatively to config path', function() {
             var config = new Config(configPath('relPathConfig.yml'));
-            config.projectRoot.must.be(path.join(DATA_ROOT, 'rel', 'path'));
+            assert.propertyVal(config, 'projectRoot', path.join(DATA_ROOT, 'rel', 'path'));
         });
 
         it('should override options', function() {
             var config = new Config(configPath('validConfig.yml'), {
                 gridUrl: 'http://example.com/overriden'
             });
-            config.gridUrl.must.be('http://example.com/overriden');
+            assert.propertyVal(config, 'gridUrl', 'http://example.com/overriden');
         });
     });
 });
