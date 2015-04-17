@@ -34,7 +34,7 @@ describe('public tests API', function() {
         it('should call callback', function() {
             var spy = sinon.spy();
             this.context.suite('name', spy);
-            sinon.assert.called(spy);
+            assert.called(spy);
         });
 
         it('should created nested suites when called nestedly', function() {
