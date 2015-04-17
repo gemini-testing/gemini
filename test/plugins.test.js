@@ -1,6 +1,7 @@
 'use strict';
 var plugins = require('../lib/plugins'),
     mockery = require('mockery'),
+    assert = require('chai').assert,
     sinon = require('sinon');
 
 describe('plugins', function() {
@@ -24,48 +25,52 @@ describe('plugins', function() {
             var options = {plugins: {foobar: true}};
             plugins.load(this.gemini, options);
 
-            sinon.assert.calledWith(this.foobarPlugin, this.gemini, {});
+            assert.calledWith(this.foobarPlugin, this.gemini, {});
         });
 
         it('should load plugin with prefix', function() {
             var options = {plugins: {'gemini-foobar': true}};
             plugins.load(this.gemini, options);
 
-            sinon.assert.calledWith(this.foobarPlugin, this.gemini, {});
+            assert.calledWith(this.foobarPlugin, this.gemini, {});
         });
 
         it('should throw error if plugin not found', function() {
             var options = {plugins: {'gemini-foo': true}};
 
-            (function() {
+            assert.throws(function() {
                 plugins.load(this.gemini, options);
-            }).must.throw();
+            });
         });
 
         it('should not load disabled plugins', function() {
             var options = {plugins: {foobar: false}};
             plugins.load(this.gemini, options);
 
-            sinon.assert.notCalled(this.foobarPlugin);
+            assert.notCalled(this.foobarPlugin);
         });
 
         it('should load plugin with empty configuration', function() {
             var options = {plugins: {foobar: {}}};
             plugins.load(this.gemini, options);
 
-            sinon.assert.calledWith(this.foobarPlugin, this.gemini, {});
+            assert.calledWith(this.foobarPlugin, this.gemini, {});
         });
 
         it('should handle empty plugins', function() {
-            var options = {plugins: {}};
-            plugins.load(this.gemini, options);
+            var _this = this.gemini,
+                options = {plugins: {}};
+
+            assert.doesNotThrow(function() {
+                plugins.load(_this.gemini, options);
+            });
         });
 
         it('should pass plugin its configuration', function() {
             var options = {plugins: {foobar: {foo: 'bar'}}};
             plugins.load(this.gemini, options);
 
-            sinon.assert.calledWith(this.foobarPlugin, this.gemini, {foo: 'bar'});
+            assert.calledWith(this.foobarPlugin, this.gemini, {foo: 'bar'});
         });
     });
 });
