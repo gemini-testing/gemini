@@ -55,4 +55,34 @@ describe('UnlimitedPool', function() {
                 assert.calledOnce(_this.browser.quit);
             });
     });
+
+    // SIGHUP, SIGINT and SIGTERM are handled in the same way
+    // so we will test only one of them
+    describe('on signal', function() {
+        var defer;
+
+        beforeEach(function() {
+            defer = q.defer();
+            this.sinon.stub(process, 'exit', defer.resolve.bind(defer));
+        });
+
+        it('should quit a browser on SIGHUP', function() {
+            var _this = this;
+            return this.requestBrowser()
+                .then(function() {
+                    process.emit('SIGHUP');
+                })
+                .then(function() {
+                    assert.calledOnce(_this.browser.quit);
+                });
+        });
+
+        it('should exit on SIGHUP', function() {
+            return this.requestBrowser()
+                .then(function() {
+                    process.emit('SIGHUP');
+                    return assert.becomes(defer.promise, 128 + 1);
+                });
+        });
+    });
 });
