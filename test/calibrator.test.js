@@ -1,5 +1,6 @@
 'use strict';
 var sinon = require('sinon'),
+    assert = require('chai').assert,
     q = require('q'),
     path = require('path'),
     fs = require('fs'),
@@ -35,10 +36,8 @@ describe('calibrator', function() {
 
     it('should calculate correct crop area', function() {
         setScreenshot('calibrate.png');
-        return calibrator.calibrate(browser)
-            .then(function(rs) {
-                rs.must.eql({top: 24, left: 6, right: 2, bottom: 0});
-            });
+        var result = calibrator.calibrate(browser);
+        return assert.eventually.deepEqual(result, {top: 24, left: 6, right: 2, bottom: 0});
     });
 
     it('should not perform the calibration process two times', function() {
@@ -48,34 +47,23 @@ describe('calibrator', function() {
                 return calibrator.calibrate(browser);
             })
             .then(function() {
-                sinon.assert.calledOnce(browser.open);
-                sinon.assert.calledOnce(browser.inject);
-                sinon.assert.calledOnce(browser.captureFullscreenImage);
+                assert.calledOnce(browser.open);
+                assert.calledOnce(browser.inject);
+                assert.calledOnce(browser.captureFullscreenImage);
             });
     });
 
     it('should return cached result second time', function() {
         setScreenshot('calibrate.png');
-        return calibrator.calibrate(browser)
-            .then(function() {
-                return calibrator.calibrate(browser);
-            })
-            .then(function(rs) {
-                rs.must.eql({top: 24, left: 6, right: 2, bottom: 0});
-            });
+        var result = calibrator.calibrate(browser)
+                        .then(function() {
+                            return calibrator.calibrate(browser);
+                        });
+        return assert.eventually.deepEqual(result, {top: 24, left: 6, right: 2, bottom: 0});
     });
 
-    it('should fail on broken calibration page', function(done) {
+    it('should fail on broken calibration page', function() {
         setScreenshot('calibrate-broken.png');
-        calibrator.calibrate(browser)
-            .then(function(rs) {
-                done(new Error('Promise must be rejected'));
-            })
-            .fail(function(err) {
-                if (err instanceof GeminiError) {
-                    return done();
-                }
-                done(new Error('Promise must be rejected with GeminiError'));
-            });
+        return assert.isRejected(calibrator.calibrate(browser), GeminiError);
     });
 });
