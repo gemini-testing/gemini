@@ -165,7 +165,18 @@ GUI advantages:
 * Clear real-time demonstration of differences between a reference shot and current state of a block;
 * Easy update of reference shots.
 
+## Plugins
+
+Gemini can be extended with plugins. You could choose from the [existing plugins](https://www.npmjs.com/browse/keyword/gemini-plugin)
+or [write your own](doc/plugins.md). To use the plugin, install and enable it in your `.gemini.yml`:
+
+```yaml
+plugins:
+  some-awesome-plugin:
+    plugin-option: value
+```
+
 ## Programmatic API
 
-To use **Gemini** in your scripts or build tools plugins you can use experimental
+To use Gemini in your scripts or build tools you can use experimental
 [programmatic API](doc/programmatic-api.md).
