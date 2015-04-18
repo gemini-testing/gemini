@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.11.0 - 2015-04-18
+
+* Plugins support (@Saulis). 
+  Check out [documentation](doc/plugins.md)
+  and some plugin examples:
+  - [gemini-sauce](https://www.npmjs.com/package/gemini-sauce) 
+  - [gemini-express](https://www.npmjs.com/package/gemini-express) 
+
+* Add `flick` action for touch devices (@scf2k).
+* Add `sessionMode` property which allows to choose when new
+  WebDriver session is created (@SevInf).
+* Automatically kill browser session on `SIGHUP`, `SIGINT` and
+  `SIGTERM` (@j0tunn).
+* Allow to switch image background in HTML reoport (@unlok).
+* `url.resolve` is not used anymore for computing absolute
+  URLs from `rootUrl` and suite URL. It is now just joined
+  with a single `/` in between (@j0tunn).
+* Update `png-image` so it can be built with `gcc` 4.6 (@j0tunn).
+* Correctly expose `__gemini` variable in client scripts (@vlkosinov).
+* Grep pattern now checked when suites load, not when they are
+  executed (@hatroman).
+* HTML report refactoring (@hatroman).
+
 ## 0.10.0 - 2015-04-06
 
 * Fix calibration to work in IE8 again (@SevInf)
