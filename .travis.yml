@@ -16,4 +16,4 @@ deploy:
   on:
     tags: true
     all_branches: true
-    repo: bem/gemini
+    repo: gemini-testing/gemini
