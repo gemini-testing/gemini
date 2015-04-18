@@ -143,3 +143,11 @@ of the specified state for specified browser.
 * `gemini.getBrowserCapabilites(browserId)` – returns WebDriver capabilities for specified `browserId`.
 * `gemini.browserIds` – list of all browser identificators to use for tests.
 
+## Events
+
+`gemini` instance emits some events, which can be used by external scripts or plugins:
+
+* `startRunner` - emitted before the start of `test` or `gather` command. If you return a promise
+from the event handler, the start of the command will be delayed until the promise resolves.
+* `endRunner` - emitted after the end of the `test` or `gather` command.
+
