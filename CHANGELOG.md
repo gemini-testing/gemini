@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.11.1 - 2105-04-21
+## 0.11.1 - 2015-04-21
 
 * Fix crash after all tests are finished (@SevInf).
 
