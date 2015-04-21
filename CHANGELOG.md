@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.2 - 2015-04-21
+
+* Republish  0.11.1 due to npm registry bug.
+
 ## 0.11.1 - 2015-04-21
 
 * Fix crash after all tests are finished (@SevInf).
