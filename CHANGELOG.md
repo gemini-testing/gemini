@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.1 - 2105-04-21
+
+* Fix crash after all tests are finished (@SevInf).
+
 ## 0.11.0 - 2015-04-18
 
 * Plugins support (@Saulis). 
