@@ -3,6 +3,8 @@ Gemini quick start
 
 [![Join the chat at https://gitter.im/gemini-testing/gemini](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gemini-testing/gemini?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+[![Join the chat at https://gitter.im/gemini-testing/gemini](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gemini-testing/gemini?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/gemini-testing/gemini.svg?branch=master)](https://travis-ci.org/gemini-testing/gemini)
 [![Coverage Status](https://img.shields.io/coveralls/gemini-testing/gemini.svg)](https://coveralls.io/r/gemini-testing/gemini)
 
