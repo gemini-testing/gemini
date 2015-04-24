@@ -508,32 +508,5 @@ describe('runner', function() {
                 );
             });
         });
-
-        it('should report total number of tests run', function() {
-            addState(this.suite, 'state');
-            var stats = this.runSuites();
-            return assert.eventually.propertyVal(stats, 'total', 1);
-        });
-
-        it('should report number of skipped suites', function() {
-            this.suite.addState({
-                name: 'state',
-                suite: this.suite,
-                shouldSkip: this.sinon.stub().returns(true)
-            });
-
-            var stats = this.runSuites();
-            return assert.eventually.propertyVal(stats, 'skipped', 1);
-        });
-
-        it('should report error to count when resolved', function() {
-            addState(this.suite, 'state', function() {
-                throw new StateError('example');
-            });
-
-            this.runner.on('error', function() {}); //supress failure on unhandled error event
-            var stats = this.runSuites();
-            return assert.eventually.propertyVal(stats, 'errored', 1);
-        });
     });
 });
