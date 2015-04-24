@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.3 - 2015-04-24
+
+* Take into account horizontal scrolling when validating capture area 
+  for viewport screenshot (@scf2k).
+* Add missing pollyfills for IE8. This allows to gather coverage in
+  ie8 (@SevInf).
+* Correctly report execptions, thrown during coverage gathering (@SevInf).
+
 ## 0.11.2 - 2015-04-21
 
 * Republish  0.11.1 due to npm registry bug.
