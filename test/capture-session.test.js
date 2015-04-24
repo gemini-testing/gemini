@@ -62,16 +62,17 @@ describe('capture session', function() {
 
     describe('capture', function() {
         function setupImageLessThenBody(ctx) {
-            return setupImage(ctx, 90);
+            return setupImage(ctx, 100, 90);
         }
 
         function setupImageGreaterThenBody(ctx) {
-            return setupImage(ctx, 150);
+            return setupImage(ctx, 100, 150);
         }
 
-        function setupImage(ctx, height) {
+        function setupImage(ctx, width, height) {
             ctx.browser.prepareScreenshot.returns({
                 documentHeight: 100,
+                documentWidth: 100,
                 captureArea: {
                     top: 80,
                     left: 30,
@@ -89,7 +90,7 @@ describe('capture session', function() {
 
             var image = {
                 getSize: sinon.stub().returns({
-                    width: 100,
+                    width: width,
                     height: height
                 }),
 
@@ -197,35 +198,21 @@ describe('capture session', function() {
             });
         });
 
-        it('should fail when crop area is not located within document area', function() {
+        it('should fail when crop area is located outside of the document area by Y axis', function() {
             this.state.name = 'state';
             this.state.suite = {name: 'suite'};
             this.browser.id = 'bro';
 
-            this.browser.prepareScreenshot.returns({
-                documentHeight: 100,
-                viewportOffset: {
-                    top: 50,
-                    left: 0
-                },
-                captureArea: {
-                    top: 50,
-                    left: 0,
-                    width: 100,
-                    height: 100
-                },
-                ignoreAreas: []
-            });
-            var image = {
-                getSize: sinon.stub().returns({
-                    width: 100,
-                    height: 90
-                }),
+            setupImage(this, 39, 40);
+            return assert.isRejected(this.session.capture(this.state), StateError);
+        });
 
-                crop: sinon.stub().returns(q())
-            };
-            this.browser.captureFullscreenImage.returns(q(image));
+        it('should fail when crop area is located outside of the document area by X axis', function() {
+            this.state.name = 'state';
+            this.state.suite = {name: 'suite'};
+            this.browser.id = 'bro';
 
+            setupImage(this, 40, 39);
             return assert.isRejected(this.session.capture(this.state), StateError);
         });
     });
