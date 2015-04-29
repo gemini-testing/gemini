@@ -252,7 +252,7 @@ describe('browser', function() {
                     return image.getSize();
                 });
 
-            return assert.eventually.deepEqual(size, {width: 572, height: 311});
+            return assert.eventually.deepEqual(size, {width: 574, height: 311});
         });
     });
 

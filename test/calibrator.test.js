@@ -37,7 +37,7 @@ describe('calibrator', function() {
     it('should calculate correct crop area', function() {
         setScreenshot('calibrate.png');
         var result = calibrator.calibrate(browser);
-        return assert.eventually.deepEqual(result, {top: 24, left: 6, right: 2, bottom: 0});
+        return assert.eventually.deepEqual(result, {top: 24, left: 6});
     });
 
     it('should not perform the calibration process two times', function() {
@@ -59,7 +59,7 @@ describe('calibrator', function() {
                         .then(function() {
                             return calibrator.calibrate(browser);
                         });
-        return assert.eventually.deepEqual(result, {top: 24, left: 6, right: 2, bottom: 0});
+        return assert.eventually.deepEqual(result, {top: 24, left: 6});
     });
 
     it('should fail on broken calibration page', function() {
