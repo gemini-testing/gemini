@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.4 - 2015-04-29
+
+* Calibration affects only top and left sides of the screenshot (@scff).
+
 ## 0.11.3 - 2015-04-24
 
 * Take into account horizontal scrolling when validating capture area 
