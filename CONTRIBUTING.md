@@ -26,6 +26,15 @@ To do so, run:
 npm run lint
 ```
 
+## Functional Tests Prerequisites
+
+Some functional tests are launched on [SauceLabs](https://saucelabs.com).
+In order to run them you'll need to:
+
+1. [Register](https://saucelabs.com/opensauce/) open source SauceLans account.
+2. Set your username and key to `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` environment 
+   variables respectively.
+
 ## Tests
 
 Make sure all tests are passing before submitting pull request:
