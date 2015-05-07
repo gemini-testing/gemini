@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.0 - 2015-05-07
+
+* When capturing element is visible compltely in the viewport do not scroll to
+  element's location while taking the screenshot (@scff).
+
 ## 0.11.5 - 2015-04-30
 
 * Fix calibration in IE8 and add functional tests for it (@SevInf).
