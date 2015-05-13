@@ -16,5 +16,14 @@
     "strict": true,
     "trailing": true,
     "maxparams": 3,
-    "node": true
+    "node": true,
+    "overrides": {
+      "test/**": {
+        "mocha": true
+      },
+      "lib/browser/client-scripts/*": {
+        "node": false,
+        "browserify": true
+      }
+    }
 }
