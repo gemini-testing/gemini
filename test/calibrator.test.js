@@ -29,7 +29,7 @@ describe('calibrator', function() {
         };
         browser = new Browser(config, 'id');
         sinon.stub(browser);
-        browser.inject.returns(q());
+        browser.evalScript.returns(q({}));
         browser.open.returns(q());
         calibrator = new Calibrator();
     });
@@ -40,6 +40,13 @@ describe('calibrator', function() {
         return assert.eventually.deepEqual(result, {top: 24, left: 6});
     });
 
+    it('should return also features detected by script', function() {
+        setScreenshot('calibrate.png');
+        browser.evalScript.returns(q({feature: 'value'}));
+        var result = calibrator.calibrate(browser);
+        return assert.eventually.propertyVal(result, 'feature', 'value');
+    });
+
     it('should not perform the calibration process two times', function() {
         setScreenshot('calibrate.png');
         return calibrator.calibrate(browser)
@@ -48,7 +55,7 @@ describe('calibrator', function() {
             })
             .then(function() {
                 assert.calledOnce(browser.open);
-                assert.calledOnce(browser.inject);
+                assert.calledOnce(browser.evalScript);
                 assert.calledOnce(browser.captureFullscreenImage);
             });
     });

@@ -2,21 +2,14 @@
 var _ = require('lodash'),
     assert = require('chai').assert,
 
-    Browser = require('../lib/browser'),
     suiteUtil = require('../lib/suite-util'),
 
     shouldSkip = suiteUtil.shouldSkip,
-    flattenSuites = suiteUtil.flattenSuites;
+    flattenSuites = suiteUtil.flattenSuites,
+    makeBrowser = require('./util').makeBrowser;
 
 describe('suite-util', function() {
     describe('shouldSkip()', function() {
-        function makeBrowser(capabilities) {
-            var config = {
-                browsers: {id: capabilities}
-            };
-            return new Browser(config, 'id');
-        }
-
         it('should not skip any browser if skipped=false', function() {
             assert.isFalse(shouldSkip(false, makeBrowser({browserName: 'browser'})));
         });
