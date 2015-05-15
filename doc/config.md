@@ -40,25 +40,37 @@ Config file options:
 * `browsers` – list of browsers to use for testing. Each browser should be available
 on Selenium Grid.
 
-    `browsers` field format:
+  `browsers` field format:
 
-    ```yaml
-    browsers:
-      <browser-id>:
-        browserName: <name>
-        version: <version>
-        # ... other browser capabilities as <key>: <value>
-    ```
+  ```yaml
+  browsers:
+    <browser-id>:
+      browserName: <name>
+      version: <version>
+      # ... other browser capabilities as <key>: <value>
+  ```
 
-    It is possible to use multiple versions of the same browser (if all versions are
-    available on your Selenium Grid instance).
+  It is possible to use multiple versions of the same browser (if all versions are
+  available on your Selenium Grid instance).
 
-    If version is omitted, any browsers of the specified name will be used.
+  If version is omitted, any browsers of the specified name will be used.
 
-    `<browser-id>: <name>` is a shortcut for `<browser-id>: {browserName: <name>}`.
+  `<browser-id>: <name>` is a shortcut for `<browser-id>: {browserName: <name>}`.
 
-    `<browser-id>` value is used for browser indentification in test reports and for
-    constructing screens file names.
+  `<browser-id>` value is used for browser indentification in test reports and for
+  constructing screens file names.
+
+  gemini supports custom capability option `--noCalibrate`. By default it's false and this enables browser calibration.
+  It is required for such cases when web driver captures screenshots with some area outside of the browser view.
+  Calibration makes browser to render a special page which allows to determine html body bounds and crop the screenshot
+  accordingly. If needed you can disable calibration for particular browser by setting `--noCalibrate` to `true`:
+
+  ```yaml
+  browsers:
+    chrome:
+      browserName: chrome
+      --noCalibrate: true
+  ```
 
 * `projectRoot` – root directory of a project. All relative paths in config or options
   will be resolved relatively to it. By default it is the directory config file is placed
@@ -77,11 +89,6 @@ on Selenium Grid.
   It is possible to set any capability, except `browserName` and `version` (use
   `browsers` option instead) and `takesScreenshot` (always set to `true`
   automatically).
-
-  gemini supports custom capability option `--noCalibrate`. By default it's false and this enables browser calibration.
-  It is required for such cases when web driver captures screenshots with some area outside of the browser view.
-  Calibration makes browser to render a special page which allows to determine html body bounds and crop the screenshot
-  accordingly. If needed you can disable calibration for particular browser by setting `--noCalibrate` to `true`.
 
 * `debug` (CLI: `--debug`, env: `GEMINI_DEBUG`) – turn on debug logging to the terminal.
 * `parallelLimit` – by default, `gemini` will run all browsers in parallel.
