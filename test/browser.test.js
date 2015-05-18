@@ -1,18 +1,14 @@
 'use strict';
-var Browser = require('../lib/browser'),
-    Calibrator = require('../lib/calibrator'),
+var Calibrator = require('../lib/calibrator'),
+    Browser = require('../lib/browser'),
+    ClientBridge = require('../lib/browser/client-bridge'),
     assert = require('chai').assert,
     q = require('q'),
     wd = require('wd'),
     fs = require('fs'),
     path = require('path'),
-    sinon = require('sinon');
-
-function makeBrowser(capabilities, config) {
-    config = config || {};
-    config.browsers = {id: capabilities};
-    return new Browser(config, 'id');
-}
+    sinon = require('sinon'),
+    makeBrowser = require('./util').makeBrowser;
 
 describe('browser', function() {
     beforeEach(function() {
@@ -149,8 +145,6 @@ describe('browser', function() {
                     assert.calledWith(_this.wd.get, 'http://www.example.com');
                 });
         });
-
-        it('should execute client script');
     });
 
     describe('reset', function() {
@@ -163,6 +157,7 @@ describe('browser', function() {
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
 
             this.browser = makeBrowser({browserName: 'browser', version: '1.0'});
+            this.browser.chooseLocator();
         });
 
         it('should reset mouse position', function() {
@@ -173,36 +168,6 @@ describe('browser', function() {
                 .then(function() {
                     assert.calledWith(_this.wd.moveTo, elem, 0, 0);
                 });
-        });
-    });
-
-    describe('prepareScreenshot', function() {
-        beforeEach(function() {
-            this.wd = {
-                eval: sinon.stub().returns(q({}))
-            };
-            this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
-
-            this.browser = makeBrowser({browserName: 'browser', version: '1.0'});
-        });
-
-        it('should execute client side method', function() {
-            var _this = this;
-            return this.browser.prepareScreenshot(['.selector1', '.selector2'], {}).then(function() {
-                /*jshint evil:true*/
-                assert.called(_this.wd.eval);
-            });
-        });
-
-        it('should reject promise if client-side method returned error', function() {
-            /*jshint evil:true*/
-            this.wd.eval.returns(q({
-                error: 'err',
-                message: 'message'
-            }));
-
-            var result = this.browser.prepareScreenshot(['.selector']);
-            return assert.isRejected(result, /^message$/);
         });
     });
 
@@ -267,6 +232,73 @@ describe('browser', function() {
             var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: false}),
                 scripts = browser.buildScripts();
             return assert.eventually.notInclude(scripts, 'exports.collectCoverage');
+        });
+    });
+
+    describe('findElement', function() {
+        beforeEach(function() {
+            this.wd = {
+                configureHttp: sinon.stub().returns(q()),
+                init: sinon.stub().returns(q({})),
+                get: sinon.stub().returns(q({})),
+                eval: sinon.stub().returns(q('')),
+                elementByCssSelector: sinon.stub().returns(q())
+            };
+            this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
+            this.browser = makeBrowser();
+        });
+
+        describe('when browser supports CSS3 selectors', function() {
+            beforeEach(function() {
+                var calibrator = sinon.createStubInstance(Calibrator);
+                calibrator.calibrate.returns(q({
+                    hasCSS3Selectors: true
+                }));
+                return this.browser.launch(calibrator);
+            });
+
+            it('should return what wd.elementByCssSelector returns', function() {
+                var element = {element: 'elem'};
+                this.wd.elementByCssSelector.withArgs('.class').returns(q(element));
+                return assert.eventually.equal(this.browser.findElement('.class'), element);
+            });
+
+            it('should add a selector property if element is not found', function() {
+                var error = new Error('Element not found');
+                error.status = Browser.ELEMENT_NOT_FOUND;
+                this.wd.elementByCssSelector.returns(q.reject(error));
+
+                return assert.isRejected(this.browser.findElement('.class'))
+                    .then(function(error) {
+                        assert.equal(error.selector, '.class');
+                    });
+            });
+        });
+
+        describe('when browser does not support CSS3 selectors', function() {
+            beforeEach(function() {
+                this.sinon.stub(ClientBridge.prototype, 'call').returns(q({}));
+                var calibrator = sinon.createStubInstance(Calibrator);
+                calibrator.calibrate.returns(q({
+                    hasCSS3Selectors: false
+                }));
+                return this.browser.launch(calibrator);
+            });
+
+            it('should return what client method returns', function() {
+                var element = {element: 'elem'};
+                ClientBridge.prototype.call.withArgs('query.first', ['.class']).returns(q(element));
+                return assert.eventually.equal(this.browser.findElement('.class'), element);
+            });
+
+            it('should reject with element not found error if client method returns null', function() {
+                ClientBridge.prototype.call.returns(q(null));
+                return assert.isRejected(this.browser.findElement('.class'))
+                    .then(function(error) {
+                        assert.equal(error.status, Browser.ELEMENT_NOT_FOUND);
+                        assert.equal(error.selector, '.class');
+                    });
+            });
         });
     });
 });
