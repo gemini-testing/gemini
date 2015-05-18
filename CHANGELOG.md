@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.1 - 2015-05-18
+
+* If CSS3 selectors are not supported by particular browser,
+  [Sizzle.js](https://github.com/jquery/sizzle) will be used for
+  all queries in that browser (@SevInf).
+* Coverage now correctly detects intersection of the elements
+  and capture area (@scff).
+
 ## 0.12.0 - 2015-05-07
 
 * When capturing element is visible compltely in the viewport do not scroll to
