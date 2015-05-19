@@ -6,12 +6,13 @@ var q = require('q'),
     sinon = require('sinon'),
 
     makeBrowser = require('./util').makeBrowser,
-    CALL_SCRIPT = 'typeof __gemini !== "undefined"? __gemini.example(1, "two") : {error: "ERRNOFUNC"})';
+    CALL = '__gemini.example(1, "two")';
 
 describe('ClientBridge', function() {
     beforeEach(function() {
         this.browser = sinon.stub(makeBrowser());
         this.browser.evalScript.returns(q({}));
+        this.browser.injectScript.returns(q({}));
         this.script = 'exampleScript()';
         this.bridge = new ClientBridge(this.browser, this.script);
     });
@@ -23,7 +24,7 @@ describe('ClientBridge', function() {
                 .then(function() {
                     assert.calledWith(
                         _this.browser.evalScript,
-                       CALL_SCRIPT
+                       sinon.match(CALL)
                     );
                 });
         });
@@ -65,9 +66,9 @@ describe('ClientBridge', function() {
                 this.setupAsNonInjected = function(finalResult) {
                     this.browser.evalScript
                         .onFirstCall().returns(q({error: 'ERRNOFUNC'}))
-                        .onThirdCall().returns(q(finalResult));
+                        .onSecondCall().returns(q(finalResult));
 
-                    this.browser.evalScript
+                    this.browser.injectScript
                         .withArgs(this.script)
                         .returns(q());
                 };
@@ -82,7 +83,7 @@ describe('ClientBridge', function() {
                 var _this = this;
                 return this.performCall()
                     .then(function() {
-                        assert.calledWith(_this.browser.evalScript, _this.script);
+                        assert.calledWith(_this.browser.injectScript, _this.script);
                     });
             });
 
@@ -91,7 +92,8 @@ describe('ClientBridge', function() {
                 var _this = this;
                 return this.bridge.call('example', [1, 'two'])
                     .then(function() {
-                        assert.deepEqual(_this.browser.evalScript.thirdCall.args, [CALL_SCRIPT]);
+                        assert.calledTwice(_this.browser.evalScript);
+                        assert.alwaysCalledWith(_this.browser.evalScript, sinon.match(CALL));
                     });
             });
 
