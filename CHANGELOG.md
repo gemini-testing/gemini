@@ -1,6 +1,13 @@
 # Changelog
 
+## 0.12.2 - 2015-05-19
+
+* Fix client bridge script injection (@SevInf).
+
 ## 0.12.1 - 2015-05-18
+
+CRITICAL BUG WAS INTRODUCED IN THIS VERSION.
+Version was deleted from npm, use 0.12.2 instead.
 
 * If CSS3 selectors are not supported by particular browser,
   [Sizzle.js](https://github.com/jquery/sizzle) will be used for
