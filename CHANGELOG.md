@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.3 - 2015-05-21
+
+* Sizzle: work with selectors ending with space (@SevInf).
+
 ## 0.12.2 - 2015-05-19
 
 * Fix client bridge script injection (@SevInf).
