@@ -70,7 +70,7 @@ describe('capture session', function() {
         }
 
         function setupImage(ctx, width, height) {
-            ctx.browser.prepareScreenshot.returns({
+            ctx.browser.prepareScreenshot.returns(q({
                 documentHeight: 100,
                 documentWidth: 100,
                 captureArea: {
@@ -86,7 +86,7 @@ describe('capture session', function() {
                 ignoreAreas: [
                     {top: 90, left: 40, width: 5, height: 8}
                 ]
-            });
+            }));
 
             var image = {
                 getSize: sinon.stub().returns({
@@ -103,6 +103,7 @@ describe('capture session', function() {
         beforeEach(function() {
             this.seq = sinon.createStubInstance(Actions);
             this.seq.perform.returns(q());
+            this.seq.performPostActions.returns(q());
 
             this.state = {
                 callback: sinon.stub()
@@ -214,6 +215,14 @@ describe('capture session', function() {
 
             setupImage(this, 40, 39);
             return assert.isRejected(this.session.capture(this.state), StateError);
+        });
+
+        it('should execute performPostActions()', function() {
+            var _this = this;
+
+            return _this.session.capture(this.state).then(function() {
+                assert.called(_this.seq.performPostActions);
+            });
         });
     });
 });
