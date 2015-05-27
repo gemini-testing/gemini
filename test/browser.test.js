@@ -43,7 +43,8 @@ describe('browser', function() {
                 configureHttp: sinon.stub().returns(q()),
                 init: sinon.stub().returns(q({})),
                 get: sinon.stub().returns(q({})),
-                eval: sinon.stub().returns(q(''))
+                eval: sinon.stub().returns(q('')),
+                setWindowSize: sinon.stub().returns(q({}))
             };
 
             this.config = {
@@ -62,6 +63,10 @@ describe('browser', function() {
                 // disable calibration for tests to avoid a lot of mocking
                 '--noCalibrate': true
             }, this.config);
+
+            this.launchBrowser = function() {
+                return this.browser.launch(this.calibrator);
+            };
         });
 
         it('should init browser with browserName, version and takeScreenshot capabilites', function() {
@@ -123,6 +128,35 @@ describe('browser', function() {
             var _this = this;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.notCalled(_this.calibrator.calibrate);
+            });
+        });
+
+        describe('with windowSize option', function() {
+            beforeEach(function() {
+                this.config.windowSize = {width: 1024, height: 768};
+            });
+
+            it('should set window size', function() {
+                var _this = this;
+                return this.launchBrowser().then(function() {
+                    assert.calledWith(_this.wd.setWindowSize, 1024, 768);
+                });
+            });
+
+            it('should not fail if not supported in legacy Opera', function() {
+                this.wd.setWindowSize.returns(q.reject({
+                    cause: {
+                        value: {
+                            message: 'Not supported in OperaDriver yet'
+                        }
+                    }
+                }));
+                return assert.isFulfilled(this.launchBrowser());
+            });
+
+            it('should fail if setWindowSize fails with other error', function() {
+                this.wd.setWindowSize.returns(q.reject(new Error('other')));
+                return assert.isRejected(this.launchBrowser());
             });
         });
     });
