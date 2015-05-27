@@ -6,6 +6,7 @@ var sinon = require('sinon'),
 
     CaptureSession = require('../lib/capture-session'),
     Actions = require('../lib/browser/actions.js'),
+    createSuite = require('../lib/suite').create,
     StateError = require('../lib/errors/state-error');
 
 describe('capture session', function() {
@@ -70,7 +71,7 @@ describe('capture session', function() {
         }
 
         function setupImage(ctx, width, height) {
-            ctx.browser.prepareScreenshot.returns({
+            ctx.browser.prepareScreenshot.returns(q({
                 documentHeight: 100,
                 documentWidth: 100,
                 captureArea: {
@@ -86,7 +87,7 @@ describe('capture session', function() {
                 ignoreAreas: [
                     {top: 90, left: 40, width: 5, height: 8}
                 ]
-            });
+            }));
 
             var image = {
                 getSize: sinon.stub().returns({
@@ -105,7 +106,8 @@ describe('capture session', function() {
             this.seq.perform.returns(q());
 
             this.state = {
-                callback: sinon.stub()
+                callback: sinon.stub(),
+                suite: sinon.stub(createSuite('suite'))
             };
             this.browser = {
                 createActionSequence: sinon.stub().returns(this.seq),
@@ -199,19 +201,11 @@ describe('capture session', function() {
         });
 
         it('should fail when crop area is located outside of the document area by Y axis', function() {
-            this.state.name = 'state';
-            this.state.suite = {name: 'suite'};
-            this.browser.id = 'bro';
-
             setupImage(this, 39, 40);
             return assert.isRejected(this.session.capture(this.state), StateError);
         });
 
         it('should fail when crop area is located outside of the document area by X axis', function() {
-            this.state.name = 'state';
-            this.state.suite = {name: 'suite'};
-            this.browser.id = 'bro';
-
             setupImage(this, 40, 39);
             return assert.isRejected(this.session.capture(this.state), StateError);
         });
