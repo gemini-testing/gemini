@@ -25,7 +25,7 @@ describe('runner', function() {
             id: 'browser',
             createActionSequence: this.sinon.stub().returns({
                 perform: this.sinon.stub().returns(q.resolve()),
-                performPostActions: this.sinon.stub().returns(q.resolve())
+                getPostActions: this.sinon.stub().returns(null)
             }),
 
             captureFullscreenImage: this.sinon.stub().returns(q({
@@ -189,7 +189,7 @@ describe('runner', function() {
                 sequence = {
                     stub: true,
                     perform: this.sinon.stub().returns(q.resolve()),
-                    performPostActions: this.sinon.stub().returns(q.resolve())
+                    getPostActions: this.sinon.stub().returns(null)
                 };
 
             this.browser.createActionSequence.returns(sequence);
@@ -203,7 +203,7 @@ describe('runner', function() {
         it('should perform before sequence ', function() {
             var sequence = {
                 perform: this.sinon.stub().returns(q()),
-                performPostActions: this.sinon.stub().returns(q())
+                getPostActions: this.sinon.stub().returns(null)
             };
 
             this.browser.createActionSequence.returns(sequence);
@@ -368,7 +368,7 @@ describe('runner', function() {
                 sequence = {
                     stub: true,
                     perform: this.sinon.stub().returns(q.resolve()),
-                    performPostActions: this.sinon.stub().returns(q.resolve())
+                    getPostActions: this.sinon.stub().returns(null)
                 };
 
             this.browser.createActionSequence.returns(sequence);
