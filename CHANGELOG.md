@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.5 - 2015-05-28
+
+Republish 0.12.4 due to another npm bug.
+
 ## 0.12.4 - 2015-05-28
 
 * Fix calibration to work in Chrome 43+ (@SevInf).
