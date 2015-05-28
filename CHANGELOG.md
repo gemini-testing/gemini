@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.4 - 2015-05-28
+
+* Original window size is restored after suite with
+  `setWindowSize` action is finished (@scff).
+* `windowSize` option is ignored in Opera Presto browsers (@SevInf).
+
 ## 0.12.3 - 2015-05-21
 
 * Sizzle: work with selectors ending with space (@SevInf).
