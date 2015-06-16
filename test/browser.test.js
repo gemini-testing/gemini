@@ -184,7 +184,7 @@ describe('browser', function() {
     describe('reset', function() {
         beforeEach(function() {
             this.wd = {
-                elementByCssSelector: sinon.stub().returns(q()),
+                eval: sinon.stub().returns(q()),
                 moveTo: sinon.stub().returns(q())
             };
 
@@ -197,7 +197,7 @@ describe('browser', function() {
         it('should reset mouse position', function() {
             var _this = this,
                 elem = {};
-            this.wd.elementByCssSelector.returns(q(elem));
+            this.wd.eval.returns(q(elem));
             return this.browser.reset()
                 .then(function() {
                     assert.calledWith(_this.wd.moveTo, elem, 0, 0);
