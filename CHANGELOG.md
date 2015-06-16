@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.6 - 2015-06-16
+
+* More clear error when capture are is hidden (@hatroman).
+* Mouse cursor is moved to (0,0) before the first test (@j0tunn).
+
 ## 0.12.5 - 2015-05-28
 
 Republish 0.12.4 due to another npm bug.
