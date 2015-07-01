@@ -3,8 +3,9 @@ var Browser = require('../lib/browser');
 
 function makeBrowser(capabilities, config) {
     config = config || {};
-    config.browsers = {id: capabilities || {}};
-    return new Browser(config, 'id');
+    config.id = 'id';
+    config.desiredCapabilities = capabilities;
+    return new Browser(config);
 }
 
 exports.makeBrowser = makeBrowser;

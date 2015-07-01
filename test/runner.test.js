@@ -39,7 +39,7 @@ describe('runner', function() {
                 ignoreAreas: []
             })),
 
-            open: this.sinon.stub().returns(q.resolve()),
+            openRelative: this.sinon.stub().returns(q.resolve()),
             quit: this.sinon.stub().returns(q.resolve())
         };
 
@@ -58,11 +58,15 @@ describe('runner', function() {
         this.suite.url = '/path';
 
         var config = new Config({
-                projectRoot: '/',
+                system: {
+                    projectRoot: '/'
+                },
                 rootUrl: 'http://example.com',
                 gridUrl: 'http://grid.example.com',
                 browsers: {
-                    browser: 'browser'
+                    browser: {
+                        desiredCapabilities: {}
+                    }
                 }
             });
         this.runner = new Runner(config);
@@ -100,11 +104,10 @@ describe('runner', function() {
             });
         });
 
-        it('should pass all browser names when emitting `begin`', function() {
-            this.runner.config.browsers = {
-                browser1: {browserName: 'browser1', version: '1'},
-                browser2: {browserName: 'browser2'}
-            };
+        it('should pass all browser ids when emitting `begin`', function() {
+            console.log(this.runner.config.getBrowserIds);
+            this.sinon.stub(this.runner.config, 'getBrowserIds')
+                .returns(['browser1', 'browser2']);
 
             var spy = this.sinon.spy().named('onBegin');
             this.runner.on('begin', spy);
@@ -129,10 +132,8 @@ describe('runner', function() {
         });
 
         it('should launch each browser in config if testBrowsers are not set', function() {
-            this.runner.config.browsers = {
-                browser1: {browserName: 'browser1', version: '1'},
-                browser2: {browserName: 'browser2'}
-            };
+            this.sinon.stub(this.runner.config, 'getBrowserIds')
+                .returns(['browser1', 'browser2']);
 
             addState(this.suite, 'state');
 
@@ -143,10 +144,8 @@ describe('runner', function() {
         });
 
         it('should launch only browsers specified in testBrowsers', function() {
-            this.runner.config.browsers = {
-                browser1: {browserName: 'browser1', version: '1'},
-                browser2: {browserName: 'browser2'}
-            };
+            this.sinon.stub(this.runner.config, 'getBrowserIds')
+                .returns(['browser1', 'browser2']);
             this.runner.setTestBrowsers(['browser1']);
 
             addState(this.suite, 'state');
@@ -157,9 +156,8 @@ describe('runner', function() {
         });
 
         it('should emit `startBrowser` event when starting browser', function() {
-            this.runner.config.browsers = {
-                browser: {browserName: 'name'}
-            };
+            this.sinon.stub(this.runner.config, 'getBrowserIds')
+                .returns(['browser']);
 
             var spy = this.sinon.spy().named('onStartBrowser');
             this.runner.on('startBrowser', spy);
@@ -286,10 +284,8 @@ describe('runner', function() {
         });
 
         it('should not emit state events in second browser when first fails', function() {
-            this.runner.config.browsers = {
-                browser1: {browserName: 'browser1', version: '1'},
-                browser2: {browserName: 'browser2'}
-            };
+            this.sinon.stub(this.runner.config, 'getBrowserIds')
+                .returns(['browser1', 'browser2']);
 
             var spy = this.sinon.spy().named('onBeginState');
             this.runner.on('endState', spy);
@@ -309,7 +305,7 @@ describe('runner', function() {
             addState(this.suite, 'state');
 
             return this.runSuites().then(function() {
-                assert.calledWith(this.browser.open, 'http://example.com/path');
+                assert.calledWith(this.browser.openRelative, '/path');
             }.bind(this));
         });
 
@@ -461,9 +457,8 @@ describe('runner', function() {
         });
 
         it('should emit `stopBrowser` after all suites', function() {
-            this.runner.config.browsers = {
-                browser: {browserName: 'name'}
-            };
+            this.sinon.stub(this.runner.config, 'getBrowserIds')
+                .returns(['browser']);
 
             var spy = this.sinon.spy().named('onStartBrowser');
             this.runner.on('stopBrowser', spy);

@@ -20,9 +20,8 @@ describe('LimitedPool', function() {
 
         this.makeBrowser = function() {
             var config = {
-                browsers: {
-                    id: {browserName: 'id'}
-                }
+                id: 'id',
+                desiredCapabilities: {browserName: 'id'}
             };
 
             return this.sinon.stub(new Browser(config, 'id'));

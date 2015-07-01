@@ -1,6 +1,8 @@
 'use strict';
 var Config = require('../../lib/config'),
     Browser = require('../../lib/browser'),
+    _ = require('lodash'),
+
     supportedBrowsers = {
         // evergreen browsers are always tested against latest
         // version
@@ -42,8 +44,12 @@ var Config = require('../../lib/config'),
     testsConfig = new Config({
         gridUrl: 'http://ondemand.saucelabs.com/wd/hub',
         rootUrl: 'http://example.com',
-        projectRoot: process.cwd(),
-        browsers: supportedBrowsers
+        browsers: _.mapValues(supportedBrowsers, function(capabilities) {
+            return {desiredCapabilities: capabilities};
+        }),
+        system: {
+            projectRoot: process.cwd()
+        }
     }),
     browserDescribe;
 
@@ -62,7 +68,8 @@ exports.eachSupportedBrowser = function(cb) {
     Object.keys(supportedBrowsers).forEach(function(browserId) {
         browserDescribe('in ' + browserId, function() {
             beforeEach(function() {
-                this.browser = new Browser(testsConfig, browserId);
+                var browserConfig = testsConfig.forBrowser(browserId);
+                this.browser = new Browser(browserConfig);
             });
 
             cb();

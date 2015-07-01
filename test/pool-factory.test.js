@@ -5,11 +5,15 @@ var browserPool = require('../lib/browser-pool'),
     LimitedPool = require('../lib/browser-pool/limited-pool'),
     CachingPool = require('../lib/browser-pool/caching-pool');
 
+function poolWithSystem(systemSection) {
+    return browserPool.create({system: systemSection});
+}
+
 describe('pool factory', function() {
     describe('without parallelLimit', function() {
         it('should create unlimited pool', function() {
             assert.instanceOf(
-                browserPool.create({sessionMode: 'perSuite'}),
+                poolWithSystem({sessionMode: 'perSuite'}),
                 Pool
             );
         });
@@ -17,7 +21,7 @@ describe('pool factory', function() {
 
     describe('with parallelLimit', function() {
         it('should create limited pool', function() {
-            var pool = browserPool.create({sessionMode: 'perSuite', parallelLimit: 1});
+            var pool = poolWithSystem({sessionMode: 'perSuite', parallelLimit: 1});
             assert.instanceOf(pool, LimitedPool);
             assert.instanceOf(pool.underlyingPool, Pool);
         });
@@ -25,7 +29,7 @@ describe('pool factory', function() {
 
     describe('with perBrowser session mode', function() {
         it('should create unlimited pool wrapped in caching pool', function() {
-            var pool = browserPool.create({sessionMode: 'perBrowser'});
+            var pool = poolWithSystem({sessionMode: 'perBrowser'});
             assert.instanceOf(pool, CachingPool);
             assert.instanceOf(pool.underlyingPool, Pool);
         });
@@ -33,7 +37,7 @@ describe('pool factory', function() {
 
     describe('with perBrowser mode and parallelLimit', function() {
         it('should create limited pool wrapped in caching pool', function() {
-            var pool = browserPool.create({sessionMode: 'perBrowser', parallelLimit: 1});
+            var pool = poolWithSystem({sessionMode: 'perBrowser', parallelLimit: 1});
             assert.instanceOf(pool, CachingPool);
             assert.instanceOf(pool.underlyingPool, LimitedPool);
         });
