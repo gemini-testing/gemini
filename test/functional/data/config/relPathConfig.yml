@@ -1,2 +1,7 @@
-projectRoot: rel/path
+system:
+  projectRoot: rel/path
 rootUrl: http://example.com
+gridUrl: http://grid.example.com
+browsers:
+  example:
+    desiredCapabilities: {}

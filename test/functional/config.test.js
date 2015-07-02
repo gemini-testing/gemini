@@ -26,24 +26,17 @@ describe('config', function() {
 
         it('should read valid config', function() {
             var config = new Config(configPath('validConfig.yml'));
-            assert.propertyVal(config, 'gridUrl', 'http://grid.example.com');
+            assert.deepPropertyVal(config, 'system.projectRoot', '/it/works');
         });
 
         it('should set correct root', function() {
-            var config = new Config(configPath('validConfig.yml'));
-            assert.propertyVal(config, 'projectRoot', DATA_ROOT);
+            var config = new Config(configPath('noRootConfig.yml'));
+            assert.deepPropertyVal(config, 'system.projectRoot', DATA_ROOT);
         });
 
         it('should set realtive root relatively to config path', function() {
             var config = new Config(configPath('relPathConfig.yml'));
-            assert.propertyVal(config, 'projectRoot', path.join(DATA_ROOT, 'rel', 'path'));
-        });
-
-        it('should override options', function() {
-            var config = new Config(configPath('validConfig.yml'), {
-                gridUrl: 'http://example.com/overriden'
-            });
-            assert.propertyVal(config, 'gridUrl', 'http://example.com/overriden');
+            assert.deepPropertyVal(config, 'system.projectRoot', path.join(DATA_ROOT, 'rel', 'path'));
         });
     });
 });

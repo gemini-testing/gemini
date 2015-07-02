@@ -48,20 +48,13 @@ describe('browser', function() {
             };
 
             this.config = {
-                capabilities: {},
-                http: {
-                    timeout: 100,
-                    retries: 5,
-                    retryDelay: 25
-                }
+                calibrate: false
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
             this.calibrator = sinon.createStubInstance(Calibrator);
             this.browser = makeBrowser({
                 browserName: 'browser',
-                version: '1.0',
-                // disable calibration for tests to avoid a lot of mocking
-                '--noCalibrate': true
+                version: '1.0'
             }, this.config);
 
             this.launchBrowser = function() {
@@ -69,50 +62,30 @@ describe('browser', function() {
             };
         });
 
-        it('should init browser with browserName, version and takeScreenshot capabilites', function() {
+        it('should init browser with browserName and version capabilites', function() {
             var _this = this;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.calledWith(_this.wd.init, {
                     browserName: 'browser',
-                    version: '1.0',
-                    takesScreenshot: true,
-                    '--noCalibrate': true
+                    version: '1.0'
                 });
             });
         });
 
         it('should set http options for browser instance', function() {
             var _this = this;
+            this.config.httpTimeout = 100;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.calledWith(_this.wd.configureHttp, {
                     timeout: 100,
-                    retries: 5,
-                    retryDelay: 25
+                    retries: 'never'
                 });
             });
         });
 
-        it('should mix additional capabilites from config', function() {
+        it('should calibrate if config.calibrate=true', function() {
             var _this = this;
-            this.config.capabilities = {
-                option1: 'value1',
-                option2: 'value2'
-            };
-
-            return this.browser.launch(this.calibrator).then(function() {
-                assert.calledWith(_this.wd.init, {
-                    browserName: 'browser',
-                    version: '1.0',
-                    takesScreenshot: true,
-                    '--noCalibrate': true,
-                    option1: 'value1',
-                    option2: 'value2'
-                });
-            });
-        });
-
-        it('should calibrate by default', function() {
-            var _this = this;
+            this.config.calibrate = true;
             this.browser = makeBrowser({
                 browserName: 'browser',
                 version: '1.0'
@@ -124,8 +97,9 @@ describe('browser', function() {
             });
         });
 
-        it('should not call calibrate() when --noCalibrate is true', function() {
+        it('should not call calibrate() when config.calibrate=false', function() {
             var _this = this;
+            this.config.calibrate = false;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.notCalled(_this.calibrator.calibrate);
             });
@@ -177,6 +151,26 @@ describe('browser', function() {
             return this.browser.open('http://www.example.com')
                 .then(function() {
                     assert.calledWith(_this.wd.get, 'http://www.example.com');
+                });
+        });
+    });
+
+    describe('openRelative', function() {
+        it('should open relative URL using config', function() {
+            this.wd = {
+                get: sinon.stub().returns(q({}))
+            };
+
+            this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
+
+            this.browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                getAbsoluteUrl: sinon.stub().withArgs('/relative').returns('http://example.com/relative')
+            });
+
+            var _this = this;
+            return this.browser.openRelative('/relative')
+                .then(function() {
+                    assert.calledWith(_this.wd.get, 'http://example.com/relative');
                 });
         });
     });
@@ -234,7 +228,9 @@ describe('browser', function() {
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
 
-            this.browser = makeBrowser({browserName: 'browser', version: '1.0'});
+            this.browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                calibrate: true
+            });
         });
 
         it('captureFullscreenImage() should crop according to calibration result', function() {
@@ -279,7 +275,9 @@ describe('browser', function() {
                 elementByCssSelector: sinon.stub().returns(q())
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
-            this.browser = makeBrowser();
+            this.browser = makeBrowser({browserName: 'bro'}, {
+                calibrate: true
+            });
         });
 
         describe('when browser supports CSS3 selectors', function() {

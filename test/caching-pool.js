@@ -11,17 +11,17 @@ describe('CachingPool', function() {
             getBrowser: sinon.stub(),
             freeBrowser: sinon.stub().returns(q())
         };
-        var config = {
-            browsers: {
-                first: {browserName: 'first'},
-                second: {browserName: 'second'}
-            }
-        };
 
         function makeStubBrowser(id) {
+            var config = {
+                id: id,
+                desiredCapabilities: {
+                    browserName: id
+                }
+            };
             // Constructor needs to be called even for stub instance,
             // because there is no way to stub readonly property
-            var browser = sinon.stub(new Browser(config, id));
+            var browser = sinon.stub(new Browser(config));
             browser.launch.returns(q());
             browser.reset.returns(q());
             return browser;
