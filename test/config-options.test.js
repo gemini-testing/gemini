@@ -55,6 +55,58 @@ describe('config', function() {
         assert.deepEqual(_.get(result, opts.property), opts.expected);
     }
 
+    function testPositiveIntegerOption(name, opts) {
+        it('should not accept non-numbers', function() {
+            assert.throws(function() {
+                createConfig(_.set({}, name, 'so many'));
+            }, GeminiError);
+        });
+
+        it('should not accept negative numbers', function() {
+            assert.throws(function() {
+                createConfig(_.set({}, name, -1));
+            }, GeminiError);
+        });
+
+        it('should not accept 0', function() {
+            assert.throws(function() {
+                createConfig(_.set({}, name, 0));
+            }, GeminiError);
+        });
+
+        it('should not accept float numbers', function() {
+            assert.throws(function() {
+                createConfig(_.set({}, name, 1.1));
+            }, GeminiError);
+        });
+
+        it('should copy positive integer', function() {
+            var config = createConfig(_.set({}, name, 3));
+            assert.deepPropertyVal(config, name, 3);
+        });
+
+        it('should correctly parse env var', function() {
+            assertParsesEnv({
+                property: name,
+                value: '100',
+                expected: 100
+            });
+        });
+
+        it('should correctly parse cli flag', function() {
+            assertParsesCli({
+                property: name,
+                value: '100',
+                expected: 100
+            });
+        });
+
+        it('should be ' + opts.default + ' by default', function() {
+            var config = createConfig({});
+            assert.deepPropertyVal(config, name, opts.default);
+        });
+    }
+
     function testBooleanOption(name, opts) {
         it('should not accept non-boolean', function() {
             assert.throws(function() {
@@ -253,95 +305,7 @@ describe('config', function() {
         });
 
         describe('parallelLimit', function() {
-            it('should not accept non-numbers', function() {
-                assert.throws(function() {
-                    createConfig({
-                        system: {
-                            parallelLimit: 'so many'
-                        }
-                    });
-                }, GeminiError);
-            });
-
-            it('should not accept negative numbers', function() {
-                assert.throws(function() {
-                    createConfig({
-                        system: {
-                            parallelLimit: -1
-                        }
-                    });
-                }, GeminiError);
-            });
-
-            it('should not accept float numbers', function() {
-                assert.throws(function() {
-                    createConfig({
-                        system: {
-                            parallelLimit: 1.1
-                        }
-                    });
-                }, GeminiError);
-            });
-
-            it('should copy non-negative integer', function() {
-                var config = createConfig({
-                    system: {
-                        parallelLimit: 3
-                    }
-                });
-                assert.equal(config.system.parallelLimit, 3);
-            });
-
-            it('should correctly parse env var', function() {
-                assertParsesEnv({
-                    property: 'system.parallelLimit',
-                    value: '100',
-                    expected: 100
-                });
-            });
-
-            it('should correctly parse cli flag', function() {
-                assertParsesCli({
-                    property: 'system.parallelLimit',
-                    value: '100',
-                    expected: 100
-                });
-            });
-        });
-
-        describe('sessionMode', function() {
-            it('should be "perBrowser" by default', function() {
-                var config = createConfig();
-                assert.equal(config.system.sessionMode, 'perBrowser');
-            });
-
-            it('should accept "perBrowser" value', function() {
-                var config = createConfig({
-                    system: {
-                        sessionMode: 'perBrowser'
-                    }
-                });
-                assert.equal(config.system.sessionMode, 'perBrowser');
-            });
-
-            it('should accept "perSuite" value', function() {
-                var config = createConfig({
-                    system: {
-                        sessionMode: 'perSuite'
-                    }
-                });
-                assert.equal(config.system.sessionMode, 'perSuite');
-            });
-
-            it('should not accept any other value', function() {
-                assert.throws(function() {
-                    createConfig({
-                        system: {
-                            sessionMode: 'other'
-                        }
-                    });
-                }, GeminiError);
-            });
+            testPositiveIntegerOption('system.parallelLimit', {default: Infinity});
         });
 
         describe('referenceImageAbsence', function() {
@@ -580,6 +544,26 @@ describe('config', function() {
             shouldOverrideTopLevelValue('gridUrl', {
                 top: 'http://top.example.com',
                 browser: 'http://browser.example.com'
+            });
+        });
+
+        describe('sessionsPerBrowser', function() {
+            testPositiveIntegerOption('browsers.browser.sessionsPerBrowser', {default: 1});
+
+            shouldBeSettableFromTopLevel('sessionsPerBrowser', 3);
+            shouldOverrideTopLevelValue('sessionsPerBrowser', {
+                top: 2,
+                browser: 100
+            });
+        });
+
+        describe('suitesPerSession', function() {
+            testPositiveIntegerOption('browsers.browser.suitesPerSession', {default: Infinity});
+
+            shouldBeSettableFromTopLevel('suitesPerSession', 3);
+            shouldOverrideTopLevelValue('suitesPerSession', {
+                top: 2,
+                browser: 100
             });
         });
 

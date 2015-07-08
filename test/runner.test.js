@@ -423,24 +423,6 @@ describe('runner', function() {
             });
         });
 
-        it('should execute next suite only after previous has been finished', function() {
-            var nextSuite = createSuite('next', this.root),
-                endSuite = sinon.spy().named('onEndFirstSuite'),
-                beginSuite = sinon.spy().named('onBeginSecondSuite');
-
-            nextSuite.url = '/path2';
-
-            this.runner.on('endSuite', endSuite);
-            this.runner.on('beginSuite', beginSuite);
-
-            return this.runSuites().then(function() {
-                assert.callOrder(
-                    endSuite.withArgs(sinon.match({suiteName: 'suite'})),
-                    beginSuite.withArgs(sinon.match({suiteName: 'next'}))
-                );
-            });
-        });
-
         it('should allow to run a suite without url and states', function() {
             var beginSuite = sinon.spy(),
                 endSuite = sinon.spy();
