@@ -5,7 +5,7 @@ var BrowserConfig = require('../lib/config/browser-config'),
 
 describe('BrowserConfig', function() {
     function createConfig(options) {
-        return new BrowserConfig('id', options);
+        return new BrowserConfig('id', {}, options);
     }
 
     describe('getAbsoluteUrl', function() {
@@ -49,7 +49,7 @@ describe('BrowserConfig', function() {
 
     describe('getScreenshotPath', function() {
         it('should return path to the image', function() {
-            var config = new BrowserConfig('browser', {
+            var config = new BrowserConfig('browser', {}, {
                     screenshotsDir: '/screens'
                 }),
                 suite = createSuite('suite'),

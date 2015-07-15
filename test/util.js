@@ -1,10 +1,15 @@
 'use strict';
-var Browser = require('../lib/browser');
+var Browser = require('../lib/browser'),
+    _ = require('lodash');
 
 function makeBrowser(capabilities, config) {
-    config = config || {};
-    config.id = config.id || 'id';
-    config.desiredCapabilities = capabilities;
+    config = _.merge({}, {
+        id: 'id',
+        desiredCapabilities: capabilities,
+        system: {
+            coverage: {}
+        }
+    }, config);
     return new Browser(config);
 }
 

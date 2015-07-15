@@ -47,15 +47,12 @@ describe('browser', function() {
                 setWindowSize: sinon.stub().returns(q({}))
             };
 
-            this.config = {
-                calibrate: false
-            };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
             this.calibrator = sinon.createStubInstance(Calibrator);
             this.browser = makeBrowser({
                 browserName: 'browser',
                 version: '1.0'
-            }, this.config);
+            }, {calibrate: false});
 
             this.launchBrowser = function() {
                 return this.browser.launch(this.calibrator);
@@ -74,7 +71,7 @@ describe('browser', function() {
 
         it('should set http options for browser instance', function() {
             var _this = this;
-            this.config.httpTimeout = 100;
+            this.browser.config.httpTimeout = 100;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.calledWith(_this.wd.configureHttp, {
                     timeout: 100,
@@ -85,12 +82,8 @@ describe('browser', function() {
 
         it('should calibrate if config.calibrate=true', function() {
             var _this = this;
-            this.config.calibrate = true;
-            this.browser = makeBrowser({
-                browserName: 'browser',
-                version: '1.0'
-            }, this.config);
 
+            this.browser.config.calibrate = true;
             this.calibrator.calibrate.returns(q());
             return this.browser.launch(this.calibrator).then(function() {
                 assert.calledWith(_this.calibrator.calibrate);
@@ -99,7 +92,7 @@ describe('browser', function() {
 
         it('should not call calibrate() when config.calibrate=false', function() {
             var _this = this;
-            this.config.calibrate = false;
+            this.browser.config.calibrate = false;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.notCalled(_this.calibrator.calibrate);
             });
@@ -107,7 +100,7 @@ describe('browser', function() {
 
         describe('with windowSize option', function() {
             beforeEach(function() {
-                this.config.windowSize = {width: 1024, height: 768};
+                this.browser.config.windowSize = {width: 1024, height: 768};
             });
 
             it('should set window size', function() {
@@ -253,13 +246,25 @@ describe('browser', function() {
 
     describe('buildScripts', function() {
         it('should include coverage script when coverage is on', function() {
-            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: true}),
+            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                    system: {
+                        coverage: {
+                            enabled: true
+                        }
+                    }
+                }),
                 scripts = browser.buildScripts();
             return assert.eventually.include(scripts, 'exports.collectCoverage');
         });
 
         it('should not include coverage script when coverage is off', function() {
-            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: false}),
+            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                    system: {
+                        coverage: {
+                            enabled: false
+                        }
+                    }
+                }),
                 scripts = browser.buildScripts();
             return assert.eventually.notInclude(scripts, 'exports.collectCoverage');
         });
