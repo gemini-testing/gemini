@@ -174,10 +174,7 @@ describe('runner', function() {
             return this.runSuites().then(function() {
                 assert.calledWith(spy, {
                     suite: _this.suite,
-                    browserId: 'browser',
-                    suiteName: 'suite',
-                    suitePath: ['suite'],
-                    suiteId: 0
+                    browserId: 'browser'
                 });
             });
         });
@@ -223,11 +220,7 @@ describe('runner', function() {
                 assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
-                    browserId: 'browser',
-                    suiteName: 'suite',
-                    suiteId: 0,
-                    stateName: 'state',
-                    suitePath: ['suite']
+                    browserId: 'browser'
                 });
             });
         });
@@ -260,11 +253,7 @@ describe('runner', function() {
                 assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
-                    browserId: 'browser',
-                    suiteName: 'suite',
-                    suiteId: 0,
-                    stateName: 'state',
-                    suitePath: ['suite']
+                    browserId: 'browser'
                 });
             });
         });
@@ -319,11 +308,7 @@ describe('runner', function() {
                 assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
-                    browserId: 'browser',
-                    suiteName: 'suite',
-                    suiteId: 0,
-                    stateName: 'state',
-                    suitePath: ['suite']
+                    browserId: 'browser'
                 });
             });
         });
@@ -342,10 +327,9 @@ describe('runner', function() {
         });
 
         it('should execute next state only after previous has been finished', function() {
-            addState(this.suite, 'state1');
-            addState(this.suite, 'state2');
-
-            var endState = this.sinon.spy().named('end state 1'),
+            var state1 = addState(this.suite, 'state1'),
+                state2 = addState(this.suite, 'state2'),
+                endState = this.sinon.spy().named('end state 1'),
                 beginState = this.sinon.spy().named('begin state 2');
 
             this.runner.on('endState', endState);
@@ -353,8 +337,8 @@ describe('runner', function() {
 
             return this.runSuites().then(function() {
                 assert.callOrder(
-                    endState.withArgs(sinon.match({stateName: 'state1'})),
-                    endState.withArgs(sinon.match({stateName: 'state2'}))
+                    endState.withArgs(sinon.match({state: state1})),
+                    endState.withArgs(sinon.match({state: state2}))
                 );
             });
         });
@@ -376,15 +360,13 @@ describe('runner', function() {
         });
 
         it('should extend state errors with metadata', function(done) {
-            addState(this.suite, 'state', function() {
-                throw new StateError('error');
-            });
+            var state = addState(this.suite, 'state', function() {
+                    throw new StateError('error');
+                }),
+                _this = this;
             this.runner.on('error', function(e) {
-                assert.equal(e.suiteId, 0);
-                assert.equal(e.suiteName, 'suite');
-                assert.equal(e.stateName, 'state');
-                assert.equal(e.browserId, 'browser');
-                assert.deepEqual(e.suitePath, ['suite']);
+                assert.equal(e.state, state);
+                assert.equal(e.suite, _this.suite);
                 done();
             });
             this.runSuites().done(null, done);
@@ -397,10 +379,7 @@ describe('runner', function() {
             return this.runSuites().then(function() {
                 assert.calledWith(spy, {
                     suite: _this.suite,
-                    browserId: 'browser',
-                    suiteName: 'suite',
-                    suitePath: ['suite'],
-                    suiteId: 0
+                    browserId: 'browser'
                 });
             });
         });
@@ -415,26 +394,22 @@ describe('runner', function() {
             return this.runSuites().then(function() {
                 assert.deepEqual(spy.thirdCall.args, [{
                     suite: child,
-                    browserId: 'browser',
-                    suiteName: 'child',
-                    suitePath: ['suite', 'child'],
-                    suiteId: 1
+                    browserId: 'browser'
                 }]);
             });
         });
 
         it('should allow to run a suite without url and states', function() {
             var beginSuite = sinon.spy(),
-                endSuite = sinon.spy();
-
-            createSuite('suite', this.root);
+                endSuite = sinon.spy(),
+                suite = createSuite('suite', this.root);
 
             this.runner.on('beginSuite', beginSuite);
             this.runner.on('endSuite', endSuite);
 
             return this.runSuites().then(function() {
-                assert.calledWith(beginSuite, sinon.match({suiteName: 'suite'}));
-                assert.calledWith(endSuite, sinon.match({suiteName: 'suite'}));
+                assert.calledWith(beginSuite, sinon.match({suite: suite}));
+                assert.calledWith(endSuite, sinon.match({suite: suite}));
             });
         });
 
