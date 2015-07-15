@@ -23,7 +23,7 @@
     "install": "^0.1.8",
     "js-yaml": "^3.2.5",
     "lodash": "^3.6.0",
-    "looks-same": "^1.1.1",
+    "looks-same": "^2.0.0",
     "minimatch": "^2.0.1",
     "png-img": "~1.1.0",
     "polyfill-service": "~1.4.0",
@@ -37,6 +37,11 @@
     "uglifyify": "^3.0.1",
     "wd": "^0.3.4"
   },
+  "bundleDependencies": [
+    "gemini-configparser",
+    "looks-same",
+    "gemini-coverage"
+  ],
   "devDependencies": {
     "chai": "^2.2.0",
     "chai-as-promised": "^4.3.0",
