@@ -1,6 +1,7 @@
 'use strict';
 var sinon = require('sinon'),
     assert = require('chai').assert,
+    _ = require('lodash'),
     q = require('q'),
     find = require('../lib/find-func').find,
 
@@ -62,46 +63,51 @@ describe('capture session', function() {
     });
 
     describe('capture', function() {
-        function setupImageLessThenBody(ctx) {
-            return setupImage(ctx, 100, 90);
-        }
-
-        function setupImageGreaterThenBody(ctx) {
-            return setupImage(ctx, 100, 150);
-        }
-
-        function setupImage(ctx, width, height) {
-            ctx.browser.prepareScreenshot.returns(q({
-                documentHeight: 100,
-                documentWidth: 100,
-                captureArea: {
-                    top: 80,
-                    left: 30,
-                    width: 20,
-                    height: 30
-                },
-                viewportOffset: {
-                    top: 70,
-                    left: 10
-                },
-                ignoreAreas: [
-                    {top: 90, left: 40, width: 5, height: 8}
-                ]
-            }));
-
-            var image = {
-                getSize: sinon.stub().returns({
-                    width: width,
-                    height: height
-                }),
-
-                crop: sinon.stub().returns(q()),
-                clear: sinon.stub().returns(q())
-            };
-            ctx.browser.captureFullscreenImage.returns(q(image));
-            return image;
-        }
         beforeEach(function() {
+            this.setCaptureData = function(opts) {
+                _.defaultsDeep(opts, {
+                    documentSize: {
+                        width: 1920,
+                        height: 1080
+                    },
+                    imageSize: {
+                        width: 1920,
+                        height: 1080
+                    },
+                    viewportOffset: {
+                        top: 0,
+                        left: 0
+                    },
+                    captureArea: {
+                        top: 500,
+                        left: 500,
+                        width: 1,
+                        height: 1
+                    },
+                    ignoreAreas: []
+                });
+
+                this.browser.prepareScreenshot.returns(q({
+                    documentWidth: opts.documentSize.width,
+                    documentHeight: opts.documentSize.height,
+                    captureArea: opts.captureArea,
+                    viewportOffset: opts.viewportOffset,
+                    ignoreAreas: opts.ignoreAreas
+                }));
+
+                var image = {
+                    getSize: sinon.stub().returns({
+                        width: opts.imageSize.width,
+                        height: opts.imageSize.height
+                    }),
+
+                    crop: sinon.stub().returns(q()),
+                    clear: sinon.stub().returns(q())
+                };
+                this.browser.captureFullscreenImage.returns(q(image));
+                this.image = image;
+            };
+
             this.seq = sinon.createStubInstance(Actions);
             this.seq.perform.returns(q());
 
@@ -122,6 +128,10 @@ describe('capture session', function() {
                 }))
             };
             this.session = new CaptureSession(this.browser);
+
+            this.performCapture = function() {
+                return this.session.capture(this.state);
+            };
         });
 
         it('should call state callback', function() {
@@ -150,64 +160,221 @@ describe('capture session', function() {
             });
         });
 
-        it('should crop screenshoot basing on viewport if image is less then document', function() {
-            var image = setupImageLessThenBody(this);
-            return this.session.capture(this.state).then(function() {
-                assert.calledWith(image.crop, {
-                    top: 10,
-                    left: 20,
-                    width: 20,
-                    height: 30
+        describe('if image size is equal to the document', function() {
+            beforeEach(function() {
+                this.setupImageEqualToDocument = function(opts) {
+                    this.setCaptureData({
+                        documentSize: {width: 1000, height: 1000},
+                        imageSize: {width: 1000, height: 1000},
+                        captureArea: opts.captureArea,
+                        ignoreAreas: opts.ignoreAreas,
+                        viewportOffset: opts.viewportOffset
+                    });
+                };
+            });
+
+            it('should ignore viewport offset when cropping the image', function() {
+                var _this = this,
+                    captureArea = {top: 10, left: 10, width: 100, height: 100};
+                this.setupImageEqualToDocument({
+                    captureArea: captureArea,
+                    viewportOffset: {top: 10, left: 10}
                 });
+
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWith(_this.image.crop, captureArea);
+                    });
+            });
+
+            it('should ignore viewport offset when clearing ignored areas', function() {
+                var _this = this,
+                    ignoreFirst = {top: 50, left: 50, width: 10, height: 10},
+                    ignoreSecond = {top: 20, left: 0, width: 50, height: 30};
+
+                this.setupImageEqualToDocument({
+                    ignoreAreas: [ignoreFirst, ignoreSecond],
+                    viewportOffset: {top: 10, left: 10}
+                });
+
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWith(_this.image.clear, ignoreFirst);
+                        assert.calledWith(_this.image.clear, ignoreSecond);
+                    });
+            });
+
+            it('should fail if left boundary is outside of image', function() {
+                this.setupImageEqualToDocument({
+                    captureArea: {left: 1001}
+                });
+
+                return assert.isRejected(this.performCapture(), StateError);
+            });
+
+            it('should fail if right boundary is outside of image', function() {
+                this.setupImageEqualToDocument({
+                    captureArea: {left: 900, width: 101}
+                });
+
+                return assert.isRejected(this.performCapture(), StateError);
+            });
+
+            it('should fail if top boundary is outside of image', function() {
+                this.setupImageEqualToDocument({
+                    captureArea: {top: 1001}
+                });
+
+                return assert.isRejected(this.performCapture(), StateError);
+            });
+
+            it('should fail if bottom boundary is outside of image', function() {
+                this.setupImageEqualToDocument({
+                    captureArea: {top: 900, height: 101}
+                });
+
+                return assert.isRejected(this.performCapture(), StateError);
             });
         });
 
-        it('should clear ignored areas basing on viewport if image is less then document', function() {
-            var image = setupImageLessThenBody(this);
-            return this.session.capture(this.state).then(function() {
-                assert.calledWith(image.clear, {
-                    top: 20,
-                    left: 30,
-                    width: 5,
-                    height: 8
+        describe('if document is higher then image', function() {
+            beforeEach(function() {
+                this.setupDocumentHigherThenImage = function(opts) {
+                    this.setCaptureData({
+                        documentSize: {width: 1000, height: 2000},
+                        imageSize: {width: 1000, height: 1000},
+                        captureArea: opts.captureArea,
+                        ignoreAreas: opts.ignoreAreas,
+                        viewportOffset: opts.viewportOffset
+                    });
+                };
+            });
+
+            it('should subtract top offset when cropping the image', function() {
+                var _this = this;
+                this.setupDocumentHigherThenImage({
+                    captureArea: {top: 10, left: 10, width: 100, height: 100},
+                    viewportOffset: {top: 10}
                 });
+
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWith(_this.image.crop, {
+                            top: 0,
+                            left: 10,
+                            width: 100,
+                            height: 100
+                        });
+                    });
+            });
+
+            it('should subtract top offset when clearing ignored areas', function() {
+                var _this = this,
+                    ignore = {top: 20, left: 0, width: 50, height: 30};
+
+                this.setupDocumentHigherThenImage({
+                    ignoreAreas: [ignore],
+                    viewportOffset: {top: 15}
+                });
+
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWith(_this.image.clear, {
+                            top: 20 - 15,
+                            left: 0,
+                            width: 50,
+                            height: 30
+                        });
+                    });
+            });
+
+            it('should not fail if bottom border - offset is inside image', function() {
+                this.setupDocumentHigherThenImage({
+                    captureArea: {top: 900, height: 101},
+                    viewportOffset: {top: 1}
+                });
+
+                return assert.isFulfilled(this.performCapture());
+            });
+
+            it('should fail if bottom border - offset is outside of image', function() {
+                this.setupDocumentHigherThenImage({
+                    captureArea: {top: 900, height: 101 + 1},
+                    viewportOffset: {top: 1}
+                });
+
+                return assert.isRejected(this.performCapture(), StateError);
             });
         });
 
-        it('should crop screenshoot basing on document if image is greater then document', function() {
-            var image = setupImageGreaterThenBody(this);
-
-            return this.session.capture(this.state).then(function() {
-                assert.calledWith(image.crop, {
-                    top: 80,
-                    left: 30,
-                    width: 20,
-                    height: 30
-                });
+        describe('if document is wider then image', function() {
+            beforeEach(function() {
+                this.setupDocumentWiderThenImage = function(opts) {
+                    this.setCaptureData({
+                        documentSize: {width: 2000, height: 1000},
+                        imageSize: {width: 1000, height: 1000},
+                        captureArea: opts.captureArea,
+                        ignoreAreas: opts.ignoreAreas,
+                        viewportOffset: opts.viewportOffset
+                    });
+                };
             });
-        });
 
-        it('should clear ignored areas basing on document if image is greater then document', function() {
-            var image = setupImageGreaterThenBody(this);
-
-            return this.session.capture(this.state).then(function() {
-                assert.calledWith(image.clear, {
-                    top: 90,
-                    left: 40,
-                    width: 5,
-                    height: 8
+            it('should subtract left offset when cropping the image', function() {
+                var _this = this;
+                this.setupDocumentWiderThenImage({
+                    captureArea: {top: 10, left: 10, width: 100, height: 100},
+                    viewportOffset: {left: 10}
                 });
+
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWith(_this.image.crop, {
+                            top: 10,
+                            left: 0,
+                            width: 100,
+                            height: 100
+                        });
+                    });
             });
-        });
 
-        it('should fail when crop area is located outside of the document area by Y axis', function() {
-            setupImage(this, 39, 40);
-            return assert.isRejected(this.session.capture(this.state), StateError);
-        });
+            it('should subtract left offset when clearing ignored areas', function() {
+                var _this = this,
+                    ignore = {top: 20, left: 10, width: 50, height: 30};
 
-        it('should fail when crop area is located outside of the document area by X axis', function() {
-            setupImage(this, 40, 39);
-            return assert.isRejected(this.session.capture(this.state), StateError);
+                this.setupDocumentWiderThenImage({
+                    ignoreAreas: [ignore],
+                    viewportOffset: {left: 5}
+                });
+
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWith(_this.image.clear, {
+                            top: 20,
+                            left: 5,
+                            width: 50,
+                            height: 30
+                        });
+                    });
+            });
+
+            it('should not fail if right border - offset is inside image', function() {
+                this.setupDocumentWiderThenImage({
+                    captureArea: {left: 900, width: 101},
+                    viewportOffset: {left: 1}
+                });
+
+                return assert.isFulfilled(this.performCapture());
+            });
+
+            it('should fail if right border - offset is outside of image', function() {
+                this.setupDocumentWiderThenImage({
+                    captureArea: {left: 900, width: 102},
+                    viewportOffset: {left: 1}
+                });
+
+                return assert.isRejected(this.performCapture(), StateError);
+            });
         });
     });
 });
