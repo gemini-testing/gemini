@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.7 - 2015-07-20
+
+* Correctly calculate element position if WebDriver returns screenshot
+  thinner then document (@SevInf).
+
 ## 0.12.6 - 2015-06-16
 
 * More clear error when capture are is hidden (@hatroman).
