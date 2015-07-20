@@ -138,6 +138,8 @@ browsers:
       browserName: firefox
       version: "39.0"
 
+windowSize: 1600x1200
+
 ```
 
 ### Другие настройки
