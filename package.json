@@ -15,6 +15,7 @@
     "chalk": "^0.5.1",
     "coa": "~0.4.0",
     "css": "^2.1.0",
+    "debug": "^2.2.0",
     "es6-weak-map": "^1.0.2",
     "gemini-configparser": "^0.1.0",
     "gemini-coverage": "~0.3.0",

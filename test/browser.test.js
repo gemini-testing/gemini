@@ -44,7 +44,8 @@ describe('browser', function() {
                 init: sinon.stub().returns(q({})),
                 get: sinon.stub().returns(q({})),
                 eval: sinon.stub().returns(q('')),
-                setWindowSize: sinon.stub().returns(q({}))
+                setWindowSize: sinon.stub().returns(q({})),
+                on: sinon.stub()
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
@@ -131,7 +132,8 @@ describe('browser', function() {
     describe('open', function() {
         beforeEach(function() {
             this.wd = {
-                get: sinon.stub().returns(q({}))
+                get: sinon.stub().returns(q({})),
+                on: sinon.stub()
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
@@ -151,7 +153,8 @@ describe('browser', function() {
     describe('openRelative', function() {
         it('should open relative URL using config', function() {
             this.wd = {
-                get: sinon.stub().returns(q({}))
+                get: sinon.stub().returns(q({})),
+                on: sinon.stub()
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
@@ -172,7 +175,8 @@ describe('browser', function() {
         beforeEach(function() {
             this.wd = {
                 eval: sinon.stub().returns(q()),
-                moveTo: sinon.stub().returns(q())
+                moveTo: sinon.stub().returns(q()),
+                on: sinon.stub()
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
@@ -197,7 +201,8 @@ describe('browser', function() {
             var img = path.join(__dirname, 'functional', 'data', 'image', 'image1.png'),
                 imgData = fs.readFileSync(img),
                 stubWd = {
-                    takeScreenshot: sinon.stub().returns(q(imgData))
+                    takeScreenshot: sinon.stub().returns(q(imgData)),
+                    on: sinon.stub()
                 };
 
             this.sinon.stub(wd, 'promiseRemote').returns(stubWd);
@@ -216,7 +221,8 @@ describe('browser', function() {
                 init: sinon.stub().returns(q(imgData)),
                 configureHttp: sinon.stub().returns(q()),
                 eval: sinon.stub().returns(q('')),
-                takeScreenshot: sinon.stub().returns(q(imgData))
+                takeScreenshot: sinon.stub().returns(q(imgData)),
+                on: sinon.stub()
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
@@ -277,7 +283,8 @@ describe('browser', function() {
                 init: sinon.stub().returns(q({})),
                 get: sinon.stub().returns(q({})),
                 eval: sinon.stub().returns(q('')),
-                elementByCssSelector: sinon.stub().returns(q())
+                elementByCssSelector: sinon.stub().returns(q()),
+                on: sinon.stub()
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
             this.browser = makeBrowser({browserName: 'bro'}, {
