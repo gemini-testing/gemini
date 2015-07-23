@@ -20,13 +20,17 @@ describe('capture session', function() {
                 createActionSequence: sinon.stub().returns(this.seq)
             };
             this.session = new CaptureSession(this.browser);
+            this.suite = createSuite('');
+            this.runWithCallback = function(cb) {
+                return this.session.runHook(cb, this.suite);
+            };
         });
 
         it('should call a callback with actions and find', function() {
             var cb = sinon.stub(),
                 _this = this;
 
-            return this.session.runHook(cb).then(function() {
+            return this.runWithCallback(cb).then(function() {
                 assert.calledWith(cb, _this.seq, find);
             });
         });
@@ -34,19 +38,18 @@ describe('capture session', function() {
         it('should perform sequence', function() {
             var cb = sinon.stub(),
                 _this = this;
-            return this.session.runHook(cb).then(function() {
+            return this.runWithCallback(cb).then(function() {
                 assert.called(_this.seq.perform);
             });
         });
 
         it('should share same context between calls', function() {
             var _this = this;
-            return this.session
-                .runHook(function() {
+            return this.runWithCallback(function() {
                     this.x = 'something';
                 })
                 .then(function() {
-                    return _this.session.runHook(function() {
+                    return _this.runWithCallback(function() {
                         assert.equal(this.x, 'something');
                     });
                 });
@@ -55,10 +58,22 @@ describe('capture session', function() {
         it('should throw StateError if callback throws', function() {
             var error = new Error('example'),
                 cb = sinon.stub().throws(error);
-            return assert.isRejected(this.session.runHook(cb)).then(function(e) {
+            return assert.isRejected(this.runWithCallback(cb)).then(function(e) {
                 assert.instanceOf(e, StateError);
                 assert.equal(e.originalError, error);
             });
+        });
+
+        it('should add post actions to the suite after hook finished', function() {
+            var _this = this,
+                cb = sinon.stub().named('hook'),
+                postActions = sinon.createStubInstance(Actions);
+            this.seq.getPostActions.returns(postActions);
+            sinon.spy(this.suite, 'addPostActions');
+            return this.session.runHook(cb, this.suite)
+                .then(function() {
+                    assert.calledWith(_this.suite.addPostActions, postActions);
+                });
         });
     });
 
