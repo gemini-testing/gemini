@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.8 - 2015-07-23
+
+* Correctly restore window size when `setWindowSize` is called in `before`
+  callback (@SevInf).
+
 ## 0.12.7 - 2015-07-20
 
 * Correctly calculate element position if WebDriver returns screenshot
