@@ -13,7 +13,7 @@
     "aliasify": "^1.7.2",
     "browserify": "^9.0.4",
     "chalk": "^0.5.1",
-    "coa": "~0.4.0",
+    "commander": "^2.8.1",
     "css": "^2.1.0",
     "debug": "^2.2.0",
     "es6-weak-map": "^1.0.2",
