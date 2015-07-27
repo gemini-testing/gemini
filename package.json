@@ -17,7 +17,7 @@
     "css": "^2.1.0",
     "debug": "^2.2.0",
     "es6-weak-map": "^1.0.2",
-    "gemini-configparser": "^0.1.0",
+    "gemini-configparser": "^0.1.1",
     "gemini-coverage": "~0.3.0",
     "handlebars": "^2.0.0",
     "inherit": "~2.2.1",
