@@ -18,9 +18,10 @@ For example:
 
 .gemini.yml:
 ```yaml
-plugins:
-  greeter:
-    name: Mr. Incredible 
+system:
+  plugins:
+    greeter:
+      name: Mr. Incredible
 ```
 
 Plugin:

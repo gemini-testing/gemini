@@ -18,9 +18,10 @@ module.exports = function(gemini, options) {
 
 .gemini.yml:
 ```yaml
-plugins:
-  greeter:
-    name: Mr. Incredible 
+system:
+  plugins:
+    greeter:
+      name: Mr. Incredible
 ```
 
 Плагин:
