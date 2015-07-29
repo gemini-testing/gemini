@@ -15,8 +15,6 @@ var gemini = new Gemini({
 ```
 
 * `new Gemini(filePath)` will load config from YAML file at given paths;
-* `new Gemini(filePath, overrides)` will load config from YAML file and override its
-properties with values, specified in `overrides`;
 * `new Gemini(options)` will create config from specified options (see config file reference).
 Options **must** have `projectRoot` setting specified.
 

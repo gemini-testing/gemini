@@ -64,14 +64,16 @@ one test completely (green color in report), partially (yellow) or was not captu
 ## Common CLI options
 
 * `--config`, `-c` – specify config file to use.
-* `--root-url`, `-r` – use specified URL instead of `rootUrl` setting from config file.
-* `--grid-url`, `-g` – use specified URL instead of `gridUrl` setting from config file.
 * `--grep PATTERN` – execute only suites with names that match the regular expression pattern.
 * `--browser ID` — execute suite only for specified browser id. Can be used multiple times.
   Can be also specified with `GEMINI_BROWSERS` environment variable. If both CLI option
   and env variable are set, CLI has precedence.
 * `--help` – display help message.
 * `--version` – display version.
+
+## Overriding config options
+
+See [config docs](doc/config.md);
 
 ## Shell completion
 
