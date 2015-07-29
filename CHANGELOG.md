@@ -1,5 +1,116 @@
 # Changelog
 
+## 0.13.0 
+
+* BREAKING CHANGE: new config format. See [docs](doc/config.md).
+
+  New config allows to set many previously global options on per-browser
+  basis. The following things have changed in this config:
+
+  - `rootUrl`, `gridUrl`, `tolerance`, `strictComparison`, `screenshotsDir`,
+    `windowSize` options can now be set separately for each browser:
+
+    ```yaml
+    gridUrl: http://grid.example.com 
+    browsers:
+      firefox:
+        # Uses gridUrl from top level
+        desiredCapabilities:
+          ...
+      chrome:
+        # Overrides top-level value
+        gridUrl: http://chrome.example.com 
+        desiredCapabilities:
+          ...
+    ```
+
+  - `projectRoot`, `sourceRoot`, `plugins`, `debug`, `parallelLimit`,
+    `diffColor`, `referenceImageAbsence` are moved into `system` section and
+    can not be set per-browser. 
+
+    ```yaml
+    system:
+      debug: true
+      diffColor: #ff0000
+      plugins:
+        teamcity: true
+      ...
+    ```
+
+  - `browsers` are no longer default to `phantomjs`. If you've used this
+    default, set up the browser explicitly:
+
+    ```yaml
+    browsers:
+      phantomjs:
+        desiredCapabilities:
+          browserName: phantomjs
+    ```
+
+  - coverage settings are now grouped under `system.coverage` section:
+    - to enable coverage, set `system.coverage.enabled` to true.
+    - `coverageExclude` is moved to `system.coverage.exclude`.
+    - `coverageNoHtml` is replaced by `system.coverage.html`. Set it to false
+      to disable html report generaion.
+
+  - `--noCalibrate` custom capability is replaced by `calibrate` option which
+    can be set for every or any particular browser.
+
+  - browser capabilites are set in `desiredCapabilites` option. 
+
+    ```yaml
+    browsers:
+      chrome:
+        desiredCapabilities:
+          browserName: 'chrome',
+          version: '45'
+    ```
+
+  - top-level `capabilities` option is replaced by `desiredCapabilites`
+    option.
+
+  - `http` settings are removed. Use new option `httpTimeout` to set timeout.
+    Setting retires is no longer possible.
+  - `sessionMode` is replaced by more flexible `suitesPerSession` setting (see
+    below).
+
+* The way config options are overriden by CLI flags and environment variables
+  are now unified (option path is converted to `--option-path` for cli and
+  `gemini_option_path` for environment variables). Due to this change, some
+  old flags and environment variables won't work:
+
+  - `--sorce-root` and `GEMINI_SOURCE_ROOT` becomes `--system-source-root` and
+    `gemini_system_source_root` respectively.
+
+  - `--debug` and `GEMINI_DEBUG` becomes `--system-debug=true` and
+    `gemini_system_debug` respectively.
+
+  - `--coverage` and `GEMINI_COVERAGE` becomes
+    `--system-coverage-enabled=true` and `gemini_system_coverage_enabled`
+    respecitvely.
+
+  - `--coverage-no-html` and `GEMINI_COVERAGE_NO_HTML` becomes
+    `--system-coverage-html=false` and `gemini_system_coverage_html`
+    respectively.
+
+  - `GEMINI_ROOT_URL` becomes `gemini_root_url`.
+
+  - `GEMINI_GRID_URL` becomes `gemini_grid_url`.
+
+  - `GEMINI_SCREENSHOTS_DIR` becomes `gemini_screenshots_dir`.
+
+  - `GEMINI_WINDOW_SIZE` becomes `gemini_window_size`.
+
+* API: `Gemini` constuctor does not accepts overrides object anymore.
+
+* `sessionMode` is replaced by `suitesPerSession` option which specifies
+  number of test suites to run in a single WebDriver session. Value of `.inf`
+  is equivalent to `perBrowser` session mode and value of `1` is equivalent to
+  `perSuite`. This option can be set globally or separately for each browser.
+
+* New option `sessionsPerBrowser` allows to launch multiple session for each
+  browser and run tests in parallel.
+
 ## 0.12.8 - 2015-07-23
 
 * Correctly restore window size when `setWindowSize` is called in `before`
