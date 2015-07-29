@@ -1,6 +1,6 @@
 {
   "name": "gemini",
-  "version": "0.13.0-alpha.6",
+  "version": "0.13.0-beta",
   "publishConfig": {
     "tag": "prerelease"
   },

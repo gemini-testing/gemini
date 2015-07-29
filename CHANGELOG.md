@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.13.0 
+## 0.13.0-beta — 2015-07-29
 
 * BREAKING CHANGE: new config format. See [docs](doc/config.md).
 
