@@ -4,6 +4,8 @@ node_js:
 - '0.10'
 - iojs
 sudo: false
+before_install:
+  - npm install -g npm
 script:
 - npm run lint
 - npm test --coverage
