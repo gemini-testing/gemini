@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.0-beta.1 — 2015-07-31
+
+Previous version was published without a tarball once again. Republishing.
+
 ## 0.13.0-beta — 2015-07-29
 
 * BREAKING CHANGE: new config format. See [docs](doc/config.md).
