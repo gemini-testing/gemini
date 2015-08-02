@@ -248,7 +248,7 @@ call:
   If it is the last action in sequence, delay the screenshot for this amount
   of time.
 
-* `waitForElementToShow(selector, [timeout])` - waits unitl element, matched
+* `waitForElementToShow(selector, [timeout])` - waits until element, matched
   by `selector` will become visible. Fails if element does not appear after
   `timeout` milliseconds (1000 by default).
 
