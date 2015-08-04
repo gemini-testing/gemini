@@ -48,6 +48,15 @@
     vertical-align: top;
 }
 
+.image-box_warning.image-box {
+    background-color: #ffe0b2;
+}
+
+.image-box_warning .reason {
+    background: none;
+    border: none;
+}
+
 .section__title {
     font-weight: bold;
     cursor: pointer;
