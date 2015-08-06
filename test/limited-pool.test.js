@@ -113,5 +113,18 @@ describe('LimitedPool', function() {
                 });
             return assert.eventually.equal(result, expectedBrowser);
         });
+
+        it('should cancel queued browsers when finalize is called', function() {
+            var pool = this.makePool(1);
+            this.underlyingPool.getBrowser.returns(q(this.makeBrowser()));
+            return pool.getBrowser('id')
+                .then(function() {
+                    var secondRequest = pool.getBrowser('id');
+                    return pool.finalizeBrowsers('id')
+                        .then(function() {
+                            assert.isRejected(secondRequest, LimitedPool.CancelledError);
+                        });
+                });
+        });
     });
 });
