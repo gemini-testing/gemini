@@ -8,15 +8,6 @@ script:
 - npm run lint
 - npm test --coverage
 after_success: cat ${TRAVIS_BUILD_DIR}/coverage/lcov.info | coveralls
-deploy:
-  provider: npm
-  email: sevinf@yandex-team.ru
-  api_key:
-    secure: POlUlNnzMO4IBgUIu6z71QH+eT0Ju3SEZoLGTXTY5APcHaJ6lHPktIJIE3ItJyrrFMSn2BUC0y67d4h6ztxT8Mbg0sSITrQrjeQ3giSLQ4zhXDLvR8u0pM7SViRmQj4bMuaQwtBUOqBWB8AOhTCBwXHlWB5NQ1oA0VVf02+03cs=
-  on:
-    tags: true
-    all_branches: true
-    repo: gemini-testing/gemini
 env:
   global:
   # SAUCE_USERNAME
