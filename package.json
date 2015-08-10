@@ -1,9 +1,6 @@
 {
   "name": "gemini",
-  "version": "0.13.0-beta.1",
-  "publishConfig": {
-    "tag": "prerelease"
-  },
+  "version": "0.13.0",
   "description": "UI Screenshot testing utility",
   "bin": {
     "gemini": "./bin/gemini"

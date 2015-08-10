@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.13.0 - 2015-08-10
+
+* Fail when removed option is detected and warn if removed env var is detected
+  (@SevInf).
+
+* Reports now always will be generated, even when there is a critical error
+  (@zumra6a).
+
+* Correctly cancel queued tests after critical error (@SevInf).
+
+* Produce more debug information in various modules (@SevInf).
+
+* In case of a critical error, try to print what test was executed when it
+  happened (@SevInf).
+
+* Corrected updates (@maximerassi).
+
 ## 0.13.0-beta.1 — 2015-07-31
 
 Previous version was published without a tarball once again. Republishing.
