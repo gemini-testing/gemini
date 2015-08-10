@@ -16,7 +16,8 @@ describe('CachingPool', function() {
     beforeEach(function() {
         this.underlyingPool = {
             getBrowser: sinon.stub(),
-            freeBrowser: sinon.stub().returns(q())
+            freeBrowser: sinon.stub().returns(q()),
+            finalizeBrowsers: sinon.stub().returns(q())
         };
 
         this.poolWithReuseLimits = function(limits) {
@@ -133,6 +134,14 @@ describe('CachingPool', function() {
             return this.pool.finalizeBrowsers('id')
                 .then(function() {
                     assert.calledWith(_this.underlyingPool.freeBrowser);
+                });
+        });
+
+        it('should call finalize on underlying pool when browser finished', function() {
+            var _this = this;
+            return this.pool.finalizeBrowsers('id')
+                .then(function() {
+                    assert.calledWith(_this.underlyingPool.finalizeBrowsers);
                 });
         });
     });
