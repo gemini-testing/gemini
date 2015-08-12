@@ -22,21 +22,21 @@ describe('plugins', function() {
 
     describe('load', function() {
         it('should load plugin without prefix', function() {
-            var options = {plugins: {foobar: true}};
+            var options = {system: {plugins: {foobar: true}}};
             plugins.load(this.gemini, options);
 
             assert.calledWith(this.foobarPlugin, this.gemini, {});
         });
 
         it('should load plugin with prefix', function() {
-            var options = {plugins: {'gemini-foobar': true}};
+            var options = {system: {plugins: {'gemini-foobar': true}}};
             plugins.load(this.gemini, options);
 
             assert.calledWith(this.foobarPlugin, this.gemini, {});
         });
 
         it('should throw error if plugin not found', function() {
-            var options = {plugins: {'gemini-foo': true}};
+            var options = {system: {plugins: {'gemini-foo': true}}};
 
             assert.throws(function() {
                 plugins.load(this.gemini, options);
@@ -44,14 +44,14 @@ describe('plugins', function() {
         });
 
         it('should not load disabled plugins', function() {
-            var options = {plugins: {foobar: false}};
+            var options = {system: {plugins: {foobar: false}}};
             plugins.load(this.gemini, options);
 
             assert.notCalled(this.foobarPlugin);
         });
 
         it('should load plugin with empty configuration', function() {
-            var options = {plugins: {foobar: {}}};
+            var options = {system: {plugins: {foobar: {}}}};
             plugins.load(this.gemini, options);
 
             assert.calledWith(this.foobarPlugin, this.gemini, {});
@@ -59,7 +59,7 @@ describe('plugins', function() {
 
         it('should handle empty plugins', function() {
             var _this = this.gemini,
-                options = {plugins: {}};
+                options = {system: {plugins: {}}};
 
             assert.doesNotThrow(function() {
                 plugins.load(_this.gemini, options);
@@ -67,7 +67,7 @@ describe('plugins', function() {
         });
 
         it('should pass plugin its configuration', function() {
-            var options = {plugins: {foobar: {foo: 'bar'}}};
+            var options = {system: {plugins: {foobar: {foo: 'bar'}}}};
             plugins.load(this.gemini, options);
 
             assert.calledWith(this.foobarPlugin, this.gemini, {foo: 'bar'});
