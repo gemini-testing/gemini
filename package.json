@@ -33,7 +33,8 @@
     "source-map": "^0.2.0",
     "temp": "~0.8.0",
     "uglifyify": "^3.0.1",
-    "wd": "^0.3.4"
+    "wd": "^0.3.4",
+    "atob": "^1.1.2"
   },
   "bundleDependencies": [
     "gemini-configparser",
