@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.1 - 2015-08-15
+
+* Inline sourcemaps support in coverage calculation (@j0tunn).
+
+* Create HTML report dir before copying files (@SevInf).
+
+* API: do not override options with CLI flags and env vars by default (@SevInf).
+
 ## 0.13.0 - 2015-08-10
 
 * Fail when removed option is detected and warn if removed env var is detected
@@ -32,7 +40,7 @@ Previous version was published without a tarball once again. Republishing.
     `windowSize` options can now be set separately for each browser:
 
     ```yaml
-    gridUrl: http://grid.example.com 
+    gridUrl: http://grid.example.com
     browsers:
       firefox:
         # Uses gridUrl from top level
@@ -40,14 +48,14 @@ Previous version was published without a tarball once again. Republishing.
           ...
       chrome:
         # Overrides top-level value
-        gridUrl: http://chrome.example.com 
+        gridUrl: http://chrome.example.com
         desiredCapabilities:
           ...
     ```
 
   - `projectRoot`, `sourceRoot`, `plugins`, `debug`, `parallelLimit`,
     `diffColor`, `referenceImageAbsence` are moved into `system` section and
-    can not be set per-browser. 
+    can not be set per-browser.
 
     ```yaml
     system:
@@ -77,7 +85,7 @@ Previous version was published without a tarball once again. Republishing.
   - `--noCalibrate` custom capability is replaced by `calibrate` option which
     can be set for every or any particular browser.
 
-  - browser capabilites are set in `desiredCapabilites` option. 
+  - browser capabilites are set in `desiredCapabilites` option.
 
     ```yaml
     browsers:
@@ -215,13 +223,13 @@ Version was deleted from npm, use 0.12.2 instead.
 
 ## 0.11.0 - 2015-04-18
 
-* Plugins support (@Saulis). 
+* Plugins support (@Saulis).
 
   Check out [documentation](doc/plugins.md) and some plugin examples:
-  
-  - [gemini-sauce](https://www.npmjs.com/package/gemini-sauce) 
 
-  - [gemini-express](https://www.npmjs.com/package/gemini-express) 
+  - [gemini-sauce](https://www.npmjs.com/package/gemini-sauce)
+
+  - [gemini-express](https://www.npmjs.com/package/gemini-express)
 
 * Add `flick` action for touch devices (@scf2k).
 
@@ -272,10 +280,10 @@ Version was deleted from npm, use 0.12.2 instead.
   cause some breaking changes. For example, bounds of a capture region are
   calculated more precisely now. You'll probably need to re-gather your
   screenshots.
-  
+
 * Calibration now correctly works in IE9 (@SevInf).
 
-* Added an option `referenceImageAbsence` (@hatroman). 
+* Added an option `referenceImageAbsence` (@hatroman).
 
   This option allows to change default behaviour of the tests to produce the
   warning if there is no reference image. Default behaviour is still the test
@@ -286,7 +294,7 @@ Version was deleted from npm, use 0.12.2 instead.
 
   - `tolerance` option in config
   - `setTolerance` method for a suite
-  - optional parameter to `capture` method: 
+  - optional parameter to `capture` method:
 
     ```javascript
     suite.capture('name', {tolerance: 20}, function() {});
@@ -478,7 +486,7 @@ Was republished as 0.7.0 due to a breaking change.
 
 * Fix incorrect capture region rounding, causing bottom row of the element to
   be cropped sometimes.
-  
+
 ## 0.6.0 - 2014-07-28
 
 * `:before` and `:after` pseudo-elements outline and shadow are now taken into
@@ -501,7 +509,7 @@ Was republished as 0.7.0 due to a breaking change.
 
 * Added ability to change diff highlight color in config file.
 
-* Change diff highlight style 
+* Change diff highlight style
 
 * Global installations of `gemini` now runs local one, if available.
 
@@ -513,7 +521,7 @@ Was republished as 0.7.0 due to a breaking change.
   `mouseUp`.
 
   Previously, this was not required if `mouseDown` was used once for suite.
-  
+
   It will show warning if versions of the modules does not match.
 
 * `flat` reporter replaces `tree`. Tree reporter can not work with new browser
@@ -743,7 +751,7 @@ Was republished as 0.7.0 due to a breaking change.
           .setElements(...)
           .setDynamicElements(...)
           .capture(...)
-          
+
   };
   ```
 
@@ -756,7 +764,7 @@ Was republished as 0.7.0 due to a breaking change.
       suite.setElements(...)
           .setDynamicElements(...)
           .capture(...)
-          
+
   };
 
   ```
