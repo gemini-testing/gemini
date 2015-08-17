@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.2 - 2015-08-17
+
+* Fix: correct handling of no-ref-image error (@j0tunn).
+
 ## 0.13.1 - 2015-08-15
 
 * Inline sourcemaps support in coverage calculation (@j0tunn).
