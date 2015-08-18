@@ -128,7 +128,7 @@ All methods are chainable:
 
     ```js
     .capture('name', {tolerance: 30}, function(actions, find) {
-    
+
     });
     ```
 
@@ -218,7 +218,8 @@ call:
   element. Possible button values are: 0 – left, 1 – middle, 2 – right. By
   default, left button is used.
 
-* `mouseUp(element)` – release previously pressed mouse button.
+* `mouseUp([element], [button])` – release previously pressed mouse button. If
+  element is specified, move mouse to element and release then.
 
 * `mouseMove(element, [offset])` – move mouse to the given element. Offset is
   specified relatively to the top left corner of the element. If not
