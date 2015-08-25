@@ -2,8 +2,8 @@
 var sinon = require('sinon'),
     assert = require('chai').assert,
     q = require('q'),
-    PerBrowserLimitedPool = require('../lib/browser-pool/per-browser-limited-pool'),
-    browserWithId = require('./util').makeBrowser;
+    PerBrowserLimitedPool = require('../../lib/browser-pool/per-browser-limited-pool'),
+    browserWithId = require('../util').makeBrowser;
 
 describe('PerBrowserLimitedPool', function() {
     beforeEach(function() {

@@ -3,13 +3,13 @@ var assert = require('assert'),
     q = require('q'),
     sinon = require('sinon'),
     assert = require('chai').assert,
-    createSuite = require('../lib/suite').create,
-    flatSuites = require('../lib/suite-util').flattenSuites,
-    State = require('../lib/state'),
-    Runner = require('../lib/runner'),
-    StateError = require('../lib/errors/state-error'),
-    pool = require('../lib/browser-pool'),
-    Config = require('../lib/config');
+    createSuite = require('../../lib/suite').create,
+    flatSuites = require('../../lib/suite-util').flattenSuites,
+    State = require('../../lib/state'),
+    Runner = require('../../lib/runner'),
+    StateError = require('../../lib/errors/state-error'),
+    pool = require('../../lib/browser-pool'),
+    Config = require('../../lib/config');
 
 function addState(suite, name, cb) {
     var state = new State(suite, name, cb || function() {});
@@ -191,7 +191,7 @@ describe('runner', function() {
 
             addState(this.suite, 'state');
             return this.runSuites().then(function() {
-                assert.calledWith(stub, sequence, require('../lib/find-func').find);
+                assert.calledWith(stub, sequence, require('../../lib/find-func').find);
             });
         });
 
@@ -355,7 +355,7 @@ describe('runner', function() {
 
             addState(this.suite, 'state');
             return this.runSuites().then(function() {
-                assert.calledWith(stub, sequence, require('../lib/find-func').find);
+                assert.calledWith(stub, sequence, require('../../lib/find-func').find);
             });
         });
 

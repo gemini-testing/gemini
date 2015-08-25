@@ -1,7 +1,7 @@
 'use strict';
 
 var assert = require('chai').assert,
-    Rect = require('../lib/browser/client-scripts/rect').Rect;
+    Rect = require('../../lib/browser/client-scripts/rect').Rect;
 
 describe('Rect', function() {
     describe('constructor', function() {

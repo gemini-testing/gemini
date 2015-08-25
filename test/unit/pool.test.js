@@ -2,8 +2,8 @@
 var sinon = require('sinon'),
     assert = require('chai').assert,
     q = require('q'),
-    Browser = require('../lib/browser'),
-    Pool = require('../lib/browser-pool/pool');
+    Browser = require('../../lib/browser'),
+    Pool = require('../../lib/browser-pool/pool');
 
 describe('UnlimitedPool', function() {
     beforeEach(function() {

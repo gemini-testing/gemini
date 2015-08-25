@@ -1,14 +1,14 @@
 'use strict';
-var Calibrator = require('../lib/calibrator'),
-    Browser = require('../lib/browser'),
-    ClientBridge = require('../lib/browser/client-bridge'),
+var Calibrator = require('../../lib/calibrator'),
+    Browser = require('../../lib/browser'),
+    ClientBridge = require('../../lib/browser/client-bridge'),
     assert = require('chai').assert,
     q = require('q'),
     wd = require('wd'),
     fs = require('fs'),
     path = require('path'),
     sinon = require('sinon'),
-    makeBrowser = require('./util').makeBrowser;
+    makeBrowser = require('../util').makeBrowser;
 
 describe('browser', function() {
     beforeEach(function() {
@@ -198,7 +198,7 @@ describe('browser', function() {
 
     describe('captureFullscreenImage', function() {
         it('should call to the driver', function() {
-            var img = path.join(__dirname, 'functional', 'data', 'image', 'image1.png'),
+            var img = path.join(__dirname, '..', 'functional', 'data', 'image', 'image1.png'),
                 imgData = fs.readFileSync(img),
                 stubWd = {
                     takeScreenshot: sinon.stub().returns(q(imgData)),
@@ -215,7 +215,7 @@ describe('browser', function() {
 
     describe('calibration', function() {
         beforeEach(function() {
-            var img = path.join(__dirname, 'functional', 'data', 'image', 'calibrate.png'),
+            var img = path.join(__dirname, '..', 'functional', 'data', 'image', 'calibrate.png'),
                 imgData = fs.readFileSync(img);
             this.wd = {
                 init: sinon.stub().returns(q(imgData)),

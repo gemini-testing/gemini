@@ -1,5 +1,5 @@
 'use strict';
-var Config = require('../lib/config'),
+var Config = require('../../lib/config'),
     assert = require('chai').assert;
 
 describe('config', function() {
