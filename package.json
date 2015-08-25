@@ -52,9 +52,9 @@
     "sinon": "^1.14.1"
   },
   "scripts": {
-    "test-unit": "istanbul test _mocha test",
+    "test-unit": "istanbul test _mocha test/unit",
     "test-func": "istanbul test _mocha test/functional",
-    "test": "istanbul test _mocha test test/functional",
+    "test": "istanbul test _mocha test/unit test/functional",
     "lint": "jshint . && jscs ."
   },
   "author": "Sergey Tatarintsev <sevinf@yandex-team.ru> (https://github.com/SevInf)",

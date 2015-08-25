@@ -2,11 +2,11 @@
 var _ = require('lodash'),
     assert = require('chai').assert,
 
-    suiteUtil = require('../lib/suite-util'),
+    suiteUtil = require('../../lib/suite-util'),
 
     shouldSkip = suiteUtil.shouldSkip,
     flattenSuites = suiteUtil.flattenSuites,
-    makeBrowser = require('./util').makeBrowser;
+    makeBrowser = require('../util').makeBrowser;
 
 describe('suite-util', function() {
     describe('shouldSkip()', function() {

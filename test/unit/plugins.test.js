@@ -1,5 +1,5 @@
 'use strict';
-var plugins = require('../lib/plugins'),
+var plugins = require('../../lib/plugins'),
     mockery = require('mockery'),
     assert = require('chai').assert,
     sinon = require('sinon');

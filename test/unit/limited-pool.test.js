@@ -1,9 +1,9 @@
 'use strict';
 var sinon = require('sinon'),
     assert = require('chai').assert,
-    Browser = require('../lib/browser'),
+    Browser = require('../../lib/browser'),
     q = require('q'),
-    LimitedPool = require('../lib/browser-pool/limited-pool');
+    LimitedPool = require('../../lib/browser-pool/limited-pool');
 
 describe('LimitedPool', function() {
     beforeEach(function() {

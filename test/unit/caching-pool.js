@@ -2,8 +2,8 @@
 var sinon = require('sinon'),
     assert = require('chai').assert,
     q = require('q'),
-    Pool = require('../lib/browser-pool/caching-pool'),
-    browserWithId = require('./util').browserWithId;
+    Pool = require('../../lib/browser-pool/caching-pool'),
+    browserWithId = require('../util').browserWithId;
 
 describe('CachingPool', function() {
     function makeStubBrowser(id) {

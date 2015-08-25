@@ -3,12 +3,12 @@ var sinon = require('sinon'),
     assert = require('chai').assert,
     _ = require('lodash'),
     q = require('q'),
-    find = require('../lib/find-func').find,
+    find = require('../../lib/find-func').find,
 
-    CaptureSession = require('../lib/capture-session'),
-    Actions = require('../lib/browser/actions.js'),
-    createSuite = require('../lib/suite').create,
-    StateError = require('../lib/errors/state-error');
+    CaptureSession = require('../../lib/capture-session'),
+    Actions = require('../../lib/browser/actions.js'),
+    createSuite = require('../../lib/suite').create,
+    StateError = require('../../lib/errors/state-error');
 
 describe('capture session', function() {
     describe('runHook', function() {

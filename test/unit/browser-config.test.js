@@ -1,7 +1,7 @@
 'use strict';
-var BrowserConfig = require('../lib/config/browser-config'),
+var BrowserConfig = require('../../lib/config/browser-config'),
     assert = require('chai').assert,
-    createSuite = require('../lib/suite').create;
+    createSuite = require('../../lib/suite').create;
 
 describe('BrowserConfig', function() {
     function createConfig(options) {
