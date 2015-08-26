@@ -1,8 +1,8 @@
 # Writing plugins
 
-Gemini plugin is just an npm package with a `gemini-<plugin name>` name. Module
-should export a single function which receives `Gemini` class instance and
-user-specified options. For example:
+Gemini plugin is just an npm package with a `gemini-<plugin name>` name.
+Module should export a single function which receives `Gemini` class instance
+and user-specified options. For example:
 
 ```js
 module.exports = function(gemini, options) {
@@ -10,17 +10,18 @@ module.exports = function(gemini, options) {
 };
 ```
 
-Documentation on the `gemini` object can be found in 
-[programmatic API](programmatic-api.md) document.
+Documentation on the `gemini` object can be found in [programmatic
+API](programmatic-api.md) document.
 
-Options are specified by a user in a config file and passed to the plugin as is.
-For example:
+Options are specified by a user in a config file and passed to the plugin as
+is. For example:
 
 .gemini.yml:
 ```yaml
-plugins:
-  greeter:
-    name: Mr. Incredible 
+system:
+  plugins:
+    greeter:
+      name: Mr. Incredible
 ```
 
 Plugin:

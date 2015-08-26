@@ -2,8 +2,8 @@
 
 var sinon = require('sinon'),
     assert = require('chai').assert,
-    testsApi = require('../lib/tests-api'),
-    Suite = require('../lib/suite');
+    testsApi = require('../../lib/tests-api'),
+    Suite = require('../../lib/suite');
 
 describe('public tests API', function() {
     beforeEach(function() {

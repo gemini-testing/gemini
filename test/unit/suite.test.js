@@ -1,7 +1,7 @@
 'use strict';
 
 var assert = require('chai').assert,
-    createSuite = require('../lib/suite').create;
+    createSuite = require('../../lib/suite').create;
 
 describe('suite', function() {
     describe('create', function() {

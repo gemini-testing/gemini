@@ -1,6 +1,6 @@
 {
   "name": "gemini",
-  "version": "0.12.6",
+  "version": "0.13.2",
   "description": "UI Screenshot testing utility",
   "bin": {
     "gemini": "./bin/gemini"
@@ -10,17 +10,21 @@
     "aliasify": "^1.7.2",
     "browserify": "^9.0.4",
     "chalk": "^0.5.1",
-    "coa": "~0.4.0",
+    "commander": "^2.8.1",
     "css": "^2.1.0",
+    "debug": "^2.2.0",
+    "es6-weak-map": "^1.0.2",
+    "gemini-configparser": "^0.1.1",
     "gemini-coverage": "~0.3.0",
     "handlebars": "^2.0.0",
     "inherit": "~2.2.1",
+    "install": "^0.1.8",
     "js-yaml": "^3.2.5",
     "lodash": "^3.6.0",
-    "looks-same": "^1.1.1",
+    "looks-same": "^2.0.0",
     "minimatch": "^2.0.1",
     "png-img": "~1.1.0",
-    "polyfill-service": "~1.1.0",
+    "polyfill-service": "~1.4.0",
     "q": "^1.1.2",
     "q-io": "~1.11.0",
     "qemitter": "^1.0.0",
@@ -31,6 +35,11 @@
     "uglifyify": "^3.0.1",
     "wd": "^0.3.4"
   },
+  "bundleDependencies": [
+    "gemini-configparser",
+    "looks-same",
+    "gemini-coverage"
+  ],
   "devDependencies": {
     "chai": "^2.2.0",
     "chai-as-promised": "^4.3.0",
@@ -43,9 +52,9 @@
     "sinon": "^1.14.1"
   },
   "scripts": {
-    "test-unit": "istanbul test _mocha test",
+    "test-unit": "istanbul test _mocha test/unit",
     "test-func": "istanbul test _mocha test/functional",
-    "test": "istanbul test _mocha test test/functional",
+    "test": "istanbul test _mocha test/unit test/functional",
     "lint": "jshint . && jscs ."
   },
   "author": "Sergey Tatarintsev <sevinf@yandex-team.ru> (https://github.com/SevInf)",

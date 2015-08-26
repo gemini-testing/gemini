@@ -1,7 +1,7 @@
 # Написание плагинов
 
 Плагин Gemini — это обычный npm-пакет с именем `gemini-<имя плагина>`. Модуль
-должен экспортировать единственную функцию, принимающую экземпляр класса 
+должен экспортировать единственную функцию, принимающую экземпляр класса
 `Gemini` и указанные пользователем опции. Например:
 
 ```js
@@ -18,9 +18,10 @@ module.exports = function(gemini, options) {
 
 .gemini.yml:
 ```yaml
-plugins:
-  greeter:
-    name: Mr. Incredible 
+system:
+  plugins:
+    greeter:
+      name: Mr. Incredible
 ```
 
 Плагин:

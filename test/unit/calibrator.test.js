@@ -4,16 +4,16 @@ var sinon = require('sinon'),
     q = require('q'),
     path = require('path'),
     fs = require('fs'),
-    Calibrator = require('../lib/calibrator'),
-    Browser = require('../lib/browser'),
-    Image = require('../lib/image'),
-    GeminiError = require('../lib/errors/gemini-error');
+    Calibrator = require('../../lib/calibrator'),
+    Browser = require('../../lib/browser'),
+    Image = require('../../lib/image'),
+    GeminiError = require('../../lib/errors/gemini-error');
 
 describe('calibrator', function() {
     var browser, calibrator;
 
     function setScreenshot(imageName) {
-        var imgPath = path.join(__dirname, 'functional', 'data', 'image', imageName),
+        var imgPath = path.join(__dirname, '..', 'functional', 'data', 'image', imageName),
             imgData = fs.readFileSync(imgPath);
 
         browser.captureFullscreenImage.returns(q(new Image(imgData)));

@@ -1,15 +1,16 @@
 'use strict';
 var sinon = require('sinon'),
     assert = require('chai').assert,
-    Browser = require('../lib/browser'),
+    Browser = require('../../lib/browser'),
     q = require('q'),
-    LimitedPool = require('../lib/browser-pool/limited-pool');
+    LimitedPool = require('../../lib/browser-pool/limited-pool');
 
 describe('LimitedPool', function() {
     beforeEach(function() {
         this.underlyingPool = {
             getBrowser: sinon.stub(),
-            freeBrowser: sinon.stub().returns(q())
+            freeBrowser: sinon.stub().returns(q()),
+            cancel: sinon.stub()
         };
 
         this.sinon = sinon.sandbox.create();
@@ -20,9 +21,8 @@ describe('LimitedPool', function() {
 
         this.makeBrowser = function() {
             var config = {
-                browsers: {
-                    id: {browserName: 'id'}
-                }
+                id: 'id',
+                desiredCapabilities: {browserName: 'id'}
             };
 
             return this.sinon.stub(new Browser(config, 'id'));
@@ -113,6 +113,34 @@ describe('LimitedPool', function() {
                         });
                 });
             return assert.eventually.equal(result, expectedBrowser);
+        });
+
+        it('should cancel queued browsers when cancel is called', function() {
+            var pool = this.makePool(1);
+            this.underlyingPool.getBrowser.returns(q(this.makeBrowser()));
+            return pool.getBrowser('id')
+                .then(function() {
+                    var secondRequest = pool.getBrowser('id');
+                    pool.cancel();
+                    return assert.isRejected(secondRequest, LimitedPool.CancelledError);
+                });
+        });
+
+        it('should reject the queued call when underlying pool rejects the reuqest', function() {
+            var pool = this.makePool(1),
+                error = new Error('You shall not pass');
+            this.underlyingPool.getBrowser
+                .onFirstCall().returns(q(this.makeBrowser()))
+                .onSecondCall().returns(q.reject(error));
+
+            return pool.getBrowser('id')
+                .then(function(browser) {
+                    var secondRequest = pool.getBrowser('id');
+                    return pool.freeBrowser(browser)
+                        .then(function() {
+                            return assert.isRejected(secondRequest, error);
+                        });
+                });
         });
     });
 });

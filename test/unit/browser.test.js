@@ -1,14 +1,14 @@
 'use strict';
-var Calibrator = require('../lib/calibrator'),
-    Browser = require('../lib/browser'),
-    ClientBridge = require('../lib/browser/client-bridge'),
+var Calibrator = require('../../lib/calibrator'),
+    Browser = require('../../lib/browser'),
+    ClientBridge = require('../../lib/browser/client-bridge'),
     assert = require('chai').assert,
     q = require('q'),
     wd = require('wd'),
     fs = require('fs'),
     path = require('path'),
     sinon = require('sinon'),
-    makeBrowser = require('./util').makeBrowser;
+    makeBrowser = require('../util').makeBrowser;
 
 describe('browser', function() {
     beforeEach(function() {
@@ -44,88 +44,56 @@ describe('browser', function() {
                 init: sinon.stub().returns(q({})),
                 get: sinon.stub().returns(q({})),
                 eval: sinon.stub().returns(q('')),
-                setWindowSize: sinon.stub().returns(q({}))
+                setWindowSize: sinon.stub().returns(q({})),
+                on: sinon.stub()
             };
 
-            this.config = {
-                capabilities: {},
-                http: {
-                    timeout: 100,
-                    retries: 5,
-                    retryDelay: 25
-                }
-            };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
             this.calibrator = sinon.createStubInstance(Calibrator);
             this.browser = makeBrowser({
                 browserName: 'browser',
-                version: '1.0',
-                // disable calibration for tests to avoid a lot of mocking
-                '--noCalibrate': true
-            }, this.config);
+                version: '1.0'
+            }, {calibrate: false});
 
             this.launchBrowser = function() {
                 return this.browser.launch(this.calibrator);
             };
         });
 
-        it('should init browser with browserName, version and takeScreenshot capabilites', function() {
+        it('should init browser with browserName and version capabilites', function() {
             var _this = this;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.calledWith(_this.wd.init, {
                     browserName: 'browser',
-                    version: '1.0',
-                    takesScreenshot: true,
-                    '--noCalibrate': true
+                    version: '1.0'
                 });
             });
         });
 
         it('should set http options for browser instance', function() {
             var _this = this;
+            this.browser.config.httpTimeout = 100;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.calledWith(_this.wd.configureHttp, {
                     timeout: 100,
-                    retries: 5,
-                    retryDelay: 25
+                    retries: 'never'
                 });
             });
         });
 
-        it('should mix additional capabilites from config', function() {
+        it('should calibrate if config.calibrate=true', function() {
             var _this = this;
-            this.config.capabilities = {
-                option1: 'value1',
-                option2: 'value2'
-            };
 
-            return this.browser.launch(this.calibrator).then(function() {
-                assert.calledWith(_this.wd.init, {
-                    browserName: 'browser',
-                    version: '1.0',
-                    takesScreenshot: true,
-                    '--noCalibrate': true,
-                    option1: 'value1',
-                    option2: 'value2'
-                });
-            });
-        });
-
-        it('should calibrate by default', function() {
-            var _this = this;
-            this.browser = makeBrowser({
-                browserName: 'browser',
-                version: '1.0'
-            }, this.config);
-
+            this.browser.config.calibrate = true;
             this.calibrator.calibrate.returns(q());
             return this.browser.launch(this.calibrator).then(function() {
                 assert.calledWith(_this.calibrator.calibrate);
             });
         });
 
-        it('should not call calibrate() when --noCalibrate is true', function() {
+        it('should not call calibrate() when config.calibrate=false', function() {
             var _this = this;
+            this.browser.config.calibrate = false;
             return this.browser.launch(this.calibrator).then(function() {
                 assert.notCalled(_this.calibrator.calibrate);
             });
@@ -133,7 +101,7 @@ describe('browser', function() {
 
         describe('with windowSize option', function() {
             beforeEach(function() {
-                this.config.windowSize = {width: 1024, height: 768};
+                this.browser.config.windowSize = {width: 1024, height: 768};
             });
 
             it('should set window size', function() {
@@ -164,7 +132,8 @@ describe('browser', function() {
     describe('open', function() {
         beforeEach(function() {
             this.wd = {
-                get: sinon.stub().returns(q({}))
+                get: sinon.stub().returns(q({})),
+                on: sinon.stub()
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
@@ -181,11 +150,33 @@ describe('browser', function() {
         });
     });
 
+    describe('openRelative', function() {
+        it('should open relative URL using config', function() {
+            this.wd = {
+                get: sinon.stub().returns(q({})),
+                on: sinon.stub()
+            };
+
+            this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
+
+            this.browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                getAbsoluteUrl: sinon.stub().withArgs('/relative').returns('http://example.com/relative')
+            });
+
+            var _this = this;
+            return this.browser.openRelative('/relative')
+                .then(function() {
+                    assert.calledWith(_this.wd.get, 'http://example.com/relative');
+                });
+        });
+    });
+
     describe('reset', function() {
         beforeEach(function() {
             this.wd = {
                 eval: sinon.stub().returns(q()),
-                moveTo: sinon.stub().returns(q())
+                moveTo: sinon.stub().returns(q()),
+                on: sinon.stub()
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
@@ -207,10 +198,11 @@ describe('browser', function() {
 
     describe('captureFullscreenImage', function() {
         it('should call to the driver', function() {
-            var img = path.join(__dirname, 'functional', 'data', 'image', 'image1.png'),
+            var img = path.join(__dirname, '..', 'functional', 'data', 'image', 'image1.png'),
                 imgData = fs.readFileSync(img),
                 stubWd = {
-                    takeScreenshot: sinon.stub().returns(q(imgData))
+                    takeScreenshot: sinon.stub().returns(q(imgData)),
+                    on: sinon.stub()
                 };
 
             this.sinon.stub(wd, 'promiseRemote').returns(stubWd);
@@ -223,18 +215,21 @@ describe('browser', function() {
 
     describe('calibration', function() {
         beforeEach(function() {
-            var img = path.join(__dirname, 'functional', 'data', 'image', 'calibrate.png'),
+            var img = path.join(__dirname, '..', 'functional', 'data', 'image', 'calibrate.png'),
                 imgData = fs.readFileSync(img);
             this.wd = {
                 init: sinon.stub().returns(q(imgData)),
                 configureHttp: sinon.stub().returns(q()),
                 eval: sinon.stub().returns(q('')),
-                takeScreenshot: sinon.stub().returns(q(imgData))
+                takeScreenshot: sinon.stub().returns(q(imgData)),
+                on: sinon.stub()
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
 
-            this.browser = makeBrowser({browserName: 'browser', version: '1.0'});
+            this.browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                calibrate: true
+            });
         });
 
         it('captureFullscreenImage() should crop according to calibration result', function() {
@@ -257,13 +252,25 @@ describe('browser', function() {
 
     describe('buildScripts', function() {
         it('should include coverage script when coverage is on', function() {
-            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: true}),
+            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                    system: {
+                        coverage: {
+                            enabled: true
+                        }
+                    }
+                }),
                 scripts = browser.buildScripts();
             return assert.eventually.include(scripts, 'exports.collectCoverage');
         });
 
         it('should not include coverage script when coverage is off', function() {
-            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {coverage: false}),
+            var browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                    system: {
+                        coverage: {
+                            enabled: false
+                        }
+                    }
+                }),
                 scripts = browser.buildScripts();
             return assert.eventually.notInclude(scripts, 'exports.collectCoverage');
         });
@@ -276,10 +283,13 @@ describe('browser', function() {
                 init: sinon.stub().returns(q({})),
                 get: sinon.stub().returns(q({})),
                 eval: sinon.stub().returns(q('')),
-                elementByCssSelector: sinon.stub().returns(q())
+                elementByCssSelector: sinon.stub().returns(q()),
+                on: sinon.stub()
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
-            this.browser = makeBrowser();
+            this.browser = makeBrowser({browserName: 'bro'}, {
+                calibrate: true
+            });
         });
 
         describe('when browser supports CSS3 selectors', function() {
