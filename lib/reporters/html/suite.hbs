@@ -2,7 +2,7 @@
     <div class="section__title">{{name}}</div>
     <div class="section__body section__body_guided">
         {{#each browsers}}
-            <div class="section {{collapse}} {{status}}">
+            <div class="section section_collapsed {{status}}">
                 {{#if skipped}}
                     <div class="section__title">[skipped] {{name}}</div>
                 {{/if}}
