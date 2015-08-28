@@ -35,6 +35,18 @@ browsers:
       browserName: firefox
       platform: LINUX
 
+sets:
+  ff:
+    files:
+     - gemini/ff
+    browsers:
+     - firefox-latest
+  chrome:
+    files:
+     - gemini/chrome
+    browsers:
+     - chrome-latest
+
 system:
   projectRoot: ../project
   sourceRoot: ../project/src
@@ -185,6 +197,28 @@ Settings list:
   started. By default is `.inf` (no limit). Set to smaller number if you are
   experiencing stability problems.
 
+## Sets
+
+You can link some set of tests with certain browsers using `sets`.
+
+Format of the `sets` section:
+```yaml
+sets:
+  <set-name>:
+    files:
+     - <dir-with-test-files>
+     ...
+    browsers:
+     - <browser-id-to-test-in>
+     ...
+```
+
+* `files` - list of test files or directories with test files. Should be relative to project root directory. `gemini` by default. Can be a string if you want to specify just one file or directory.
+
+* `browsers` - list of browser ids to run tests specified in `files`. All browsers by default.
+
+If no sets specified then default set named `all` with all defaults will be created.
+
 ## Overriding settings
 
 All options can also be overridden via command-line flags or environment
@@ -221,5 +255,5 @@ environment variables instead of CLI options:
 
 ```
 gemini_root_url=http://example.com gemini test
-gemini_browsers_ie9_screenshots_dir=./ie9-screens gemini gather 
+gemini_browsers_ie9_screenshots_dir=./ie9-screens gemini gather
 ```

@@ -25,26 +25,26 @@ describe('config.sets', function() {
     }
 
     describe('files', function() {
-        it('should be `gemini/*` by default', function() {
+        it('should be `gemini` by default', function() {
             var config = createConfig({
                     sets: {
                         someSet: {}
                     }
                 });
 
-            assert.deepEqual(config.sets.someSet.files, 'gemini/*.gemini.js');
+            assert.deepEqual(config.sets.someSet.files, ['gemini']);
         });
 
-        it('should accept string', function() {
+        it('should convert string to array of strings', function() {
             var config = createConfig({
                     sets: {
                         someSet: {
-                            files: 'dir/*.js'
+                            files: 'some/path'
                         }
                     }
                 });
 
-            assert.equal(config.sets.someSet.files, 'dir/*.js');
+            assert.deepEqual(config.sets.someSet.files, ['some/path']);
         });
 
         it('should not accept non-string arrays', function() {
@@ -64,16 +64,16 @@ describe('config.sets', function() {
                 sets: {
                     someSet: {
                         files: [
-                            'path1/*.js',
-                            'path2/'
+                            'some/path',
+                            'other/path'
                         ]
                     }
                 }
             });
 
             assert.deepEqual(config.sets.someSet.files, [
-                'path1/*.js',
-                'path2/'
+                'some/path',
+                'other/path'
             ]);
         });
     });
@@ -150,7 +150,7 @@ describe('config.sets', function() {
             }
         });
 
-        assert.deepEqual(config.sets.all.files, 'gemini/*.gemini.js');
+        assert.deepEqual(config.sets.all.files, ['gemini']);
         assert.deepEqual(config.sets.all.browsers, ['b1', 'b2']);
     });
 });
