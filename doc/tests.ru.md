@@ -168,8 +168,7 @@
 вызывает перезапуск браузера, даже если адрес страницы не меняется.
 
 **Пример**:
-
-    ```javascript
+```javascript
     var gemini = require('gemini');
 
     gemini.suite('parent', function(parent) {
@@ -204,7 +203,7 @@
                 .capture('fifth state');
         });
     });
-    ```
+```
 
 ## Доступные действия
 
