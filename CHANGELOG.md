@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.4 - 2015-08-30
+
+* Path to the plugin configuration fixed (@SevInf)
+
+* Sets support (@j0tunn)
+
 ## 0.13.3 - 2015-08-27
 
 * mouseUp action: make element argument optional (@just-boris).
