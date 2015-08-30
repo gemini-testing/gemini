@@ -57,6 +57,8 @@ describe('runner', function() {
         this.suite.id = 0;
         this.suite.url = '/path';
 
+        this.root.browsers = [browser.id];
+
         var config = new Config({
                 system: {
                     projectRoot: '/'
@@ -134,6 +136,7 @@ describe('runner', function() {
         it('should launch each browser in config if testBrowsers are not set', function() {
             this.sinon.stub(this.runner.config, 'getBrowserIds')
                 .returns(['browser1', 'browser2']);
+            this.root.browsers = ['browser1', 'browser2'];
 
             addState(this.suite, 'state');
 
@@ -146,12 +149,27 @@ describe('runner', function() {
         it('should launch only browsers specified in testBrowsers', function() {
             this.sinon.stub(this.runner.config, 'getBrowserIds')
                 .returns(['browser1', 'browser2']);
+            this.root.browsers = ['browser1', 'browser2'];
             this.runner.setTestBrowsers(['browser1']);
 
             addState(this.suite, 'state');
             return this.runSuites().then(function() {
                 assert.calledWith(this.pool.getBrowser, 'browser1');
                 assert.neverCalledWith(this.pool.getBrowser, 'browser2');
+            }.bind(this));
+        });
+
+        it('should run only in browsers specified for suite', function() {
+            this.sinon.stub(this.runner.config, 'getBrowserIds')
+                .returns(['browser1', 'browser2', 'browser3']);
+            this.root.browsers = ['browser2', 'browser3'];
+
+            addState(this.suite, 'state');
+
+            return this.runSuites().then(function() {
+                assert.neverCalledWith(this.pool.getBrowser, 'browser1');
+                assert.calledWith(this.pool.getBrowser, 'browser2');
+                assert.calledWith(this.pool.getBrowser, 'browser3');
             }.bind(this));
         });
 
@@ -369,7 +387,8 @@ describe('runner', function() {
                 assert.equal(e.suite, _this.suite);
                 done();
             });
-            this.runSuites().done(null, done);
+            this.runSuites()
+                .done(q.reject.bind(null, 'no error'), done);
         });
 
         it('should emit `endSuite` for each suite', function() {

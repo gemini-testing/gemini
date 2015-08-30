@@ -17,6 +17,7 @@
     "trailing": true,
     "maxparams": 3,
     "node": true,
+    "laxbreak": true,
     "overrides": {
       "test/**": {
         "mocha": true
