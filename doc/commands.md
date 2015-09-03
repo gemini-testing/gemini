@@ -81,7 +81,7 @@ report), partially (yellow) or was not captured at all (red).
 
 ## Overriding config options
 
-See [config docs](doc/config.md);
+See [config docs](./config.md);
 
 ## Shell completion
 
