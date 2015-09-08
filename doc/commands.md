@@ -47,8 +47,9 @@ each browser.
 
 Available reporters are:
 
-* `flat` (default console reporter)
-* `html` for HTML report
+* `flat` (default console reporter);
+* `vflat` (verbose console reporter);
+* `html` for HTML report.
 
 You can also use multiple reporters at the same time using multiple
 `--reporter` options:
