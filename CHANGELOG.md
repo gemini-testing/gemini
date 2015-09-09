@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.5 - 2015-09-09
+
+* Added the `vflat` reporter (@unlok)
+
 ## 0.13.4 - 2015-08-30
 
 * Path to the plugin configuration fixed (@SevInf)
