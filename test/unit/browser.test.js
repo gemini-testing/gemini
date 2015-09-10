@@ -197,19 +197,117 @@ describe('browser', function() {
     });
 
     describe('captureFullscreenImage', function() {
-        it('should call to the driver', function() {
+        beforeEach(function() {
             var img = path.join(__dirname, '..', 'functional', 'data', 'image', 'image1.png'),
-                imgData = fs.readFileSync(img),
-                stubWd = {
-                    takeScreenshot: sinon.stub().returns(q(imgData)),
-                    on: sinon.stub()
-                };
+                imgData = fs.readFileSync(img);
 
-            this.sinon.stub(wd, 'promiseRemote').returns(stubWd);
-            var browser = makeBrowser({browserName: 'browser', version: '1.0'});
+            this.stubWd = {
+                takeScreenshot: sinon.stub().returns(q(imgData)),
+                currentContext: sinon.stub().returns(q()),
+                context: sinon.stub().returns(q()),
+                on: sinon.stub()
+            };
+
+            this.sinon.stub(wd, 'promiseRemote').returns(this.stubWd);
+        });
+
+        it('should call to the driver', function() {
+            var _this = this,
+                browser = makeBrowser();
             return browser.captureFullscreenImage().then(function() {
-                assert.called(stubWd.takeScreenshot);
+                assert.calledOnce(_this.stubWd.takeScreenshot);
             });
+        });
+
+        it('should not switch appium context', function() {
+            var _this = this,
+                browser = makeBrowser();
+
+            return browser.captureFullscreenImage().then(function() {
+                assert.notCalled(_this.stubWd.context);
+            });
+        });
+
+        it('should not switch appium context if capture succeeds for the first, but fails for the second time', function() {
+            var _this = this,
+                browser = makeBrowser(),
+                error = new Error('not today');
+
+            this.stubWd.takeScreenshot
+                .onSecondCall().returns(q.reject(error));
+
+            var result = browser.captureFullscreenImage()
+                .then(function() {
+                    return browser.captureFullscreenImage();
+                });
+
+            return assert.isRejected(result, error)
+                .then(function() {
+                    assert.notCalled(_this.stubWd.context);
+                });
+        });
+
+        it('should try to switch appium context if taking screenshot fails', function() {
+            var _this = this,
+                browser = makeBrowser();
+            this.stubWd.takeScreenshot
+                .onFirstCall().returns(q.reject(new Error('not today')));
+
+            return browser.captureFullscreenImage().then(function() {
+                assert.calledWithExactly(_this.stubWd.context, 'NATIVE_APP');
+            });
+        });
+
+        it('should try to take screenshot after switching context', function() {
+            var _this = this,
+                browser = makeBrowser();
+            this.stubWd.takeScreenshot
+                .onFirstCall().returns(q.reject(new Error('not today')));
+
+            return browser.captureFullscreenImage().then(function() {
+                assert.calledTwice(_this.stubWd.takeScreenshot);
+            });
+        });
+
+        it('should restore original context after taking screenshot', function() {
+            var _this = this,
+                browser = makeBrowser();
+            this.stubWd.currentContext.returns(q('Original'));
+            this.stubWd.takeScreenshot
+                .onFirstCall().returns(q.reject(new Error('not today')));
+
+            return browser.captureFullscreenImage().then(function() {
+                assert.calledWithExactly(_this.stubWd.context, 'Original');
+            });
+        });
+
+        it('should fail with original error if switching context does not helps', function() {
+            var browser = makeBrowser(),
+                originalError = new Error('Original');
+
+            this.stubWd.takeScreenshot
+                .onFirstCall().returns(q.reject(originalError))
+                .onSecondCall().returns(q.reject(new Error('still does not work')));
+
+            return assert.isRejected(browser.captureFullscreenImage(), originalError);
+        });
+
+        it('should not try to take screenshot without switching context if it failed first time', function() {
+            var _this = this,
+                browser = makeBrowser(),
+                error = new Error('not today');
+
+            this.stubWd.takeScreenshot
+                .onFirstCall().returns(q.reject(error))
+                .onThirdCall().returns(q.reject(error));
+
+            return assert.isRejected(browser.captureFullscreenImage()
+                .then(function() {
+                    return browser.captureFullscreenImage();
+                }))
+                .then(function() {
+                    assert.calledThrice(_this.stubWd.takeScreenshot);
+                });
         });
     });
 
@@ -235,7 +333,7 @@ describe('browser', function() {
         it('captureFullscreenImage() should crop according to calibration result', function() {
             var _this = this,
                 calibrator = {
-                    calibrate: sinon.stub().returns(q({top: 24, left: 6, right: 2, bottom: 0}))
+                    calibrate: sinon.stub().returns(q({top: 6, left: 4}))
                 };
 
             var size = this.browser.launch(calibrator)
@@ -246,7 +344,7 @@ describe('browser', function() {
                     return image.getSize();
                 });
 
-            return assert.eventually.deepEqual(size, {width: 574, height: 311});
+            return assert.eventually.deepEqual(size, {width: 1000, height: 13});
         });
     });
 

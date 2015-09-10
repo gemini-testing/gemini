@@ -37,7 +37,10 @@ describe('calibrator', function() {
     it('should calculate correct crop area', function() {
         setScreenshot('calibrate.png');
         var result = calibrator.calibrate(browser);
-        return assert.eventually.deepEqual(result, {top: 24, left: 6});
+        return q.all([
+            assert.eventually.propertyVal(result, 'top', 2),
+            assert.eventually.propertyVal(result, 'left', 2)
+        ]);
     });
 
     it('should return also features detected by script', function() {
@@ -66,7 +69,10 @@ describe('calibrator', function() {
                         .then(function() {
                             return calibrator.calibrate(browser);
                         });
-        return assert.eventually.deepEqual(result, {top: 24, left: 6});
+        return q.all([
+            assert.eventually.propertyVal(result, 'top', 2),
+            assert.eventually.propertyVal(result, 'left', 2)
+        ]);
     });
 
     it('should fail on broken calibration page', function() {
