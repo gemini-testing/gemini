@@ -6,3 +6,4 @@
 test/
 coverage/
 CONTRIBUTING.md
+/lib/browser/client-scripts/gemini.calibrate.js
