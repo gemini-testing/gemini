@@ -46,6 +46,14 @@ var Config = require('../../lib/config'),
             platform: 'Linux',
             device: 'Android Emulator',
             deviceOrientation: 'portrait'
+        },
+
+        'android5': {
+            browserName: 'android',
+            version: '5.0',
+            platform: 'Linux',
+            device: 'Android Emulator',
+            deviceOrientation: 'portrait'
         }
     },
 
