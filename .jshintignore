@@ -1,3 +1,4 @@
 node_modules
 /coverage
 lib/coverage/tinytable.sorter.js
+lib/browser/client-scripts/gemini.calibrate.min.js

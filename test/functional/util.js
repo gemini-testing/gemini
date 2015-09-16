@@ -38,6 +38,22 @@ var Config = require('../../lib/config'),
         opera12: {
             browserName: 'opera',
             version: '12'
+        },
+
+        'android4.4': {
+            browserName: 'android',
+            version: '4.4',
+            platform: 'Linux',
+            device: 'Android Emulator',
+            deviceOrientation: 'portrait'
+        },
+
+        'android5': {
+            browserName: 'android',
+            version: '5.0',
+            platform: 'Linux',
+            device: 'Android Emulator',
+            deviceOrientation: 'portrait'
         }
     },
 

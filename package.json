@@ -21,7 +21,7 @@
     "install": "^0.1.8",
     "js-yaml": "^3.2.5",
     "lodash": "^3.6.0",
-    "looks-same": "^2.0.0",
+    "looks-same": "^2.2.0",
     "minimatch": "^2.0.1",
     "png-img": "~1.1.0",
     "polyfill-service": "~1.4.0",
@@ -49,10 +49,12 @@
     "jshint": "^2.7.0",
     "mocha": "^2.1.0",
     "mockery": "^1.4.0",
-    "sinon": "^1.14.1"
+    "sinon": "^1.14.1",
+    "uglify-js": "^2.4.24"
   },
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
+    "prepublish": "uglifyjs ./lib/browser/client-scripts/gemini.calibrate.js -m > ./lib/browser/client-scripts/gemini.calibrate.min.js",
     "test-func": "istanbul test _mocha test/functional",
     "test": "istanbul test _mocha -- --recursive test/unit test/functional",
     "lint": "jshint . && jscs ."

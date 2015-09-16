@@ -99,7 +99,8 @@ describe('capture session', function() {
                         width: 1,
                         height: 1
                     },
-                    ignoreAreas: []
+                    ignoreAreas: [],
+                    pixelRatio: 1
                 });
 
                 this.browser.prepareScreenshot.returns(q({
@@ -107,7 +108,8 @@ describe('capture session', function() {
                     documentHeight: opts.documentSize.height,
                     captureArea: opts.captureArea,
                     viewportOffset: opts.viewportOffset,
-                    ignoreAreas: opts.ignoreAreas
+                    ignoreAreas: opts.ignoreAreas,
+                    pixelRatio: opts.pixelRatio
                 }));
 
                 var image = {
@@ -183,7 +185,8 @@ describe('capture session', function() {
                         imageSize: {width: 1000, height: 1000},
                         captureArea: opts.captureArea,
                         ignoreAreas: opts.ignoreAreas,
-                        viewportOffset: opts.viewportOffset
+                        viewportOffset: opts.viewportOffset,
+                        pixelRatio: opts.pixelRatio
                     });
                 };
             });
@@ -249,6 +252,37 @@ describe('capture session', function() {
                 });
 
                 return assert.isRejected(this.performCapture(), StateError);
+            });
+
+            it('should scale coords by pixel ratio if browser.usePixelRatio is true', function() {
+                var _this = this;
+                this.setupImageEqualToDocument({
+                    captureArea: {top: 1, left: 2, width: 3, height: 4},
+                    pixelRatio: 2
+                });
+
+                this.browser.usePixelRatio = true;
+
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWith(_this.image.crop, {top: 2, left: 4, width: 6, height: 8});
+                    });
+            });
+
+            it('should ignore pixel ratio when browser.usePixelRatio is false', function() {
+                var _this = this,
+                    captureArea = {top: 1, left: 2, width: 3, height: 4};
+                this.setupImageEqualToDocument({
+                    captureArea: captureArea,
+                    pixelRatio: 2
+                });
+
+                this.browser.usePixelRatio = false;
+
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWith(_this.image.crop, captureArea);
+                    });
             });
         });
 
