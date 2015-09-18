@@ -1,6 +1,7 @@
 'use strict';
 var Config = require('../../lib/config'),
-    assert = require('chai').assert;
+    assert = require('chai').assert,
+    _ = require('lodash');
 
 describe('config', function() {
     describe('overrides', function() {
@@ -50,6 +51,57 @@ describe('config', function() {
 
         it('should override value with cli if allowOverredies.cli is true', function() {
             assert.equal(this.getFinalConfigValue({cli: true}), this.cliValue);
+        });
+    });
+
+    describe('forBrowser', function() {
+        // Set required options
+        function mkConfig_(opts) {
+            opts = _.defaults(opts || {}, {
+                system: {
+                    projectRoot: '/some/root'
+                },
+                browsers: {}
+            });
+
+            _.forEach(opts.browsers, function(browser) {
+                _.defaults(browser, {
+                    desiredCapabilities: {}
+                });
+            });
+
+            return new Config(opts);
+        }
+
+        it('should return same object for each request', function() {
+            var config = mkConfig_({
+                rootUrl: 'http://some/url',
+                browsers: {
+                    browser: {}
+                }
+            });
+
+            var browserConfig = config.forBrowser('browser');
+            browserConfig.rootUrl = 'http://new/url';
+
+            var browserConfig2 = config.forBrowser('browser');
+            assert.equal(browserConfig2.rootUrl, 'http://new/url');
+        });
+
+        it('should return different objects for different browsers', function() {
+            var config = mkConfig_({
+                rootUrl: 'http://some/url',
+                browsers: {
+                    browser1: {},
+                    browser2: {}
+                }
+            });
+
+            var browserConfig1 = config.forBrowser('browser1');
+            browserConfig1.rootUrl = 'http://new/url';
+
+            var browserConfig2 = config.forBrowser('browser2');
+            assert.equal(browserConfig2.rootUrl, 'http://some/url');
         });
     });
 });
