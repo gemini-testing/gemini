@@ -10,6 +10,10 @@ env:
   - secure: UondfJRnFfyjIOHoC5CXMiC8kPotq4dmgI93G5KETC2yLplRMNLBGSgaa+wuow3kDk0gDamYPWl/wV0tGbKG5qAvtm8DcvgONzIamTKYElf+7wmeHSoBZQ8vbrvu2Eo+zw8kGIzreBvOnm8TxpTM1vE6mAtfXq+aBGhW3l/2Mkw=
   - CXX=g++-4.8
 
+cache:
+  directories:
+    - node_modules
+
 matrix:
   include:
     - env: NPM_SCRIPT=lint
