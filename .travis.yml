@@ -15,6 +15,7 @@ cache:
     - node_modules
 
 matrix:
+  fast_finish: true
   include:
     - env: NPM_SCRIPT=lint
 
