@@ -128,11 +128,11 @@ describe('Reporter#Flat', function() {
         });
 
         it('originalError', function() {
-            test.originalError = {message: 'Error from originalError'};
+            test.originalError = {stack: 'Error from originalError'};
 
             emit(RunnerEvents.ERROR, test);
 
-            assert.calledWith(logger.error, test.originalError.message);
+            assert.calledWith(logger.error, test.originalError.stack);
         });
     });
 
