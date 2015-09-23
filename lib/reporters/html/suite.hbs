@@ -14,7 +14,13 @@
                         {{/if}}
 
                         {{#if warning}}
-                            <pre class="reason">{{{reason}}}</pre>
+                            <div class="image-box image-box_warning">
+                                <div class="image-box__image">
+                                    <div class="image-box__title">New image</div>
+                                    {{image "actual"}}
+                                    <pre class="reason">{{{reason}}}</pre>
+                                </div>
+                            </div>
                         {{/if}}
 
                         {{#if success}}
