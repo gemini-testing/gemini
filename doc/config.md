@@ -197,6 +197,9 @@ Settings list:
   started. By default is `.inf` (no limit). Set to smaller number if you are
   experiencing stability problems.
 
+* `retry` – maximum amount of relaunch fallen tests with a critical error. If not
+  specified, the fallen tests will not be relaunched (by default it's 0).
+
 ## Sets
 
 You can link some set of tests with certain browsers using `sets`.
