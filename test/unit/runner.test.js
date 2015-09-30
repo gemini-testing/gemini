@@ -47,7 +47,8 @@ describe('runner', function() {
         this.pool = {
             getBrowser: this.sinon.stub().returns(q(browser)),
             freeBrowser: this.sinon.stub().returns(q()),
-            finalizeBrowsers: this.sinon.stub().returns(q())
+            finalizeBrowsers: this.sinon.stub().returns(q()),
+            cancel: this.sinon.stub()
         };
 
         this.sinon.stub(pool, 'create').returns(this.pool);
@@ -72,6 +73,9 @@ describe('runner', function() {
                 }
             });
         this.runner = new Runner(config);
+
+        this.sinon.stub(this.runner.config, 'forBrowser')
+            .returns({retry: 0});
 
         this.runSuites = function() {
             return this.runner.run(flatSuites(this.root));
@@ -107,7 +111,6 @@ describe('runner', function() {
         });
 
         it('should pass all browser ids when emitting `begin`', function() {
-            console.log(this.runner.config.getBrowserIds);
             this.sinon.stub(this.runner.config, 'getBrowserIds')
                 .returns(['browser1', 'browser2']);
 
@@ -483,6 +486,100 @@ describe('runner', function() {
                     stopBrowser,
                     end
                 );
+            });
+        });
+    });
+
+    describe('relaunch', function() {
+        beforeEach(function() {
+            this.runSuites = function() {
+                return this.runner.run(flatSuites(this.suite));
+            };
+        });
+
+        it('should not relaunch suites by default', function() {
+            this.pool.getBrowser.onFirstCall().returns(q.reject(new Error('error')));
+
+            return assert.isRejected(this.runSuites());
+        });
+
+        describe('with predefined "retry" option', function() {
+            beforeEach(function() {
+                var config = new Config({
+                        system: {
+                            projectRoot: '/'
+                        },
+                        rootUrl: 'http://example.com',
+                        gridUrl: 'http://grid.example.com',
+                        browsers: {
+                            browser: {
+                                desiredCapabilities: {},
+                                retry: 3
+                            },
+                            browser2: {
+                                desiredCapabilities: {}
+                            }
+                        }
+                    });
+                this.runner = new Runner(config);
+            });
+
+            it('should emit `info` message on retry', function() {
+                var spy = this.sinon.spy().named('onInfo');
+
+                this.runner.on('info', spy);
+                this.pool.getBrowser.onFirstCall().returns(q.reject(new Error('error')));
+
+                return this.runSuites().then(function() {
+                    assert.calledOnce(spy);
+                });
+            });
+
+            it('should relaunch suites after first call', function() {
+                var getBrowser = this.pool.getBrowser;
+
+                getBrowser.onFirstCall().returns(q.reject(new Error('error')));
+
+                return this.runSuites().then(function() {
+                    assert.calledTwice(getBrowser);
+                });
+            });
+
+            it('should relaunch suite as many times as specified in "retry" option', function() {
+                var getBrowser = this.pool.getBrowser,
+                    // count of retries + first function call
+                    totalCallCount = this.runner.config.forBrowser('browser').retry + 1;
+
+                getBrowser.returns(q.reject(new Error('error')));
+
+                return this.runSuites().fail(function() {
+                    assert.callCount(getBrowser, totalCallCount);
+                });
+            });
+
+            it('should apply "retry" option personally for each browser', function() {
+                this.root.browsers = ['browser', 'browser2'];
+                var getBrowser = this.pool.getBrowser,
+                    firstBrowser = getBrowser.withArgs('browser'),
+                    secondBrowser = getBrowser.withArgs('browser2'),
+                    firstBrowserCallCount = this.runner.config.forBrowser('browser').retry + 1;
+
+                getBrowser.returns(q.reject(new Error('error')));
+
+                return this.runSuites().fail(function() {
+                    assert.callCount(firstBrowser, firstBrowserCallCount);
+                    assert.calledOnce(secondBrowser);
+                });
+            });
+
+            it('should not relaunch suite if it was manually stopped', function() {
+                var getBrowser = this.pool.getBrowser;
+
+                getBrowser.onFirstCall().returns(q.reject(new pool.CancelledError()));
+
+                return this.runSuites().then(function() {
+                    assert.calledOnce(getBrowser);
+                });
             });
         });
     });

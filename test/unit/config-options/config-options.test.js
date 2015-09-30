@@ -567,6 +567,65 @@ describe('config', function() {
             });
         });
 
+        describe('retry', function() {
+            it('should not accept non-numbers', function() {
+                assert.throws(function() {
+                    createBrowserConfig({
+                        retry: '1'
+                    });
+                }, GeminiError);
+            });
+
+            it('should not accept negative value', function() {
+                assert.throws(function() {
+                    createBrowserConfig({
+                        retry: -1
+                    });
+                }, GeminiError);
+            });
+
+            it('should accept numbers', function() {
+                var config = createBrowserConfig({
+                    retry: 3
+                });
+                assert.equal(config.retry, 3);
+            });
+
+            it('should accept 0', function() {
+                var config = createBrowserConfig({
+                    retry: 0
+                });
+                assert.equal(config.retry, 0);
+            });
+
+            it('should be 0 by default', function() {
+                var config = createBrowserConfig({});
+                assert.equal(config.retry, 0);
+            });
+
+            it('should correctly parse env var', function() {
+                assertParsesEnv({
+                    property: 'browsers.browser.retry',
+                    value: '3',
+                    expected: 3
+                });
+            });
+
+            it('should correctly parse cli flag', function() {
+                assertParsesCli({
+                    property: 'browsers.browser.retry',
+                    value: '3',
+                    expected: 3
+                });
+            });
+
+            shouldBeSettableFromTopLevel('retry', 3);
+            shouldOverrideTopLevelValue('retry', {
+                top: 2,
+                browser: 5
+            });
+        });
+
         describe('tolerance', function() {
             it('should not accept non-numbers', function() {
                 assert.throws(function() {
