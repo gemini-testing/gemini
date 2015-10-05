@@ -41,19 +41,22 @@ var Config = require('../../lib/config'),
         },
 
         'android4.4': {
-            browserName: 'android',
-            version: '4.4',
-            platform: 'Linux',
-            device: 'Android Emulator',
-            deviceOrientation: 'portrait'
+            browserName: 'Browser',
+            appiumVersion: '1.4.11',
+            deviceName: 'Android Emulator',
+            deviceOrientation: 'portrait',
+            platformVersion: '4.4',
+            platformName: 'Android'
+
         },
 
         'android5': {
-            browserName: 'android',
-            version: '5.0',
-            platform: 'Linux',
-            device: 'Android Emulator',
-            deviceOrientation: 'portrait'
+            browserName: 'Browser',
+            appiumVersion: '1.4.11',
+            deviceName: 'Android Emulator',
+            deviceOrientation: 'portrait',
+            platformVersion: '5.0',
+            platformName: 'Android'
         }
     },
 
