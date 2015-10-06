@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.0 - 2015-10-05
+
+* Add Android support (@SevInf)
+
+* Fix: return same config object for each config.forBrowser request (@j0tunn)
+
+* Fix "undefined" output instead of browser name in the flat reporter (@scf2k)
+
+* Show current image for tests which have no reference images (@hatroman)
+
+* Screenshot whole page when gemini can't find a selector (@scf2k)
+
+* Add `retry` option. See [docs](doc/config.md) (@sipayrt)
+
+* Fix: fire END_SUITE event when nested suites are done (@scf2k)
+
 ## 0.13.5 - 2015-09-09
 
 * Added the `vflat` reporter (@unlok)
