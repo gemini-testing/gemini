@@ -163,6 +163,18 @@ describe('capture session', function() {
             });
         });
 
+        it('should not make screenshot before prepareScreenshot has been executed', function() {
+            var _this = this,
+                spy = sinon.spy();
+
+            // add delay for guaranted call spy in next tick
+            this.browser.prepareScreenshot.returns(q.delay(1).then(spy));
+
+            return this.session.capture(this.state).then(function() {
+                assert.callOrder(spy, _this.browser.captureFullscreenImage);
+            });
+        });
+
         it('should prepare screenshot before taking it', function() {
             var _this = this;
             this.state.captureSelectors = ['.selector1', '.selector2'];
