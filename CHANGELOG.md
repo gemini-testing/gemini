@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 - 2015-10-08
+
+* Fix: END_RUNNER event delivered to plugins in case of critical error (@SwinX)
+* Fix: make screenshot after prepareScreenshot() has been executed (@sipayrt)
+* Remove spaces from env GEMINI_BROWSERS (@sipayrt)
+
 ## 1.0.0 - 2015-10-05
 
 * Add Android support (@SevInf)
