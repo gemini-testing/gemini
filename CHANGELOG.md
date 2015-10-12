@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3 - 2015-12-08
+
+* Fix: return correct exit code on test failing (@sipayrt)
+
 ## 1.0.2 - 2015-12-08
 
 * Fix handling of END_RUNNER event (@sipayrt)
