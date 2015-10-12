@@ -80,7 +80,7 @@ describe('LimitedPool', function() {
 
             this.underlyingPool.getBrowser
                 .withArgs('first').returns(q(this.makeBrowser()))
-                .withArgs('second').returns(expectedBrowser);
+                .withArgs('second').returns(q(expectedBrowser));
 
             var result = pool.getBrowser('first')
                 .then(function(browser) {
