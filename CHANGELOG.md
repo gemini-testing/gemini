@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 - 2015-12-08
+
+* Fix handling of END_RUNNER event (@sipayrt)
+
 ## 1.0.1 - 2015-10-08
 
 * Fix: END_RUNNER event delivered to plugins in case of critical error (@SwinX)
