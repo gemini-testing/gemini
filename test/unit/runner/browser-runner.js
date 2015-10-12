@@ -5,7 +5,9 @@ var q = require('q'),
     pool = require('../../../lib/browser-pool'),
     Pool = require('../../../lib/browser-pool/pool'),
     Config = require('../../../lib/config'),
-    MetaError = require('../../../lib/errors/meta-error');
+    MetaError = require('../../../lib/errors/meta-error'),
+
+    makekSuiteStub = require('../../util').makeSuiteStub;
 
 describe('runner/BrowserRunner', function() {
     var sandbox = sinon.sandbox.create(),
@@ -49,8 +51,8 @@ describe('runner/BrowserRunner', function() {
 
         it('should get only browser associated wit runner', function() {
             var suites = [
-                    {browsers: ['browser1', 'browser2']},
-                    {browsers: ['browser2']}
+                    makekSuiteStub({browsers: ['browser1', 'browser2']}),
+                    makekSuiteStub({browsers: ['browser2']})
                 ];
 
             var runner = mkRunner_('browser1');
@@ -64,8 +66,8 @@ describe('runner/BrowserRunner', function() {
 
         it('should get new browser for each suite', function() {
             var suites = [
-                    {browsers: ['browser']},
-                    {browsers: ['browser']}
+                    makekSuiteStub({browsers: ['browser']}),
+                    makekSuiteStub({browsers: ['browser']})
                 ];
 
             var runner = mkRunner_('browser');
@@ -78,10 +80,10 @@ describe('runner/BrowserRunner', function() {
         });
 
         it('should run only suites expected to be run in current browser', function() {
-            var someSuite = {browsers: ['browser1', 'browser2']},
+            var someSuite = makekSuiteStub({browsers: ['browser1', 'browser2']}),
                 suites = [
                     someSuite,
-                    {browsers: ['browser2']}
+                    makekSuiteStub({browsers: ['browser2']})
                 ];
 
             var runner = mkRunner_('browser1');
@@ -109,8 +111,8 @@ describe('runner/BrowserRunner', function() {
         it('should cancel suite runners on cancel', function() {
             var runner = mkRunner_('browser'),
                 suites = [
-                    {browsers: ['browser']},
-                    {browsers: ['browser']}
+                    makekSuiteStub({browsers: ['browser']}),
+                    makekSuiteStub({browsers: ['browser']})
                 ];
 
             return runner.run(suites)
@@ -124,7 +126,7 @@ describe('runner/BrowserRunner', function() {
         it('should free browser after cancel', function() {
             var runner = mkRunner_('browser'),
                 suites = [
-                    {browsers: ['browser']}
+                    makekSuiteStub({browsers: ['browser']})
                 ];
             runner.cancel();
 
@@ -165,7 +167,7 @@ describe('runner/BrowserRunner', function() {
             var startBrowser = sinon.spy().named('onStartBrowser'),
                 stopBrowser = sinon.spy().named('onStopBrowser'),
                 suites = [
-                    {browsers: ['browser']}
+                    makekSuiteStub({browsers: ['browser']})
                 ];
 
             var runner = mkRunner_('browser');
@@ -183,65 +185,61 @@ describe('runner/BrowserRunner', function() {
         });
     });
 
-    describe('relaunch', function() {
+    describe('critical error', function() {
         beforeEach(function() {
             browserPool.getBrowser.returns(q.resolve());
             browserPool.finalizeBrowsers.returns(q.resolve());
         });
 
-        function run_() {
-            var runner = mkRunner_('browser'),
+        it('should emit `criticalError` event on error', function() {
+            var onCriticalError = sinon.spy().named('onCriticalError'),
                 suites = [
-                    {browsers: ['browser']}
-                ];
-            return runner.run(suites);
-        }
-
-        it('should not relaunch suites if retry count is 0', function() {
-            config.forBrowser.returns({retry: 0});
-            browserPool.getBrowser.onFirstCall().returns(q.reject(new Error('some-error')));
-
-            return assert.isRejected(run_(), /some-error/);
-        });
-
-        it('should emit `info` message on retry', function() {
-            config.forBrowser.returns({retry: 1});
-
-            var onInfo = sinon.spy().named('onInfo'),
-                suites = [
-                    {browsers: ['browser']}
+                    makekSuiteStub({browsers: ['browser']})
                 ];
 
             var runner = mkRunner_('browser');
-            runner.on('info', onInfo);
+            runner.on('criticalError', onCriticalError);
             browserPool.getBrowser.onFirstCall().returns(q.reject(new Error('error')));
 
             return runner.run(suites)
                 .then(function() {
-                    assert.calledOnce(onInfo);
+                    assert.calledOnce(onCriticalError);
                 });
         });
 
-        it('should relaunch suite as many times as specified in "retry" option', function() {
-            config.forBrowser.returns({retry: 2});
+        it('should not emit `criticalError` if it was manually stopped', function() {
+            var onCriticalError = sinon.spy().named('onCriticalError'),
+                suites = [
+                    makekSuiteStub()
+                ],
+                runner = mkRunner_();
 
-            browserPool.getBrowser.onFirstCall().returns(q.reject(new Error('error')));
-            browserPool.getBrowser.onSecondCall().returns(q.reject(new Error('error')));
-
-            return run_()
-                .then(function() {
-                    assert.callCount(browserPool.getBrowser, 2 + 1);
-                });
-        });
-
-        it('should not relaunch suite if it was manually stopped', function() {
-            config.forBrowser.returns({retry: 1});
-
+            runner.on('criticalError', onCriticalError);
             browserPool.getBrowser.onFirstCall().returns(q.reject(new pool.CancelledError()));
 
-            return run_()
+            return runner.run(suites)
                 .then(function() {
-                    assert.calledOnce(browserPool.getBrowser);
+                    assert.notCalled(onCriticalError);
+                });
+        });
+
+        it('should pass suite and browser id as critical error event data', function() {
+            var onCriticalError = sinon.spy().named('onCriticalError'),
+                suite = makekSuiteStub({browsers: ['browser']}),
+                suites = [
+                    suite
+                ],
+                runner = mkRunner_('browser');
+
+            runner.on('criticalError', onCriticalError);
+            browserPool.getBrowser.onFirstCall().returns(q.reject(new Error('error')));
+
+            return runner.run(suites)
+                .then(function() {
+                    assert.calledWithMatch(onCriticalError, {
+                        suite: suite,
+                        browserId: 'browser'
+                    });
                 });
         });
     });

@@ -1,11 +1,12 @@
 'use strict';
-var _ = require('lodash'),
-    q = require('q'),
+var q = require('q'),
     CaptureSession = require('../../../lib/capture-session'),
     SuiteRunner = require('../../../lib/runner/suite-runner'),
     StateRunner = require('../../../lib/runner/state-runner'),
     Config = require('../../../lib/config'),
-    util = require('../../util');
+    util = require('../../util'),
+
+    makeSuiteStub = require('../../util').makeSuiteStub;
 
 describe('runner/SuiteRunner', function() {
     var sandbox = sinon.sandbox.create(),
@@ -33,18 +34,6 @@ describe('runner/SuiteRunner', function() {
         return SuiteRunner.create(browser, config);
     }
 
-    function mkSuiteStub_(opts) {
-        opts = opts || {};
-        return _.defaults(opts, {
-            hasStates: opts.states && opts.states.length > 0,
-            url: 'some-default-url',
-            beforeHook: sinon.spy(),
-            afterHook: sinon.spy(),
-            states: [],
-            runPostActions: sinon.stub()
-        });
-    }
-
     function run_(suite) {
         var runner = mkRunner_();
         return runner.run(suite);
@@ -53,7 +42,7 @@ describe('runner/SuiteRunner', function() {
     describe('run', function() {
         it('should emit `beginSuite` event', function() {
             var onBeginSuite = sinon.spy().named('onBeginSuite'),
-                suite = mkSuiteStub_(),
+                suite = makeSuiteStub(),
                 runner = SuiteRunner.create(browser, config);
             browser.id = 'browser';
 
@@ -69,7 +58,7 @@ describe('runner/SuiteRunner', function() {
 
         it('should emit `endSuite` event', function() {
             var onEndSuite = sinon.spy().named('onEndSuite'),
-                suite = mkSuiteStub_(),
+                suite = makeSuiteStub(),
                 runner = SuiteRunner.create(browser, config);
             browser.id = 'browser';
 
@@ -86,7 +75,7 @@ describe('runner/SuiteRunner', function() {
         it('should emit events in correct order', function() {
             var onBeginSuite = sinon.spy().named('onBeginSuite'),
                 onEndSuite = sinon.spy().named('onEndSuite'),
-                suite = mkSuiteStub_(),
+                suite = makeSuiteStub(),
                 runner = mkRunner_();
 
             runner.on('beginSuite', onBeginSuite);
@@ -102,7 +91,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should not call any hook if no states', function() {
-            var suite = mkSuiteStub_();
+            var suite = makeSuiteStub();
 
             return run_(suite)
                 .then(function() {
@@ -111,7 +100,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should call `before` hook if there are some states', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -123,7 +112,7 @@ describe('runner/SuiteRunner', function() {
 
         it('should run states', function() {
             var state = util.makeStateStub(),
-                suite = mkSuiteStub_({
+                suite = makeSuiteStub({
                     states: [state]
                 });
 
@@ -137,7 +126,7 @@ describe('runner/SuiteRunner', function() {
             var suite;
 
             beforeEach(function() {
-                suite = mkSuiteStub_({
+                suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -176,7 +165,7 @@ describe('runner/SuiteRunner', function() {
             var state1 = util.makeStateStub(),
                 state2 = util.makeStateStub(),
                 mediator = sinon.spy(),
-                suite = mkSuiteStub_({
+                suite = makeSuiteStub({
                     states: [state1, state2]
                 });
 
@@ -193,7 +182,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should open suite url in browser', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()],
                     url: '/path'
                 });
@@ -206,7 +195,7 @@ describe('runner/SuiteRunner', function() {
 
         it('should not run states after cancel', function() {
             var state = util.makeStateStub(),
-                suite = mkSuiteStub_({
+                suite = makeSuiteStub({
                     states: [state]
                 }),
                 runner = mkRunner_();
@@ -221,7 +210,7 @@ describe('runner/SuiteRunner', function() {
 
         it('should fail if some state failed', function() {
             var state = util.makeStateStub(),
-                suite = mkSuiteStub_({
+                suite = makeSuiteStub({
                     states: [state]
                 });
 
@@ -233,7 +222,7 @@ describe('runner/SuiteRunner', function() {
         it('should not run state after failed state', function() {
             var state1 = util.makeStateStub(),
                 state2 = util.makeStateStub(),
-                suite = mkSuiteStub_({
+                suite = makeSuiteStub({
                     states: [state1, state2]
                 });
 
@@ -246,7 +235,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should call `after` hook', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -258,7 +247,7 @@ describe('runner/SuiteRunner', function() {
 
         it('should run `afterHook` even if state failed', function() {
             var state = util.makeStateStub(),
-                suite = mkSuiteStub_({
+                suite = makeSuiteStub({
                     states: [state]
                 });
 
@@ -272,7 +261,7 @@ describe('runner/SuiteRunner', function() {
 
         it('should fail if `afterHook` failed', function() {
             var state = util.makeStateStub(),
-                suite = mkSuiteStub_({
+                suite = makeSuiteStub({
                     states: [state]
                 });
 
@@ -282,7 +271,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should reject with state error if state and `afterHook` failed', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -293,7 +282,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should run post actions', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -304,7 +293,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should fail if post actions failed', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -314,7 +303,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should run post actions if state failed', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -327,7 +316,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should run post actions if `afterHook` failed', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -340,7 +329,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should reject with state error if state and post actions failed', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
@@ -351,7 +340,7 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should reject with afterHook error if afterHook and post actions failed', function() {
-            var suite = mkSuiteStub_({
+            var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 

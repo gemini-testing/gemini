@@ -23,6 +23,18 @@ function browserWithId(id) {
     });
 }
 
+function makeSuiteStub(opts) {
+    opts = opts || {};
+    return _.defaults(opts, {
+        hasStates: opts.states && opts.states.length > 0,
+        url: 'some-default-url',
+        beforeHook: sinon.spy(),
+        afterHook: sinon.spy(),
+        states: [],
+        runPostActions: sinon.stub()
+    });
+}
+
 function makeStateStub(suite) {
     var state = new State(suite, 'default-state-name');
     state.shouldSkip = sinon.stub();
@@ -32,3 +44,4 @@ function makeStateStub(suite) {
 exports.makeBrowser = makeBrowser;
 exports.browserWithId = browserWithId;
 exports.makeStateStub = makeStateStub;
+exports.makeSuiteStub = makeSuiteStub;
