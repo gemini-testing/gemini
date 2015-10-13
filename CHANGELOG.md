@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.4 - 2015-13-08
+
+* Fix counting of skipped test by flat reporter (@sipayrt)
+* Pass sessionId on events for correctly TC work (@sipayrt)
+
 ## 1.0.3 - 2015-12-08
 
 * Fix: return correct exit code on test failing (@sipayrt)
