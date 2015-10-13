@@ -23,6 +23,7 @@ describe('runner', function() {
 
         var browser = {
             id: 'browser',
+            sessionId: 'sessionId',
             createActionSequence: this.sinon.stub().returns({
                 perform: this.sinon.stub().returns(q.resolve()),
                 getPostActions: this.sinon.stub().returns(null)
@@ -241,7 +242,8 @@ describe('runner', function() {
                 assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
-                    browserId: 'browser'
+                    browserId: 'browser',
+                    sessionId: 'sessionId'
                 });
             });
         });
@@ -274,7 +276,8 @@ describe('runner', function() {
                 assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
-                    browserId: 'browser'
+                    browserId: 'browser',
+                    sessionId: 'sessionId'
                 });
             });
         });
@@ -329,7 +332,8 @@ describe('runner', function() {
                 assert.calledWith(spy, {
                     suite: _this.suite,
                     state: state,
-                    browserId: 'browser'
+                    browserId: 'browser',
+                    sessionId: 'sessionId'
                 });
             });
         });
