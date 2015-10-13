@@ -83,15 +83,24 @@ describe('Reporter#Flat', function() {
             assert.equal(counters.skipped, 0);
         });
 
-        it('skipped', function() {
-            emit(RunnerEvents.WARNING, test);
+        describe('skipped', function() {
+            it('should increment skipped count on WARNING event', function() {
+                emit(RunnerEvents.WARNING, test);
 
-            var counters = getCounters(logger.log.lastCall.args);
+                var counters = getCounters(logger.log.lastCall.args);
 
-            assert.equal(counters.total, 1);
-            assert.equal(counters.passed, 0);
-            assert.equal(counters.failed, 0);
-            assert.equal(counters.skipped, 1);
+                assert.equal(counters.total, 1);
+                assert.equal(counters.skipped, 1);
+            });
+
+            it('should increment skipped count on SKIP_STATE event', function() {
+                emit(RunnerEvents.SKIP_STATE, test);
+
+                var counters = getCounters(logger.log.lastCall.args);
+
+                assert.equal(counters.total, 1);
+                assert.equal(counters.skipped, 1);
+            });
         });
     });
 
