@@ -37,6 +37,9 @@ matrix:
       - BROWSER=chrome
       - NPM_SCRIPT='test-browser --coverage'
     - env:
+      - BROWSER=safari
+      - NPM_SCRIPT='test-browser --coverage'
+    - env:
       - BROWSER=firefox
       - NPM_SCRIPT='test-browser --coverage'
     - env:

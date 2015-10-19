@@ -14,6 +14,10 @@ var Config = require('../../lib/config'),
             browserName: 'firefox'
         },
 
+        safari: {
+            browserName: 'safari'
+        },
+
         // Some specific versions we support
         ie8: {
             browserName: 'internet explorer',
@@ -57,6 +61,15 @@ var Config = require('../../lib/config'),
             deviceOrientation: 'portrait',
             platformVersion: '5.0',
             platformName: 'Android'
+        },
+
+        'ipad': {
+            browserName: 'Browser',
+            appiumVersion: '1.4.11',
+            deviceName: 'iPad Simulator',
+            deviceOrientation: 'portrait',
+            platformVersion: '9.1',
+            platformName: 'iOS'
         }
     },
 
