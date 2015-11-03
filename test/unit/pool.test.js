@@ -3,7 +3,8 @@ var sinon = require('sinon'),
     assert = require('chai').assert,
     q = require('q'),
     Browser = require('../../lib/browser'),
-    Pool = require('../../lib/browser-pool/pool');
+    Pool = require('../../lib/browser-pool/pool'),
+    browserWithId = require('../util').browserWithId;
 
 describe('UnlimitedPool', function() {
     beforeEach(function() {
@@ -12,7 +13,7 @@ describe('UnlimitedPool', function() {
             forBrowser: sinon.stub().returns(this.browserConfig)
         };
         this.sinon = sinon.sandbox.create();
-        this.browser = sinon.stub(new Browser(this.config, 'id'));
+        this.browser = sinon.stub(browserWithId('id'));
         this.browser.launch.returns(q());
         this.browser.quit.returns(q());
         this.sinon.stub(Browser.prototype, '__constructor')

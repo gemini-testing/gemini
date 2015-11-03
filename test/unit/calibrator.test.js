@@ -5,9 +5,9 @@ var sinon = require('sinon'),
     path = require('path'),
     fs = require('fs'),
     Calibrator = require('../../lib/calibrator'),
-    Browser = require('../../lib/browser'),
     Image = require('../../lib/image'),
-    GeminiError = require('../../lib/errors/gemini-error');
+    GeminiError = require('../../lib/errors/gemini-error'),
+    browserWithId = require('../util').browserWithId;
 
 describe('calibrator', function() {
     var browser, calibrator;
@@ -20,14 +20,7 @@ describe('calibrator', function() {
     }
 
     beforeEach(function() {
-        var config = {
-            browsers: {
-                id: {
-                    browserName: 'id'
-                }
-            }
-        };
-        browser = new Browser(config, 'id');
+        browser = browserWithId('id');
         sinon.stub(browser);
         browser.evalScript.returns(q({}));
         browser.open.returns(q());
