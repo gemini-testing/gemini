@@ -1,15 +1,19 @@
 # Changelog
 
-## 1.0.4 - 2015-13-08
+## 1.0.5 - 2015-11-03
+
+* Do not fail tests if browsers specified from env does not exists in config (@sipayrt)
+
+## 1.0.4 - 2015-10-13
 
 * Fix counting of skipped test by flat reporter (@sipayrt)
 * Pass sessionId on events for correctly TC work (@sipayrt)
 
-## 1.0.3 - 2015-12-08
+## 1.0.3 - 2015-10-12
 
 * Fix: return correct exit code on test failing (@sipayrt)
 
-## 1.0.2 - 2015-12-08
+## 1.0.2 - 2015-10-12
 
 * Fix handling of END_RUNNER event (@sipayrt)
 
