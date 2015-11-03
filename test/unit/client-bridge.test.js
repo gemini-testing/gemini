@@ -5,12 +5,12 @@ var q = require('q'),
     assert = require('chai').assert,
     sinon = require('sinon'),
 
-    makeBrowser = require('../util').makeBrowser,
+    browserWithId = require('../util').browserWithId,
     CALL = '__gemini.example(1, "two")';
 
 describe('ClientBridge', function() {
     beforeEach(function() {
-        this.browser = sinon.stub(makeBrowser());
+        this.browser = sinon.stub(browserWithId('id'));
         this.browser.evalScript.returns(q({}));
         this.browser.injectScript.returns(q({}));
         this.script = 'exampleScript()';
