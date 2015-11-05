@@ -165,7 +165,12 @@ describe('capture session', function() {
 
         it('should not make screenshot before prepareScreenshot has been executed', function() {
             var _this = this,
-                spy = sinon.spy();
+                screenshotData = {
+                    captureArea: {},
+                    viewportOffset: {},
+                    ignoreAreas: []
+                },
+                spy = sinon.stub().returns(q.resolve(screenshotData));
 
             // add delay for guaranted call spy in next tick
             this.browser.prepareScreenshot.returns(q.delay(1).then(spy));
