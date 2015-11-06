@@ -137,6 +137,22 @@ describe('CachingPool', function() {
                 });
         });
 
+        it('should clear existing browser when browser finished', function() {
+            var anotherBrowser = makeStubBrowser('id'),
+                pool = this.pool;
+
+            this.underlyingPool.getBrowser
+                .onFirstCall().returns(q(anotherBrowser));
+
+            return pool.finalizeBrowsers('id') //this.browser already added to pool in beforeEach
+                .then(function() {
+                    return pool.getBrowser('id');
+                })
+                .then(function(browser) {
+                    assert.deepEqual(browser, anotherBrowser);
+                });
+        });
+
         it('should call finalize on underlying pool when browser finished', function() {
             var _this = this;
             return this.pool.finalizeBrowsers('id')
