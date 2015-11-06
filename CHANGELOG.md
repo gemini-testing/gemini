@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.6 - 2015-11-06
+
+* Show error message + whole page screenshot on test fail (@sipayrt)
+* Fix: clean browsers pool after finalization (@SwinX)
+* Fix: check for global window variable on client-side (@eroshinev)
+
 ## 1.0.5 - 2015-11-03
 
 * Do not fail tests if browsers specified from env does not exists in config (@sipayrt)
