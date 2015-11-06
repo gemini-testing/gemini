@@ -10,7 +10,14 @@
                     <div class="section__title">{{name}}</div>
                     <div class="section__body">
                         {{#if error}}
-                            <pre class="reason">{{{reason}}}</pre>
+                            <div class="image-box image-box_error">
+                                <div class="image-box__image">
+                                    <pre class="reason">{{{reason}}}</pre>
+                                    {{#if image}}
+                                        {{image "actual"}}
+                                    {{/if}}
+                                </div>
+                            </div>
                         {{/if}}
 
                         {{#if warning}}

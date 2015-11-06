@@ -165,13 +165,38 @@ describe('capture session', function() {
 
         it('should not make screenshot before prepareScreenshot has been executed', function() {
             var _this = this,
-                spy = sinon.spy();
+                screenshotData = {
+                    captureArea: {},
+                    viewportOffset: {},
+                    ignoreAreas: []
+                },
+                spy = sinon.stub().returns(q.resolve(screenshotData));
 
             // add delay for guaranted call spy in next tick
             this.browser.prepareScreenshot.returns(q.delay(1).then(spy));
 
             return this.session.capture(this.state).then(function() {
                 assert.callOrder(spy, _this.browser.captureFullscreenImage);
+            });
+        });
+
+        it('should call captureFullscreenImage method even if prepareScreenshot has been failed', function() {
+            var _this = this;
+
+            this.browser.prepareScreenshot.returns(q.reject({}));
+
+            return this.session.capture(this.state).fail(function() {
+                assert.calledOnce(_this.browser.captureFullscreenImage);
+            });
+        });
+
+        it('should reject error with image object on prepareScreenshot has been failed', function() {
+            var error = new Error('Some error');
+            this.browser.prepareScreenshot.returns(q.reject(error));
+
+            return this.session.capture(this.state).fail(function(e) {
+                assert.propertyVal(e, 'message', error.message);
+                assert.property(e, 'image');
             });
         });
 
