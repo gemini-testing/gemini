@@ -180,6 +180,26 @@ describe('capture session', function() {
             });
         });
 
+        it('should call captureFullscreenImage method even if prepareScreenshot has been failed', function() {
+            var _this = this;
+
+            this.browser.prepareScreenshot.returns(q.reject({}));
+
+            return this.session.capture(this.state).fail(function() {
+                assert.calledOnce(_this.browser.captureFullscreenImage);
+            });
+        });
+
+        it('should reject error with image object on prepareScreenshot has been failed', function() {
+            var error = new Error('Some error');
+            this.browser.prepareScreenshot.returns(q.reject(error));
+
+            return this.session.capture(this.state).fail(function(e) {
+                assert.propertyVal(e, 'message', error.message);
+                assert.property(e, 'image');
+            });
+        });
+
         it('should prepare screenshot before taking it', function() {
             var _this = this;
             this.state.captureSelectors = ['.selector1', '.selector2'];
