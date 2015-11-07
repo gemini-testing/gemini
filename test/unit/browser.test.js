@@ -45,6 +45,8 @@ describe('browser', function() {
                 get: sinon.stub().returns(q({})),
                 eval: sinon.stub().returns(q('')),
                 setWindowSize: sinon.stub().returns(q({})),
+                maximize: sinon.stub().returns(q()),
+                windowHandle: sinon.stub().returns(q({})),
                 on: sinon.stub()
             };
 
@@ -99,6 +101,19 @@ describe('browser', function() {
             });
         });
 
+        it('should maximize window if launching phantomjs', function() {
+            var _this = this;
+
+            this.browser = makeBrowser({
+                browserName: 'phantomjs',
+                version: '1.0'
+            }, {calibrate: false});
+
+            return this.launchBrowser().then(function() {
+                assert.called(_this.wd.maximize);
+            });
+        });
+
         describe('with windowSize option', function() {
             beforeEach(function() {
                 this.browser.config.windowSize = {width: 1024, height: 768};
@@ -108,6 +123,13 @@ describe('browser', function() {
                 var _this = this;
                 return this.launchBrowser().then(function() {
                     assert.calledWith(_this.wd.setWindowSize, 1024, 768);
+                });
+            });
+
+            it('should not maximize window', function() {
+                var _this = this;
+                return this.launchBrowser().then(function() {
+                    assert.notCalled(_this.wd.maximize);
                 });
             });
 
