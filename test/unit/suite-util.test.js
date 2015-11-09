@@ -45,6 +45,20 @@ describe('suite-util', function() {
                 makeBrowser({browserName: 'browser', version: '1.1'})
             ));
         });
+
+        it('should skip browser if its id matches skip list', function() {
+            assert.isTrue(shouldSkip(
+                [{id: 'browserId'}],
+                makeBrowser({browserName: 'browser', version: '1.0'}, {id: 'browserId'})
+            ));
+        });
+
+        it('should not skip browser if its id is not specified in skip list', function() {
+            assert.isFalse(shouldSkip(
+                [{id: 'browserId2'}],
+                makeBrowser({browserName: 'browser', version: '1.0'}, {id: 'browserId'})
+            ));
+        });
     });
 
     describe('flattenSuites()', function() {
