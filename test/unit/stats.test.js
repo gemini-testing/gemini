@@ -1,8 +1,5 @@
 'use strict';
 var EventEmitter = require('events').EventEmitter,
-
-    assert = require('chai').assert,
-
     inherit = require('inherit'),
 
     Stats = require('../../lib/stats'),

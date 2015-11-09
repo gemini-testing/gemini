@@ -2,9 +2,7 @@
 
 var utils = require('../../lib/utils'),
     pathUtils = require('../../lib/path-utils'),
-    assert = require('chai').assert,
     mockery = require('mockery'),
-    sinon = require('sinon'),
     _ = require('lodash'),
     q = require('q');
 

@@ -1,6 +1,5 @@
 'use strict';
 var path = require('path'),
-    assert = require('chai').assert,
     Config = require('../../lib/config'),
     GeminiError = require('../../lib/errors/gemini-error'),
 

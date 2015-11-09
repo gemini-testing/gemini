@@ -2,8 +2,6 @@
 var q = require('q'),
     ClientBridge = require('../../lib/browser/client-bridge'),
     StateError = require('../../lib/errors/state-error'),
-    assert = require('chai').assert,
-    sinon = require('sinon'),
 
     browserWithId = require('../util').browserWithId,
     CALL = '__gemini.example(1, "two")';

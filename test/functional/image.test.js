@@ -1,7 +1,6 @@
 'use strict';
 
 var fs = require('fs'),
-    assert = require('chai').assert,
     path = require('path'),
     temp = require('temp'),
     Image = require('../../lib/image');

@@ -1,6 +1,6 @@
 'use strict';
-var assert = require('assert'),
-    level = require('../../lib/coverage-level');
+var level = require('../../lib/coverage-level');
+
 describe('coverage level', function() {
     describe('merge', function() {
         it('NONE + NONE should equal NONE', function() {

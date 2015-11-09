@@ -1,5 +1,6 @@
 'use strict';
 var Browser = require('../lib/browser'),
+    State = require('../lib/state'),
     _ = require('lodash');
 
 function makeBrowser(capabilities, config) {
@@ -22,5 +23,12 @@ function browserWithId(id) {
     });
 }
 
+function makeStateStub(suite) {
+    var state = new State(suite, 'default-state-name');
+    state.shouldSkip = sinon.stub();
+    return state;
+}
+
 exports.makeBrowser = makeBrowser;
 exports.browserWithId = browserWithId;
+exports.makeStateStub = makeStateStub;

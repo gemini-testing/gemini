@@ -1,7 +1,6 @@
 'use strict';
 var eachSupportedBrowser = require('./util').eachSupportedBrowser,
-    Calibrator = require('../../lib/calibrator'),
-    assert = require('chai').assert;
+    Calibrator = require('../../lib/calibrator');
 
 describe('calibrator', function() {
     eachSupportedBrowser(function() {

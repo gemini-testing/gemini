@@ -1,7 +1,5 @@
 'use strict';
-var sinon = require('sinon'),
-    assert = require('chai').assert,
-    createSuite = require('../../lib/suite').create,
+var createSuite = require('../../lib/suite').create,
     SuiteMonitor = require('../../lib/suite-monitor');
 
 describe('suite-monitor', function() {

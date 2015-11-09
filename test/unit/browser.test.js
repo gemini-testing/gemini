@@ -2,12 +2,10 @@
 var Calibrator = require('../../lib/calibrator'),
     Browser = require('../../lib/browser'),
     ClientBridge = require('../../lib/browser/client-bridge'),
-    assert = require('chai').assert,
     q = require('q'),
     wd = require('wd'),
     fs = require('fs'),
     path = require('path'),
-    sinon = require('sinon'),
     makeBrowser = require('../util').makeBrowser;
 
 describe('browser', function() {

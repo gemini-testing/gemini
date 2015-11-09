@@ -1,8 +1,6 @@
 'use strict';
 
-var assert = require('chai').assert,
-    sinon = require('sinon'),
-    EventEmitter = require('events').EventEmitter,
+var EventEmitter = require('events').EventEmitter,
     FlatReporter = require('../../../../lib/reporters/flat-factory/flat'),
     RunnerEvents = require('../../../../lib/constants/runner-events'),
     logger = require('../../../../lib/utils').logger,

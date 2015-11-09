@@ -1,7 +1,5 @@
 'use strict';
-var sinon = require('sinon'),
-    assert = require('chai').assert,
-    _ = require('lodash'),
+var _ = require('lodash'),
     q = require('q'),
     find = require('../../lib/find-func').find,
 
