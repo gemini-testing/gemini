@@ -394,12 +394,20 @@ describe('public tests API', function() {
                 }.bind(this), TypeError);
             });
 
-            it('should throw if argument is an object and browser name is not specified', function() {
+            it('should throw if argument is an object and browser name or id is not specified', function() {
                 assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.skip({iHaveNo: 'name'});
                     });
                 }.bind(this), Error);
+            });
+
+            it('should throw if browser id is not a string', function() {
+                assert.throws(function() {
+                    this.context.suite('name', function(suite) {
+                        suite.skip({id: true});
+                    });
+                }.bind(this), TypeError);
             });
 
             it('should throw if browser name is not a string', function() {
@@ -433,12 +441,20 @@ describe('public tests API', function() {
                 assert.deepEqual(this.suite.children[0].skipped[0], {browserName: 'opera'});
             });
 
-            it('should accept browser object', function() {
+            it('should accept browser object with browserName', function() {
                 this.context.suite('name', function(suite) {
                     suite.skip({browserName: 'opera'});
                 });
 
                 assert.deepEqual(this.suite.children[0].skipped[0], {browserName: 'opera'});
+            });
+
+            it('should accept browser object with id', function() {
+                this.context.suite('name', function(suite) {
+                    suite.skip({id: 'opera'});
+                });
+
+                assert.deepEqual(this.suite.children[0].skipped[0], {id: 'opera'});
             });
 
             it('should accept array of objects', function() {
