@@ -120,17 +120,6 @@ describe('runner/SuiteRunner', function() {
                 });
         });
 
-        it('should call `after` hook if there are some states', function() {
-            var suite = mkSuiteStub_({
-                    states: [util.makeStateStub()]
-                });
-
-            return run_(suite)
-                .then(function() {
-                    assert.calledWith(CaptureSession.prototype.runHook, suite.afterHook, suite);
-                });
-        });
-
         it('should run states', function() {
             var state = util.makeStateStub(),
                 suite = mkSuiteStub_({
@@ -141,6 +130,45 @@ describe('runner/SuiteRunner', function() {
                 .then(function() {
                     assert.calledWith(StateRunner.prototype.run, state);
                 });
+        });
+
+        describe('if `beforeHook` failed', function() {
+            var suite;
+
+            beforeEach(function() {
+                suite = mkSuiteStub_({
+                    states: [util.makeStateStub()]
+                });
+
+                CaptureSession.prototype.runHook.withArgs(suite.beforeHook).returns(q.reject());
+            });
+
+            it('should fail', function() {
+                CaptureSession.prototype.runHook.withArgs(suite.beforeHook).returns(q.reject('some-error'));
+
+                return assert.isRejected(run_(suite), /some-error/);
+            });
+
+            it('should not run states', function() {
+                return run_(suite)
+                    .fail(function() {
+                        assert.notCalled(StateRunner.prototype.run);
+                    });
+            });
+
+            it('should not run `afterHook`', function() {
+                return run_(suite)
+                    .fail(function() {
+                        assert.neverCalledWith(CaptureSession.prototype.runHook, suite.afterHook);
+                    });
+            });
+
+            it('should not run post actions', function() {
+                return run_(suite)
+                    .fail(function() {
+                        assert.notCalled(suite.runPostActions);
+                    });
+            });
         });
 
         it('should run next state only after previous has been finished', function() {
@@ -163,6 +191,18 @@ describe('runner/SuiteRunner', function() {
                 });
         });
 
+        it('should open suite url in browser', function() {
+            var suite = mkSuiteStub_({
+                    states: [util.makeStateStub()],
+                    url: '/path'
+                });
+
+            return run_(suite)
+                .then(function() {
+                    assert.calledWith(browser.openRelative, '/path');
+                });
+        });
+
         it('should not run states after cancel', function() {
             var state = util.makeStateStub(),
                 suite = mkSuiteStub_({
@@ -178,15 +218,51 @@ describe('runner/SuiteRunner', function() {
                 });
         });
 
-        it('should open suite url in browser', function() {
+        it('should fail if some state failed', function() {
+            var state1 = util.makeStateStub(),
+                suite = mkSuiteStub_({
+                    states: [state1]
+                });
+
+            StateRunner.prototype.run.returns(q.reject('some-error'));
+
+            return assert.isRejected(run_(suite), /some-error/);
+        });
+
+        it('should not run state after failed state', function() {
+            var state1 = util.makeStateStub(),
+                state2 = util.makeStateStub(),
+                suite = mkSuiteStub_({
+                    states: [state1, state2]
+                });
+
+            StateRunner.prototype.run.withArgs(state1).returns(q.reject());
+
+            return run_(suite)
+                .fail(function() {
+                    assert.neverCalledWith(StateRunner.prototype.run, state2);
+                });
+        });
+
+        it('should call `after` hook', function() {
             var suite = mkSuiteStub_({
-                    states: [util.makeStateStub()],
-                    url: '/path'
+                    states: [util.makeStateStub()]
                 });
 
             return run_(suite)
                 .then(function() {
-                    assert.calledWith(browser.openRelative, '/path');
+                    assert.calledWith(CaptureSession.prototype.runHook, suite.afterHook, suite);
+                });
+        });
+
+        it('should run post actions', function() {
+            var suite = mkSuiteStub_({
+                    states: [util.makeStateStub()]
+                });
+
+            return run_(suite)
+                .then(function() {
+                    assert.calledOnce(suite.runPostActions);
                 });
         });
     });
