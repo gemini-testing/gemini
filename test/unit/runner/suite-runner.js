@@ -219,9 +219,9 @@ describe('runner/SuiteRunner', function() {
         });
 
         it('should fail if some state failed', function() {
-            var state1 = util.makeStateStub(),
+            var state = util.makeStateStub(),
                 suite = mkSuiteStub_({
-                    states: [state1]
+                    states: [state]
                 });
 
             StateRunner.prototype.run.returns(q.reject('some-error'));
@@ -253,6 +253,31 @@ describe('runner/SuiteRunner', function() {
                 .then(function() {
                     assert.calledWith(CaptureSession.prototype.runHook, suite.afterHook, suite);
                 });
+        });
+
+        it('should run `afterHook` even if state failed', function() {
+            var state = util.makeStateStub(),
+                suite = mkSuiteStub_({
+                    states: [state]
+                });
+
+            StateRunner.prototype.run.returns(q.reject());
+
+            return run_(suite)
+                .fail(function() {
+                    assert.calledWith(CaptureSession.prototype.runHook, suite.afterHook, suite);
+                });
+        });
+
+        it('should fail if `afterHook` failed', function() {
+            var state = util.makeStateStub(),
+                suite = mkSuiteStub_({
+                    states: [state]
+                });
+
+            CaptureSession.prototype.runHook.withArgs(suite.afterHook).returns(q.reject('some-error'));
+
+            return assert.isRejected(run_(suite), /some-error/);
         });
 
         it('should run post actions', function() {
