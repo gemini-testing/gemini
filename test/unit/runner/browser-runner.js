@@ -120,6 +120,19 @@ describe('runner/BrowserRunner', function() {
                 });
         });
 
+        it('should free browser after cancel', function() {
+            var runner = mkRunner_('browser'),
+                suites = [
+                    {browsers: ['browser']}
+                ];
+            runner.cancel();
+
+            return runner.run(suites)
+                .then(function() {
+                    assert.calledOnce(browserPool.freeBrowser);
+                });
+        });
+
         it('should emit `stopBrowser` after all suites', function() {
             var onStopBrowser = sinon.spy().named('onStopBrowser'),
                 runner = mkRunner_('browser');
