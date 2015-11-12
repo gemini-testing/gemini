@@ -40,7 +40,7 @@ describe('runner/SuiteRunner', function() {
             beforeHook: sinon.spy(),
             afterHook: sinon.spy(),
             states: [],
-            runPostActions: sinon.spy()
+            runPostActions: sinon.stub()
         });
     }
 
@@ -287,6 +287,42 @@ describe('runner/SuiteRunner', function() {
 
             return run_(suite)
                 .then(function() {
+                    assert.calledOnce(suite.runPostActions);
+                });
+        });
+
+        it('should fail if post actions failed', function() {
+            var suite = mkSuiteStub_({
+                    states: [util.makeStateStub()]
+                });
+
+            suite.runPostActions.returns(q.reject('some-error'));
+
+            return assert.isRejected(run_(suite), /some-error/);
+        });
+
+        it('should run post actions if state failed', function() {
+            var suite = mkSuiteStub_({
+                    states: [util.makeStateStub()]
+                });
+
+            StateRunner.prototype.run.returns(q.reject());
+
+            return run_(suite)
+                .fail(function() {
+                    assert.calledOnce(suite.runPostActions);
+                });
+        });
+
+        it('should run post actions if `afterHook` failed', function() {
+            var suite = mkSuiteStub_({
+                    states: [util.makeStateStub()]
+                });
+
+            CaptureSession.prototype.runHook.withArgs(suite.afterHook).returns(q.reject());
+
+            return run_(suite)
+                .fail(function() {
                     assert.calledOnce(suite.runPostActions);
                 });
         });
