@@ -78,7 +78,7 @@ describe('runner', function() {
 
             return run_().then(function() {
                 assert.calledWith(TestSessionRunner.create, sinon.match.any, ['browser1']);
-            }.bind(this));
+            });
         });
 
         it('should emit `end`', function() {

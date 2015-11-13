@@ -58,7 +58,7 @@ describe('runner/BrowserRunner', function() {
                 .then(function() {
                     assert.calledOnce(browserPool.getBrowser);
                     assert.calledWith(browserPool.getBrowser, 'browser1');
-                }.bind(this));
+                });
         });
 
         it('should get new browser for each suite', function() {
@@ -73,7 +73,7 @@ describe('runner/BrowserRunner', function() {
                 .then(function() {
                     assert.calledTwice(browserPool.getBrowser);
                     assert.alwaysCalledWith(browserPool.getBrowser, 'browser');
-                }.bind(this));
+                });
         });
 
         it('should run only suites expected to be run in current browser', function() {
@@ -89,7 +89,7 @@ describe('runner/BrowserRunner', function() {
                 .then(function() {
                     assert.calledOnce(SuiteRunner.prototype.run);
                     assert.calledWith(SuiteRunner.prototype.run, someSuite);
-                }.bind(this));
+                });
         });
 
         it('should not run suites after cancel', function() {
