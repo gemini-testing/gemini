@@ -26,5 +26,18 @@
         "node": false,
         "browserify": true
       }
+    },
+
+    "globals": {
+        "describe": false,
+        "xdescribe": false,
+        "before": false,
+        "after": false,
+        "beforeEach": false,
+        "afterEach": false,
+        "it": false,
+        "xit": false,
+        "assert": false,
+        "sinon": false
     }
 }

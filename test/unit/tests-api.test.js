@@ -1,8 +1,6 @@
 'use strict';
 
-var sinon = require('sinon'),
-    assert = require('chai').assert,
-    testsApi = require('../../lib/tests-api'),
+var testsApi = require('../../lib/tests-api'),
     Suite = require('../../lib/suite');
 
 describe('public tests API', function() {

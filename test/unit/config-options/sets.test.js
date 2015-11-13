@@ -1,6 +1,5 @@
 'use strict';
 var parser = require('../../../lib/config/options'),
-    assert = require('chai').assert,
     GeminiError = require('../../../lib/errors/gemini-error'),
     _ = require('lodash');
 

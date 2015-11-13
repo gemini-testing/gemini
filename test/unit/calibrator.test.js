@@ -1,7 +1,5 @@
 'use strict';
-var sinon = require('sinon'),
-    assert = require('chai').assert,
-    q = require('q'),
+var q = require('q'),
     path = require('path'),
     fs = require('fs'),
     Calibrator = require('../../lib/calibrator'),

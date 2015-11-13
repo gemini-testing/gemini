@@ -1,10 +1,8 @@
 'use strict';
 var Config = require('../../../lib/config'),
     parser = require('../../../lib/config/options'),
-    assert = require('chai').assert,
     GeminiError = require('../../../lib/errors/gemini-error'),
     MissingOptionError = require('gemini-configparser').MissingOptionError,
-    sinon = require('sinon'),
     _ = require('lodash');
 
 describe('config', function() {

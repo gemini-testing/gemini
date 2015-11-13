@@ -1,6 +1,5 @@
 'use strict';
 var Config = require('../../lib/config'),
-    assert = require('chai').assert,
     _ = require('lodash');
 
 describe('config', function() {

@@ -1,7 +1,5 @@
 'use strict';
 var _ = require('lodash'),
-    assert = require('chai').assert,
-
     suiteUtil = require('../../lib/suite-util'),
 
     shouldSkip = suiteUtil.shouldSkip,

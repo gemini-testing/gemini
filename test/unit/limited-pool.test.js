@@ -1,7 +1,5 @@
 'use strict';
-var sinon = require('sinon'),
-    assert = require('chai').assert,
-    Browser = require('../../lib/browser'),
+var Browser = require('../../lib/browser'),
     q = require('q'),
     LimitedPool = require('../../lib/browser-pool/limited-pool');
 
