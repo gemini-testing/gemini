@@ -19,6 +19,7 @@ describe('runner/SuiteRunner', function() {
         config = sinon.createStubInstance(Config);
 
         StateRunner.prototype.run.returns(q.resolve());
+        CaptureSession.prototype.runHook.returns(q.resolve());
 
         sandbox.stub(browser, 'openRelative');
         browser.openRelative.returns(q.resolve());
@@ -280,6 +281,17 @@ describe('runner/SuiteRunner', function() {
             return assert.isRejected(run_(suite), /some-error/);
         });
 
+        it('should reject with state error if state and `afterHook` failed', function() {
+            var suite = mkSuiteStub_({
+                    states: [util.makeStateStub()]
+                });
+
+            StateRunner.prototype.run.returns(q.reject('state-error'));
+            CaptureSession.prototype.runHook.withArgs(suite.afterHook).returns(q.reject('hook-error'));
+
+            return assert.isRejected(run_(suite), /state-error/);
+        });
+
         it('should run post actions', function() {
             var suite = mkSuiteStub_({
                     states: [util.makeStateStub()]
@@ -325,6 +337,28 @@ describe('runner/SuiteRunner', function() {
                 .fail(function() {
                     assert.calledOnce(suite.runPostActions);
                 });
+        });
+
+        it('should reject with state error if state and post actions failed', function() {
+            var suite = mkSuiteStub_({
+                    states: [util.makeStateStub()]
+                });
+
+            StateRunner.prototype.run.returns(q.reject('state-error'));
+            suite.runPostActions.returns(q.reject('post-actions-error'));
+
+            return assert.isRejected(run_(suite), /state-error/);
+        });
+
+        it('should reject with afterHook error if afterHook and post actions failed', function() {
+            var suite = mkSuiteStub_({
+                    states: [util.makeStateStub()]
+                });
+
+            CaptureSession.prototype.runHook.withArgs(suite.afterHook).returns(q.reject('after-hook-error'));
+            suite.runPostActions.returns(q.reject('post-actions-error'));
+
+            return assert.isRejected(run_(suite), /after-hook-error/);
         });
     });
 });
