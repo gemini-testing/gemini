@@ -4,7 +4,8 @@ var q = require('q'),
     SuiteRunner = require('../../../lib/runner/suite-runner'),
     pool = require('../../../lib/browser-pool'),
     Pool = require('../../../lib/browser-pool/pool'),
-    Config = require('../../../lib/config');
+    Config = require('../../../lib/config'),
+    MetaError = require('../../../lib/errors/meta-error');
 
 describe('runner/BrowserRunner', function() {
     var sandbox = sinon.sandbox.create(),
@@ -141,6 +142,22 @@ describe('runner/BrowserRunner', function() {
             return runner.run([])
                 .then(function() {
                     assert.calledWith(onStopBrowser, {browserId: 'browser'});
+                });
+        });
+
+        it('should not emit `criticalError` if error is an instance of MetaError', function() {
+            var onCriticalError = sinon.spy().named('onCriticalError'),
+                suites = [
+                    {browsers: ['browser']}
+                ],
+                runner = mkRunner_('browser');
+
+            runner.on('criticalError', onCriticalError);
+            browserPool.finalizeBrowsers.returns(q.reject(new MetaError('meta-error')));
+
+            return runner.run(suites)
+                .then(function() {
+                    assert.notCalled(onCriticalError);
                 });
         });
 
