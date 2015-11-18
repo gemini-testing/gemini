@@ -140,7 +140,7 @@ describe('runner/StateRunner', function() {
                 runner = mkRunner_(browserSession),
                 state = util.makeStateStub();
 
-            runner.on('error', onStateError);
+            runner.on('err', onStateError);
 
             browserSession.capture.returns(q.reject(new StateError()));
 

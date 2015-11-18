@@ -197,7 +197,7 @@ describe('public tests API', function() {
                 }.bind(this), TypeError);
             });
 
-            it('should throw if argument is not a string', function() {
+            it('should set tolerance passed as number', function() {
                 this.context.suite('name', function(suite) {
                     suite.setTolerance(25);
                 });
