@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 - 2015-11-18
+
+* Fix: html reporter correctly handles `error` event if no data about state passed
+
 ## 1.1.0 - 2015-11-18
 
 * Implemented suite retry on compare diff and critical errors (@SwinX)
