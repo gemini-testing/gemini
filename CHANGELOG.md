@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 - 2015-11-18
+
+* Implemented suite retry on compare diff and critical errors (@SwinX)
+* Only maximize PhantomJS browser if windowSize is not configured (@davidchin)
+* Allow tests to skip by browser id (@davidchin)
+* Do not fail tests on error from grid-side (@sipayrt)
+* Fix: run 'afterHook' if some state failed (@j0tunn)
+* Fix: run 'postActions' if state or 'afterHook' failed (@j0tunn)
+* Fix: free browser after cancel (@j0tunn)
+* Fix: keep original error if 'afterHook' or 'postActions' failed (@j0tunn)
+
 ## 1.0.6 - 2015-11-06
 
 * Show error message + whole page screenshot on test fail (@sipayrt)
