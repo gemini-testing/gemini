@@ -109,12 +109,12 @@ gridUrl: http://selenium.example.com:4444/wd/hub
 
 browsers:
   chrome:
-    desriedCapabilities:
+    desiredCapabilities:
       browserName: chrome
       version: "45.0"
 
   firefox:
-    desriedCapabilities:
+    desiredCapabilities:
       browserName: firefox
       version: "39.0"
 
@@ -128,13 +128,13 @@ rootUrl: http://yandex.com
 browsers:
   gridUrl: http://chrome-node.example.com:4444/wd/hub
   chrome:
-    desriedCapabilities:
+    desiredCapabilities:
       browserName: chrome
       version: "45.0"
 
   firefox:
     gridUrl: http://firefox-node.example.com:4444/wd/hub
-    desriedCapabilities:
+    desiredCapabilities:
       browserName: firefox
       version: "39.0"
 
