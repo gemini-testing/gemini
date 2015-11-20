@@ -57,6 +57,21 @@ describe('runner/TestSessionRunner', function() {
             return TestSessionRunner.create(config).run(suites || []);
         }
 
+        it('should emit `beginSession` event on start runner', function() {
+            config.getBrowserIds
+                .returns(['browser1']);
+
+            var onBeginSession = sandbox.spy().named('onBeginSession'),
+                runner = TestSessionRunner.create(config);
+
+            runner.on('beginSession', onBeginSession);
+
+            runner.run()
+                .then(function() {
+                    assert.called(onBeginSession);
+                });
+        });
+
         it('shoud run all created runners', function() {
             config.getBrowserIds
                 .returns(['browser1', 'browser2']);
@@ -78,6 +93,38 @@ describe('runner/TestSessionRunner', function() {
             run_(suites);
 
             assert.calledWith(BrowserRunner.prototype.run, suites);
+        });
+
+        it('should emit `endSession` event after test session finished', function() {
+            config.getBrowserIds
+                .returns(['browser1']);
+
+            var onEndSession = sandbox.spy().named('onEndSession'),
+                runner = TestSessionRunner.create(config);
+
+            runner.on('endSession', onEndSession);
+
+            return runner.run()
+                .then(function() {
+                    assert.called(onEndSession);
+                });
+        });
+
+        it('should emit `beginSession` and `endSession` events in correct order', function() {
+            config.getBrowserIds
+                .returns(['browser1']);
+
+            var onBeginSession = sandbox.spy().named('onBeginSession'),
+                onEndSession = sandbox.spy().named('onEndSession'),
+                runner = TestSessionRunner.create(config);
+
+            runner.on('beginSession', onBeginSession);
+            runner.on('endSession', onEndSession);
+
+            return runner.run()
+                .then(function() {
+                    assert.callOrder(onBeginSession, onEndSession);
+                });
         });
 
         describe('on error', function() {
