@@ -49,7 +49,7 @@ console.log(gemini.config.rootUrl);
   
   gemini.readTests()
       .done(function(root) {
-          root.chidlren.forEach(function(suite) {
+          root.children.forEach(function(suite) {
               console.log(suite.name);
           });
       });

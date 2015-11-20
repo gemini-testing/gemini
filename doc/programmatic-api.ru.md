@@ -50,7 +50,7 @@ var Gemini = require('gemini/api'),
 
 gemini.readTests()
     .done(function(root) {
-        root.chidlren.forEach(function(suite) {
+        root.children.forEach(function(suite) {
             console.log(suite.name);
         });
     });
