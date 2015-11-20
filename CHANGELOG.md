@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2 - 2015-11-20
+
+* Fix: wrong initial-scale meta data (@sipayrt)
+* Fix: build crashed on 'gather' command (@SwinX)
+
 ## 1.1.1 - 2015-11-18
 
 * Fix: html reporter correctly handles `error` event if no data about state passed
