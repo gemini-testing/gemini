@@ -1,3 +1,5 @@
+'use strict';
+
 var chai = require('chai');
 
 global.sinon = require('sinon');
