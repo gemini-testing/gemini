@@ -43,6 +43,18 @@ describe('UnlimitedPool', function() {
             });
     });
 
+    it('should finalize browser if failed to create it', function() {
+        var freeBrowser = this.sinon.spy(this.pool, 'freeBrowser'),
+            assertCalled = function() {
+                assert.called(freeBrowser);
+            };
+
+        this.browser.reset.returns(q.reject());
+
+        return this.requestBrowser()
+            .then(assertCalled, assertCalled);
+    });
+
     it('should quit a browser when freed', function() {
         var _this = this;
         return this.requestBrowser()
