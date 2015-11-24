@@ -349,5 +349,22 @@ describe('runner/SuiteRunner', function() {
 
             return assert.isRejected(run_(suite), /after-hook-error/);
         });
+
+        it('should add `browserId` and `sessionId` to error if something failed', function() {
+            var suite = makeSuiteStub({
+                states: [util.makeStateStub()]
+            });
+
+            browser.sessionId = 'test-session-id';
+            CaptureSession.prototype.runHook.returns(q.reject(new Error('test_error')));
+
+            return run_(suite)
+                .fail(function(e) {
+                    assert.deepEqual(e, {
+                        browserId: 'default-browser',
+                        sessionId: 'test-session-id'
+                    });
+                });
+        });
     });
 });

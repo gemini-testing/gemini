@@ -214,6 +214,19 @@ describe('browser', function() {
                     assert.calledWith(_this.wd.moveTo, elem, 0, 0);
                 });
         });
+
+        it('should reject promise with browserId and sessionId if error happened', function() {
+            this.browser.sessionId = 'test_session_id';
+            this.wd.eval.returns(q.reject());
+
+            return this.browser.reset()
+                .fail(function(e) {
+                    assert.deepEqual(e, {
+                        browserId: 'id',
+                        sessionId: 'test_session_id'
+                    });
+                });
+        });
     });
 
     describe('captureFullscreenImage', function() {
