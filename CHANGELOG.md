@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3 - 2015-11-25
+
+* Implemented TestCounter class for reporters (@SwinX)
+* Fixed undefined session id in vflat reporter (@SwinX)
+* Immediately quit browser if failed to create it (@SwinX)
+
 ## 1.1.2 - 2015-11-20
 
 * Fix: wrong initial-scale meta data (@sipayrt)
