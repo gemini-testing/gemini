@@ -47,6 +47,18 @@ describe('LimitedPool', function() {
         });
     });
 
+    it('should launch next request from queue on fail to receive browser from underlying pool', function() {
+        var browser = this.makeBrowser(),
+            pool = this.makePool();
+
+        this.underlyingPool.getBrowser.onFirstCall().returns(q.reject());
+        this.underlyingPool.getBrowser.onSecondCall().returns(browser);
+
+        pool.getBrowser('id');
+
+        assert.eventually.equal(pool.getBrowser('id'), browser);
+    });
+
     describe('limit', function() {
         it('should launch all browser in limit', function() {
             var _this = this;
