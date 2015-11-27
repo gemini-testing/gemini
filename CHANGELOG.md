@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.4 - 2015-11-27
+
+* Fix: in LimitedPool next browser request will be triggered if failed to receive browser from underlying pool (@SwinX)
+
 ## 1.1.3 - 2015-11-25
 
 * Implemented TestCounter class for reporters (@SwinX)
