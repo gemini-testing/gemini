@@ -58,6 +58,7 @@ system:
   parallelLimit: 3
   diffColor: '#ff0000'
   referenceImageAbsence: 'error'
+  multiProcess: true
   coverage:
     enabled: true
     exclude:
@@ -106,6 +107,10 @@ system:
 * `referenceImageAbsence` – считать отсутствие эталонного шаблона
   предупреждением (`warning`) или ошибкой (`error`). По-умолчанию ошибка
   (`error`).
+
+* `multiProcess` - если `true`, то gemini создаст несколько вспомогательных
+  процессов для выполнения "тяжелых" операций, таких как  сравнение изображений
+  и создание diff-оф. По-умолчанию `true`
 
 * `coverage` - `gemini` может собирать статистику покрытия CSS-кода тестами.
   Вы можете получить отчет о покрытии даже если используете препроцессоры и
