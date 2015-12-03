@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.5 - 2015-12-03
+
+* Show reference image if test failed due to lack of it (@sipayrt)
+* Fixed result in HTML report for sibling states appear several times on retry (@SwinX)
+
 ## 1.1.4 - 2015-11-27
 
 * Fix: in LimitedPool next browser request will be triggered if failed to receive browser from underlying pool (@SwinX)
