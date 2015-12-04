@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.6 - 2015-12-04
+
+* Remove restirction for maximum open concurrent sockets (@j0tunn)
+
 ## 1.1.5 - 2015-12-03
 
 * Show reference image if test failed due to lack of it (@sipayrt)
