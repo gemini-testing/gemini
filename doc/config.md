@@ -56,7 +56,6 @@ system:
   parallelLimit: 3
   diffColor: '#ff0000'
   referenceImageAbsence: 'error'
-  multiProcess: true
   coverage:
     enabled: true
     exclude:
@@ -107,9 +106,6 @@ settings. These settings can not be set per-browser.
 
 * `referenceImageAbsence` – treat the cases when a reference image does not
   exist as `error` or `warning`. Default value is `error`.
-
-* `multiProcess` - if `true` gemini will make few child processes for heavy
-  operations like image comparison and creating diff images. `true` by default
 
 * `coverage` - `gemini` can gather and report CSS tests coverage. It supports
   source maps, so you can get the report even if you are using preprocessor or

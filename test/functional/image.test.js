@@ -11,9 +11,10 @@ describe('image', function() {
     });
 
     it('should return correct size', function() {
-        var size = this.image.getSize();
-        assert.equal(size.width, 20);
-        assert.equal(size.height, 20);
+        assert.deepEqual(
+            this.image.getSize(),
+            {width: 20, height: 20}
+        );
     });
 
     it('should save the image', function() {
@@ -29,7 +30,7 @@ describe('image', function() {
     it('should crop image', function() {
         var _this = this;
         return util.withTempFile(function(filePath) {
-            return _this.image.crop({top: 1, left:1, width: 18, height: 18})
+            return _this.image.crop({top: 1, left: 1, width: 18, height: 18})
                 .then(function(image) {
                     return image.save(filePath);
                 })

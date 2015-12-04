@@ -1,9 +1,17 @@
 'use strict';
 
-var util = require('./util');
+var EventEmitter = require('events').EventEmitter,
+    util = require('./util'),
+    ImageProcessor = require('../../lib/image-processor'),
+    RunnerEvents = require('../../lib/constants/runner-events');
 
 describe('image', function() {
-    var imageProcessor = require('../../lib/image-processor').create();
+    var emitter = new EventEmitter(),
+        imageProcessor = new ImageProcessor(emitter);
+
+    after(function() {
+        emitter.emit(RunnerEvents.END);
+    });
 
     describe('compare', function() {
         it('should resolve to `true` for equal images', function() {
