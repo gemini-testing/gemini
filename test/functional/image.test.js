@@ -56,6 +56,14 @@ describe('image', function() {
                 imagePath('image4.png')
             ));
         });
+
+        it('should resolve to `false` for images with unnoticable difference if strictComparison=true', function() {
+            return assert.eventually.isFalse(Image.compare(
+                imagePath('image1.png'),
+                imagePath('image4.png'),
+                {strictComparison: true}
+            ));
+        });
     });
 
     describe('buildDiff', function() {
