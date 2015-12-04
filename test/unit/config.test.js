@@ -103,4 +103,81 @@ describe('config', function() {
             assert.equal(browserConfig2.rootUrl, 'http://some/url');
         });
     });
+
+    describe('browser desiredCapabilities', function() {
+        var TRAVIS_JOB_NUMBER = '123',
+            ACTUAL_TRAVIS_JOB_NUMBER,
+            TRAVIS_BUILD_NUMBER = '666',
+            ACTUAL_TRAVIS_BUILD_NUMBER,
+            sauceLabsUrl = 'http://username:access_key@ondemand.saucelabs.com/wd/hub',
+            oldEnv;
+
+        before(function() {
+            ACTUAL_TRAVIS_JOB_NUMBER = process.env.TRAVIS_JOB_NUMBER;
+            ACTUAL_TRAVIS_BUILD_NUMBER = process.env.TRAVIS_BUILD_NUMBER;
+        });
+
+        after(function() {
+            process.env.TRAVIS_JOB_NUMBER = ACTUAL_TRAVIS_JOB_NUMBER;
+            process.env.TRAVIS_BUILD_NUMBER = ACTUAL_TRAVIS_BUILD_NUMBER;
+        });
+
+        function mkConfig_(opts) {
+            opts = _.defaults(opts || {}, {
+                rootUrl: 'http://some/url',
+                system: {
+                    projectRoot: '/some/root'
+                }
+            });
+            return new Config(opts);
+        }
+
+        it('should have \'tunnel-identifier\' and \'build\' when Travis and SauceLabs are used', function() {
+            process.env.TRAVIS_JOB_NUMBER = TRAVIS_JOB_NUMBER;
+            process.env.TRAVIS_BUILD_NUMBER = TRAVIS_BUILD_NUMBER;
+            var config = mkConfig_({
+                    browsers: {
+                        browser: {
+                            desiredCapabilities: {},
+                            gridUrl: sauceLabsUrl
+                        }
+                    }
+                }),
+                browserConfig = config.forBrowser('browser');
+            assert.equal(browserConfig.desiredCapabilities['tunnel-identifier'], TRAVIS_JOB_NUMBER);
+            assert.equal(browserConfig.desiredCapabilities.build, TRAVIS_BUILD_NUMBER);
+        });
+
+        it('shouldn\'t have \'tunnel-identifier\' and \'build\' when SauceLabs is not used', function() {
+            process.env.TRAVIS_JOB_NUMBER = TRAVIS_JOB_NUMBER;
+            process.env.TRAVIS_BUILD_NUMBER = TRAVIS_BUILD_NUMBER;
+            var config = mkConfig_({
+                    browsers: {
+                        browser: {
+                            desiredCapabilities: {},
+                            gridUrl: 'http://somehost/wd/hub'
+                        }
+                    }
+                }),
+                browserConfig = config.forBrowser('browser');
+            assert.isUndefined(browserConfig.desiredCapabilities['tunnel-identifier']);
+            assert.isUndefined(browserConfig.desiredCapabilities.build);
+        });
+
+        it('shouldn\'t have \'tunnel-identifier\' and \'build\' when Travis is not used', function() {
+            delete process.env.TRAVIS_JOB_NUMBER;
+            delete process.env.TRAVIS_BUILD_NUMBER;
+            var config = mkConfig_({
+                    browsers: {
+                        browser: {
+                            desiredCapabilities: {},
+                            gridUrl: sauceLabsUrl
+                        }
+                    }
+                }),
+                browserConfig = config.forBrowser('browser');
+            assert.isUndefined(browserConfig.desiredCapabilities['tunnel-identifier']);
+            assert.isUndefined(browserConfig.desiredCapabilities.build);
+        });
+    });
 });
