@@ -46,7 +46,7 @@ console.log(gemini.config.rootUrl);
   ```javascript
   var Gemini = require('gemini/api'),
       gemini = new Gemini('/path/to/config');
-  
+
   gemini.readTests()
       .done(function(root) {
           root.children.forEach(function(suite) {
@@ -148,11 +148,6 @@ Rejects promise if critical error occurred.
 
 * `gemini.getScreenshotPath(suite, stateName, browserId)` – returns path to
   the reference screenshot of the specified state for specified browser.
-
-* **deprecated** `gemini.buildDiff(referencePath, currentPath, diffPath)`
-  – creates a diff image between `referencePath` and `currentPath` and stores
-  the result at `diffPath`. Use `saveDiffTo(path)` method of a test result in
-  `endTest` event handler.
 
 * `gemini.getBrowserCapabilites(browserId)` – returns WebDriver capabilities
   for specified `browserId`.

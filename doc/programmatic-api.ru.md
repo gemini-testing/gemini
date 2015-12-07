@@ -153,12 +153,6 @@ state.shouldSkip({browserName: 'firefox', version: '25.0'});
 * `gemini.getScreenshotPath(suite, stateName, browserId)` – возвращает путь
   к эталонному изображению указанного состояния, для указанного браузера.
 
-* **устаревший метод** `gemini.buildDiff(referencePath, currentPath,
-  diffPath)` – создаёт  diff-изображение между файлами, указанными
-  в `referencePath` и `currentPath`, и сохраняет результат по пути `diffPath`.
-  Предпочтительно использование метода `saveDiffTo(path)` у объекта
-  с резултатми теста, передаваемого в обработчик события `endTest`.
-
 * `gemini.getBrowserCapabilites(browserId)` – возвращает свойства WebDriver
   для указанного `browserId`.
 
