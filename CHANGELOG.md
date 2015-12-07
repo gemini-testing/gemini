@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0 - 2015-12.07
+
+* Heavy operations (image comparison, diff creation) now run in separate processes (@j0tunn)
+* Removed deprecated API method buildDiff (@j0tunn)
+
 ## 1.1.6 - 2015-12-04
 
 * Remove restirction for maximum open concurrent sockets (@j0tunn)
