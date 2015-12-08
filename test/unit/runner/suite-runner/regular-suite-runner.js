@@ -1,16 +1,14 @@
 'use strict';
 var q = require('q'),
-    _ = require('lodash'),
-    CaptureSession = require('../../../lib/capture-session'),
-    SuiteRunner = require('../../../lib/runner/suite-runner'),
-    StateRunner = require('../../../lib/runner/state-runner'),
-    BrowserAgent = require('../../../lib/runner/browser-runner/browser-agent'),
-    Config = require('../../../lib/config'),
-    util = require('../../util'),
+    CaptureSession = require('../../../../lib/capture-session'),
+    suiteRunner = require('../../../../lib/runner/suite-runner'),
+    StateRunner = require('../../../../lib/runner/state-runner'),
+    BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
+    Config = require('../../../../lib/config'),
+    util = require('../../../util'),
+    makeSuiteStub = util.makeSuiteStub;
 
-    makeSuiteStub = require('../../util').makeSuiteStub;
-
-describe('runner/SuiteRunner', function() {
+describe('runner/suite-runner/regular-suite-runner', function() {
     var sandbox = sinon.sandbox.create(),
         browser;
 
@@ -34,31 +32,31 @@ describe('runner/SuiteRunner', function() {
         sandbox.restore();
     });
 
-    function mkRunner_() {
-        return SuiteRunner.create(sinon.createStubInstance(Config));
+    function mkRunner_(suite, browserId) {
+        var browserAgent = new BrowserAgent();
+        browserAgent.browserId = browserId || browser.id;
+
+        return suiteRunner.create(
+            suite || makeSuiteStub(),
+            browserAgent,
+            sinon.createStubInstance(Config)
+        );
     }
 
-    function run_(suite, runner, opts) {
-        runner = runner || mkRunner_();
-        opts = _.defaults(opts || {}, {
-            browser: browser.id
-        });
-
-        var browserAgent = new BrowserAgent();
-        browserAgent.browserId = opts.browser;
-
-        return runner.run(suite, browserAgent);
+    function run_(suite) {
+        var runner = mkRunner_(suite);
+        return runner.run();
     }
 
     describe('run', function() {
         it('should emit `beginSuite` event', function() {
             var onBeginSuite = sinon.spy().named('onBeginSuite'),
                 suite = makeSuiteStub(),
-                runner = mkRunner_();
+                runner = mkRunner_(suite, 'browser');
 
             runner.on('beginSuite', onBeginSuite);
 
-            return run_(suite, runner, {browser: 'browser'})
+            return runner.run()
                 .then(function() {
                     assert.calledWith(onBeginSuite, {
                         suite: suite,
@@ -70,11 +68,11 @@ describe('runner/SuiteRunner', function() {
         it('should emit `endSuite` event', function() {
             var onEndSuite = sinon.spy().named('onEndSuite'),
                 suite = makeSuiteStub(),
-                runner = mkRunner_();
+                runner = mkRunner_(suite, 'browser');
 
             runner.on('endSuite', onEndSuite);
 
-            return run_(suite, runner, {browser: 'browser'})
+            return runner.run()
                 .then(function() {
                     assert.calledWith(onEndSuite, {
                         suite: suite,
@@ -86,13 +84,12 @@ describe('runner/SuiteRunner', function() {
         it('should emit events in correct order', function() {
             var onBeginSuite = sinon.spy().named('onBeginSuite'),
                 onEndSuite = sinon.spy().named('onEndSuite'),
-                suite = makeSuiteStub(),
                 runner = mkRunner_();
 
             runner.on('beginSuite', onBeginSuite);
             runner.on('endSuite', onEndSuite);
 
-            return run_(suite, runner)
+            return runner.run()
                 .then(function() {
                     assert.callOrder(
                         onBeginSuite,
@@ -223,11 +220,11 @@ describe('runner/SuiteRunner', function() {
                 suite = makeSuiteStub({
                     states: [state]
                 }),
-                runner = mkRunner_();
+                runner = mkRunner_(suite);
 
             runner.cancel();
 
-            return run_(suite, runner)
+            return runner.run()
                 .then(function() {
                     assert.notCalled(StateRunner.prototype.run);
                 });

@@ -2,7 +2,8 @@
 var q = require('q'),
     BrowserRunner = require('../../../../lib/runner/browser-runner'),
     BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
-    SuiteRunner = require('../../../../lib/runner/suite-runner'),
+    SuiteRunner = require('../../../../lib/runner/suite-runner/suite-runner'),
+    suiteRunnerFabric = require('../../../../lib/runner/suite-runner'),
     pool = require('../../../../lib/browser-pool'),
     Pool = require('../../../../lib/browser-pool/pool'),
     Config = require('../../../../lib/config'),
@@ -11,11 +12,15 @@ var q = require('q'),
     makeSuiteStub = require('../../../util').makeSuiteStub;
 
 describe('runner/BrowserRunner', function() {
-    var sandbox = sinon.sandbox.create();
+    var sandbox = sinon.sandbox.create(),
+        suiteRunner;
 
     beforeEach(function() {
-        sandbox.stub(SuiteRunner.prototype);
-        SuiteRunner.prototype.run.returns(q.resolve());
+        suiteRunner = sinon.createStubInstance(SuiteRunner);
+        suiteRunner.run.returns(q.resolve());
+
+        sandbox.stub(suiteRunnerFabric, 'create');
+        suiteRunnerFabric.create.returns(suiteRunner);
 
         sandbox.stub(BrowserAgent.prototype);
         BrowserAgent.prototype.finalizeBrowsers.returns(q.resolve());
@@ -66,8 +71,8 @@ describe('runner/BrowserRunner', function() {
 
             return runner.run(suites)
                 .then(function() {
-                    assert.calledOnce(SuiteRunner.prototype.run);
-                    assert.calledWith(SuiteRunner.prototype.run, someSuite);
+                    assert.calledOnce(suiteRunnerFabric.create);
+                    assert.calledWith(suiteRunnerFabric.create, someSuite);
                 });
         });
 
@@ -82,7 +87,7 @@ describe('runner/BrowserRunner', function() {
 
             return runner.run(suites)
                 .then(function() {
-                    assert.calledWith(SuiteRunner.prototype.run, sinon.match.any, browserAgent);
+                    assert.calledWith(suiteRunnerFabric.create, sinon.match.any, browserAgent);
                 });
         });
 
@@ -95,7 +100,7 @@ describe('runner/BrowserRunner', function() {
 
             return runner.run(suites)
                 .then(function() {
-                    assert.notCalled(SuiteRunner.prototype.run);
+                    assert.notCalled(suiteRunner.run);
                 });
         });
 
@@ -110,7 +115,7 @@ describe('runner/BrowserRunner', function() {
                 .then(function() {
                     runner.cancel();
 
-                    assert.calledTwice(SuiteRunner.prototype.cancel);
+                    assert.calledTwice(suiteRunner.cancel);
                 });
         });
 
@@ -156,7 +161,7 @@ describe('runner/BrowserRunner', function() {
                 .then(function() {
                     assert.callOrder(
                         startBrowser,
-                        SuiteRunner.prototype.run,
+                        suiteRunner.run,
                         stopBrowser
                     );
                 });
@@ -172,7 +177,7 @@ describe('runner/BrowserRunner', function() {
 
             var runner = mkRunner_('browser');
             runner.on('criticalError', onCriticalError);
-            SuiteRunner.prototype.run.onFirstCall().returns(q.reject(new Error('error')));
+            suiteRunner.run.onFirstCall().returns(q.reject(new Error('error')));
 
             return runner.run(suites)
                 .then(function() {
@@ -188,7 +193,7 @@ describe('runner/BrowserRunner', function() {
                 runner = mkRunner_();
 
             runner.on('criticalError', onCriticalError);
-            SuiteRunner.prototype.run.onFirstCall().returns(q.reject(new pool.CancelledError()));
+            suiteRunner.run.onFirstCall().returns(q.reject(new pool.CancelledError()));
 
             return runner.run(suites)
                 .then(function() {
@@ -205,7 +210,7 @@ describe('runner/BrowserRunner', function() {
                 runner = mkRunner_('browser');
 
             runner.on('criticalError', onCriticalError);
-            SuiteRunner.prototype.run.onFirstCall().returns(q.reject(new Error('error')));
+            suiteRunner.run.onFirstCall().returns(q.reject(new Error('error')));
 
             return runner.run(suites)
                 .then(function() {
