@@ -306,34 +306,6 @@ describe('config', function() {
             testPositiveIntegerOption('system.parallelLimit', {default: Infinity});
         });
 
-        describe('referenceImageAbsence', function() {
-            it('should not accept invalid values', function() {
-                assert.throws(function() {
-                    createConfig({
-                        system: {
-                            referenceImageAbsence: 'invalid value'
-                        }
-                    });
-                }, GeminiError);
-            });
-
-            ['error', 'warning'].forEach(function(value) {
-                it('should accept ' + value, function() {
-                    var config = createConfig({
-                        system: {
-                            referenceImageAbsence: value
-                        }
-                    });
-                    assert.equal(config.system.referenceImageAbsence, value);
-                });
-            });
-
-            it('should be error by default', function() {
-                var config = createConfig();
-                assert.equal(config.system.referenceImageAbsence, 'error');
-            });
-        });
-
         describe('diffColor', function() {
             it('should be magenta by default', function() {
                 var config = createConfig();

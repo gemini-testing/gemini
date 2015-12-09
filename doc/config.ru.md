@@ -56,7 +56,6 @@ system:
   debug: true
   parallelLimit: 3
   diffColor: '#ff0000'
-  referenceImageAbsence: 'error'
   coverage:
     enabled: true
     exclude:
@@ -101,10 +100,6 @@ system:
 
 * `diffColor` – определяет цвет выделения различий между изображениями.
   Задаётся в `#RRGGBB`-формате. По умолчанию, magenta (`#FF00FF`).
-
-* `referenceImageAbsence` – считать отсутствие эталонного шаблона
-  предупреждением (`warning`) или ошибкой (`error`). По-умолчанию ошибка
-  (`error`).
 
 * `coverage` - `gemini` может собирать статистику покрытия CSS-кода тестами.
   Вы можете получить отчет о покрытии даже если используете препроцессоры и

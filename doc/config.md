@@ -54,7 +54,6 @@ system:
   debug: true
   parallelLimit: 3
   diffColor: '#ff0000'
-  referenceImageAbsence: 'error'
   coverage:
     enabled: true
     exclude:
@@ -102,9 +101,6 @@ settings. These settings can not be set per-browser.
 * `diffColor` – specifies color which will be used to highlight differences
   between images. Specified in hexadecimal RGB (`#RRGGBB`). Magenta by default
   (`#FF00FF`).
-
-* `referenceImageAbsence` – treat the cases when a reference image does not
-  exist as `error` or `warning`. Default value is `error`.
 
 * `coverage` - `gemini` can gather and report CSS tests coverage. It supports
   source maps, so you can get the report even if you are using preprocessor or
