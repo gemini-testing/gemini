@@ -668,16 +668,6 @@ describe('config', function() {
             });
         });
 
-        describe('strictComparison', function() {
-            testBooleanOption('browsers.browser.strictComparison', {default: false});
-
-            shouldBeSettableFromTopLevel('strictComparison', true);
-            shouldOverrideTopLevelValue('strictComparison', {
-                top: true,
-                browser: false
-            });
-        });
-
         describe('screenshotsDir', function() {
             it('should not accept non-string value', function() {
                 assert.throws(function() {

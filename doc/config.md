@@ -12,7 +12,6 @@ desiredCapabilities:
   commonThing: value
 calibrate: false
 tolerance: 3.5
-strictComparison: false
 httpTimeout: 5000
 screenshotsDir: './screens'
 windowSize: 1600x1080
@@ -180,10 +179,6 @@ Settings list:
   which should be enough for the most cases. Increasing global default is not
   recommended, prefer changing tolerance for particular suites or states
   instead.
-
-* `strictComparison` – test will be considered as failed in case of any kind
-  of error. By default, only noticeable differences are treated as test
-  failure.
 
 * `windowSize` – specify browser window dimensions (i.e. `1600x1200`). If not
   specified, the size of the window depends on WebDriver.
