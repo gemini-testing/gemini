@@ -4,57 +4,37 @@ var _ = require('lodash'),
 
     shouldSkip = suiteUtil.shouldSkip,
     flattenSuites = suiteUtil.flattenSuites,
-    makeBrowser = require('../util').makeBrowser;
+    util = require('../util'),
+    browserWithId = util.browserWithId;
 
 describe('suite-util', function() {
     describe('shouldSkip()', function() {
         it('should not skip any browser if skipped=false', function() {
-            assert.isFalse(shouldSkip(false, makeBrowser({browserName: 'browser'})));
+            assert.isFalse(shouldSkip({skipped: false}, browserWithId('browser')));
         });
 
         it('should skip any browser if skipped=true', function() {
-            assert.isTrue(shouldSkip(true, makeBrowser({browserName: 'browser'})));
-        });
-
-        it('should skip browser if its name and version matches skip list', function() {
-            assert.isTrue(shouldSkip(
-                [{browserName: 'browser', version: '1.0'}],
-                makeBrowser({browserName: 'browser', version: '1.0'})
-            ));
-        });
-
-        it('should not skip the browser if its name does not match skip list', function() {
-            assert.isFalse(shouldSkip(
-                [{browserName: 'browser', version: '1.0'}],
-                makeBrowser({browserName: 'other browser', version: '1.0'})
-            ));
-        });
-
-        it('should not skip browser if its version does not match skip list', function() {
-            assert.isFalse(shouldSkip(
-                [{browserName: 'browser', version: '1.0'}],
-                makeBrowser({browserName: 'browser', version: '1.1'})
-            ));
-        });
-
-        it('should skip any browser of a given name if version is not specified in skip list', function() {
-            assert.isTrue(shouldSkip(
-                [{browserName: 'browser'}],
-                makeBrowser({browserName: 'browser', version: '1.1'})
-            ));
+            assert.isTrue(shouldSkip({skipped: true}, browserWithId('browser')));
         });
 
         it('should skip browser if its id matches skip list', function() {
+            var matcher = {
+                    matches: _.isEqual.bind(null, 'some-browser')
+                };
+
             assert.isTrue(shouldSkip(
-                [{id: 'browserId'}],
-                makeBrowser({browserName: 'browser', version: '1.0'}, {id: 'browserId'})
+                {skipped: [matcher]},
+                browserWithId('some-browser')
             ));
         });
 
-        it('should not skip browser if its id is not specified in skip list', function() {
+        it('should not skip the browser if its id does not match skip list', function() {
+            var matcher = {
+                    matches: _.isEqual.bind(null, 'some-browser')
+                };
             assert.isFalse(shouldSkip(
-                [{id: 'browserId2'}],
-                makeBrowser({browserName: 'browser', version: '1.0'}, {id: 'browserId'})
+                {skipped: [matcher]},
+                browserWithId('another-browser')
             ));
         });
     });

@@ -376,7 +376,7 @@ describe('public tests API', function() {
         });
 
         describe('skip', function() {
-            it('should throw if argument is not a string nor object', function() {
+            it('should throw if argument is not a string nor RegExp', function() {
                 assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.skip(123);
@@ -384,7 +384,7 @@ describe('public tests API', function() {
                 }.bind(this), TypeError);
             });
 
-            it('should throw if argument is array with non-string or non-object', function() {
+            it('should throw if argument is array with non-string or non-RegExp', function() {
                 assert.throws(function() {
                     this.context.suite('name', function(suite) {
                         suite.skip([123]);
@@ -392,36 +392,12 @@ describe('public tests API', function() {
                 }.bind(this), TypeError);
             });
 
-            it('should throw if argument is an object and browser name or id is not specified', function() {
+            it('should throw if argument is an object', function() {
                 assert.throws(function() {
                     this.context.suite('name', function(suite) {
-                        suite.skip({iHaveNo: 'name'});
+                        suite.skip({browserName: 'name', version: '123', id: 'browser'});
                     });
                 }.bind(this), Error);
-            });
-
-            it('should throw if browser id is not a string', function() {
-                assert.throws(function() {
-                    this.context.suite('name', function(suite) {
-                        suite.skip({id: true});
-                    });
-                }.bind(this), TypeError);
-            });
-
-            it('should throw if browser name is not a string', function() {
-                assert.throws(function() {
-                    this.context.suite('browserName', function(suite) {
-                        suite.skip({browserName: true});
-                    });
-                }.bind(this), TypeError);
-            });
-
-            it('should throw if browser version is not a string', function() {
-                assert.throws(function() {
-                    this.context.suite('name', function(suite) {
-                        suite.skip({browserName: 'browser', version: {major: 42}});
-                    });
-                }.bind(this), TypeError);
             });
 
             it('should mark suite as skipped', function() {
@@ -431,56 +407,35 @@ describe('public tests API', function() {
                 assert.isTrue(this.suite.children[0].skipped);
             });
 
-            it('should accept skipped browser name', function() {
+            it('should accept skipped browser string id', function() {
                 this.context.suite('name', function(suite) {
                     suite.skip('opera');
                 });
 
-                assert.deepEqual(this.suite.children[0].skipped[0], {browserName: 'opera'});
+                assert.equal(this.suite.children[0].skipped.length, 1);
+                assert.isTrue(this.suite.children[0].skipped[0].matches('opera'));
+                assert.isFalse(this.suite.children[0].skipped[0].matches('firefox'));
             });
 
-            it('should accept browser object with browserName', function() {
+            it('should accept skipped browser RegExp', function() {
                 this.context.suite('name', function(suite) {
-                    suite.skip({browserName: 'opera'});
+                    suite.skip(/ie1.*/);
                 });
 
-                assert.deepEqual(this.suite.children[0].skipped[0], {browserName: 'opera'});
+                assert.isTrue(this.suite.children[0].skipped[0].matches('ie11'));
+                assert.isFalse(this.suite.children[0].skipped[0].matches('ie8'));
             });
 
-            it('should accept browser object with id', function() {
-                this.context.suite('name', function(suite) {
-                    suite.skip({id: 'opera'});
-                });
-
-                assert.deepEqual(this.suite.children[0].skipped[0], {id: 'opera'});
-            });
-
-            it('should accept array of objects', function() {
+            it('should accept array of string ids and RegExp\'s', function() {
                 this.context.suite('name', function(suite) {
                     suite.skip([
-                        {browserName: 'opera'},
-                        {browserName: 'chrome'}
+                        'ie11',
+                        /firefox/
                     ]);
                 });
 
-                assert.deepEqual(this.suite.children[0].skipped, [
-                    {browserName: 'opera'},
-                    {browserName: 'chrome'}
-                ]);
-            });
-
-            it('should accept array of strings', function() {
-                this.context.suite('name', function(suite) {
-                    suite.skip([
-                        'opera',
-                        'chrome'
-                    ]);
-                });
-
-                assert.deepEqual(this.suite.children[0].skipped, [
-                    {browserName: 'opera'},
-                    {browserName: 'chrome'}
-                ]);
+                assert.isTrue(this.suite.children[0].skipped[0].matches('ie11'));
+                assert.isTrue(this.suite.children[0].skipped[1].matches('firefox33'));
             });
         });
     });

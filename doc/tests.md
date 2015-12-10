@@ -75,28 +75,32 @@ All methods are chainable:
 
   - `skip()` – all browsers;
 
-  - `skip(browserName)` or `skip({browserName: browserName})` – all versions
-    of specified browser;
+  - `skip('id')` – browser with specified `id`;
+  
+  - `skip('id', comment)` – browser with specified `id` and show `comment` in the report;
 
-  - `skip({browserName: browserName, version: browserVersion})` – particular
-    version of a browser.
+  - `skip(/some RegExp/)` – browser with `id` which matches `/some RegExp/`;
+  
+  - `skip(/some RegExp/, comment)` – browser with `id` which matches `/some RegExp/` and show `comment` in the report;
 
-  - `skip([browser1, browser2, ...])` – multiple browsers or versions.
+  - `skip(['id1', /RegExp1/, ...])` – multiple browsers;
+  
+  - `skip(['id1', /RegExp1/, ...], comment)` – multiple browsers and show `comment` in the report.
 
   All browsers from subsequent calls to `.skip()` are added to the skip list:
 
   ```js
   suite
-      .skip({browserName: 'browser1', version: '1.0'})
-      .skip('browser2');
+      .skip('id1')
+      .skip(/RegExp1/);
   ```
 
   is equivalent to
 
   ```js
   suite.skip([
-      {browserName: 'browser1', version: '1.0'},
-      'browser2'
+      'id1',
+      /RegExp1/
   ]);
   ```
 
