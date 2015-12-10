@@ -1,43 +1,54 @@
 'use strict';
 var q = require('q'),
-    BrowserRunner = require('../../../lib/runner/browser-runner'),
-    SuiteRunner = require('../../../lib/runner/suite-runner'),
-    pool = require('../../../lib/browser-pool'),
-    Pool = require('../../../lib/browser-pool/pool'),
-    Config = require('../../../lib/config'),
-    MetaError = require('../../../lib/errors/meta-error'),
+    BrowserRunner = require('../../../../lib/runner/browser-runner'),
+    BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
+    SuiteRunner = require('../../../../lib/runner/suite-runner/suite-runner'),
+    suiteRunnerFabric = require('../../../../lib/runner/suite-runner'),
+    pool = require('../../../../lib/browser-pool'),
+    Pool = require('../../../../lib/browser-pool/pool'),
+    Config = require('../../../../lib/config'),
+    MetaError = require('../../../../lib/errors/meta-error'),
 
-    makekSuiteStub = require('../../util').makeSuiteStub;
+    makeSuiteStub = require('../../../util').makeSuiteStub;
 
 describe('runner/BrowserRunner', function() {
     var sandbox = sinon.sandbox.create(),
-        config,
-        browserPool;
+        suiteRunner;
 
     beforeEach(function() {
-        sandbox.stub(pool, 'create');
-        sandbox.stub(SuiteRunner.prototype);
-        config = sinon.createStubInstance(Config);
-        browserPool = sinon.createStubInstance(Pool);
+        suiteRunner = sinon.createStubInstance(SuiteRunner);
+        suiteRunner.run.returns(q.resolve());
 
-        SuiteRunner.prototype.run.returns(q.resolve());
+        sandbox.stub(suiteRunnerFabric, 'create');
+        suiteRunnerFabric.create.returns(suiteRunner);
+
+        sandbox.stub(BrowserAgent.prototype);
+        BrowserAgent.prototype.finalizeBrowsers.returns(q.resolve());
     });
 
     afterEach(function() {
         sandbox.restore();
     });
 
-    function mkRunner_(browser) {
-        return BrowserRunner.create(browser || 'default-browser', config, browserPool);
+    function mkRunner_(browser, browserPool) {
+        return BrowserRunner.create(
+            browser || 'default-browser',
+            sinon.createStubInstance(Config),
+            browserPool || sinon.createStubInstance(Pool)
+        );
     }
 
-    describe('run', function() {
-        beforeEach(function() {
-            config.forBrowser.returns({retry: 0});
-            browserPool.getBrowser.returns(q.resolve());
-            browserPool.finalizeBrowsers.returns(q.resolve());
-        });
+    describe('constructor', function() {
+        it('should create browser agent associated with passed browser id', function() {
+            var browserPool = sinon.createStubInstance(Pool);
 
+            mkRunner_('browser', browserPool);
+
+            assert.calledWith(BrowserAgent.prototype.__constructor, 'browser', browserPool);
+        });
+    });
+
+    describe('run', function() {
         it('should emit `startBrowser` event when starting browser', function() {
             var onStartBrowser = sinon.spy().named('onStartBrowser'),
                 runner = mkRunner_('browser');
@@ -49,49 +60,34 @@ describe('runner/BrowserRunner', function() {
                 });
         });
 
-        it('should get only browser associated wit runner', function() {
-            var suites = [
-                    makekSuiteStub({browsers: ['browser1', 'browser2']}),
-                    makekSuiteStub({browsers: ['browser2']})
+        it('should run only suites expected to be run in current browser', function() {
+            var someSuite = makeSuiteStub({browsers: ['browser1', 'browser2']}),
+                suites = [
+                    someSuite,
+                    makeSuiteStub({browsers: ['browser2']})
                 ];
 
             var runner = mkRunner_('browser1');
 
             return runner.run(suites)
                 .then(function() {
-                    assert.calledOnce(browserPool.getBrowser);
-                    assert.calledWith(browserPool.getBrowser, 'browser1');
+                    assert.calledOnce(suiteRunnerFabric.create);
+                    assert.calledWith(suiteRunnerFabric.create, someSuite);
                 });
         });
 
-        it('should get new browser for each suite', function() {
-            var suites = [
-                    makekSuiteStub({browsers: ['browser']}),
-                    makekSuiteStub({browsers: ['browser']})
-                ];
+        it('should pass to suite runner browser agent associated with current browser', function() {
+            var browserAgent = new BrowserAgent('browser'),
+                suites = [makeSuiteStub({browsers: ['browser']})];
+
+            sandbox.stub(BrowserAgent, 'create');
+            BrowserAgent.create.returns(browserAgent);
 
             var runner = mkRunner_('browser');
 
             return runner.run(suites)
                 .then(function() {
-                    assert.calledTwice(browserPool.getBrowser);
-                    assert.alwaysCalledWith(browserPool.getBrowser, 'browser');
-                });
-        });
-
-        it('should run only suites expected to be run in current browser', function() {
-            var someSuite = makekSuiteStub({browsers: ['browser1', 'browser2']}),
-                suites = [
-                    someSuite,
-                    makekSuiteStub({browsers: ['browser2']})
-                ];
-
-            var runner = mkRunner_('browser1');
-
-            return runner.run(suites)
-                .then(function() {
-                    assert.calledOnce(SuiteRunner.prototype.run);
-                    assert.calledWith(SuiteRunner.prototype.run, someSuite);
+                    assert.calledWith(suiteRunnerFabric.create, sinon.match.any, browserAgent);
                 });
         });
 
@@ -104,35 +100,22 @@ describe('runner/BrowserRunner', function() {
 
             return runner.run(suites)
                 .then(function() {
-                    assert.notCalled(SuiteRunner.prototype.run);
+                    assert.notCalled(suiteRunner.run);
                 });
         });
 
         it('should cancel suite runners on cancel', function() {
             var runner = mkRunner_('browser'),
                 suites = [
-                    makekSuiteStub({browsers: ['browser']}),
-                    makekSuiteStub({browsers: ['browser']})
+                    makeSuiteStub({browsers: ['browser']}),
+                    makeSuiteStub({browsers: ['browser']})
                 ];
 
             return runner.run(suites)
                 .then(function() {
                     runner.cancel();
 
-                    assert.calledTwice(SuiteRunner.prototype.cancel);
-                });
-        });
-
-        it('should free browser after cancel', function() {
-            var runner = mkRunner_('browser'),
-                suites = [
-                    makekSuiteStub({browsers: ['browser']})
-                ];
-            runner.cancel();
-
-            return runner.run(suites)
-                .then(function() {
-                    assert.calledOnce(browserPool.freeBrowser);
+                    assert.calledTwice(suiteRunner.cancel);
                 });
         });
 
@@ -155,7 +138,7 @@ describe('runner/BrowserRunner', function() {
                 runner = mkRunner_('browser');
 
             runner.on('criticalError', onCriticalError);
-            browserPool.finalizeBrowsers.returns(q.reject(new MetaError('meta-error')));
+            BrowserAgent.prototype.finalizeBrowsers.returns(q.reject(new MetaError('meta-error')));
 
             return runner.run(suites)
                 .then(function() {
@@ -167,7 +150,7 @@ describe('runner/BrowserRunner', function() {
             var startBrowser = sinon.spy().named('onStartBrowser'),
                 stopBrowser = sinon.spy().named('onStopBrowser'),
                 suites = [
-                    makekSuiteStub({browsers: ['browser']})
+                    makeSuiteStub({browsers: ['browser']})
                 ];
 
             var runner = mkRunner_('browser');
@@ -178,7 +161,7 @@ describe('runner/BrowserRunner', function() {
                 .then(function() {
                     assert.callOrder(
                         startBrowser,
-                        SuiteRunner.prototype.run,
+                        suiteRunner.run,
                         stopBrowser
                     );
                 });
@@ -186,20 +169,15 @@ describe('runner/BrowserRunner', function() {
     });
 
     describe('critical error', function() {
-        beforeEach(function() {
-            browserPool.getBrowser.returns(q.resolve());
-            browserPool.finalizeBrowsers.returns(q.resolve());
-        });
-
         it('should emit `criticalError` event on error', function() {
             var onCriticalError = sinon.spy().named('onCriticalError'),
                 suites = [
-                    makekSuiteStub({browsers: ['browser']})
+                    makeSuiteStub({browsers: ['browser']})
                 ];
 
             var runner = mkRunner_('browser');
             runner.on('criticalError', onCriticalError);
-            browserPool.getBrowser.onFirstCall().returns(q.reject(new Error('error')));
+            suiteRunner.run.onFirstCall().returns(q.reject(new Error('error')));
 
             return runner.run(suites)
                 .then(function() {
@@ -210,12 +188,12 @@ describe('runner/BrowserRunner', function() {
         it('should not emit `criticalError` if it was manually stopped', function() {
             var onCriticalError = sinon.spy().named('onCriticalError'),
                 suites = [
-                    makekSuiteStub()
+                    makeSuiteStub()
                 ],
                 runner = mkRunner_();
 
             runner.on('criticalError', onCriticalError);
-            browserPool.getBrowser.onFirstCall().returns(q.reject(new pool.CancelledError()));
+            suiteRunner.run.onFirstCall().returns(q.reject(new pool.CancelledError()));
 
             return runner.run(suites)
                 .then(function() {
@@ -225,14 +203,14 @@ describe('runner/BrowserRunner', function() {
 
         it('should pass suite and browser id as critical error event data', function() {
             var onCriticalError = sinon.spy().named('onCriticalError'),
-                suite = makekSuiteStub({browsers: ['browser']}),
+                suite = makeSuiteStub({browsers: ['browser']}),
                 suites = [
                     suite
                 ],
                 runner = mkRunner_('browser');
 
             runner.on('criticalError', onCriticalError);
-            browserPool.getBrowser.onFirstCall().returns(q.reject(new Error('error')));
+            suiteRunner.run.onFirstCall().returns(q.reject(new Error('error')));
 
             return runner.run(suites)
                 .then(function() {
