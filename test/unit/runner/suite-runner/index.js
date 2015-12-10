@@ -5,7 +5,7 @@ var suiteRunner = require('../../../../lib/runner/suite-runner'),
     StatelessSuiteRunner = require('../../../../lib/runner/suite-runner/stateless-suite-runner'),
     util = require('../../../util');
 
-describe.only('runner/suite-runner/create', function() {
+describe('runner/suite-runner/create', function() {
     it('should create RegularSuiteRunner for suite with states', function() {
         var suite = util.makeSuiteStub({
                 states: [util.makeStateStub()]

@@ -4,7 +4,7 @@ var BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'
     StatelessSuiteRunner = require('../../../../lib/runner/suite-runner/stateless-suite-runner'),
     util = require('../../../util');
 
-describe.only('runner/suite-runner/stateless-suite-runner', function() {
+describe('runner/suite-runner/stateless-suite-runner', function() {
     var sandbox = sinon.sandbox.create(),
         suite = util.makeSuiteStub(),
         browserAgent = new BrowserAgent('default-browser'),
