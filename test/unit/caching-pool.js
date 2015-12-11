@@ -127,11 +127,46 @@ describe('CachingPool', function() {
                 });
         });
 
+        describe('when reset failed', function() {
+            it('should fail to get browser', function() {
+                this.browser.reset.returns(q.reject('error'));
+                return assert.isRejected(this.pool.getBrowser('id'));
+            });
+
+            it('should put browser back', function() {
+                var _this = this;
+                this.browser.reset.onFirstCall().returns(q.reject('error'));
+
+                return this.pool.getBrowser('id')
+                    .fail(function() {
+                        return _this.pool.getBrowser('id');
+                    })
+                    .then(function() {
+                        assert.notCalled(_this.underlyingPool.getBrowser);
+                    });
+            });
+
+            it('should keep original error if failed to put browser back', function() {
+                var pool = this.poolWithReuseLimits({id: 1}),
+                    browser = makeStubBrowser('id');
+
+                this.underlyingPool.getBrowser.returns(browser);
+
+                browser.reset.returns(q.reject('reset-error'));
+                this.underlyingPool.freeBrowser.returns(q.reject('free-error'));
+
+                return pool.freeBrowser(browser)
+                    .then(function() {
+                        return assert.isRejected(pool.getBrowser('id'), /reset-error/);
+                    });
+            });
+        });
+
         it('should free cached instance when browser finished', function() {
             var _this = this;
             return this.pool.finalizeBrowsers('id')
                 .then(function() {
-                    assert.calledWith(_this.underlyingPool.freeBrowser);
+                    assert.calledOnce(_this.underlyingPool.freeBrowser);
                 });
         });
 
