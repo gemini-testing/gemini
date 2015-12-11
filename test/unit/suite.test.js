@@ -112,15 +112,17 @@ describe('suite', function() {
     describe('skipped', function() {
         beforeEach(function() {
             this.suite = createSuite('suite');
+            this.matcher = {a: 1};
+            this.matcher2 = {b: 2};
         });
 
         it('should be false by default', function() {
             assert.isFalse(this.suite.skipped);
         });
 
-        it('should be changed by skip() method', function() {
-            this.suite.skip();
-            assert.isTrue(this.suite.skipped);
+        it('should be changed by skip(object) method', function() {
+            this.suite.skip(this.matcher);
+            assert.deepEqual(this.suite.skipped, [this.matcher]);
         });
 
         it('should be inherited by children', function() {
@@ -130,59 +132,41 @@ describe('suite', function() {
             assert.isTrue(child.skipped);
         });
 
-        it('should accept browsers list', function() {
-            var list = [
-                {browserName: 'browser1', version: '1.0'},
-                {browserName: 'browser2', version: '2.0'}
-            ];
+        it('should merge multiple matchers together', function() {
+            this.suite.skip(this.matcher);
+            this.suite.skip(this.matcher2);
 
-            this.suite.skip(list);
-            assert.deepEqual(this.suite.skipped, list);
-        });
-
-        it('should merge multiple lists together', function() {
-            this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
-            this.suite.skip([{browserName: 'browser2'}]);
-
-            assert.deepEqual(this.suite.skipped, [
-                {browserName: 'browser1', version: '1.0'},
-                {browserName: 'browser2'}
-            ]);
+            assert.deepEqual(this.suite.skipped, [this.matcher, this.matcher2]);
         });
 
         it('should not override `true` by browser list', function() {
             this.suite.skip();
-            this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
+            this.suite.skip(this.matcher);
 
             assert.isTrue(this.suite.skipped);
         });
 
         it('should override browser list by `true`', function() {
-            this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
+            this.suite.skip(this.matcher);
             this.suite.skip();
 
             assert.isTrue(this.suite.skipped);
         });
 
         it('should merge children list with parent', function() {
-            this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
+            this.suite.skip(this.matcher);
             var child = createSuite('child', this.suite);
-            child.skip([{browserName: 'browser2'}]);
+            child.skip(this.matcher2);
 
-            assert.deepEqual(child.skipped, [
-                {browserName: 'browser1', version: '1.0'},
-                {browserName: 'browser2'}
-            ]);
+            assert.deepEqual(child.skipped, [this.matcher, this.matcher2]);
         });
 
         it('should not affect parent when calling .skip() on child', function() {
-            this.suite.skip([{browserName: 'browser1', version: '1.0'}]);
+            this.suite.skip(this.matcher);
             var child = createSuite('child', this.suite);
-            child.skip([{browserName: 'browser2'}]);
+            child.skip(this.matcher2);
 
-            assert.deepEqual(this.suite.skipped, [
-                {browserName: 'browser1', version: '1.0'}
-            ]);
+            assert.deepEqual(this.suite.skipped, [this.matcher]);
         });
     });
 

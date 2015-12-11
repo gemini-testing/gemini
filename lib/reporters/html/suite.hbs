@@ -4,7 +4,12 @@
         {{#each browsers}}
             <div class="section section_collapsed {{status}}">
                 {{#if skipped}}
-                    <div class="section__title">[skipped] {{name}}</div>
+                    {{#if reason}}
+                        <div class="section__title">[skipped] {{name}}, reason: {{reason}}</div>
+                    {{/if}}
+                    {{#unless reason}}
+                        <div class="section__title">[skipped] {{name}}</div>
+                    {{/unless}}
                 {{/if}}
                 {{#unless skipped}}
                     <div class="section__title">{{name}}</div>

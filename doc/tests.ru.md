@@ -76,27 +76,32 @@
 
     - `skip()` – для всех браузеров;
 
-    - `skip(browserName)` или `skip({browserName: browserName})` – для всех
-      версий указанного браузера;
+    - `skip('id')` – для браузера с указанным `id`;
+    
+    - `skip('id', comment)` – для браузера с указанным `id`, при этом указать в отчетах комментарий `comment`;
 
-    - `skip({browserName: browserName, version: browserVersion})` – только для
-      указанной версии браузера;
+    - `skip(/some RegExp/)` – для браузеров, `id` которых матчатся с указанным `/some RegExp/`;
+    
+    - `skip(/some RegExp/, comment)` – для браузеров, `id` которых матчатся с указанным `/some RegExp/`,
+    при этом указать в отчетах комментарий `comment`;
 
-    - `skip([browser1, browser2, ...])` – для нескольких браузеров или версий.
+    - `skip(['id1', /RegExp1/, ...])` – для нескольких браузеров;
+    
+    - `skip(['id1', /RegExp1/, ...], comment)` – для нескольких браузеров с общим комментарием.
 
   Все браузеры из последующих вызовов `skip()` добавляются в список
   пропускаемых. Таким образом,
 
     ```javascript
-        suite.skip({browserName: 'browser1', version: '1.0'})
-            .skip('browser2');
+        suite.skip('id1')
+            .skip(/RegExp1/);
     ```
    эквивалентно
 
     ```javascript
         suite.skip([
-            {browserName: 'browser1', version: '1.0'},
-            'browser2'
+            'id1',
+            /RegExp/
         ]);
     ```
 
