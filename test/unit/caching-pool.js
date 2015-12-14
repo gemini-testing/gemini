@@ -127,11 +127,36 @@ describe('CachingPool', function() {
                 });
         });
 
+        describe('when reset failed', function() {
+            it('should fail to get browser', function() {
+                this.browser.reset.returns(q.reject('some-error'));
+                return assert.isRejected(this.pool.getBrowser('id'), /some-error/);
+            });
+
+            it('should put browser back', function() {
+                var _this = this;
+                this.browser.reset.returns(q.reject());
+
+                return this.pool.getBrowser('id')
+                    .fail(function() {
+                        assert.calledOnce(_this.underlyingPool.freeBrowser);
+                        assert.calledWith(_this.underlyingPool.freeBrowser, _this.browser);
+                    });
+            });
+
+            it('should keep original error if failed to put browser back', function() {
+                this.browser.reset.returns(q.reject('reset-error'));
+                this.underlyingPool.freeBrowser.returns(q.reject('free-error'));
+
+                return assert.isRejected(this.pool.getBrowser('id'), /reset-error/);
+            });
+        });
+
         it('should free cached instance when browser finished', function() {
             var _this = this;
             return this.pool.finalizeBrowsers('id')
                 .then(function() {
-                    assert.calledWith(_this.underlyingPool.freeBrowser);
+                    assert.calledOnce(_this.underlyingPool.freeBrowser);
                 });
         });
 
