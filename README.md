@@ -41,7 +41,7 @@ configuration and usage of **Gemini**.
 
 Required software:
 
-1. WebDriver server implementation. There are few possible options: 
+1. WebDriver server implementation. There are few possible options:
 
    - [Selenium Server](http://docs.seleniumhq.org/download/) – for testing in
      different browsers.
@@ -55,7 +55,7 @@ Required software:
    - Cloud WebDriver services, such as such as
      [SauceLabs] (http://saucelabs.com/) or
      [BrowserStack](http://www.browserstack.com/)
-     
+
 2. Compiler with support of C++11 (`GCC@4.6` or higher). This is a
    [png-img](https://github.com/gemini-testing/png-img) requirement.
 
@@ -140,6 +140,8 @@ browsers:
     desiredCapabilities:
       browserName: firefox
       version: "39.0"
+
+windowSize: 1600x1200
 
 ```
 
