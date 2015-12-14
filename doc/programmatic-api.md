@@ -76,12 +76,8 @@ Suite objects have the following properties:
 
 Methods:
 
-* `shouldSkip(browser)` – returns `true` if this state should be skipped for
-  a browser. Browser is specified in WebDriver capabilities format:
-
-```javascript
-state.shouldSkip({browserName: 'firefox', version: '25.0'});
-```
+* `shouldSkip(browserId)` – returns `true` if this state should be skipped for
+  a browser.
 
 ## Gathering reference screenshots
 

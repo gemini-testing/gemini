@@ -31,7 +31,8 @@ function makeSuiteStub(opts) {
         beforeHook: sinon.spy(),
         afterHook: sinon.spy(),
         states: [],
-        runPostActions: sinon.stub()
+        runPostActions: sinon.stub(),
+        skipped: false
     });
 }
 

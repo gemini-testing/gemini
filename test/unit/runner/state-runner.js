@@ -48,56 +48,6 @@ describe('runner/StateRunner', function() {
                 });
         });
 
-        it('should not emit `beginState` if state is skipped', function() {
-            var onBeginState = sinon.spy().named('onBeginState'),
-                runner = mkRunner_(),
-                state = util.makeStateStub();
-
-            runner.on('beginState', onBeginState);
-            state.shouldSkip.returns(true);
-
-            return runner.run(state)
-                .then(function() {
-                    assert.notCalled(onBeginState);
-                });
-        });
-
-        it('should emit `skipState` if state is skipped', function() {
-            var onSkipState = sinon.spy().named('onSkipState'),
-                browserSession = mkBrowserSessionStub_({
-                    browserId: 'browser',
-                    sessionId: 'session'
-                }),
-                runner = mkRunner_(browserSession),
-                state = util.makeStateStub();
-
-            runner.on('skipState', onSkipState);
-            state.shouldSkip.returns(true);
-
-            return runner.run(state)
-                .then(function() {
-                    assert.calledWith(onSkipState, {
-                        suite: state.suite,
-                        state: state,
-                        browserId: 'browser',
-                        sessionId: 'session'
-                    });
-                });
-        });
-
-        it('should not emit `skipState` if state is not skipped', function() {
-            var onSkipState = sinon.spy().named('onSkipState'),
-                runner = mkRunner_(),
-                state = util.makeStateStub();
-
-            runner.on('skipState', onSkipState);
-
-            return runner.run(state)
-                .then(function() {
-                    assert.notCalled(onSkipState);
-                });
-        });
-
         it('should emit `endState` event', function() {
             var onEndState = sinon.spy().named('onEndState'),
                 browserSession = mkBrowserSessionStub_({
@@ -117,20 +67,6 @@ describe('runner/StateRunner', function() {
                         browserId: 'browser',
                         sessionId: 'session'
                     });
-                });
-        });
-
-        it('should not emit `endState` if state is skipped', function() {
-            var onEndState = sinon.spy().named('onEndState'),
-                runner = mkRunner_(),
-                state = util.makeStateStub();
-
-            runner.on('endState', onEndState);
-            state.shouldSkip.returns(true);
-
-            return runner.run(state)
-                .then(function() {
-                    assert.notCalled(onEndState);
                 });
         });
 

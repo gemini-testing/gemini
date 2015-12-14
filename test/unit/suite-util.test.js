@@ -3,18 +3,16 @@ var _ = require('lodash'),
     suiteUtil = require('../../lib/suite-util'),
 
     shouldSkip = suiteUtil.shouldSkip,
-    flattenSuites = suiteUtil.flattenSuites,
-    util = require('../util'),
-    browserWithId = util.browserWithId;
+    flattenSuites = suiteUtil.flattenSuites;
 
 describe('suite-util', function() {
     describe('shouldSkip()', function() {
         it('should not skip any browser if skipped=false', function() {
-            assert.isFalse(shouldSkip({skipped: false}, browserWithId('browser')));
+            assert.isFalse(shouldSkip({skipped: false}, 'browser'));
         });
 
         it('should skip any browser if skipped=true', function() {
-            assert.isTrue(shouldSkip({skipped: true}, browserWithId('browser')));
+            assert.isTrue(shouldSkip({skipped: true}, 'browser'));
         });
 
         it('should skip browser if its id matches skip list', function() {
@@ -24,7 +22,7 @@ describe('suite-util', function() {
 
             assert.isTrue(shouldSkip(
                 {skipped: [matcher]},
-                browserWithId('some-browser')
+                'some-browser'
             ));
         });
 
@@ -34,7 +32,7 @@ describe('suite-util', function() {
                 };
             assert.isFalse(shouldSkip(
                 {skipped: [matcher]},
-                browserWithId('another-browser')
+                'another-browser'
             ));
         });
     });
