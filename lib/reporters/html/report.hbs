@@ -16,6 +16,18 @@
         <button id="expandAll" class="button">Expand all</button>
         <button id="collapseAll" class="button">Collapse all</button>
         <button id="expandErrors" class="button">Expand errors</button>
+        <button id="showSkipped" class="button">Show skipped</button>
+
+        <div id="skippedList" class="skipped__list collapsed">
+            {{#if skips}}
+                {{#each skips}}
+                    <div>{{suite}} > {{browser}}{{#if comment}}, reason: {{{comment}}}{{/if}}</div>
+                {{/each}}
+            {{/if}}
+            {{#unless skips}}
+                There are no skipped tests
+            {{/unless}}
+        </div>
 
         {{#each suites}}
             {{> suite}}
