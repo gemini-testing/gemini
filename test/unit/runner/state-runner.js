@@ -13,6 +13,7 @@ describe('runner/StateRunner', function() {
         session.browser = util.browserWithId(opts.browserId || 'default-browser-id');
         session.browser.sessionId = opts.sessionId || 'default-session-id';
 
+        session.runHook.returns(q.resolve());
         session.capture.returns(q.resolve());
 
         return session;
@@ -67,6 +68,40 @@ describe('runner/StateRunner', function() {
                         browserId: 'browser',
                         sessionId: 'session'
                     });
+                });
+        });
+
+        it('should perform state callback', function() {
+            var browserSession = mkBrowserSessionStub_(),
+                runner = mkRunner_(browserSession),
+                suite = util.makeSuiteStub(),
+                state = util.makeStateStub(suite);
+
+            return runner.run(state)
+                .then(function() {
+                    assert.calledOnce(browserSession.runHook);
+                    assert.calledWith(browserSession.runHook,
+                        state.callback,
+                        suite
+                    );
+                });
+        });
+
+        it('should perform state callback before capture', function() {
+            var browserSession = mkBrowserSessionStub_(),
+                runner = mkRunner_(browserSession),
+                state = util.makeStateStub(),
+                mediator = sinon.spy().named('mediator');
+
+            browserSession.runHook.returns(q.delay(1).then(mediator));
+
+            return runner.run(state)
+                .then(function() {
+                    assert.callOrder(
+                        browserSession.runHook,
+                        mediator,
+                        browserSession.capture
+                    );
                 });
         });
 
