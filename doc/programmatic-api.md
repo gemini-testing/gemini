@@ -71,6 +71,32 @@ SuiteCollection API:
 * `allSuites()` - return array of all suites in collection. Goes through all suites
   children recursively.
 
+* `disableAll()` - disable all suites in collection
+
+* `enableAll()` - enable all suites in collection
+
+* `disable(suite, [opts])` - disable suite and all its children
+
+  `opts` are optional:
+    * `opts.browser` - browser to disable suite in
+    * `opts.state` - disable only specified state
+
+* `enable(suite, [opts])` - enable suite and all its children. `opts` are the same as in
+  `disable`
+
+Example on how to run only certain states in certain browsers:
+```js
+var collection = gemini.readTests(paths),
+    suite = findSomeSuite(collection);
+
+collection
+  .disableAll()
+  .enable(suite, {state: 'some-state', browser: 'ie9'})
+  .enable(suite, {state: 'other-state', browser: 'firefox'});
+
+return gemini.test(collection);
+```
+
 ### Suite
 
 Suite objects have the following properties:

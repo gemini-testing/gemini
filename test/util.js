@@ -25,19 +25,31 @@ function browserWithId(id) {
 
 function makeSuiteStub(opts) {
     opts = opts || {};
-    return _.defaults(opts, {
+    opts = _.defaults(opts, {
         hasStates: opts.states && opts.states.length > 0,
         url: 'some-default-url',
         beforeHook: sinon.spy(),
         afterHook: sinon.spy(),
         states: [],
         runPostActions: sinon.stub(),
-        skipped: false
+        skipped: false,
+        children: []
     });
+
+    var obj = Object.create(opts.parent || null);
+    _.assign(obj, opts);
+
+    if (opts.parent) {
+        opts.parent.children = opts.parent.children || [];
+        opts.parent.children.push(obj);
+    }
+
+    return obj;
 }
 
-function makeStateStub(suite) {
-    var state = new State(suite, 'default-state-name');
+function makeStateStub(suite, opts) {
+    opts = opts || {};
+    var state = new State(suite, opts.name || 'default-state-name');
     state.shouldSkip = sinon.stub();
     return state;
 }
