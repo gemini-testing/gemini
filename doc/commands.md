@@ -11,7 +11,9 @@ used. In this case, run PhantomJS in webdriver mode before executing
 phantomjs --webdriver=4444
 ```
 
-## Gathering reference images
+## Gathering reference images [deprecated]
+
+**This command is deprecated. Use `gemini update` command instead.**
 
 Once you have few suites written you need to capture reference images:
 
