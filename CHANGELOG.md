@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.0.0 - 2015-12-19
+
+* `gemini update` command: ability to update only new and changed references (@sipayRT)
+* `SuiteCollection`: new API to run separate suites and states (@j0tunn)
+* Fix: free browser when reset failed (@j0tunn)
+* Fix: provide image for errors during actions chain execution (@leonsabr)
+* Run heavy operations in separate processes (@j0tunn)
+* Force quit on second Ctrl+C (@j0tunn)
+* Do not get browser session for suites without states (@j0tunn)
+* Do not get browser session and do not perform any pre-actions for skipped suite (@j0tunn)
+
+**BREAKING CHANGES**:
+
+* New skip method API (@leonsabr)
+  * Browser now can be specified only by browser id matcher (string or RegExp)
+  * skip now accepts optional second parameter - reason, which will be displayed in reporters
+* Deprecated options removed: `strictComparison`, `referenceImageAbsence` (@SevInf, @j0tunn)
+* Deprecated API method `gemini.buildDiff` removed (@j0tunn)
+* Russian documentation removed (@j0tunn)
+* `gemini.readTests` now returns `SuiteCollection` instance instead of `rootSuite` object (@j0tunn)
+* `gemini gather` deprecated in favor of `gemini update` (@sipayRT)
+
 ## 1.1.6 - 2015-12-04
 
 * Remove restirction for maximum open concurrent sockets (@j0tunn)
