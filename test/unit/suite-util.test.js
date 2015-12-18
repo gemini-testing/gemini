@@ -1,9 +1,7 @@
 'use strict';
 var _ = require('lodash'),
     suiteUtil = require('../../lib/suite-util'),
-
-    shouldSkip = suiteUtil.shouldSkip,
-    flattenSuites = suiteUtil.flattenSuites;
+    shouldSkip = suiteUtil.shouldSkip;
 
 describe('suite-util', function() {
     describe('shouldSkip()', function() {
@@ -34,54 +32,6 @@ describe('suite-util', function() {
                 {skipped: [matcher]},
                 'another-browser'
             ));
-        });
-    });
-
-    describe('flattenSuites()', function() {
-        var root;
-
-        function addChildTo(parent) {
-            var child = {};
-            parent.children = (parent.children || []).concat(child);
-            return child;
-        }
-
-        function addGrandNthChild(n, parent) {
-            var result = addChildTo;
-            while (n-- > 1) {
-                result = _.compose(addChildTo, result);
-            }
-            return result(parent);
-        }
-
-        beforeEach(function() {
-            root = {name: 'root'};
-        });
-
-        it('should return an array when root is falsey', function() {
-            assert.isArray(flattenSuites());
-        });
-
-        it('should return an empty array when root is falsey', function() {
-            assert.lengthOf(flattenSuites(), 0);
-        });
-
-        it('should return an array with 1 item when root has no children', function() {
-            assert.lengthOf(flattenSuites(root), 1);
-        });
-
-        it('should return an array of n+1 suites for n own children', function() {
-            var n = 7;
-            _.times(n, _.partial(addChildTo, root));
-
-            assert.lengthOf(flattenSuites(root), n + 1);
-        });
-
-        it('should return an array of n+1 suites for n-depth tree', function() {
-            var n = 13;
-            addGrandNthChild(n, root);
-
-            assert.lengthOf(flattenSuites(root), n + 1);
         });
     });
 });

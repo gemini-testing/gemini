@@ -35,11 +35,10 @@ console.log(gemini.config.rootUrl);
 ## Reading the tests
 
 * `gemini.readTests(paths)` – read all of the tests from specified paths into
-  one single meta-suite. `paths` is an array of files or directories paths
+  one suite collection. `paths` is an array of files or directories paths
   containing Gemini tests. If not specified, will look for tests in
-  `$projectRoot/gemini` directory. Returns promise which resolves to a single
-  `Suite` object. All top level suites will be the children of this root
-  suite.
+  `$projectRoot/gemini` directory. Returns promise which resolves to a
+  `SuiteCollection` object.
 
   Here is the example that prints all top level suite names:
 
@@ -48,12 +47,55 @@ console.log(gemini.config.rootUrl);
       gemini = new Gemini('/path/to/config');
 
   gemini.readTests()
-      .done(function(root) {
-          root.children.forEach(function(suite) {
+      .done(function(collection) {
+          collection.topLevelSuites().forEach(function(suite) {
               console.log(suite.name);
           });
       });
   ```
+
+## Suite Collection
+
+You can create SuiteCollection object by using `gemini.SuiteCollection` constructor.
+Also SuiteCollection object is returned by `gemini.readTests` method.
+
+SuiteCollection API:
+
+* `SuiteCollection([suites])` - constructor.
+  Takes optional `suites` parameter, these are the top level suites.
+
+* `add(suite)` - add suite to collection.
+
+* `topLevelSuites()` - return array of top level suites.
+
+* `allSuites()` - return array of all suites in collection. Goes through all suites
+  children recursively.
+
+* `disableAll()` - disable all suites in collection
+
+* `enableAll()` - enable all suites in collection
+
+* `disable(suite, [opts])` - disable suite and all its children
+
+  `opts` are optional:
+    * `opts.browser` - browser to disable suite in
+    * `opts.state` - disable only specified state
+
+* `enable(suite, [opts])` - enable suite and all its children. `opts` are the same as in
+  `disable`
+
+Example on how to run only certain states in certain browsers:
+```js
+var collection = gemini.readTests(paths),
+    suite = findSomeSuite(collection);
+
+collection
+  .disableAll()
+  .enable(suite, {state: 'some-state', browser: 'ie9'})
+  .enable(suite, {state: 'other-state', browser: 'firefox'});
+
+return gemini.test(collection);
+```
 
 ### Suite
 
@@ -83,7 +125,8 @@ Methods:
 
 Use `gemini.gather(paths, options)` method.
 
-`paths` is the array of file paths or directories to run the suites from.
+`paths` is the array of file paths or directories to run the suites from
+or `SuiteCollection` instance.
 
 Options:
 
@@ -112,7 +155,8 @@ Rejects promise if critical error occurred.
 
 Use `gemini.test(paths, options)` method.
 
-`paths` is the array of file paths or directories to run the tests from.
+`paths` is the array of file paths or directories to run the tests from
+or `SuiteCollection` instance.
 
 Options:
 

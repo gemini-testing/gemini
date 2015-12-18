@@ -214,10 +214,9 @@ describe('runner/BrowserRunner', function() {
 
             return runner.run(suites)
                 .then(function() {
-                    assert.calledWithMatch(onCriticalError, {
-                        suite: suite,
-                        browserId: 'browser'
-                    });
+                    var err = onCriticalError.firstCall.args[0];
+                    assert.equal(suite, err.suite);
+                    assert.equal('browser', err.browserId);
                 });
         });
     });

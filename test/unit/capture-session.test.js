@@ -154,13 +154,6 @@ describe('capture session', function() {
             };
         });
 
-        it('should call state callback', function() {
-            var _this = this;
-            return this.session.capture(this.state).then(function() {
-                assert.calledWith(_this.state.callback, _this.seq, find);
-            });
-        });
-
         it('should not make screenshot before prepareScreenshot has been executed', function() {
             var _this = this,
                 screenshotData = {
