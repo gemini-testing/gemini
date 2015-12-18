@@ -23,6 +23,26 @@ If no paths are specified, each `.js` file from `gemini` directory will be
 processed. By default, configuration will be loaded from `.gemini.yml` in the
 current directory. To specify other config, use `--config` or `-c` option.
 
+## Updating reference images
+
+Once you have few suites written or some code changed you need to capture or update reference images:
+
+```
+gemini update [paths to suites]
+```
+By default, this command will do two things:
+ * update reference images that have changed
+ * generate new reference images for new tests.
+
+ Also, you can run this command with options:
+
+ * `--diff` - update only existing images, states with no reference images will be ignored;
+ * `--new` - generate only missing images.
+
+If no paths are specified, each `.js` file from `gemini` directory will be
+processed. By default, configuration will be loaded from `.gemini.yml` in the
+current directory. To specify other config, use `--config` or `-c` option.
+
 ## Running tests
 
 To compare you reference screenshots with current state of blocks, use:
