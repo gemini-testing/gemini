@@ -45,10 +45,7 @@ describe('runner/state-runner/disabled-state-runner', function() {
     it('should not perform capture', function() {
         var browserSession = mkBrowserSessionStub_(),
             state = util.makeStateStub(),
-            runner = mkRunner_(state, browserSession),
-            mediator = sinon.spy().named('mediator');
-
-        browserSession.runHook.returns(q.delay(1).then(mediator));
+            runner = mkRunner_(state, browserSession);
 
         return runner.run()
             .then(function() {
