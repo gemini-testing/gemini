@@ -15,6 +15,7 @@ describe('runner/StateRunner', function() {
 
         session.runHook.returns(q.resolve());
         session.capture.returns(q.resolve());
+        session.handleError.returns(q.resolve());
 
         return session;
     }
@@ -122,6 +123,21 @@ describe('runner/StateRunner', function() {
                         state: state,
                         suite: state.suite
                     });
+                });
+        });
+
+        it('should handle error in state callback', function() {
+            var browserSession = mkBrowserSessionStub_(),
+                state = util.makeStateStub(),
+                runner = mkRunner_(state, browserSession);
+
+            var error = new StateError('some error');
+            browserSession.runHook.returns(q.reject(error));
+
+            return runner.run()
+                .then(function() {
+                    assert.calledOnce(browserSession.handleError);
+                    assert.calledWith(browserSession.handleError, error);
                 });
         });
 

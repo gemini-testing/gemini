@@ -507,4 +507,48 @@ describe('capture session', function() {
             });
         });
     });
+
+    describe('handleError', function() {
+        beforeEach(function() {
+            this.browser = {
+                captureFullscreenImage: sinon.stub().returns(q({}))
+            };
+            this.session = new CaptureSession(this.browser);
+            this.error = {};
+        });
+
+        it('should always reject', function() {
+            return assert.isRejected(this.session.handleError(this.error));
+        });
+
+        it('should call captureFullscreenImage method', function() {
+            var _this = this;
+
+            return this.session.handleError(this.error).fail(function() {
+                assert.called(_this.browser.captureFullscreenImage);
+            });
+        });
+
+        it('should add an image to error', function() {
+            var _this = this;
+
+            var image = {some: 'thing'};
+            _this.browser.captureFullscreenImage.returns(q.resolve(image));
+
+            return this.session.handleError(this.error).fail(function() {
+                assert.deepEqual(_this.error.image, image);
+            });
+        });
+
+        it('should not add an image to error if can not captureFullscreenImage', function() {
+            var _this = this;
+            _this.browser.captureFullscreenImage = sinon.stub().returns(q.reject({}));
+
+            this.error = new StateError('some error');
+
+            return this.session.handleError(this.error).fail(function(e) {
+                assert.deepEqual(_this.error, e);
+            });
+        });
+    });
 });
