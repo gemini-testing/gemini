@@ -5,7 +5,7 @@ var EventEmitter = require('events').EventEmitter,
     ImageProcessor = require('../../lib/image-processor'),
     RunnerEvents = require('../../lib/constants/runner-events');
 
-describe('image', function() {
+describe('image-processor', function() {
     var emitter = new EventEmitter(),
         imageProcessor = new ImageProcessor(emitter);
 
