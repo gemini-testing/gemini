@@ -21,7 +21,7 @@
     "install": "^0.1.8",
     "js-yaml": "^3.2.5",
     "lodash": "^3.6.0",
-    "looks-same": "^2.2.0",
+    "looks-same": "^2.2.2",
     "minimatch": "^2.0.1",
     "png-img": "~1.1.0",
     "polyfill-service": "~1.4.0",
