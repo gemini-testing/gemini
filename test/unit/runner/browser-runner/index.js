@@ -5,7 +5,7 @@ var q = require('q'),
     SuiteRunner = require('../../../../lib/runner/suite-runner/suite-runner'),
     suiteRunnerFabric = require('../../../../lib/runner/suite-runner'),
     pool = require('../../../../lib/browser-pool'),
-    Pool = require('../../../../lib/browser-pool/pool'),
+    BasicPool = require('../../../../lib/browser-pool/basic-pool'),
     Config = require('../../../../lib/config'),
     MetaError = require('../../../../lib/errors/meta-error'),
 
@@ -34,13 +34,13 @@ describe('runner/BrowserRunner', function() {
         return BrowserRunner.create(
             browser || 'default-browser',
             sinon.createStubInstance(Config),
-            browserPool || sinon.createStubInstance(Pool)
+            browserPool || sinon.createStubInstance(BasicPool)
         );
     }
 
     describe('constructor', function() {
         it('should create browser agent associated with passed browser id', function() {
-            var browserPool = sinon.createStubInstance(Pool);
+            var browserPool = sinon.createStubInstance(BasicPool);
 
             mkRunner_('browser', browserPool);
 

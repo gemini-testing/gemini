@@ -3,7 +3,7 @@ var q = require('q'),
     TestSessionRunner = require('../../../lib/runner/test-session-runner'),
     BrowserRunner = require('../../../lib/runner/browser-runner'),
     pool = require('../../../lib/browser-pool'),
-    Pool = require('../../../lib/browser-pool/pool'),
+    BasicPool = require('../../../lib/browser-pool/basic-pool'),
     Config = require('../../../lib/config');
 
 describe('runner/TestSessionRunner', function() {
@@ -135,7 +135,7 @@ describe('runner/TestSessionRunner', function() {
                 BrowserRunner.prototype.run
                     .onFirstCall().returns(q.reject());
 
-                pool.create.returns(sinon.createStubInstance(Pool));
+                pool.create.returns(sinon.createStubInstance(BasicPool));
             });
 
             it('should be rejected', function() {
@@ -150,7 +150,7 @@ describe('runner/TestSessionRunner', function() {
             });
 
             it('should cancel browser pool', function() {
-                var browserPool = sinon.createStubInstance(Pool);
+                var browserPool = sinon.createStubInstance(BasicPool);
                 pool.create.returns(browserPool);
 
                 return run_()
