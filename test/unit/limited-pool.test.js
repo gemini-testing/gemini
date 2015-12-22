@@ -125,6 +125,31 @@ describe('LimitedPool', function() {
             return assert.eventually.equal(result, expectedBrowser);
         });
 
+        it('should launch next browsers if free failed', function() {
+            var expectedBrowser = this.makeBrowser(),
+                pool = this.makePool(1);
+
+            this.underlyingPool.getBrowser
+                .withArgs('first').returns(q(this.makeBrowser()))
+                .withArgs('second').returns(q(expectedBrowser));
+
+            this.underlyingPool.freeBrowser.returns(q.reject('error'));
+
+            var result = pool.getBrowser('first')
+                .then(function(browser) {
+                    var secondPromise = pool.getBrowser('second');
+                    return q.delay(100)
+                        .then(function() {
+                            return pool.freeBrowser(browser);
+                        })
+                        .fail(function() {
+                            return secondPromise;
+                        });
+                });
+
+            return assert.eventually.equal(result, expectedBrowser);
+        });
+
         it('should cancel queued browsers when cancel is called', function() {
             var pool = this.makePool(1);
             this.underlyingPool.getBrowser.returns(q(this.makeBrowser()));
@@ -136,7 +161,7 @@ describe('LimitedPool', function() {
                 });
         });
 
-        it('should reject the queued call when underlying pool rejects the reuqest', function() {
+        it('should reject the queued call when underlying pool rejects the request', function() {
             var pool = this.makePool(1),
                 error = new Error('You shall not pass');
             this.underlyingPool.getBrowser
