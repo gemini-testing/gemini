@@ -150,6 +150,34 @@ describe('LimitedPool', function() {
             return assert.eventually.equal(result, expectedBrowser);
         });
 
+        it('should not wait for queued browser to start after release browser', function() {
+            var pool = this.makePool(1),
+                afterFree = sinon.spy().named('afterFree'),
+                afterSecondGet = sinon.spy().named('afterSecondGet');
+
+            this.underlyingPool.getBrowser
+                .withArgs('first').returns(q(this.makeBrowser()))
+                .withArgs('second').returns(q.resolve());
+
+            return pool.getBrowser('first')
+                .then(function(browser) {
+                    pool.getBrowser('second')
+                        .then(afterSecondGet);
+
+                    return q.delay(100)
+                        .then(function() {
+                            return pool.freeBrowser(browser);
+                        })
+                        .then(afterFree)
+                        .then(function() {
+                            assert.callOrder(
+                                afterFree,
+                                afterSecondGet
+                            );
+                        });
+                });
+        });
+
         it('should cancel queued browsers when cancel is called', function() {
             var pool = this.makePool(1);
             this.underlyingPool.getBrowser.returns(q(this.makeBrowser()));
