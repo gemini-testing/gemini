@@ -1,7 +1,7 @@
 'use strict';
 var q = require('q'),
     Browser = require('../../lib/browser'),
-    Pool = require('../../lib/browser-pool/pool'),
+    BasicPool = require('../../lib/browser-pool/basic-pool'),
     signalHandler = require('../../lib/signal-handler'),
     browserWithId = require('../util').browserWithId;
 
@@ -17,7 +17,7 @@ describe('UnlimitedPool', function() {
         this.browser.quit.returns(q());
         this.sinon.stub(Browser.prototype, '__constructor')
             .returns(this.browser);
-        this.pool = new Pool(this.config);
+        this.pool = new BasicPool(this.config);
 
         this.requestBrowser = function() {
             return this.pool.getBrowser('id');

@@ -1,14 +1,14 @@
 'use strict';
 
 var BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
-    Pool = require('../../../../lib/browser-pool/pool');
+    BasicPool = require('../../../../lib/browser-pool/basic-pool');
 
 describe('runner/browser-runner/browser-agent', function() {
     var sandbox = sinon.sandbox.create(),
         browserPool;
 
     beforeEach(function() {
-        browserPool = sinon.createStubInstance(Pool);
+        browserPool = sinon.createStubInstance(BasicPool);
     });
 
     afterEach(function() {
