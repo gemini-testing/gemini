@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3 - 2015-12-23
+
+* Fix update command called without any options (@sipayRT)
+* Limited pool fix: push defer queue if failed to free browser (@j0tunn)
+* Add editor files to the .npmignore (@j0tunn)
+
 ## 2.0.0 - 2015-12-19
 
 * `gemini update` command: ability to update only new and changed references (@sipayRT)
