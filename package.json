@@ -23,7 +23,7 @@
     "lodash": "^3.6.0",
     "looks-same": "^2.2.2",
     "minimatch": "^2.0.1",
-    "png-img": "~1.1.0",
+    "png-img": "git://github.com/gemini-testing/png-img.git#feature/pngjs2",
     "polyfill-service": "~1.4.0",
     "q": "^1.1.2",
     "q-debug-mode": "0.0.1",
