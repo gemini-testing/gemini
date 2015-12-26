@@ -1,0 +1,31 @@
+siteName: gemini
+description: Utility for regression testing of web pages using screenshots
+
+pages:
+  - slug: index
+    source: README.md
+    title: Quick start
+
+  - slug: configuration
+    source: doc/config.md
+    title: Configuration
+
+  - slug: testing
+    source: doc/tests.md
+    title: Writing Gemini tests
+
+  - slug: commands
+    source: doc/commands.md
+    title: Commands
+
+  - slug: api
+    source: doc/programmatic-api.md
+    title: Programmatic API
+
+  - slug: plugins
+    source: doc/plugins.md
+    title: Writing plugins
+
+theme: simple
+
+outputDir: site
