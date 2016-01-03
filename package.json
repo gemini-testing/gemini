@@ -46,6 +46,7 @@
     "chai": "^2.2.0",
     "chai-as-promised": "^4.3.0",
     "coveralls": "^2.11.2",
+    "husky": "^0.10.2",
     "istanbul": "^0.3.5",
     "jscs": "^1.10.0",
     "jshint": "^2.7.0",
@@ -60,7 +61,9 @@
     "test-func": "istanbul test _mocha test/functional",
     "test-browser": "istanbul test _mocha test/browser",
     "test": "istanbul test _mocha -- --recursive test/unit test/functional test/browser",
-    "lint": "jshint . && jscs ."
+    "lint": "jshint . && jscs .",
+    "precommit": "npm run lint",
+    "preversion": "npm run lint && npm test"
   },
   "author": "Sergey Tatarintsev <sevinf@yandex-team.ru> (https://github.com/SevInf)",
   "license": "MIT",
