@@ -1,21 +1,17 @@
 'use strict';
-var plugins = require('../../lib/plugins'),
-    mockery = require('mockery');
+var plugins,
+    proxyquire = require('proxyquire');
 
 describe('plugins', function() {
     beforeEach(function() {
         this.foobarPlugin = sinon.spy();
         this.gemini = sinon.spy();
 
-        mockery.registerMock('gemini-foobar', this.foobarPlugin);
-        mockery.enable({
-            warnOnReplace: false,
-            warnOnUnregistered: false
-        });
-    });
-
-    afterEach(function() {
-        mockery.disable();
+        plugins = proxyquire
+            .noCallThru()
+            .load('../../lib/plugins', {
+                'gemini-foobar': this.foobarPlugin
+            });
     });
 
     describe('load', function() {
