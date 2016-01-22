@@ -65,7 +65,7 @@
     "precommit": "npm run lint",
     "preversion": "npm run lint && npm test"
   },
-  "author": "Sergey Tatarintsev <sevinf@yandex-team.ru> (https://github.com/SevInf)",
+  "author": "Sergey Tatarintsev <tatarincev.serg@yandex.ua> (https://github.com/SevInf)",
   "license": "MIT",
   "directories": {
     "test": "test"
