@@ -119,10 +119,9 @@ describe('runner/StateRunner', function() {
 
             return runner.run()
                 .then(function() {
-                    assert.calledWithMatch(onStateError, {
-                        state: state,
-                        suite: state.suite
-                    });
+                    var error = onStateError.firstCall.args[0];
+                    assert.equal(error.state, state);
+                    assert.equal(error.suite, state.suite);
                 });
         });
 

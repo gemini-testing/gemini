@@ -77,11 +77,13 @@ SuiteCollection API:
 
 * `disable(suite, [opts])` - disable suite and all its children
 
+  `suite` can be a real suite object, or suite full name
+
   `opts` are optional:
     * `opts.browser` - browser to disable suite in
     * `opts.state` - disable only specified state
 
-* `enable(suite, [opts])` - enable suite and all its children. `opts` are the same as in
+* `enable(suite, [opts])` - enable suite and all its children. Arguments are the same as in
   `disable`
 
 Example on how to run only certain states in certain browsers:

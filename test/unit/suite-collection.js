@@ -1,8 +1,7 @@
 'use strict';
 
 var SuiteCollection = require('../../lib/suite-collection'),
-    util = require('../util'),
-    format = require('util').format;
+    mkTree = require('../util').makeSuiteTree;
 
 describe('suite-collection', function() {
     describe('topLevelSuites', function() {
@@ -12,30 +11,34 @@ describe('suite-collection', function() {
         });
 
         it('should return all suites from collection', function() {
-            var collection = new SuiteCollection(),
-                suite1 = util.makeSuiteStub(),
-                suite2 = util.makeSuiteStub();
+            var tree = mkTree({
+                    suite1: [],
+                    suite2: []
+                }),
+                collection = new SuiteCollection();
 
             collection
-                .add(suite1)
-                .add(suite2);
+                .add(tree.suite1)
+                .add(tree.suite2);
 
             assert.deepEqual(
-                [suite1, suite2],
+                [tree.suite1, tree.suite2],
                 collection.topLevelSuites()
             );
         });
 
         it('should return only top level suites', function() {
-            var collection = new SuiteCollection(),
-                root = util.makeSuiteStub();
+            var tree = mkTree({
+                    parent: {
+                        child: []
+                    }
+                }),
+                collection = new SuiteCollection();
 
-            util.makeSuiteStub({parent: root});
-
-            collection.add(root);
+            collection.add(tree.parent);
 
             assert.deepEqual(
-                [root],
+                [tree.parent],
                 collection.topLevelSuites()
             );
         });
@@ -48,204 +51,399 @@ describe('suite-collection', function() {
         });
 
         it('should return all suites including children', function() {
-            var collection = new SuiteCollection(),
-                root = util.makeSuiteStub(),
-                child = util.makeSuiteStub({parent: root}),
-                grandchild1 = util.makeSuiteStub({parent: child}),
-                grandchild2 = util.makeSuiteStub({parent: child});
+            var tree = mkTree({
+                    parent: {
+                        child: {
+                            grandchild1: [],
+                            grandchild2: []
+                        }
+                    }
+                }),
+                collection = new SuiteCollection();
 
-            collection.add(root);
+            collection.add(tree.parent);
 
             assert.deepEqual(
-                [root, child, grandchild1, grandchild2],
+                [
+                    tree.parent,
+                    tree.child,
+                    tree.grandchild1,
+                    tree.grandchild2
+                ],
                 collection.allSuites()
             );
         });
     });
 
-    describe('disableAll', function() {
-        it('should disable all suites', function() {
-            var root = util.makeSuiteStub({name: 'root'}),
-                child = util.makeSuiteStub({parent: root, name: 'child'}),
-                collection = new SuiteCollection([root]);
+    describe('enable/disable', function() {
+        it('all tests should be enabled by default', function() {
+            var tree = mkTree({
+                    parent: {
+                        child: ['state1', 'state2']
+                    }
+                }, {browsers: ['b1', 'b2']});
 
-            collection.disableAll();
-
-            assertDisabled(root);
-            assertDisabled(child);
-        });
-    });
-
-    describe('disable', function() {
-        it('should disable only passed suite and its subtree', function() {
-            var root = util.makeSuiteStub({name: 'root'}),
-                child = util.makeSuiteStub({parent: root, name: 'child'}),
-                grandchild = util.makeSuiteStub({parent: child, name: 'grandchild'}),
-                collection = new SuiteCollection([root]);
-
-            collection.disable(child);
-
-            assertEnabled(root);
-            assertDisabled(child);
-            assertDisabled(grandchild);
+            assert.deepEqual(tree.parent.browsers, ['b1', 'b2']);
+            assert.deepEqual(tree.child.browsers, ['b1', 'b2']);
+            assert.deepEqual(tree.state1.browsers, ['b1', 'b2']);
+            assert.deepEqual(tree.state2.browsers, ['b1', 'b2']);
         });
 
-        it('should disable subtree even if it was enabled', function() {
-            var root = util.makeSuiteStub({name: 'root'}),
-                child = util.makeSuiteStub({parent: root, name: 'child'}),
-                grandchild = util.makeSuiteStub({parent: child, name: 'grandchild'}),
-                collection = new SuiteCollection([root]);
+        describe('disableAll', function() {
+            it('should disable all suites', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: []
+                        }
+                    });
 
-            collection.enableAll();
-            collection.disable(child);
+                new SuiteCollection([tree.parent])
+                    .disableAll();
 
-            assertEnabled(root);
-            assertDisabled(child);
-            assertDisabled(grandchild);
+                assert.deepEqual(tree.parent.browsers, []);
+                assert.deepEqual(tree.child.browsers, []);
+            });
+
+            it('should not disable parent suite if it not in collection', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: []
+                        }
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.child])
+                    .disableAll();
+
+                assert.deepEqual(tree.parent.browsers, ['b1', 'b2']);
+            });
+
+            it('should disable all suites after enable', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: []
+                        }
+                    });
+
+                new SuiteCollection([tree.parent])
+                    .enableAll()
+                    .disableAll();
+
+                assert.deepEqual(tree.parent.browsers, []);
+                assert.deepEqual(tree.child.browsers, []);
+            });
         });
 
-        it('should disable only specified state', function() {
-            var suite = util.makeSuiteStub(),
-                collection = new SuiteCollection([suite]),
-                someState = util.makeStateStub(suite, {name: 'some-state'}),
-                otherState = util.makeStateStub(suite, {name: 'other-state'});
+        describe('disable', function() {
+            it('should disable only passed suite and its subtree', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: {
+                                grandchild: []
+                            }
+                        }
+                    }, {browsers: ['b1', 'b2']});
 
-            collection.disable(suite, {state: 'some-state'});
+                new SuiteCollection([tree.parent])
+                    .disable(tree.child);
 
-            assertDisabled(suite, someState);
-            assertEnabled(suite, otherState);
+                assert.deepEqual(tree.parent.browsers, ['b1', 'b2']);
+                assert.deepEqual(tree.child.browsers, []);
+                assert.deepEqual(tree.grandchild.browsers, []);
+            });
+
+            it('should disable suite by full name', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: []
+                        }
+                    });
+
+                new SuiteCollection([tree.parent])
+                    .disable(tree.child.fullName);
+
+                assert.deepEqual(tree.child.browsers, []);
+            });
+
+            it('should fail on attempt to disable unknown suite', function() {
+                var tree = mkTree({
+                        suite: []
+                    }),
+                    collection = new SuiteCollection([tree.suite]);
+
+                assert.throws(function() {
+                    collection.disable('some bad suite');
+                }, /Unknown/);
+            });
+
+            it('should disable whole subtree including states', function() {
+                var tree = mkTree({
+                        parent: {
+                            child1: ['state1'],
+                            child2: ['state2', 'state3']
+                        }
+                    });
+
+                new SuiteCollection([tree.parent])
+                    .disable(tree.parent);
+
+                assert.deepEqual(tree.parent.browsers, []);
+                assert.deepEqual(tree.child1.browsers, []);
+                assert.deepEqual(tree.child2.browsers, []);
+                assert.deepEqual(tree.state1.browsers, []);
+                assert.deepEqual(tree.state2.browsers, []);
+                assert.deepEqual(tree.state3.browsers, []);
+            });
+
+            it('should disable subtree even if it was enabled', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: {
+                                grandchild: []
+                            }
+                        }
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.parent])
+                    .enableAll()
+                    .disable(tree.child);
+
+                assert.deepEqual(tree.parent.browsers, ['b1', 'b2']);
+                assert.deepEqual(tree.child.browsers, []);
+                assert.deepEqual(tree.grandchild.browsers, []);
+            });
+
+            it('should disable only specified state', function() {
+                var tree = mkTree({
+                        suite: ['someState', 'otherState']
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.suite])
+                    .disable(tree.suite, {state: 'someState'});
+
+                assert.deepEqual(tree.someState.browsers, []);
+                assert.deepEqual(tree.otherState.browsers, ['b1', 'b2']);
+            });
+
+            it('should fail to disable unknown state', function() {
+                var tree = mkTree({
+                        suite: ['someState']
+                    }),
+                    collection = new SuiteCollection([tree.suite]);
+
+                assert.throws(function() {
+                    collection.disable(tree.suite, {state: 'otherState'});
+                }, /No such state/);
+            });
+
+            it('should not disable whole tree down to disabled state', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: ['someState']
+                        }
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.parent])
+                    .disable(tree.child, {state: 'someState'});
+
+                assert.deepEqual(tree.parent.browsers, ['b1', 'b2']);
+                assert.deepEqual(tree.child.browsers, ['b1', 'b2']);
+            });
+
+            it('should apply all disable rules', function() {
+                var tree = mkTree({
+                        suite: ['someState', 'otherState']
+                    });
+
+                new SuiteCollection([tree.suite])
+                    .disable(tree.suite, {state: 'someState'})
+                    .disable(tree.suite, {state: 'otherState'});
+
+                assert.deepEqual(tree.someState.browsers, []);
+                assert.deepEqual(tree.otherState.browsers, []);
+            });
+
+            it('should disable only specified state in specified browser', function() {
+                var tree = mkTree({
+                        suite: ['someState']
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.suite])
+                    .disable(tree.suite, {state: 'someState', browser: 'b1'});
+
+                assert.deepEqual(tree.someState.browsers, ['b2']);
+            });
+
+            it('should apply browser rule to whole tree', function() {
+                var tree = mkTree({
+                        parent: {
+                            child1: ['state1'],
+                            child2: ['state2', 'state3']
+                        }
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.parent])
+                    .disable(tree.parent, {browser: 'b1'});
+
+                assert.deepEqual(tree.parent.browsers, ['b2']);
+                assert.deepEqual(tree.child1.browsers, ['b2']);
+                assert.deepEqual(tree.child2.browsers, ['b2']);
+                assert.deepEqual(tree.state1.browsers, ['b2']);
+                assert.deepEqual(tree.state2.browsers, ['b2']);
+                assert.deepEqual(tree.state3.browsers, ['b2']);
+            });
         });
 
-        it('should apply all disable rules', function() {
-            var suite = util.makeSuiteStub(),
-                collection = new SuiteCollection([suite]),
-                someState = util.makeStateStub(suite, {name: 'some-state'}),
-                otherState = util.makeStateStub(suite, {name: 'other-state'});
+        describe('enableAll', function() {
+            it('should enable all suites', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: []
+                        }
+                    }, {browsers: ['b1', 'b2']});
 
-            collection
-                .disable(suite, {state: 'some-state'})
-                .disable(suite, {state: 'other-state'});
+                new SuiteCollection([tree.parent])
+                    .enableAll();
 
-            assertDisabled(suite, someState);
-            assertDisabled(suite, otherState);
+                assert.deepEqual(tree.parent.browsers, ['b1', 'b2']);
+                assert.deepEqual(tree.child.browsers, ['b1', 'b2']);
+            });
+
+            it('should enable all suites after disable', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: []
+                        }
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.parent])
+                    .disableAll()
+                    .enableAll();
+
+                assert.deepEqual(tree.parent.browsers, ['b1', 'b2']);
+                assert.deepEqual(tree.child.browsers, ['b1', 'b2']);
+            });
         });
 
-        it('should state if whole suite was disabled', function() {
-            var suite = util.makeSuiteStub(),
-                collection = new SuiteCollection([suite]),
-                someState = util.makeStateStub(suite, {name: 'some-state'});
+        describe('enable', function() {
+            it('should enable suite by full name', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: []
+                        }
+                    }, {browsers: ['b1', 'b2']});
 
-            collection.disable(suite);
+                new SuiteCollection([tree.parent])
+                    .disableAll()
+                    .enable(tree.child.fullName);
 
-            assertDisabled(suite, someState);
-        });
+                assert.deepEqual(tree.child.browsers, ['b1', 'b2']);
+            });
 
-        it('should disable only specified state in specified browser', function() {
-            var suite = util.makeSuiteStub(),
-                collection = new SuiteCollection([suite]),
-                state = util.makeStateStub(suite, {name: 'some-state'});
+            it('should fail on attempt to enable unknown suite', function() {
+                var tree = mkTree({
+                        suite: []
+                    }),
+                    collection = new SuiteCollection([tree.suite]);
 
-            collection.disable(suite, {state: 'some-state', browser: 'ie9'});
+                assert.throws(function() {
+                    collection.enable('some bad suite');
+                }, /Unknown/);
+            });
 
-            assertDisabled(suite, state, 'ie9');
-            assertEnabled(suite, state, 'firefox');
-        });
-    });
+            it('should enable only specified state', function() {
+                var tree = mkTree({
+                        suite: ['someState', 'otherState']
+                    }, {browsers: ['b1', 'b2']});
 
-    describe('enableAll', function() {
-        it('should enable all suites', function() {
-            var root = util.makeSuiteStub({name: 'root'}),
-                child = util.makeSuiteStub({parent: root, name: 'child'}),
-                collection = new SuiteCollection([root]);
+                new SuiteCollection([tree.suite])
+                    .disableAll()
+                    .enable(tree.suite, {state: 'someState'});
 
-            collection.enableAll();
+                assert.deepEqual(tree.someState.browsers, ['b1', 'b2']);
+                assert.deepEqual(tree.otherState.browsers, []);
+            });
 
-            assertEnabled(root);
-            assertEnabled(child);
-        });
-    });
+            it('should apply all enable rules', function() {
+                var tree = mkTree({
+                        suite: ['someState', 'otherState']
+                    }, {browsers: ['b1', 'b2']});
 
-    describe('enable', function() {
-        it('should enable only passed suite and its subtree', function() {
-            var root = util.makeSuiteStub({name: 'root'}),
-                child = util.makeSuiteStub({parent: root, name: 'child'}),
-                grandchild = util.makeSuiteStub({parent: child, name: 'grandchild'}),
-                collection = new SuiteCollection([root]);
+                new SuiteCollection([tree.suite])
+                    .disableAll()
+                    .enable(tree.suite, {state: 'someState'})
+                    .enable(tree.suite, {state: 'otherState'});
 
-            collection
-                .disableAll()
-                .enable(child);
+                assert.deepEqual(tree.someState.browsers, ['b1', 'b2']);
+                assert.deepEqual(tree.otherState.browsers, ['b1', 'b2']);
+            });
 
-            assertDisabled(root);
-            assertEnabled(child);
-            assertEnabled(grandchild);
-        });
+            it('should enable only specified state in specified browser', function() {
+                var tree = mkTree({
+                        suite: ['someState']
+                    }, {browsers: ['b1', 'b2']});
 
-        it('should enable only specified state', function() {
-            var suite = util.makeSuiteStub(),
-                collection = new SuiteCollection([suite]),
-                someState = util.makeStateStub(suite, {name: 'some-state'}),
-                otherState = util.makeStateStub(suite, {name: 'other-state'});
+                new SuiteCollection([tree.suite])
+                    .disableAll()
+                    .enable(tree.suite, {state: 'someState', browser: 'b1'});
 
-            collection
-                .disableAll()
-                .enable(suite, {state: 'some-state'});
+                assert.deepEqual(tree.someState.browsers, ['b1']);
+            });
 
-            assertEnabled(suite, someState);
-            assertDisabled(suite, otherState);
-        });
+            it('should apply all browser enable rules', function() {
+                var tree = mkTree({
+                        suite: ['someState']
+                    }, {browsers: ['b1', 'b2']});
 
-        it('should apply all enable rules', function() {
-            var suite = util.makeSuiteStub(),
-                collection = new SuiteCollection([suite]),
-                someState = util.makeStateStub(suite, {name: 'some-state'}),
-                otherState = util.makeStateStub(suite, {name: 'other-state'});
+                new SuiteCollection([tree.suite])
+                    .disableAll()
+                    .enable(tree.suite, {state: 'someState', browser: 'b2'})
+                    .enable(tree.suite, {state: 'someState', browser: 'b1'});
 
-            collection
-                .disableAll()
-                .enable(suite, {state: 'some-state'})
-                .enable(suite, {state: 'other-state'});
+                assert.deepEqual(tree.someState.browsers, ['b2', 'b1']);
+            });
 
-            assertEnabled(suite, someState);
-            assertEnabled(suite, otherState);
-        });
+            it('should enable whole tree down to enabled state', function() {
+                var tree = mkTree({
+                        parent: {
+                            child: {
+                                grandchild: ['someState']
+                            }
+                        }
+                    }, {browsers: ['b1', 'b2']});
 
-        it('should enable only specified state in specified browser', function() {
-            var suite = util.makeSuiteStub(),
-                collection = new SuiteCollection([suite]),
-                state = util.makeStateStub(suite, {name: 'some-state'});
+                new SuiteCollection([tree.parent])
+                    .disableAll()
+                    .enable(tree.grandchild, {state: 'someState', browser: 'b1'});
 
-            collection
-                .disableAll()
-                .enable(suite, {state: 'some-state', browser: 'ie9'});
+                assert.deepEqual(tree.parent.browsers, ['b1']);
+                assert.deepEqual(tree.child.browsers, ['b1']);
+                assert.deepEqual(tree.grandchild.browsers, ['b1']);
+                assert.deepEqual(tree.someState.browsers, ['b1']);
+            });
 
-            assertEnabled(suite, state, 'ie9');
-            assertDisabled(suite, state, 'firefox');
+            it('should be able to enable in some unknown browser', function() {
+                var tree = mkTree({
+                        suite: []
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.suite])
+                    .enable(tree.suite, {browser: 'b3'});
+
+                assert.deepEqual(tree.suite.browsers, ['b1', 'b2', 'b3']);
+            });
+
+            it('should not remove new browser on second enable', function() {
+                var tree = mkTree({
+                        suite: []
+                    }, {browsers: ['b1', 'b2']});
+
+                new SuiteCollection([tree.suite])
+                    .disableAll()
+                    .enable(tree.suite, {browser: 'b3'})
+                    .enable(tree.suite);
+
+                assert.deepEqual(tree.suite.browsers, ['b3', 'b1', 'b2']);
+            });
         });
     });
 });
-
-function assertEnabled(suite, state, browser) {
-    assert.isFalse(
-        Boolean(suite.isDisabled) && suite.isDisabled(browser, state),
-        toStr(suite, state, browser) + ' should be enabled'
-    );
-}
-
-function assertDisabled(suite, state, browser) {
-    assert.isTrue(
-        suite.isDisabled(browser, state),
-        toStr(suite, state, browser) + ' should be disabled'
-    );
-}
-
-function toStr(suite, state, browser) {
-    var msg = format('suite `%s`', suite.name);
-    if (state) {
-        msg = format('state `%s` of %s', state.name, msg);
-    }
-    if (browser) {
-        msg = format('%s in browser `%s`', msg, browser);
-    }
-    return msg;
-}
