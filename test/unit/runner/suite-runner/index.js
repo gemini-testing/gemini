@@ -4,7 +4,6 @@ var suiteRunner = require('../../../../lib/runner/suite-runner'),
     RegularSuiteRunner = require('../../../../lib/runner/suite-runner/regular-suite-runner'),
     StatelessSuiteRunner = require('../../../../lib/runner/suite-runner/stateless-suite-runner'),
     SkippedSuiteRunner = require('../../../../lib/runner/suite-runner/skipped-suite-runner'),
-    DisabledSuiteRunner = require('../../../../lib/runner/suite-runner/disabled-suite-runner'),
     suiteUtil = require('../../../../lib/suite-util'),
     util = require('../../../util');
 
@@ -42,14 +41,5 @@ describe('runner/suite-runner/create', function() {
         var runner = suiteRunner.create(suite, {});
 
         assert.instanceOf(runner, SkippedSuiteRunner);
-    });
-
-    it('should create DisabledSuiteRunner for disabled suite', function() {
-        var suite = util.makeSuiteStub();
-        sandbox.stub(suiteUtil, 'isDisabled').returns(true);
-
-        var runner = suiteRunner.create(suite, {});
-
-        assert.instanceOf(runner, DisabledSuiteRunner);
     });
 });

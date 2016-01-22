@@ -4,9 +4,10 @@ var util = require('../../../util'),
     Image = require('../../../../lib/image');
 
 util.makeCaptureStub = function() {
+    var suite = util.makeSuiteStub();
     return {
-            suite: util.makeSuiteStub(),
-            state: util.makeStateStub({tolerance: 1}),
+            suite: suite,
+            state: util.makeStateStub(suite, {tolerance: 1}),
             browser: util.makeBrowser({}, {
                 getScreenshotPath: sinon.stub()
             }),

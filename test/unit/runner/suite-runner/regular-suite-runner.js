@@ -5,7 +5,6 @@ var q = require('q'),
     StateRunner = require('../../../../lib/runner/state-runner/state-runner'),
     BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
     Config = require('../../../../lib/config'),
-    suiteUtil = require('../../../../lib/suite-util'),
     util = require('../../../util'),
     makeSuiteStub = util.makeSuiteStub;
 
@@ -28,9 +27,6 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         sandbox.stub(CaptureSession.prototype);
         CaptureSession.prototype.runHook.returns(q.resolve());
         CaptureSession.prototype.browser = {};
-
-        sandbox.stub(suiteUtil);
-        suiteUtil.isDisabled.returns(false);
     });
 
     afterEach(function() {
@@ -202,18 +198,17 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         });
 
         it('should run next state only after previous has been finished', function() {
-            var state1 = util.makeStateStub(),
-                state2 = util.makeStateStub(),
-                mediator = sinon.spy(),
-                suite = makeSuiteStub({
-                    states: [state1, state2]
-                });
+            var suite = makeSuiteStub(),
+                state1 = util.makeStateStub(suite),
+                state2 = util.makeStateStub(suite),
+                mediator = sinon.spy();
 
             StateRunner.prototype.run.onFirstCall().returns(q.delay(1).then(mediator));
 
             return run_(suite)
                 .then(function() {
                     assert.callOrder(
+                        StateRunner.prototype.__constructor.withArgs(state1).named('state1 runner'),
                         mediator.named('middle function'),
                         StateRunner.prototype.__constructor.withArgs(state2).named('state2 runner')
                     );
