@@ -34,25 +34,31 @@ console.log(gemini.config.rootUrl);
 
 ## Reading the tests
 
-* `gemini.readTests(paths)` – read all of the tests from specified paths into
-  one suite collection. `paths` is an array of files or directories paths
-  containing Gemini tests. If not specified, will look for tests in
-  `$projectRoot/gemini` directory. Returns promise which resolves to a
-  `SuiteCollection` object.
+`gemini.readTests(paths, grep)` – read all of the tests from specified paths into
+one suite collection.
 
-  Here is the example that prints all top level suite names:
+* `paths` is an array of files or directories paths containing Gemini tests.
+  If not specified, will look for tests in `$projectRoot/gemini` directory.
 
-  ```javascript
-  var Gemini = require('gemini/api'),
-      gemini = new Gemini('/path/to/config');
+* `grep` is a regular expression to filter suites to read. By default, all tests
+  will be read. If this option is set, only suites with name matching the
+  pattern will be read.
 
-  gemini.readTests()
-      .done(function(collection) {
-          collection.topLevelSuites().forEach(function(suite) {
-              console.log(suite.name);
-          });
-      });
-  ```
+Returns promise which resolves to a `SuiteCollection` object.
+
+Here is the example that prints all top level suite names:
+
+```javascript
+var Gemini = require('gemini/api'),
+    gemini = new Gemini('/path/to/config');
+
+gemini.readTests()
+    .done(function(collection) {
+        collection.topLevelSuites().forEach(function(suite) {
+            console.log(suite.name);
+        });
+    });
+```
 
 ## Suite Collection
 
