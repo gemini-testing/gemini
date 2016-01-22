@@ -185,7 +185,7 @@ gemini.suite('parent', function(parent) {
 
     gemini.suite('second child', function(child) {
         //this suite captures different elements on the same page
-        child.setCaptureElements('.next-selector'})
+        child.setCaptureElements('.next-selector')
             .capture('third state', function(actions, elements) {
                 // ...
             })
