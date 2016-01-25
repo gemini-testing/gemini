@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0 - 2016-01-25
+
+* Fixed bug in enable/disable logic in suite collection - may not work properly when disabling 
+  all suites and enabling only some states in specific suite (@j0tunn)
+* Added possibility to enable/disable suites by full name (@j0tunn)
+* Added possibility to specify `grep` condition for `readTests` API method (@SwinX)
+
 ## 2.0.3 - 2015-12-23
 
 * Fix update command called without any options (@sipayRT)
