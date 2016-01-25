@@ -47,11 +47,11 @@
     "chai-as-promised": "^4.3.0",
     "coveralls": "^2.11.2",
     "husky": "^0.10.2",
-    "istanbul": "^0.3.5",
+    "istanbul": "^0.4.2",
     "jscs": "^1.10.0",
     "jshint": "^2.7.0",
     "mocha": "^2.1.0",
-    "mockery": "^1.4.0",
+    "proxyquire": "^1.7.3",
     "sinon": "^1.14.1",
     "uglify-js": "^2.4.24"
   },
