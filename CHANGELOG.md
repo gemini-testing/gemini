@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1 - 2016-01-27
+
+* Fix: specified name for NoRefImageError (@SwinX)
+
 ## 2.1.0 - 2016-01-25
 
 * Fixed bug in enable/disable logic in suite collection - may not work properly when disabling 
