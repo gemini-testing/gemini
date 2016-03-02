@@ -64,7 +64,7 @@ describe('PerBrowserLimitedPool', function() {
                     .then(function() {
                         return pool.getBrowser('id').timeout(100, 'timeout');
                     });
-            return assert.isRejected(result, /^timeout$/);
+            return assert.isRejected(result, /timeout$/);
         });
 
         it('should allow to launch different browser when first is over limit', function() {
