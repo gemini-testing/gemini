@@ -81,7 +81,7 @@ describe('LimitedPool', function() {
                 .then(function() {
                     return pool.getBrowser('second').timeout(100, 'timeout');
                 });
-            return assert.isRejected(result, /^timeout$/);
+            return assert.isRejected(result, /timeout$/);
         });
 
         it('should launch next browsers after previous are released', function() {

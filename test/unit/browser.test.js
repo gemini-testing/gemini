@@ -6,6 +6,7 @@ var Calibrator = require('../../lib/calibrator'),
     wd = require('wd'),
     fs = require('fs'),
     path = require('path'),
+    polyfillService = require('polyfill-service'),
     makeBrowser = require('../util').makeBrowser;
 
 describe('browser', function() {
@@ -149,45 +150,80 @@ describe('browser', function() {
         });
     });
 
-    describe('open', function() {
+    describe('URL opening', function() {
         beforeEach(function() {
             this.wd = {
+                configureHttp: sinon.stub().returns(q({})),
+                eval: sinon.stub().returns(q({})),
                 get: sinon.stub().returns(q({})),
-                on: sinon.stub()
+                init: sinon.stub().returns(q({})),
+                on: sinon.stub(),
+                setWindowSize: sinon.stub().returns(q({}))
             };
 
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
-
-            this.browser = makeBrowser({browserName: 'browser', version: '1.0'});
+            this.sinon.stub(ClientBridge.prototype, 'call').returns(q({}));
+            this.sinon.stub(polyfillService, 'getPolyfillString').returns('function() {}');
         });
 
-        it('should open URL', function() {
-            var _this = this;
-            return this.browser.open('http://www.example.com')
-                .then(function() {
-                    assert.calledWith(_this.wd.get, 'http://www.example.com');
-                });
-        });
-    });
+        describe('open', function() {
+            function open_(browser, params) {
+                params = params || {};
 
-    describe('openRelative', function() {
-        it('should open relative URL using config', function() {
-            this.wd = {
-                get: sinon.stub().returns(q({})),
-                on: sinon.stub()
-            };
+                return browser.launch()
+                    .then(function() {
+                        return browser.open(
+                            params.url || 'http://www.example.com',
+                            params.shouldSkipZoomReset
+                        );
+                    });
+            }
 
-            this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
-
-            this.browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
-                getAbsoluteUrl: sinon.stub().withArgs('/relative').returns('http://example.com/relative')
+            beforeEach(function() {
+                this.browser = makeBrowser({browserName: 'browser', version: '1.0'});
             });
 
-            var _this = this;
-            return this.browser.openRelative('/relative')
-                .then(function() {
-                    assert.calledWith(_this.wd.get, 'http://example.com/relative');
+            it('should open URL', function() {
+                var _this = this;
+
+                return open_(this.browser, {url: 'http://www.example.com'})
+                    .then(function() {
+                        assert.calledWith(_this.wd.get, 'http://www.example.com');
+                    });
+            });
+
+            it('should reset page zoom by default', function() {
+                return open_(this.browser, {url: 'http://www.example.com'})
+                    .then(function() {
+                        assert.calledWith(ClientBridge.prototype.call, 'resetZoom');
+                    });
+            });
+
+            it('should not reset page zoom if `shouldSkipZoomReset` param passed as true', function() {
+                return open_(this.browser, {url: 'http://www.example.com', shouldSkipZoomReset: true})
+                    .then(function() {
+                        assert.neverCalledWith(ClientBridge.prototype.call, 'resetZoom');
+                    });
+            });
+        });
+
+        describe('openRelative', function() {
+            beforeEach(function() {
+                this.browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                    getAbsoluteUrl: sinon.stub().withArgs('/relative').returns('http://example.com/relative')
                 });
+            });
+
+            it('should open relative URL using config', function() {
+                var _this = this;
+                return this.browser.launch()
+                    .then(function() {
+                        return _this.browser.openRelative('/relative');
+                    })
+                    .then(function() {
+                        assert.calledWith(_this.wd.get, 'http://example.com/relative');
+                    });
+            });
         });
     });
 
