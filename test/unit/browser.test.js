@@ -174,7 +174,7 @@ describe('browser', function() {
                     .then(function() {
                         return browser.open(
                             params.url || 'http://www.example.com',
-                            params.shouldSkipZoomReset
+                            {resetZoom: params.resetZoom}
                         );
                     });
             }
@@ -199,8 +199,8 @@ describe('browser', function() {
                     });
             });
 
-            it('should not reset page zoom if `shouldSkipZoomReset` param passed as true', function() {
-                return open_(this.browser, {url: 'http://www.example.com', shouldSkipZoomReset: true})
+            it('should not reset page zoom if `resetZoom` param passed as false', function() {
+                return open_(this.browser, {url: 'http://www.example.com', resetZoom: false})
                     .then(function() {
                         assert.neverCalledWith(ClientBridge.prototype.call, 'resetZoom');
                     });
