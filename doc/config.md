@@ -179,7 +179,7 @@ Settings list:
 * `windowSize` – specify browser window dimensions (i.e. `1600x1200`). If not
   specified, the size of the window depends on WebDriver.
 
-* `sessionPerBrowser` - how many WebDriver sessions  can be launched
+* `sessionsPerBrowser` - how many WebDriver sessions  can be launched
   simultaneously for this browser. Default is 1. Increase the value if you
   want to speed up your tests.
 
