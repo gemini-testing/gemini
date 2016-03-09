@@ -41,7 +41,7 @@ configuration and usage of **Gemini**.
 
 Required software:
 
-1. WebDriver server implementation. There are few possible options: 
+1. WebDriver server implementation. There are few possible options:
 
    - [Selenium Server](http://docs.seleniumhq.org/download/) – for testing in
      different browsers.
@@ -55,7 +55,7 @@ Required software:
    - Cloud WebDriver services, such as
      [SauceLabs](http://saucelabs.com/) or
      [BrowserStack](http://www.browserstack.com/)
-     
+
 2. Compiler with support of C++11 (`GCC@4.6` or higher). This is a
    [png-img](https://github.com/gemini-testing/png-img) requirement.
 
@@ -81,7 +81,15 @@ npm install gemini
 
 ## Configuration
 
-**Gemini** is configured using `.gemini.yml` file at the root of the project.
+**Gemini** is configured using config file at the root of the project.
+Gemini can use one of the next files:
+* `.gemini.conf.js`
+* `.gemini.conf.json`
+* `.gemini.conf.yml`
+* `.gemini.js`
+* `.gemini.json`
+* `.gemini.yml`
+
 Lets say we want to run our tests only in locally installed `PhantomJS`.
 
 In this case, the minimal configuration file will need to have only the root url

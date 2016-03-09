@@ -34,7 +34,7 @@ describe('config', function() {
                 assert.deepPropertyVal(config, 'system.projectRoot', DATA_ROOT);
             });
 
-            it('should set realtive root relatively to config path', function() {
+            it('should set relative root relatively to config path', function() {
                 var config = new Config(configPath('relPathConfig.yml'));
                 assert.deepPropertyVal(config, 'system.projectRoot', path.join(DATA_ROOT, 'rel', 'path'));
             });
