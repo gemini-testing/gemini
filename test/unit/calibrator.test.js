@@ -20,7 +20,7 @@ describe('calibrator', function() {
     beforeEach(function() {
         browser = browserWithId('id');
         sinon.stub(browser);
-        browser.evalScript.returns(q({}));
+        browser.evalScript.returns(q({innerWidth: 984})); //width of viewport in test image
         browser.open.returns(q());
         calibrator = new Calibrator();
     });
@@ -36,7 +36,7 @@ describe('calibrator', function() {
 
     it('should return also features detected by script', function() {
         setScreenshot('calibrate.png');
-        browser.evalScript.returns(q({feature: 'value'}));
+        browser.evalScript.returns(q({feature: 'value', innerWidth:984}));
         var result = calibrator.calibrate(browser);
         return assert.eventually.propertyVal(result, 'feature', 'value');
     });
