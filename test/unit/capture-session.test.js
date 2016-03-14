@@ -506,6 +506,68 @@ describe('capture session', function() {
                     });
             });
         });
+
+        describe('if document shorter than image', function() {
+            it('should ignore viewport offset if image size >= document dimension * pixel ratio', function() {
+                this.setCaptureData({
+                    documentSize: {width: 1000, height: 1000},
+                    imageSize: {width: 2000, height: 2000},
+                    pixelRatio: 2,
+                    viewportOffset: {top: 1000, left: 1000},
+                    captureArea: {top: 10, left: 10}
+                });
+                this.browser.usePixelRatio = true;
+
+                var _this = this;
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWithMatch(_this.image.crop, {
+                            top: 10 * 2,
+                            left: 10 * 2
+                        });
+                    });
+            });
+
+            it('should ignore viewport offset if browser should not use pixel ratio', function() {
+                this.setCaptureData({
+                    documentSize: {width: 1000, height: 1000},
+                    imageSize: {width: 2000, height: 2000},
+                    pixelRatio: 2,
+                    viewportOffset: {top: 5, left: 5},
+                    captureArea: {top: 10, left: 10}
+                });
+                this.browser.usePixelRatio = false;
+
+                var _this = this;
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWithMatch(_this.image.crop, {
+                            top: 10,
+                            left: 10
+                        });
+                    });
+            });
+
+            it('should apply viewport offset if image size < document dimensions * pixel ratio', function() {
+                this.setCaptureData({
+                    documentSize: {width: 1000, height: 1000},
+                    imageSize: {width: 2000, height: 2000},
+                    pixelRatio: 3,
+                    viewportOffset: {top: 5, left: 5},
+                    captureArea: {top: 100, left: 100}
+                });
+                this.browser.usePixelRatio = true;
+
+                var _this = this;
+                return this.performCapture()
+                    .then(function() {
+                        assert.calledWithMatch(_this.image.crop, {
+                            top: 100 * 3 - 5 * 3,
+                            left: 100 * 3 - 5 * 3
+                        });
+                    });
+            });
+        });
     });
 
     describe('handleError', function() {
