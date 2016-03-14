@@ -191,6 +191,14 @@ Settings list:
 * `retry` – maximum amount of relaunch fallen tests with a critical error. If not
   specified, the fallen tests will not be relaunched (by default it's 0).
 
+  Note that fallen test will not be retried immediatelly, it will be delayed until
+  all tests finish and then restarted in new browser session. So the tests will be
+  performed in waves:
+  - run all tests
+  - first retry: run tests failed during all tests run
+  - second retry: run tests failed during first retry
+  - ...
+
 ## Sets
 
 You can link some set of tests with certain browsers using `sets`.
