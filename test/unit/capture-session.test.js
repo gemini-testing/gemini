@@ -4,7 +4,7 @@ var _ = require('lodash'),
     find = require('../../lib/find-func').find,
 
     CaptureSession = require('../../lib/capture-session'),
-    Actions = require('../../lib/browser/actions.js'),
+    Actions = require('../../lib/browser/actions'),
     createSuite = require('../../lib/suite').create,
     StateError = require('../../lib/errors/state-error');
 
