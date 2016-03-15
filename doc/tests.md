@@ -76,15 +76,15 @@ All methods are chainable:
   - `skip()` – all browsers;
 
   - `skip('id')` – browser with specified `id`;
-  
+
   - `skip('id', comment)` – browser with specified `id` and show `comment` in the report;
 
   - `skip(/some RegExp/)` – browser with `id` which matches `/some RegExp/`;
-  
+
   - `skip(/some RegExp/, comment)` – browser with `id` which matches `/some RegExp/` and show `comment` in the report;
 
   - `skip(['id1', /RegExp1/, ...])` – multiple browsers;
-  
+
   - `skip(['id1', /RegExp1/, ...], comment)` – multiple browsers and show `comment` in the report.
 
   All browsers from subsequent calls to `.skip()` are added to the skip list:
@@ -103,6 +103,14 @@ All methods are chainable:
       /RegExp1/
   ]);
   ```
+
+* `browsers([browser])` – run all tests and nested suites in specified browsers:
+
+  - `browsers('id')` – browser with specified `id`;
+
+  - `browsers(/some RegExp/)` – browser `id` which matches `/some RegExp/`;
+
+  - `browsers(['id1', /RegExp1/, ...])` – multiple browsers.
 
 * `capture(stateName, [options], callback(actions, find))` – defines a new
   state to capture. Optional callback describes a sequence of actions to bring
