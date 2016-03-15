@@ -438,5 +438,137 @@ describe('public tests API', function() {
                 assert.isTrue(this.suite.children[0].skipped[1].matches('firefox33'));
             });
         });
+
+        describe('browsers', function() {
+            var setRootSuiteBrowsers;
+
+            before(function() {
+                setRootSuiteBrowsers = function(browsers) {
+                    testsApi(this.context, this.suite, browsers);
+                }.bind(this);
+            });
+
+            it('should throw without an argument', function() {
+                assert.throws(function() {
+                    this.context.suite('name', function(suite) {
+                        suite.browsers();
+                    });
+                }.bind(this), /string or RegExp/);
+            });
+
+            it('should throw if an argument is not a string or RegExp', function() {
+                assert.throws(function() {
+                    this.context.suite('name', function(suite) {
+                        suite.browsers(123);
+                    });
+                }.bind(this), /string or RegExp/);
+            });
+
+            it('should throw if an argument is an array of non-strings or non-RegExps', function() {
+                assert.throws(function() {
+                    this.context.suite('name', function(suite) {
+                        suite.browsers([123]);
+                    });
+                }.bind(this), /string or RegExp/);
+            });
+
+            it('should filter suite browsers by a string', function() {
+                setRootSuiteBrowsers(['ie8', 'ie9', 'chrome']);
+
+                this.context.suite('name', function(suite) {
+                    suite.browsers('chrome');
+                });
+
+                assert.deepEqual(this.suite.children[0].browsers, ['chrome']);
+            });
+
+            it('should filter suite browsers by a RegExp', function() {
+                setRootSuiteBrowsers(['ie8', 'ie9', 'chrome']);
+
+                this.context.suite('name', function(suite) {
+                    suite.browsers(/ie.+/);
+                });
+
+                assert.deepEqual(this.suite.children[0].browsers, ['ie8', 'ie9']);
+            });
+
+            it('should filter suite browsers by an array of strings', function() {
+                setRootSuiteBrowsers(['ie8', 'ie9', 'chrome']);
+
+                this.context.suite('name', function(suite) {
+                    suite.browsers(['chrome']);
+                });
+
+                assert.deepEqual(this.suite.children[0].browsers, ['chrome']);
+            });
+
+            it('should filter suite browsers by an array of RegExps', function() {
+                setRootSuiteBrowsers(['ie8', 'ie9', 'chrome']);
+
+                this.context.suite('name', function(suite) {
+                    suite.browsers([/ie.+/]);
+                });
+
+                assert.deepEqual(this.suite.children[0].browsers, ['ie8', 'ie9']);
+            });
+
+            it('should filter suite browsers by an array of strings and RegExps', function() {
+                setRootSuiteBrowsers(['ie8', 'ie9', 'opera', 'chrome']);
+
+                this.context.suite('name', function(suite) {
+                    suite.browsers([/ie.+/, 'chrome']);
+                });
+
+                assert.deepEqual(this.suite.children[0].browsers, ['ie8', 'ie9', 'chrome']);
+            });
+
+            it('should filter browsers in all children suites', function() {
+                setRootSuiteBrowsers(['ie8', 'ie9', 'opera', 'chrome']);
+
+                this.context.suite('name', function(suite) {
+                    suite.browsers([/ie.+/, 'chrome']);
+
+                    this.context.suite('first-child-name', function(suite) {
+                        suite.browsers(/ie.+/);
+                    });
+
+                    this.context.suite('second-child-name', function(suite) {
+                        suite.browsers('chrome');
+                    });
+                }.bind(this));
+
+                assert.deepEqual(this.suite.children[0].browsers, ['ie8', 'ie9', 'chrome']);
+                assert.deepEqual(this.suite.children[0].children[0].browsers, ['ie8', 'ie9']);
+                assert.deepEqual(this.suite.children[0].children[1].browsers, ['chrome']);
+            });
+
+            it('should pass filtered browsers from a parent suite to a child one', function() {
+                setRootSuiteBrowsers(['ie8', 'ie9', 'opera', 'chrome']);
+
+                this.context.suite('name', function(suite) {
+                    suite.browsers('chrome');
+
+                    this.context.suite('child-name', function(suite) {});
+                }.bind(this));
+
+                assert.deepEqual(this.suite.children[0].children[0].browsers, ['chrome']);
+            });
+
+            it('should not set a browser for a suite if it is not specified in a root one', function() {
+                setRootSuiteBrowsers(['opera']);
+
+                this.context.suite('name', function(suite) {
+                    suite.browsers('chrome');
+                });
+
+                assert.deepEqual(this.suite.children[0].browsers, []);
+            });
+
+            it('should be chainable', function() {
+                this.context.suite('name', function(suite) {
+                    assert.deepEqual(suite.browsers([]), suite);
+                });
+            });
+        });
     });
 });
