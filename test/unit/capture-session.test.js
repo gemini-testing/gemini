@@ -9,14 +9,18 @@ var _ = require('lodash'),
     StateError = require('../../lib/errors/state-error');
 
 describe('capture session', function() {
+    var sandbox = sinon.sandbox.create();
+
+    afterEach(function() {
+        sandbox.restore();
+    });
+
     describe('runHook', function() {
         beforeEach(function() {
-            this.seq = sinon.createStubInstance(Actions);
-            this.seq.perform.returns(q());
+            sandbox.stub(Actions.prototype);
+            Actions.prototype.perform.returns(q());
 
-            this.browser = {
-                createActionSequence: sinon.stub().returns(this.seq)
-            };
+            this.browser = {};
             this.session = new CaptureSession(this.browser);
             this.suite = createSuite('');
             this.runWithCallback = function(cb) {
@@ -26,18 +30,21 @@ describe('capture session', function() {
 
         it('should call a callback with actions and find', function() {
             var cb = sinon.stub(),
-                _this = this;
+                actions = new Actions();
+
+            Actions.prototype.__constructor.returns(actions);
 
             return this.runWithCallback(cb).then(function() {
-                assert.calledWith(cb, _this.seq, find);
+                assert.calledWith(cb, actions, find);
             });
         });
 
-        it('should perform sequence', function() {
+        it('should perform sequence in associated browser', function() {
             var cb = sinon.stub(),
                 _this = this;
             return this.runWithCallback(cb).then(function() {
-                assert.called(_this.seq.perform);
+                assert.calledOnce(Actions.prototype.perform);
+                assert.calledWith(Actions.prototype.perform, _this.browser);
             });
         });
 
@@ -65,9 +72,11 @@ describe('capture session', function() {
         it('should add post actions to the suite after hook finished', function() {
             var _this = this,
                 cb = sinon.stub().named('hook'),
-                postActions = sinon.createStubInstance(Actions);
-            this.seq.getPostActions.returns(postActions);
+                postActions = [];
+
+            Actions.prototype.getPostActions.returns(postActions);
             sinon.spy(this.suite, 'addPostActions');
+
             return this.session.runHook(cb, this.suite)
                 .then(function() {
                     assert.calledWith(_this.suite.addPostActions, postActions);
@@ -128,15 +137,11 @@ describe('capture session', function() {
                 this.image = image;
             };
 
-            this.seq = sinon.createStubInstance(Actions);
-            this.seq.perform.returns(q());
-
             this.state = {
                 callback: sinon.stub(),
                 suite: sinon.stub(createSuite('suite'))
             };
             this.browser = {
-                createActionSequence: sinon.stub().returns(this.seq),
                 captureFullscreenImage: sinon.stub().returns(q({
                     crop: sinon.stub().returns(q()),
                     getSize: sinon.stub().returns({})
