@@ -1,15 +1,21 @@
 'use strict';
 var _ = require('lodash'),
     q = require('q'),
+    promiseUtils = require('q-promise-utils'),
     find = require('../../lib/find-func').find,
 
     CaptureSession = require('../../lib/capture-session'),
-    Actions = require('../../lib/browser/actions'),
+    ActionsBuilder = require('../../lib/actions-builder'),
     createSuite = require('../../lib/suite').create,
     StateError = require('../../lib/errors/state-error');
 
 describe('capture session', function() {
     var sandbox = sinon.sandbox.create();
+
+    beforeEach(function() {
+        sandbox.stub(promiseUtils);
+        promiseUtils.sequence.returns(q());
+    });
 
     afterEach(function() {
         sandbox.restore();
@@ -17,35 +23,74 @@ describe('capture session', function() {
 
     describe('runHook', function() {
         beforeEach(function() {
-            sandbox.stub(Actions.prototype);
-            Actions.prototype.perform.returns(q());
-
             this.browser = {};
             this.session = new CaptureSession(this.browser);
-            this.suite = createSuite('');
             this.runWithCallback = function(cb) {
-                return this.session.runHook(cb, this.suite);
+                return this.session.runHook(cb || sinon.stub());
             };
         });
 
         it('should call a callback with actions and find', function() {
-            var cb = sinon.stub(),
-                actions = new Actions();
+            var cb = sinon.stub();
 
-            Actions.prototype.__constructor.returns(actions);
+            this.runWithCallback(cb);
 
-            return this.runWithCallback(cb).then(function() {
-                assert.calledWith(cb, actions, find);
-            });
+            assert.calledWith(cb, sinon.match.instanceOf(ActionsBuilder), find);
         });
 
-        it('should perform sequence in associated browser', function() {
-            var cb = sinon.stub(),
-                _this = this;
-            return this.runWithCallback(cb).then(function() {
-                assert.calledOnce(Actions.prototype.perform);
-                assert.calledWith(Actions.prototype.perform, _this.browser);
-            });
+        it('should perform actions sequence built by ActionsBuilder', function() {
+            sandbox.stub(ActionsBuilder.prototype);
+
+            this.runWithCallback();
+
+            assert.calledOnce(promiseUtils.sequence);
+
+            var actions = ActionsBuilder.prototype.__constructor.firstCall.args[0];
+            assert.calledWith(promiseUtils.sequence, actions);
+        });
+
+        it('should create new actions sequence for each hook', function() {
+            sandbox.stub(ActionsBuilder.prototype);
+
+            this.runWithCallback();
+            this.runWithCallback();
+
+            assert.calledTwice(promiseUtils.sequence);
+
+            var actions1 = ActionsBuilder.prototype.__constructor.firstCall.args[0],
+                actions2 = ActionsBuilder.prototype.__constructor.thirdCall.args[0];
+
+            assert.notEqual(actions1, actions2);
+        });
+
+        it('should perform actions sequence in associated browser', function() {
+            var _this = this;
+
+            this.runWithCallback();
+
+            assert.calledWith(promiseUtils.sequence, sinon.match.any, _this.browser);
+        });
+
+        it('should peform actions sequence with postActions', function() {
+            this.runWithCallback();
+
+            assert.calledWith(promiseUtils.sequence,
+                sinon.match.any,
+                sinon.match.any,
+                sinon.match.instanceOf(ActionsBuilder)
+            );
+        });
+
+        it('should perform all hooks with the same postActions instance', function() {
+            sandbox.stub(ActionsBuilder.prototype);
+
+            this.runWithCallback();
+            this.runWithCallback();
+
+            var postActions1 = ActionsBuilder.prototype.__constructor.getCall(1).args[0],
+                postActions2 = ActionsBuilder.prototype.__constructor.getCall(3).args[0];
+
+            assert.equal(postActions1, postActions2);
         });
 
         it('should share same context between calls', function() {
@@ -68,19 +113,32 @@ describe('capture session', function() {
                 assert.equal(e.originalError, error);
             });
         });
+    });
 
-        it('should add post actions to the suite after hook finished', function() {
-            var _this = this,
-                cb = sinon.stub().named('hook'),
-                postActions = [];
+    describe('runPostActions', function() {
+        it('should not pass postActions to actions', function() {
+            var browser = sinon.stub(),
+                session = new CaptureSession(browser);
 
-            Actions.prototype.getPostActions.returns(postActions);
-            sinon.spy(this.suite, 'addPostActions');
+            session.runPostActions();
 
-            return this.session.runHook(cb, this.suite)
-                .then(function() {
-                    assert.calledWith(_this.suite.addPostActions, postActions);
-                });
+            assert.lengthOf(promiseUtils.sequence.firstCall.args, 2);
+        });
+
+        it('should perform post actions in reverse order', function() {
+            var browser = sinon.stub(),
+                session = new CaptureSession(browser),
+                i = 1;
+
+            sandbox.stub(ActionsBuilder.prototype, '__constructor', function(postActions) {
+                postActions.push(i++);
+            });
+            session.runHook(sinon.stub());
+            session.runHook(sinon.stub());
+
+            session.runPostActions();
+
+            assert.calledWith(promiseUtils.sequence, [4, 2]); // TODO: вообще не очевидно почему так
         });
     });
 

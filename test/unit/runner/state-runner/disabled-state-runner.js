@@ -28,17 +28,13 @@ describe('runner/state-runner/disabled-state-runner', function() {
 
     it('should perform state callback', function() {
         var browserSession = mkBrowserSessionStub_(),
-            suite = util.makeSuiteStub(),
-            state = util.makeStateStub(suite),
+            state = util.makeStateStub(),
             runner = mkRunner_(state, browserSession);
 
         return runner.run()
             .then(function() {
                 assert.calledOnce(browserSession.runHook);
-                assert.calledWith(browserSession.runHook,
-                    state.callback,
-                    suite
-                );
+                assert.calledWith(browserSession.runHook, state.callback);
             });
     });
 
