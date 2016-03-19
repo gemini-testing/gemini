@@ -2,10 +2,9 @@
 var _ = require('lodash'),
     q = require('q'),
     promiseUtils = require('q-promise-utils'),
-    find = require('../../lib/find-func').find,
 
     CaptureSession = require('../../lib/capture-session'),
-    ActionsBuilder = require('../../lib/actions-builder'),
+    ActionsBuilder = require('../../lib/tests-api/actions-builder'),
     createSuite = require('../../lib/suite').create,
     StateError = require('../../lib/errors/state-error');
 
@@ -21,58 +20,29 @@ describe('capture session', function() {
         sandbox.restore();
     });
 
-    describe('runHook', function() {
+    describe('runActions', function() {
         beforeEach(function() {
-            this.browser = {};
+            this.browser = sinon.stub();
             this.session = new CaptureSession(this.browser);
-            this.runWithCallback = function(cb) {
-                return this.session.runHook(cb || sinon.stub());
-            };
         });
 
-        it('should call a callback with actions and find', function() {
-            var cb = sinon.stub();
+        it('should perform passed action sequence', function() {
+            var actions = [];
 
-            this.runWithCallback(cb);
-
-            assert.calledWith(cb, sinon.match.instanceOf(ActionsBuilder), find);
-        });
-
-        it('should perform actions sequence built by ActionsBuilder', function() {
-            sandbox.stub(ActionsBuilder.prototype);
-
-            this.runWithCallback();
+            this.session.runActions(actions);
 
             assert.calledOnce(promiseUtils.sequence);
-
-            var actions = ActionsBuilder.prototype.__constructor.firstCall.args[0];
             assert.calledWith(promiseUtils.sequence, actions);
         });
 
-        it('should create new actions sequence for each hook', function() {
-            sandbox.stub(ActionsBuilder.prototype);
-
-            this.runWithCallback();
-            this.runWithCallback();
-
-            assert.calledTwice(promiseUtils.sequence);
-
-            var actions1 = ActionsBuilder.prototype.__constructor.firstCall.args[0],
-                actions2 = ActionsBuilder.prototype.__constructor.thirdCall.args[0];
-
-            assert.notEqual(actions1, actions2);
-        });
-
         it('should perform actions sequence in associated browser', function() {
-            var _this = this;
+            this.session.runActions([]);
 
-            this.runWithCallback();
-
-            assert.calledWith(promiseUtils.sequence, sinon.match.any, _this.browser);
+            assert.calledWith(promiseUtils.sequence, sinon.match.any, this.browser);
         });
 
         it('should peform actions sequence with postActions', function() {
-            this.runWithCallback();
+            this.session.runActions([]);
 
             assert.calledWith(promiseUtils.sequence,
                 sinon.match.any,
@@ -81,42 +51,21 @@ describe('capture session', function() {
             );
         });
 
-        it('should perform all hooks with the same postActions instance', function() {
-            sandbox.stub(ActionsBuilder.prototype);
+        it('should perform all actions with the same postActions instance', function() {
+            sandbox.stub(ActionsBuilder.prototype, '__constructor').returnsArg(0);
 
-            this.runWithCallback();
-            this.runWithCallback();
+            this.session.runActions([]);
+            this.session.runActions([]);
 
-            var postActions1 = ActionsBuilder.prototype.__constructor.getCall(1).args[0],
-                postActions2 = ActionsBuilder.prototype.__constructor.getCall(3).args[0];
-
-            assert.equal(postActions1, postActions2);
-        });
-
-        it('should share same context between calls', function() {
-            var _this = this;
-            return this.runWithCallback(function() {
-                    this.x = 'something';
-                })
-                .then(function() {
-                    return _this.runWithCallback(function() {
-                        assert.equal(this.x, 'something');
-                    });
-                });
-        });
-
-        it('should throw StateError if callback throws', function() {
-            var error = new Error('example'),
-                cb = sinon.stub().throws(error);
-            return assert.isRejected(this.runWithCallback(cb)).then(function(e) {
-                assert.instanceOf(e, StateError);
-                assert.equal(e.originalError, error);
-            });
+            assert.equal(
+                promiseUtils.sequence.firstCall.args[2],
+                promiseUtils.sequence.secondCall.args[2]
+            );
         });
     });
 
     describe('runPostActions', function() {
-        it('should not pass postActions to actions', function() {
+        it('should not pass postActions while performing postActions', function() {
             var browser = sinon.stub(),
                 session = new CaptureSession(browser);
 
@@ -127,18 +76,17 @@ describe('capture session', function() {
 
         it('should perform post actions in reverse order', function() {
             var browser = sinon.stub(),
-                session = new CaptureSession(browser),
-                i = 1;
+                session = new CaptureSession(browser);
 
             sandbox.stub(ActionsBuilder.prototype, '__constructor', function(postActions) {
-                postActions.push(i++);
+                postActions.push(1, 2, 3);
             });
-            session.runHook(sinon.stub());
-            session.runHook(sinon.stub());
+            session.runActions([]);
+            session.runActions([]);
 
             session.runPostActions();
 
-            assert.calledWith(promiseUtils.sequence, [4, 2]); // TODO: вообще не очевидно почему так
+            assert.calledWith(promiseUtils.sequence, [3, 2, 1, 3, 2, 1]);
         });
     });
 

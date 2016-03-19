@@ -1,15 +1,22 @@
 'use strict';
 
 var SuiteBuilder = require('../../../lib/tests-api/suite-builder'),
-    Suite = require('../../../lib/suite');
+    Suite = require('../../../lib/suite'),
+    ActionsBuilder = require('../../../lib/tests-api/actions-builder'),
+    find = require('../../../lib/tests-api/find-func').find;
 
 describe('tests-api/suite-builder', function() {
-    var suite,
+    var sandbox = sinon.sandbox.create(),
+        suite,
         suiteBuilder;
 
     beforeEach(function() {
         suite = Suite.create('');
         suiteBuilder = new SuiteBuilder(suite);
+    });
+
+    afterEach(function() {
+        sandbox.restore();
     });
 
     describe('setUrl', function() {
@@ -88,26 +95,129 @@ describe('tests-api/suite-builder', function() {
         });
     }
 
-    testHook('before');
-    testHook('after');
-
-    function testHook(name) {
-        var hookProperty = name + 'Hook';
-        describe(name, function() {
-            it('should set ' + hookProperty + ' property', function() {
-                var func = sinon.stub();
-
-                suiteBuilder[name](func);
-                assert.equal(suite[hookProperty], func);
-            });
-
-            it('should throw if hook is not a function', function() {
-                assert.throws(function() {
-                    suiteBuilder[name]('the dawn');
-                }, TypeError);
-            });
+    describe('before', function() {
+        beforeEach(function() {
+            sandbox.stub(ActionsBuilder.prototype, '__constructor');
         });
-    }
+
+        it('should call before hook with actions builder and find', function() {
+            var hook = sinon.stub();
+
+            suiteBuilder.before(hook);
+
+            assert.calledOnce(hook);
+            assert.calledWith(hook, sinon.match.instanceOf(ActionsBuilder), find);
+        });
+
+        it('should call before hook and set beforeActions property', function() {
+            ActionsBuilder.prototype.__constructor.returnsArg(0);
+
+            suiteBuilder.before(function(actions) {
+                actions.push(1, 2, 3);
+            });
+
+            assert.deepEqual([1, 2, 3], suite.beforeActions);
+        });
+
+        it('should call before hook with suite context', function() {
+            var hook = sinon.stub();
+
+            suiteBuilder.before(hook);
+
+            assert.equal(
+                hook.thisValues[0],
+                suite.context
+            );
+        });
+
+        it('should prepend suite beforeActions with parent beforeActions', function() {
+            var parent = Suite.create('parent'),
+                suite = Suite.create('suite', parent);
+
+            parent.beforeActions = [1, 2, 3];
+            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            new SuiteBuilder(suite).before(function(actions) {
+                actions.push(4, 5);
+            });
+
+            assert.deepEqual([1, 2, 3, 4, 5], suite.beforeActions);
+        });
+
+        it('should not affect parent beforeActions property', function() {
+            var parent = Suite.create('parent'),
+                suite = Suite.create('suite', parent);
+
+            parent.beforeActions = [1, 2, 3];
+            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            new SuiteBuilder(suite).before(function(actions) {
+                actions.push(4, 5);
+            });
+
+            assert.deepEqual([1, 2, 3], parent.beforeActions);
+        });
+    });
+
+    describe('after', function() {
+        beforeEach(function() {
+            sandbox.stub(ActionsBuilder.prototype, '__constructor');
+        });
+
+        it('should call after hook with actions builder and find', function() {
+            var hook = sinon.stub();
+
+            suiteBuilder.after(hook);
+
+            assert.calledOnce(hook);
+            assert.calledWith(hook, sinon.match.instanceOf(ActionsBuilder), find);
+        });
+
+        it('should call after hook and set afterActions property', function() {
+            ActionsBuilder.prototype.__constructor.returnsArg(0);
+
+            suiteBuilder.after(function(actions) {
+                actions.push(1, 2, 3);
+            });
+
+            assert.deepEqual([1, 2, 3], suite.afterActions);
+        });
+
+        it('should call after hook with suite context', function() {
+            var hook = sinon.stub();
+
+            suiteBuilder.after(hook);
+
+            assert.equal(
+                hook.thisValues[0],
+                suite.context
+            );
+        });
+
+        it('should append parent afterActions to suite afterActions', function() {
+            var parent = Suite.create('parent'),
+                suite = Suite.create('suite', parent);
+
+            parent.afterActions = [4, 5];
+            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            new SuiteBuilder(suite).after(function(actions) {
+                actions.push(1, 2, 3);
+            });
+
+            assert.deepEqual([1, 2, 3, 4, 5], suite.afterActions);
+        });
+
+        it('should not affect parent afterActions property', function() {
+            var parent = Suite.create('parent'),
+                suite = Suite.create('suite', parent);
+
+            parent.afterActions = [4, 5];
+            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            new SuiteBuilder(suite).after(function(actions) {
+                actions.push(1, 2, 3);
+            });
+
+            assert.deepEqual([4, 5], parent.afterActions);
+        });
+    });
 
     describe('capture', function() {
         beforeEach(function() {
@@ -160,12 +270,34 @@ describe('tests-api/suite-builder', function() {
             assert.equal(suite.states[0].suite, suite);
         });
 
-        it('should store passed callback', function() {
-            var spy = sinon.spy();
+        it('should call passed callback with actions builder and find', function() {
+            var cb = sinon.stub();
 
-            suiteBuilder.capture('state', spy);
+            suiteBuilder.capture('state', cb);
 
-            assert.equal(suite.states[0].callback, spy);
+            assert.calledOnce(cb);
+            assert.calledWith(cb, sinon.match.instanceOf(ActionsBuilder), find);
+        });
+
+        it('should call passed callback with suite context', function() {
+            var cb = sinon.stub();
+
+            suiteBuilder.capture('state', cb);
+
+            assert.equal(
+                cb.thisValues[0],
+                suite.context
+            );
+        });
+
+        it('should set `actions` property', function() {
+            sandbox.stub(ActionsBuilder.prototype, '__constructor').returnsArg(0);
+
+            suiteBuilder.capture('state', function(actions) {
+                actions.push(1, 2, 3);
+            });
+
+            assert.deepEqual([1, 2, 3], suite.states[0].actions);
         });
 
         it('should allow to set tolerance', function() {
