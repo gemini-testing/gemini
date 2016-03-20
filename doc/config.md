@@ -49,6 +49,7 @@ sets:
 system:
   projectRoot: ../project
   sourceRoot: ../project/src
+  reportRoot: my-report
   plugins:
     teamcity: true
   debug: true
@@ -76,6 +77,10 @@ settings. These settings can not be set per-browser.
   will be used in the coverage report when the source map is available, but
   the sources can not be downloaded via URLs from the test pages. By default,
   it is equal to `projectRoot`.
+
+* `reportRoot` – directory which html report file will be written to. By default,
+  it is equal to `gemini-report`.
+
 
 * `plugins` - list of plugins to enable. Should have form of `pluginName:
   settings`.  For example:
