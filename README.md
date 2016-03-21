@@ -16,7 +16,7 @@ Its key features are:
 
 * Compatibility with different browsers:
 
-  - Google Chrome (tested in latest version)
+  - Google Chrome (testeg in latest version)
   - Mozilla Firefox (tested in latest version)
   - [IE8+](doc/ie-support.md)
   - Opera 12+;
@@ -196,7 +196,7 @@ To complete the test creation procedure you need to take reference shots using
 the following command:
 
 ```
-gemini gather [paths to test suites]
+gemini update [paths to test suites]
 ```
 
 For test launch (to compare current state of a block with a reference shot) use
