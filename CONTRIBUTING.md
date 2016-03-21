@@ -49,3 +49,12 @@ adding a feature, write a test for it. To see test coverage report run:
 ```
 npm test --coverage
 ```
+
+## Issues reporting
+
+When submitting an issue please do following:
+
+1. [Search](https://github.com/gemini-testing/gemini/issues) for same issues on github in order to prevent duplicates
+2. Fill as many sections as possible described in [issue template](https://github.com/gemini-testing/gemini/blob/master/ISSUE_TEMPLATE.md) so we will additional info to work with
+
+Note that if no response for contributors questions will be provided in 1 week then issue may be considered as irrelevant/resolved and may be closed.
