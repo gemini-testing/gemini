@@ -1,7 +1,7 @@
 'use strict';
-var Config = require('../../../lib/config'),
-    parser = require('../../../lib/config/options'),
-    GeminiError = require('../../../lib/errors/gemini-error'),
+var Config = require('../../../src/config'),
+    parser = require('../../../src/config/options'),
+    GeminiError = require('../../../src/errors/gemini-error'),
     MissingOptionError = require('gemini-configparser').MissingOptionError,
     _ = require('lodash');
 

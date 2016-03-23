@@ -1,9 +1,9 @@
 'use strict';
 var q = require('q'),
-    StateRunner = require('../../../../lib/runner/state-runner/state-runner'),
-    CaptureSession = require('../../../../lib/capture-session'),
-    StateError = require('../../../../lib/errors/state-error'),
-    Config = require('../../../../lib/config'),
+    StateRunner = require('../../../../src/runner/state-runner/state-runner'),
+    CaptureSession = require('../../../../src/capture-session'),
+    StateError = require('../../../../src/errors/state-error'),
+    Config = require('../../../../src/config'),
     util = require('../../../util');
 
 describe('runner/StateRunner', function() {

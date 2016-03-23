@@ -1,7 +1,7 @@
 'use strict';
-var Calibrator = require('../../lib/calibrator'),
-    Browser = require('../../lib/browser'),
-    ClientBridge = require('../../lib/browser/client-bridge'),
+var Calibrator = require('../../src/calibrator'),
+    Browser = require('../../src/browser'),
+    ClientBridge = require('../../src/browser/client-bridge'),
     q = require('q'),
     wd = require('wd'),
     fs = require('fs'),

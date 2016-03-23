@@ -1,11 +1,11 @@
 'use strict';
 var q = require('q'),
     QEmitter = require('qemitter'),
-    Runner = require('../../../lib/runner'),
-    TestSessionRunner = require('../../../lib/runner/test-session-runner'),
-    Tester = require('../../../lib/capture-processor/tester'),
-    Config = require('../../../lib/config'),
-    FailCollector = require('../../../lib/fail-collector');
+    Runner = require('../../../src/runner'),
+    TestSessionRunner = require('../../../src/runner/test-session-runner'),
+    Tester = require('../../../src/capture-processor/tester'),
+    Config = require('../../../src/config'),
+    FailCollector = require('../../../src/fail-collector');
 
 describe('runner', function() {
     var sandbox = sinon.sandbox.create(),

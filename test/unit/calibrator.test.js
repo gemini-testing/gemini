@@ -2,9 +2,9 @@
 var q = require('q'),
     path = require('path'),
     fs = require('fs'),
-    Calibrator = require('../../lib/calibrator'),
-    Image = require('../../lib/image'),
-    GeminiError = require('../../lib/errors/gemini-error'),
+    Calibrator = require('../../src/calibrator'),
+    Image = require('../../src/image'),
+    GeminiError = require('../../src/errors/gemini-error'),
     browserWithId = require('../util').browserWithId;
 
 describe('calibrator', function() {

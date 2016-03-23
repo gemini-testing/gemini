@@ -1,5 +1,5 @@
 'use strict';
-var level = require('../../lib/coverage-level');
+var level = require('../../src/coverage-level');
 
 describe('coverage level', function() {
     describe('merge', function() {

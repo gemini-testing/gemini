@@ -3,8 +3,8 @@
 var q = require('q'),
     _ = require('lodash'),
     QEmitter = require('qemitter'),
-    DiffScreenUpdater = require('../../../../lib/capture-processor/screen-updater/diff-screen-updater'),
-    ImageProcessor = require('../../../../lib/image-processor'),
+    DiffScreenUpdater = require('../../../../src/capture-processor/screen-updater/diff-screen-updater'),
+    ImageProcessor = require('../../../../src/image-processor'),
     fs = require('q-io/fs'),
     temp = require('temp'),
     util = require('./util');

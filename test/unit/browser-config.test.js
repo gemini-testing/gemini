@@ -1,6 +1,6 @@
 'use strict';
-var BrowserConfig = require('../../lib/config/browser-config'),
-    createSuite = require('../../lib/suite').create;
+var BrowserConfig = require('../../src/config/browser-config'),
+    createSuite = require('../../src/suite').create;
 
 describe('BrowserConfig', function() {
     function createConfig(options) {

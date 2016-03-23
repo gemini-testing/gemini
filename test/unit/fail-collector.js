@@ -1,8 +1,8 @@
 'use strict';
 
 var _ = require('lodash'),
-    Config = require('../../lib/config'),
-    FailCollector = require('../../lib/fail-collector');
+    Config = require('../../src/config'),
+    FailCollector = require('../../src/fail-collector');
 
 describe('FailCollector', function() {
     var sandbox = sinon.sandbox.create(),

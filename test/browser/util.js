@@ -1,6 +1,6 @@
 'use strict';
-var Config = require('../../lib/config'),
-    Browser = require('../../lib/browser'),
+var Config = require('../../src/config'),
+    Browser = require('../../src/browser'),
     _ = require('lodash'),
 
     supportedBrowsers = {

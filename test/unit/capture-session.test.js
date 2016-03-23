@@ -3,10 +3,10 @@ var _ = require('lodash'),
     q = require('q'),
     promiseUtils = require('q-promise-utils'),
 
-    CaptureSession = require('../../lib/capture-session'),
-    ActionsBuilder = require('../../lib/tests-api/actions-builder'),
-    createSuite = require('../../lib/suite').create,
-    StateError = require('../../lib/errors/state-error');
+    CaptureSession = require('../../src/capture-session'),
+    ActionsBuilder = require('../../src/tests-api/actions-builder'),
+    createSuite = require('../../src/suite').create,
+    StateError = require('../../src/errors/state-error');
 
 describe('capture session', function() {
     var sandbox = sinon.sandbox.create();

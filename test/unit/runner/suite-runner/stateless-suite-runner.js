@@ -1,7 +1,7 @@
 'use strict';
 
-var BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
-    StatelessSuiteRunner = require('../../../../lib/runner/suite-runner/stateless-suite-runner'),
+var BrowserAgent = require('../../../../src/runner/browser-runner/browser-agent'),
+    StatelessSuiteRunner = require('../../../../src/runner/suite-runner/stateless-suite-runner'),
     util = require('../../../util');
 
 describe('runner/suite-runner/stateless-suite-runner', function() {

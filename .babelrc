@@ -1,0 +1,6 @@
+{
+  "presets": ["es2015"],
+  "sourceMaps": "both",
+  "plugins": ["transform-runtime"],
+  "ignore": ["src/browser/client-scripts/*"]
+}

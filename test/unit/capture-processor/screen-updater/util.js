@@ -1,7 +1,7 @@
 'use strict';
 
 var util = require('../../../util'),
-    Image = require('../../../../lib/image');
+    Image = require('../../../../src/image');
 
 util.makeCaptureStub = function() {
     var suite = util.makeSuiteStub();

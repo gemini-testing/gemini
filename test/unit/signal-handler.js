@@ -1,7 +1,7 @@
 'use strict';
 
 var q = require('q'),
-    signalHandler = require('../../lib/signal-handler');
+    signalHandler = require('../../src/signal-handler');
 
 describe('signalHandler', function() {
     var sandbox = sinon.sandbox.create(),

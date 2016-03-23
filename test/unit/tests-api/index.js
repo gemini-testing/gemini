@@ -1,7 +1,7 @@
 'use strict';
 
-var testsApi = require('../../../lib/tests-api'),
-    Suite = require('../../../lib/suite');
+var testsApi = require('../../../src/tests-api'),
+    Suite = require('../../../src/suite');
 
 describe('tests-api', function() {
     beforeEach(function() {

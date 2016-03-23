@@ -2,8 +2,8 @@
 
 var q = require('q'),
     proxyquire = require('proxyquire'),
-    SuiteCollection = require('../../lib/suite-collection'),
-    Config = require('../../lib/config'),
+    SuiteCollection = require('../../src/suite-collection'),
+    Config = require('../../src/config'),
 
     mkSuiteStub = require('../util').makeSuiteStub;
 
@@ -19,7 +19,7 @@ describe('gemini', function() {
             rootSuite = rootSuite || mkSuiteStub();
 
             var testReaderStub = sandbox.stub().named('TestReader').returns(q(rootSuite)),
-                Gemini = proxyquire('../../lib/gemini', {
+                Gemini = proxyquire('../../src/gemini', {
                     './test-reader': testReaderStub
                 });
 

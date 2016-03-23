@@ -1,6 +1,6 @@
 'use strict';
 var eachSupportedBrowser = require('./util').eachSupportedBrowser,
-    Calibrator = require('../../lib/calibrator');
+    Calibrator = require('../../src/calibrator');
 
 describe('calibrator', function() {
     eachSupportedBrowser(function() {
