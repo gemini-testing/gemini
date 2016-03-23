@@ -32,9 +32,8 @@ function makeSuiteStub(opts) {
     });
 
     var suite = Suite.create(opts.name, opts.parent);
-    suite.beforeHook = sinon.stub();
-    suite.afterHook = sinon.stub();
-    suite.runPostActions = sinon.stub();
+    suite.beforeActions = ['before', 'actions'];
+    suite.afterActions = ['after', 'actions'];
 
     if (opts.browsers) {
         suite.browsers = opts.browsers;

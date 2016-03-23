@@ -12,7 +12,7 @@ describe('runner/state-runner/disabled-state-runner', function() {
         session.browser = util.browserWithId(opts.browserId || 'default-browser-id');
         session.browser.sessionId = opts.sessionId || 'default-session-id';
 
-        session.runHook.returns(q.resolve());
+        session.runActions.returns(q.resolve());
         session.capture.returns(q.resolve());
 
         return session;
@@ -26,19 +26,15 @@ describe('runner/state-runner/disabled-state-runner', function() {
         return new DisabledStateRunner(state, browserSession, config);
     }
 
-    it('should perform state callback', function() {
+    it('should perform state actions', function() {
         var browserSession = mkBrowserSessionStub_(),
-            suite = util.makeSuiteStub(),
-            state = util.makeStateStub(suite),
+            state = util.makeStateStub(),
             runner = mkRunner_(state, browserSession);
 
         return runner.run()
             .then(function() {
-                assert.calledOnce(browserSession.runHook);
-                assert.calledWith(browserSession.runHook,
-                    state.callback,
-                    suite
-                );
+                assert.calledOnce(browserSession.runActions);
+                assert.calledWith(browserSession.runActions, state.actions);
             });
     });
 

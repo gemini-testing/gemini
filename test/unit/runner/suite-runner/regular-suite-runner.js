@@ -25,7 +25,7 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         StateRunner.prototype.run.returns(q.resolve());
 
         sandbox.stub(CaptureSession.prototype);
-        CaptureSession.prototype.runHook.returns(q.resolve());
+        CaptureSession.prototype.runActions.returns(q.resolve());
         CaptureSession.prototype.browser = {};
     });
 
@@ -45,6 +45,10 @@ describe('runner/suite-runner/regular-suite-runner', function() {
     }
 
     function run_(suite) {
+        suite = suite || makeSuiteStub({
+            states: [util.makeStateStub()]
+        });
+
         var runner = mkRunner_(suite);
         return runner.run();
     }
@@ -100,11 +104,7 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         });
 
         it('should get new browser before open url', function() {
-            var suite = makeSuiteStub({
-                    states: [util.makeStateStub()]
-                });
-
-            return run_(suite)
+            return run_()
                 .then(function() {
                     assert.callOrder(
                         BrowserAgent.prototype.getBrowser,
@@ -125,23 +125,23 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                 });
         });
 
-        it('should not call any hook if no states', function() {
+        it('should not call any actions if no states', function() {
             var suite = makeSuiteStub();
 
             return run_(suite)
                 .then(function() {
-                    assert.notCalled(CaptureSession.prototype.runHook);
+                    assert.notCalled(CaptureSession.prototype.runActions);
                 });
         });
 
-        it('should call `before` hook if there are some states', function() {
+        it('should run `before` actions if there are some states', function() {
             var suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
 
             return run_(suite)
                 .then(function() {
-                    assert.calledWith(CaptureSession.prototype.runHook, suite.beforeHook, suite);
+                    assert.calledWith(CaptureSession.prototype.runActions, suite.beforeActions);
                 });
         });
 
@@ -158,7 +158,7 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                 });
         });
 
-        describe('if `beforeHook` failed', function() {
+        describe('if `beforeActions` failed', function() {
             var suite;
 
             beforeEach(function() {
@@ -166,11 +166,11 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                     states: [util.makeStateStub()]
                 });
 
-                CaptureSession.prototype.runHook.withArgs(suite.beforeHook).returns(q.reject());
+                CaptureSession.prototype.runActions.withArgs(suite.beforeActions).returns(q.reject());
             });
 
             it('should fail', function() {
-                CaptureSession.prototype.runHook.withArgs(suite.beforeHook).returns(q.reject('some-error'));
+                CaptureSession.prototype.runActions.withArgs(suite.beforeActions).returns(q.reject('some-error'));
 
                 return assert.isRejected(run_(suite), /some-error/);
             });
@@ -182,17 +182,17 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                     });
             });
 
-            it('should not run `afterHook`', function() {
+            it('should not run `afterActions`', function() {
                 return run_(suite)
                     .fail(function() {
-                        assert.neverCalledWith(CaptureSession.prototype.runHook, suite.afterHook);
+                        assert.neverCalledWith(CaptureSession.prototype.runActions, suite.afterActions);
                     });
             });
 
             it('should not run post actions', function() {
                 return run_(suite)
                     .fail(function() {
-                        assert.notCalled(suite.runPostActions);
+                        assert.notCalled(CaptureSession.prototype.runPostActions);
                     });
             });
         });
@@ -256,50 +256,51 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                 });
         });
 
-        describe('afterHook', function() {
-            it('should call `after` hook', function() {
+        describe('afterActions', function() {
+            it('should perform afterActions', function() {
                 var suite = makeSuiteStub({
                         states: [util.makeStateStub()]
                     });
 
                 return run_(suite)
                     .then(function() {
-                        assert.calledWith(CaptureSession.prototype.runHook, suite.afterHook, suite);
+                        assert.calledWith(CaptureSession.prototype.runActions, suite.afterActions);
                     });
             });
 
-            it('should run `afterHook` even if state failed', function() {
-                var state = util.makeStateStub(),
-                    suite = makeSuiteStub({
-                        states: [state]
+            it('should perform afterActions even if state failed', function() {
+                var suite = makeSuiteStub({
+                        states: [util.makeStateStub()]
                     });
 
                 StateRunner.prototype.run.returns(q.reject());
 
                 return run_(suite)
                     .fail(function() {
-                        assert.calledWith(CaptureSession.prototype.runHook, suite.afterHook, suite);
+                        assert.calledWith(CaptureSession.prototype.runActions, suite.afterActions);
                     });
             });
 
-            it('should fail if `afterHook` failed', function() {
+            it('should fail if `afterActions` failed', function() {
                 var state = util.makeStateStub(),
                     suite = makeSuiteStub({
                         states: [state]
                     });
 
-                CaptureSession.prototype.runHook.withArgs(suite.afterHook).returns(q.reject('some-error'));
+                CaptureSession.prototype.runActions.withArgs(suite.afterActions)
+                    .returns(q.reject('some-error'));
 
                 return assert.isRejected(run_(suite), /some-error/);
             });
 
-            it('should reject with state error if state and `afterHook` failed', function() {
+            it('should reject with state error if state and `afterActions` failed', function() {
                 var suite = makeSuiteStub({
                         states: [util.makeStateStub()]
                     });
 
                 StateRunner.prototype.run.returns(q.reject('state-error'));
-                CaptureSession.prototype.runHook.withArgs(suite.afterHook).returns(q.reject('hook-error'));
+                CaptureSession.prototype.runActions.withArgs(suite.afterActions)
+                    .returns(q.reject('after-actions-error'));
 
                 return assert.isRejected(run_(suite), /state-error/);
             });
@@ -307,98 +308,75 @@ describe('runner/suite-runner/regular-suite-runner', function() {
 
         describe('postActions', function() {
             it('should run post actions', function() {
-                var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
-
-                return run_(suite)
+                return run_()
                     .then(function() {
-                        assert.calledOnce(suite.runPostActions);
+                        assert.calledOnce(CaptureSession.prototype.runPostActions);
                     });
             });
 
             it('should fail if post actions failed', function() {
-                var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
+                CaptureSession.prototype.runPostActions.returns(q.reject('some-error'));
 
-                suite.runPostActions.returns(q.reject('some-error'));
-
-                return assert.isRejected(run_(suite), /some-error/);
+                return assert.isRejected(run_(), /some-error/);
             });
 
             it('should run post actions if state failed', function() {
-                var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
-
                 StateRunner.prototype.run.returns(q.reject());
 
-                return run_(suite)
+                return run_()
                     .fail(function() {
-                        assert.calledOnce(suite.runPostActions);
+                        assert.calledOnce(CaptureSession.prototype.runPostActions);
                     });
             });
 
-            it('should run post actions if `afterHook` failed', function() {
+            it('should run post actions if `afterActions` failed', function() {
                 var suite = makeSuiteStub({
                         states: [util.makeStateStub()]
                     });
 
-                CaptureSession.prototype.runHook.withArgs(suite.afterHook).returns(q.reject());
+                CaptureSession.prototype.runActions.withArgs(suite.afterActions).returns(q.reject());
 
                 return run_(suite)
                     .fail(function() {
-                        assert.calledOnce(suite.runPostActions);
+                        assert.calledOnce(CaptureSession.prototype.runPostActions);
                     });
             });
 
             it('should reject with state error if state and post actions failed', function() {
-                var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
-
                 StateRunner.prototype.run.returns(q.reject('state-error'));
-                suite.runPostActions.returns(q.reject('post-actions-error'));
+                CaptureSession.prototype.runPostActions.returns(q.reject('post-actions-error'));
 
-                return assert.isRejected(run_(suite), /state-error/);
+                return assert.isRejected(run_(), /state-error/);
             });
 
-            it('should reject with afterHook error if afterHook and post actions failed', function() {
+            it('should reject with afterActions error if afterActions and postActions failed', function() {
                 var suite = makeSuiteStub({
                         states: [util.makeStateStub()]
                     });
 
-                CaptureSession.prototype.runHook.withArgs(suite.afterHook).returns(q.reject('after-hook-error'));
-                suite.runPostActions.returns(q.reject('post-actions-error'));
+                CaptureSession.prototype.runActions.withArgs(suite.afterActions)
+                    .returns(q.reject('after-actions-error'));
+                CaptureSession.prototype.runPostActions.returns(q.reject('post-actions-error'));
 
-                return assert.isRejected(run_(suite), /after-hook-error/);
+                return assert.isRejected(run_(suite), /after-actions-error/);
             });
         });
 
         describe('freeBrowser', function() {
             it('should free browser after all', function() {
-                var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
-
-                return run_(suite)
+                return run_()
                     .then(function() {
                         assert.callOrder(
-                            suite.runPostActions,
+                            CaptureSession.prototype.runPostActions,
                             BrowserAgent.prototype.freeBrowser
                         );
                     });
             });
 
             it('should free browser if run states failed', function() {
-                var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
-
                 StateRunner.prototype.run.returns(q.reject());
 
-                return run_(suite)
+                return run_()
                     .fail(function() {
                         assert.calledOnce(BrowserAgent.prototype.freeBrowser);
                     });
@@ -406,14 +384,10 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         });
 
         it('should add `browserId` and `sessionId` to error if something failed', function() {
-            var suite = makeSuiteStub({
-                states: [util.makeStateStub()]
-            });
-
             browser.sessionId = 'test-session-id';
-            CaptureSession.prototype.runHook.returns(q.reject(new Error('test_error')));
+            CaptureSession.prototype.runActions.returns(q.reject(new Error('test_error')));
 
-            return run_(suite)
+            return run_()
                 .fail(function(e) {
                     assert.deepEqual(e, {
                         browserId: 'default-browser',

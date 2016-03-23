@@ -28,6 +28,7 @@
     "q": "^1.1.2",
     "q-debug-mode": "0.0.1",
     "q-io": "~1.11.0",
+    "q-promise-utils": "^1.1.0",
     "qemitter": "^1.0.0",
     "resolve": "^1.1.0",
     "sizzle": "^2.2.0",

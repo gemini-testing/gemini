@@ -13,7 +13,7 @@ describe('runner/StateRunner', function() {
         session.browser = util.browserWithId(opts.browserId || 'default-browser-id');
         session.browser.sessionId = opts.sessionId || 'default-session-id';
 
-        session.runHook.returns(q.resolve());
+        session.runActions.returns(q.resolve());
         session.capture.returns(q.resolve());
         session.handleError.returns(q.resolve());
 
@@ -73,34 +73,30 @@ describe('runner/StateRunner', function() {
                 });
         });
 
-        it('should perform state callback', function() {
+        it('should perform state actions', function() {
             var browserSession = mkBrowserSessionStub_(),
-                suite = util.makeSuiteStub(),
-                state = util.makeStateStub(suite),
+                state = util.makeStateStub(),
                 runner = mkRunner_(state, browserSession);
 
             return runner.run()
                 .then(function() {
-                    assert.calledOnce(browserSession.runHook);
-                    assert.calledWith(browserSession.runHook,
-                        state.callback,
-                        suite
-                    );
+                    assert.calledOnce(browserSession.runActions);
+                    assert.calledWith(browserSession.runActions, state.actions);
                 });
         });
 
-        it('should perform state callback before capture', function() {
+        it('should perform state actions before capture', function() {
             var browserSession = mkBrowserSessionStub_(),
                 state = util.makeStateStub(),
                 runner = mkRunner_(state, browserSession),
                 mediator = sinon.spy().named('mediator');
 
-            browserSession.runHook.returns(q.delay(1).then(mediator));
+            browserSession.runActions.returns(q.delay(1).then(mediator));
 
             return runner.run()
                 .then(function() {
                     assert.callOrder(
-                        browserSession.runHook,
+                        browserSession.runActions,
                         mediator,
                         browserSession.capture
                     );
@@ -125,13 +121,13 @@ describe('runner/StateRunner', function() {
                 });
         });
 
-        it('should handle error in state callback', function() {
+        it('should handle error in state actions', function() {
             var browserSession = mkBrowserSessionStub_(),
                 state = util.makeStateStub(),
                 runner = mkRunner_(state, browserSession);
 
             var error = new StateError('some error');
-            browserSession.runHook.returns(q.reject(error));
+            browserSession.runActions.returns(q.reject(error));
 
             return runner.run()
                 .then(function() {
