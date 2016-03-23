@@ -2,8 +2,8 @@
 var EventEmitter = require('events').EventEmitter,
     inherit = require('inherit'),
 
-    Stats = require('../../lib/stats'),
-    RunnerEvents = require('../../lib/constants/runner-events');
+    Stats = require('../../src/stats'),
+    RunnerEvents = require('../../src/constants/runner-events');
 
 describe('stats', function() {
     var stats;

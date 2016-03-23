@@ -16,5 +16,6 @@ build
 .grunt
 
 node_modules
+lib
 /coverage
-/lib/browser/client-scripts/gemini.calibrate.min.js
+/src/browser/client-scripts/gemini.calibrate.min.js

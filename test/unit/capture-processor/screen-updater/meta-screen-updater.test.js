@@ -2,9 +2,9 @@
 
 var q = require('q'),
     QEmitter = require('qemitter'),
-    MetaScreenUpdater = require('../../../../lib/capture-processor/screen-updater/meta-screen-updater'),
-    CaptureProcessor = require('../../../../lib/capture-processor/capture-processor'),
-    ImageProcessor = require('../../../../lib/image-processor'),
+    MetaScreenUpdater = require('../../../../src/capture-processor/screen-updater/meta-screen-updater'),
+    CaptureProcessor = require('../../../../src/capture-processor/capture-processor'),
+    ImageProcessor = require('../../../../src/image-processor'),
     fs = require('q-io/fs'),
     temp = require('temp'),
     util = require('./util');

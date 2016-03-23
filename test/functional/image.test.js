@@ -1,7 +1,7 @@
 'use strict';
 
 var fs = require('fs'),
-    Image = require('../../lib/image'),
+    Image = require('../../src/image'),
     util = require('./util');
 
 describe('image', function() {

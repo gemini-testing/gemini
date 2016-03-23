@@ -22,7 +22,7 @@
       "test/**": {
         "mocha": true
       },
-      "lib/browser/client-scripts/*": {
+      "src/browser/client-scripts/*": {
         "node": false,
         "browserify": true
       }

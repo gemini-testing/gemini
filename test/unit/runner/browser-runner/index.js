@@ -1,13 +1,13 @@
 'use strict';
 var q = require('q'),
-    BrowserRunner = require('../../../../lib/runner/browser-runner'),
-    BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
-    SuiteRunner = require('../../../../lib/runner/suite-runner/suite-runner'),
-    suiteRunnerFabric = require('../../../../lib/runner/suite-runner'),
-    pool = require('../../../../lib/browser-pool'),
-    BasicPool = require('../../../../lib/browser-pool/basic-pool'),
-    Config = require('../../../../lib/config'),
-    MetaError = require('../../../../lib/errors/meta-error'),
+    BrowserRunner = require('../../../../src/runner/browser-runner'),
+    BrowserAgent = require('../../../../src/runner/browser-runner/browser-agent'),
+    SuiteRunner = require('../../../../src/runner/suite-runner/suite-runner'),
+    suiteRunnerFabric = require('../../../../src/runner/suite-runner'),
+    pool = require('../../../../src/browser-pool'),
+    BasicPool = require('../../../../src/browser-pool/basic-pool'),
+    Config = require('../../../../src/config'),
+    MetaError = require('../../../../src/errors/meta-error'),
 
     makeSuiteStub = require('../../../util').makeSuiteStub;
 

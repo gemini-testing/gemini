@@ -1,5 +1,5 @@
 'use strict';
-var Config = require('../../lib/config'),
+var Config = require('../../src/config'),
     _ = require('lodash');
 
 describe('config', function() {

@@ -1,8 +1,8 @@
 'use strict';
 
-var stateRunner = require('../../../../lib/runner/state-runner'),
-    StateRunner = require('../../../../lib/runner/state-runner/state-runner'),
-    DisabledStateRunner = require('../../../../lib/runner/state-runner/disabled-state-runner'),
+var stateRunner = require('../../../../src/runner/state-runner'),
+    StateRunner = require('../../../../src/runner/state-runner/state-runner'),
+    DisabledStateRunner = require('../../../../src/runner/state-runner/disabled-state-runner'),
     util = require('../../../util');
 
 describe('runner/state-runner', function() {

@@ -4,7 +4,7 @@ var q = require('q'),
     fs = require('fs'),
     path = require('path'),
     temp = require('temp'),
-    compareAdapter = require('../../lib/image-processor/compare-adapter');
+    compareAdapter = require('../../src/image-processor/compare-adapter');
 
 function imagePath(name) {
     return path.join(__dirname, 'data', 'image', name);

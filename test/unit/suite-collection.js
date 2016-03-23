@@ -1,6 +1,6 @@
 'use strict';
 
-var SuiteCollection = require('../../lib/suite-collection'),
+var SuiteCollection = require('../../src/suite-collection'),
     mkTree = require('../util').makeSuiteTree;
 
 describe('suite-collection', function() {

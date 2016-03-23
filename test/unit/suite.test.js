@@ -1,6 +1,6 @@
 'use strict';
 
-var createSuite = require('../../lib/suite').create;
+var createSuite = require('../../src/suite').create;
 
 describe('suite', function() {
     describe('create', function() {

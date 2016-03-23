@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 'use strict';
 var path = require('path'),
+    fs = require('fs'),
     resolve = require('resolve'),
     chalk = require('chalk'),
     ownVersion = require('../package.json').version;
 
-function getCliModule() {
+require('source-map-support/register');
+
+function getGeminiRoot() {
     var localPackage;
     try {
         // try local module first
@@ -14,7 +17,7 @@ function getCliModule() {
         });
     } catch (e) {
         // if fails, use global package
-        return '../lib/cli';
+        return path.resolve(__dirname, '..');
     }
 
     var localModule = path.dirname(localPackage),
@@ -27,7 +30,26 @@ function getCliModule() {
         console.error('Global: %s', chalk.green(ownVersion));
         console.error('');
     }
-    return path.join(localModule, 'lib', 'cli');
+    return localModule;
 }
 
-require(getCliModule()).run();
+function loadModule(rootPath) {
+    var srcCli = getCliModulePath(rootPath, 'src');
+    if (fs.existsSync(srcCli)) {
+
+        require('babel-register');
+        return require(srcCli);
+    }
+
+    return require(getCliModulePath(rootPath, 'lib'));
+}
+
+function getCliModulePath(rootPath, sourceDir) {
+    return path.join(rootPath, sourceDir, 'cli', 'index.js')
+}
+
+function loadCliModule() {
+    return loadModule(getGeminiRoot());
+}
+
+loadCliModule().run();

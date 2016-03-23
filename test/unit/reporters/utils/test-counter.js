@@ -1,6 +1,6 @@
 'use strict';
 
-var TestCounter = require('../../../../lib/reporters/utils/test-counter');
+var TestCounter = require('../../../../src/reporters/utils/test-counter');
 
 describe('TestCounter', function() {
     var counter;

@@ -6,5 +6,6 @@
 .sublime-project*
 test/
 coverage/
+src/
 CONTRIBUTING.md
 /lib/browser/client-scripts/gemini.calibrate.js

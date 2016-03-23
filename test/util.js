@@ -1,7 +1,7 @@
 'use strict';
-var Browser = require('../lib/browser'),
-    State = require('../lib/state'),
-    Suite = require('../lib/suite'),
+var Browser = require('../src/browser'),
+    State = require('../src/state'),
+    Suite = require('../src/suite'),
     _ = require('lodash');
 
 function makeBrowser(capabilities, config) {

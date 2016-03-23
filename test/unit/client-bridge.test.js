@@ -1,7 +1,7 @@
 'use strict';
 var q = require('q'),
-    ClientBridge = require('../../lib/browser/client-bridge'),
-    StateError = require('../../lib/errors/state-error'),
+    ClientBridge = require('../../src/browser/client-bridge'),
+    StateError = require('../../src/errors/state-error'),
 
     browserWithId = require('../util').browserWithId,
     CALL = '__gemini.example(1, "two")';

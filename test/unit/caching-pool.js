@@ -1,6 +1,6 @@
 'use strict';
 var q = require('q'),
-    Pool = require('../../lib/browser-pool/caching-pool'),
+    Pool = require('../../src/browser-pool/caching-pool'),
     browserWithId = require('../util').browserWithId;
 
 describe('CachingPool', function() {
