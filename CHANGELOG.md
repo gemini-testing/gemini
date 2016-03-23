@@ -1,12 +1,31 @@
 # Changelog
 
+## 3.0.0 - 2016-03-23
+
+* Fixed `CLIENT_STOPPED_SESSION` bug when performing setWindowSize in post actions (@j0tunn)
+* Suite.browsers: ability to set browsers, in which suite should be run (@egavr)
+* Added ability to use .js/.json config files (@j0tunn)
+* Android support:
+  * Do zoom reset after page load instead of before screenshot (@SwinX)
+  * Fixed calibration for android emulators (@SwinX)
+  * Fixed image crop for big pixelRatio (@SwinX)
+* Enable uncaughtException logging (@SwinX)
+* Fix coverage (@benedfit):
+  * pass in all original options when processing media rules
+  * check length of selector after pseudo-elements have been removed
+
+**BREAKING CHANGES**:
+
+* Removed skip method for actions (@j0tunn)
+* Accumulate "before" and "after" actions for nested suites (@j0tunn)
+
 ## 2.1.1 - 2016-01-27
 
 * Fix: specified name for NoRefImageError (@SwinX)
 
 ## 2.1.0 - 2016-01-25
 
-* Fixed bug in enable/disable logic in suite collection - may not work properly when disabling 
+* Fixed bug in enable/disable logic in suite collection - may not work properly when disabling
   all suites and enabling only some states in specific suite (@j0tunn)
 * Added possibility to enable/disable suites by full name (@j0tunn)
 * Added possibility to specify `grep` condition for `readTests` API method (@SwinX)
