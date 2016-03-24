@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1 - 2016-03-24
+
+* Fixed element find caching (@j0tunn)
+
 ## 3.0.0 - 2016-03-23
 
 * Fixed `CLIENT_STOPPED_SESSION` bug when performing setWindowSize in post actions (@j0tunn)
