@@ -5,7 +5,8 @@ var q = require('q'),
     TestSessionRunner = require('../../../lib/runner/test-session-runner'),
     Tester = require('../../../lib/capture-processor/tester'),
     Config = require('../../../lib/config'),
-    FailCollector = require('../../../lib/fail-collector');
+    FailCollector = require('../../../lib/fail-collector'),
+    util = require('../../util');
 
 describe('runner', function() {
     var sandbox = sinon.sandbox.create(),
@@ -110,6 +111,18 @@ describe('runner', function() {
             });
         });
 
+        it('should run suites in test session runner', function() {
+            var suites = [util.makeSuiteStub()];
+
+            sandbox.stub(testSessionRunner, 'run').returns(q());
+
+            return run_(suites)
+                .then(function() {
+                    assert.calledOnce(testSessionRunner.run);
+                    assert.calledWith(testSessionRunner.run, suites, captureProcessor);
+                });
+        });
+
         it('should emit `end`', function() {
             var onEnd = sandbox.spy();
             runner.on('end', onEnd);
@@ -140,9 +153,9 @@ describe('runner', function() {
                 };
             }
 
-            function runAndEmit_(event) {
+            function runAndEmit_(event, data) {
                 return run_().then(function() {
-                    return testSessionRunner.emitAndWait(event);
+                    return testSessionRunner.emitAndWait(event, data);
                 });
             }
 
@@ -150,19 +163,19 @@ describe('runner', function() {
                 config.forBrowser.returns({retry: Infinity});
             });
 
-            it('should try to submit processed capture for retry', function() {
-                return runAndEmit_('captureData')
+            it('should try to submit state result for retry', function() {
+                return runAndEmit_('stateResult')
                     .then(function() {
                         assert.called(FailCollector.prototype.tryToSubmitCapture);
                     });
             });
 
-            it('should emit processed capture event if capture was not submitted for retry', function() {
+            it('should emit state result event if it was not submitted for retry', function() {
                 var onProcessedCapture = sandbox.spy();
 
                 runner.on('onCaptureProcessed', onProcessedCapture);
 
-                return runAndEmit_('captureData')
+                return runAndEmit_('stateResult')
                     .then(function() {
                         assert.called(onProcessedCapture);
                     });
@@ -185,9 +198,15 @@ describe('runner', function() {
                     });
             });
 
+            it('should reject promise if critical error was not submitted for retry', function() {
+                FailCollector.prototype.tryToSubmitError.returns(false);
+                return assert.isRejected(runAndEmit_('criticalError'));
+            });
+
             it('should try to submit critical error for retry', function() {
+                FailCollector.prototype.tryToSubmitError.returns(false);
                 return runAndEmit_('criticalError')
-                    .fail(function() { //promise rejected if failed to submit critical for retry
+                    .fail(function() {
                         assert.called(FailCollector.prototype.tryToSubmitError);
                     });
             });
@@ -202,10 +221,6 @@ describe('runner', function() {
                     });
             });
 
-            it('should reject promise if critical error was not submitted for retry', function() {
-                return assert.isRejected(runAndEmit_('criticalError'));
-            });
-
             describe('`retry` event', function() {
                 beforeEach(function() {
                     FailCollector.prototype.tryToSubmitCapture.restore();
@@ -213,24 +228,20 @@ describe('runner', function() {
                 });
 
                 it('should emit `retry` event if candidate was submitted for retry', function() {
-                    captureProcessor.processCapture.returns(q(mkRetryCandidate_()));
-
                     var onRetry = sandbox.spy();
                     runner.on('retry', onRetry);
 
-                    return runAndEmit_('captureData')
+                    return runAndEmit_('stateResult', mkRetryCandidate_())
                         .then(function() {
                             assert.called(onRetry);
                         });
                 });
 
                 it('should add info about retry to `retry` event data', function() {
-                    captureProcessor.processCapture.returns(q(mkRetryCandidate_()));
-
                     var onRetry = sandbox.spy();
                     runner.on('retry', onRetry);
 
-                    return runAndEmit_('captureData')
+                    return runAndEmit_('stateResult', mkRetryCandidate_())
                         .then(function() {
                             assert.calledWithMatch(onRetry, {attempt: 1, retriesLeft: Infinity});
                         });

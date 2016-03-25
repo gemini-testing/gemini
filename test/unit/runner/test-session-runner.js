@@ -53,8 +53,8 @@ describe('runner/TestSessionRunner', function() {
             BrowserRunner.prototype.run.returns(q.resolve());
         });
 
-        function run_(suites) {
-            return TestSessionRunner.create(config).run(suites || []);
+        function run_(suites, captureProcessor) {
+            return TestSessionRunner.create(config).run(suites || [], captureProcessor);
         }
 
         it('should emit `beginSession` event on start runner', function() {
@@ -93,6 +93,15 @@ describe('runner/TestSessionRunner', function() {
             run_(suites);
 
             assert.calledWith(BrowserRunner.prototype.run, suites);
+        });
+
+        it('should pass through captureProcessor to browserRunner', function() {
+            var captureProcessor = 'captureProcessor';
+
+            config.getBrowserIds.returns(['browser']);
+            run_([], captureProcessor);
+
+            assert.calledWith(BrowserRunner.prototype.run, sinon.match.any, captureProcessor);
         });
 
         it('should emit `endSession` event after test session finished', function() {
