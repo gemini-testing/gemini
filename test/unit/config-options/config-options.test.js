@@ -298,6 +298,39 @@ describe('config', function() {
             });
         });
 
+        describe('reportRoot', function() {
+            it('should be equal to gemini-report by default', function() {
+                var config = createConfig({
+                    system: {
+                        projectRoot: '/some/absolute/path'
+                    }
+                });
+
+                assert.equal(config.system.reportRoot, '/some/absolute/path/gemini-report');
+            });
+
+            it('should resolve relative paths relatively to projectRoot', function() {
+                var config = createConfig({
+                    system: {
+                        projectRoot: '/root',
+                        reportRoot: './rel/path'
+                    }
+                });
+                assert.equal(config.system.reportRoot, '/root/rel/path');
+            });
+
+            it('should leave absolute path unchanged', function() {
+                var config = createConfig({
+                    system: {
+                        projectRoot: '/root',
+                        reportRoot: '/some/absolute/path'
+                    }
+                });
+
+                assert.equal(config.system.reportRoot, '/some/absolute/path');
+            });
+        });
+
         describe('debug', function() {
             testBooleanOption('system.debug', {default: false});
         });
