@@ -3,7 +3,7 @@ var q = require('q'),
     QEmitter = require('qemitter'),
     Runner = require('../../../lib/runner'),
     TestSessionRunner = require('../../../lib/runner/test-session-runner'),
-    Tester = require('../../../lib/capture-processor/tester'),
+    Tester = require('../../../lib/state-processor/tester'),
     Config = require('../../../lib/config'),
     FailCollector = require('../../../lib/fail-collector'),
     util = require('../../util');
@@ -11,7 +11,7 @@ var q = require('q'),
 describe('runner', function() {
     var sandbox = sinon.sandbox.create(),
         config,
-        captureProcessor,
+        stateProcessor,
         testSessionRunner,
         runner;
 
@@ -19,12 +19,12 @@ describe('runner', function() {
         return runner.run(suites || []);
     }
 
-    function createCaptureProcessor_() {
-        var captureProcessor = sinon.createStubInstance(Tester);
+    function createStateProcessor_() {
+        var stateProcessor = sinon.createStubInstance(Tester);
 
-        captureProcessor.getProcessedCaptureEventName.returns('onCaptureProcessed');
-        captureProcessor.processCapture.returns(q());
-        return captureProcessor;
+        stateProcessor.getProcessedCaptureEventName.returns('onCaptureProcessed');
+        stateProcessor.processCapture.returns(q());
+        return stateProcessor;
     }
 
     function createTestSessionRunner_() {
@@ -38,13 +38,13 @@ describe('runner', function() {
     beforeEach(function() {
         config = sinon.createStubInstance(Config);
         testSessionRunner = createTestSessionRunner_();
-        captureProcessor = createCaptureProcessor_();
-        runner = new Runner(config, captureProcessor);
+        stateProcessor = createStateProcessor_();
+        runner = new Runner(config, stateProcessor);
 
         sandbox.stub(TestSessionRunner, 'create');
         TestSessionRunner.create.returns(testSessionRunner);
 
-        sandbox.stub(FailCollector.prototype, 'tryToSubmitCapture');
+        sandbox.stub(FailCollector.prototype, 'tryToSubmitStateResult');
         sandbox.stub(FailCollector.prototype, 'tryToSubmitError');
     });
 
@@ -119,7 +119,7 @@ describe('runner', function() {
             return run_(suites)
                 .then(function() {
                     assert.calledOnce(testSessionRunner.run);
-                    assert.calledWith(testSessionRunner.run, suites, captureProcessor);
+                    assert.calledWith(testSessionRunner.run, suites, stateProcessor);
                 });
         });
 
@@ -166,7 +166,7 @@ describe('runner', function() {
             it('should try to submit state result for retry', function() {
                 return runAndEmit_('stateResult')
                     .then(function() {
-                        assert.called(FailCollector.prototype.tryToSubmitCapture);
+                        assert.called(FailCollector.prototype.tryToSubmitStateResult);
                     });
             });
 
@@ -223,7 +223,7 @@ describe('runner', function() {
 
             describe('`retry` event', function() {
                 beforeEach(function() {
-                    FailCollector.prototype.tryToSubmitCapture.restore();
+                    FailCollector.prototype.tryToSubmitStateResult.restore();
                     FailCollector.prototype.tryToSubmitError.restore();
                 });
 

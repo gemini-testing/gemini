@@ -2,8 +2,8 @@
 
 var q = require('q'),
     QEmitter = require('qemitter'),
-    MetaScreenUpdater = require('../../../../lib/capture-processor/screen-updater/meta-screen-updater'),
-    CaptureProcessor = require('../../../../lib/capture-processor/capture-processor'),
+    MetaScreenUpdater = require('../../../../lib/state-processor/screen-updater/meta-screen-updater'),
+    StateProcessor = require('../../../../lib/state-processor/state-processor'),
     ImageProcessor = require('../../../../lib/image-processor'),
     fs = require('q-io/fs'),
     temp = require('temp'),
@@ -26,7 +26,7 @@ describe('meta-screen-updater', function() {
         sandbox.stub(fs);
         sandbox.stub(temp);
         sandbox.stub(ImageProcessor.prototype);
-        sandbox.stub(CaptureProcessor.prototype);
+        sandbox.stub(StateProcessor.prototype);
         capture = util.makeCaptureStub();
 
         capture.image.save.returns(q.resolve());
@@ -43,7 +43,7 @@ describe('meta-screen-updater', function() {
 
         return processCapture()
             .then(function() {
-                assert.calledOnce(CaptureProcessor.prototype.getStateData);
+                assert.calledOnce(StateProcessor.prototype.getStateData);
             });
     });
 

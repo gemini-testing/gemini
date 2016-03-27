@@ -3,7 +3,7 @@ var q = require('q'),
     StateRunner = require('../../../../lib/runner/state-runner/state-runner'),
     CaptureSession = require('../../../../lib/capture-session'),
     StateError = require('../../../../lib/errors/state-error'),
-    CaptureProcessor = require('../../../../lib/capture-processor/capture-processor'),
+    StateProcessor = require('../../../../lib/state-processor/state-processor'),
     Config = require('../../../../lib/config'),
     util = require('../../../util');
 
@@ -30,9 +30,9 @@ describe('runner/state-runner/state-runner', function() {
     }
 
     function run_(runner) {
-        var captureProcessor = sinon.createStubInstance(CaptureProcessor);
-        captureProcessor.processCapture.returns(q());
-        return runner.run(captureProcessor);
+        var stateProcessor = sinon.createStubInstance(StateProcessor);
+        stateProcessor.processCapture.returns(q());
+        return runner.run(stateProcessor);
     }
 
     describe('run', function() {
@@ -114,17 +114,17 @@ describe('runner/state-runner/state-runner', function() {
             var browserSession = mkBrowserSessionStub_(),
                 state = util.makeStateStub(),
                 runner = mkRunner_(state, browserSession),
-                captureProcessor = sinon.createStubInstance(CaptureProcessor),
+                stateProcessor = sinon.createStubInstance(StateProcessor),
                 capture = {some: 'stuff'};
 
             browserSession.capture.returns(q(capture));
-            captureProcessor.processCapture.returns(q());
+            stateProcessor.processCapture.returns(q());
 
-            return runner.run(captureProcessor)
+            return runner.run(stateProcessor)
                 .then(function() {
-                    assert.calledOnce(captureProcessor.processCapture);
-                    assert.calledWithMatch(captureProcessor.processCapture, capture);
-                    assert.calledWithMatch(captureProcessor.processCapture, {
+                    assert.calledOnce(stateProcessor.processCapture);
+                    assert.calledWithMatch(stateProcessor.processCapture, capture);
+                    assert.calledWithMatch(stateProcessor.processCapture, {
                         suite: state.suite,
                         state: state,
                         browser: browserSession.browser

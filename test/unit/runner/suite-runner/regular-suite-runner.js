@@ -44,13 +44,13 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         );
     }
 
-    function run_(suite, captureProcessor) {
+    function run_(suite, stateProcessor) {
         suite = suite || makeSuiteStub({
             states: [util.makeStateStub()]
         });
 
         var runner = mkRunner_(suite);
-        return runner.run(captureProcessor);
+        return runner.run(stateProcessor);
     }
 
     describe('run', function() {
@@ -163,9 +163,9 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                     states: [util.makeStateStub()]
                 });
 
-            return run_(suite, 'captureProcessor')
+            return run_(suite, 'stateProcessor')
                 .then(function() {
-                    assert.calledWith(StateRunner.prototype.run, 'captureProcessor');
+                    assert.calledWith(StateRunner.prototype.run, 'stateProcessor');
                 });
         });
 

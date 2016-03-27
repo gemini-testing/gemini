@@ -91,13 +91,13 @@ describe('runner/BrowserRunner', function() {
                 });
         });
 
-        it('should passthrough captureProcessor to suite runner', function() {
+        it('should passthrough stateProcessor to suite runner', function() {
             var suites = [makeSuiteStub({browsers: ['browser']})],
                 runner = mkRunner_('browser');
 
-            return runner.run(suites, 'captureProcessor')
+            return runner.run(suites, 'stateProcessor')
                 .then(function() {
-                    assert.calledWith(suiteRunner.run, 'captureProcessor');
+                    assert.calledWith(suiteRunner.run, 'stateProcessor');
                 });
         });
 

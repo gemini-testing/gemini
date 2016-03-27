@@ -1,7 +1,7 @@
 'use strict';
 
 var q = require('q'),
-    NewScreenUpdater = require('../../../../lib/capture-processor/screen-updater/new-screen-updater'),
+    NewScreenUpdater = require('../../../../lib/state-processor/screen-updater/new-screen-updater'),
     fs = require('q-io/fs'),
     util = require('./util');
 
