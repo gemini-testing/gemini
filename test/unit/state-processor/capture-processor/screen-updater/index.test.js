@@ -1,9 +1,9 @@
 'use strict';
 
-var screenUpdater = require('../../../../lib/state-processor/screen-updater'),
-    DiffUpdater = require('../../../../lib/state-processor/screen-updater/diff-screen-updater'),
-    NewUpdater = require('../../../../lib/state-processor/screen-updater/new-screen-updater'),
-    MetaUpdater = require('../../../../lib/state-processor/screen-updater/meta-screen-updater');
+var screenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater'),
+    DiffUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/diff-screen-updater'),
+    NewUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/new-screen-updater'),
+    MetaUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/meta-screen-updater');
 
 describe('state-processor/screen-updater/create', function() {
     it('should create MetaUpdater by default', function() {

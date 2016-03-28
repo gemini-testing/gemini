@@ -1,17 +1,16 @@
 'use strict';
 
-var q = require('q'),
+var DiffScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/diff-screen-updater'),
+    ImageProcessor = require('../../../../../lib/image-processor'),
+    Image = require('../../../../../lib/image'),
+    q = require('q'),
     _ = require('lodash'),
     QEmitter = require('qemitter'),
-    DiffScreenUpdater = require('../../../../lib/state-processor/screen-updater/diff-screen-updater'),
-    ImageProcessor = require('../../../../lib/image-processor'),
     fs = require('q-io/fs'),
-    temp = require('temp'),
-    util = require('./util');
+    temp = require('temp');
 
 describe('diff-screen-updater', function() {
-    var sandbox = sinon.sandbox.create(),
-        capture;
+    var sandbox = sinon.sandbox.create();
 
     function makeUpdater(opts) {
         opts = _.defaults(opts || {}, {
@@ -20,12 +19,19 @@ describe('diff-screen-updater', function() {
         return new DiffScreenUpdater({}, {tempDir: opts.tempDir});
     }
 
-    function processCapture(updater) {
-        updater = updater || makeUpdater();
+    function exec_(opts) {
+        opts = opts || {};
+        var updater = opts.updater || makeUpdater(),
+            capture = {
+                image: new Image()
+            },
+            env = {
+                refPath: opts.refPath
+            };
 
         return updater.prepare(new QEmitter())
             .then(function() {
-                return updater.processCapture(capture);
+                return updater.exec(capture, env);
             });
     }
 
@@ -33,9 +39,10 @@ describe('diff-screen-updater', function() {
         sandbox.stub(fs);
         sandbox.stub(temp);
         sandbox.stub(ImageProcessor.prototype);
-        capture = util.makeCaptureStub();
 
-        capture.image.save.returns(q.resolve());
+        sandbox.stub(Image.prototype);
+        Image.prototype.save.returns(q());
+
         fs.exists.returns(q.resolve(true));
         fs.makeTree.returns(q.resolve());
     });
@@ -57,16 +64,17 @@ describe('diff-screen-updater', function() {
         ImageProcessor.prototype.compare.returns(q());
         temp.path.returns('/temp/path');
 
-        return processCapture()
+        return exec_()
             .then(function() {
-                assert.calledWith(capture.image.save, '/temp/path');
+                assert.calledOnce(Image.prototype.save);
+                assert.calledWith(Image.prototype.save, '/temp/path');
             });
     });
 
     it('should not compare images if reference image does not exist', function() {
         fs.exists.returns(q.resolve(false));
 
-        return processCapture()
+        return exec_()
             .then(function() {
                 assert.notCalled(ImageProcessor.prototype.compare);
             });
@@ -75,7 +83,7 @@ describe('diff-screen-updater', function() {
     it('should not save image if images are the same', function() {
         ImageProcessor.prototype.compare.returns(q.resolve(true));
 
-        return processCapture()
+        return exec_()
             .then(function() {
                 assert.notCalled(fs.copy);
             });
@@ -84,9 +92,8 @@ describe('diff-screen-updater', function() {
     it('should save image if images are different', function() {
         ImageProcessor.prototype.compare.returns(q.resolve(false));
         temp.path.returns('/temp/path');
-        capture.browser.config.getScreenshotPath.returns('/ref/path');
 
-        return processCapture()
+        return exec_({refPath: '/ref/path'})
             .then(function() {
                 assert.calledWith(fs.copy, '/temp/path', '/ref/path');
             });
@@ -97,7 +104,7 @@ describe('diff-screen-updater', function() {
 
         ImageProcessor.prototype.compare.returns(q.resolve(false));
 
-        return processCapture(updater)
+        return exec_({updater: updater})
             .then(function() {
                 assert.calledWith(temp.path, {dir: '/temp/path', suffix: '.png'});
             });

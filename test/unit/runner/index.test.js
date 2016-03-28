@@ -3,7 +3,7 @@ var q = require('q'),
     QEmitter = require('qemitter'),
     Runner = require('../../../lib/runner'),
     TestSessionRunner = require('../../../lib/runner/test-session-runner'),
-    Tester = require('../../../lib/state-processor/tester'),
+    Tester = require('../../../lib/state-processor/capture-processor/tester'),
     Config = require('../../../lib/config'),
     FailCollector = require('../../../lib/fail-collector'),
     util = require('../../util');
@@ -23,7 +23,7 @@ describe('runner', function() {
         var stateProcessor = sinon.createStubInstance(Tester);
 
         stateProcessor.getProcessedCaptureEventName.returns('onCaptureProcessed');
-        stateProcessor.processCapture.returns(q());
+        stateProcessor.exec.returns(q());
         return stateProcessor;
     }
 
