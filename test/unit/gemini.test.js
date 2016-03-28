@@ -4,6 +4,8 @@ var q = require('q'),
     proxyquire = require('proxyquire'),
     SuiteCollection = require('../../lib/suite-collection'),
     Config = require('../../lib/config'),
+    Runner = require('../../lib/runner'),
+    temp = require('../../lib/temp'),
 
     mkSuiteStub = require('../util').makeSuiteStub;
 
@@ -120,6 +122,47 @@ describe('gemini', function() {
 
                     assert.include(allSuites, matchingBranchRoot);
                     assert.include(allSuites, matchingBranchLeaf);
+                });
+        });
+    });
+
+    describe('test', function() {
+        beforeEach(function() {
+            sandbox.stub(temp);
+        });
+
+        function test_(opts) {
+            opts = opts || {};
+            var Gemini = require('../../lib/gemini');
+
+            sandbox.stub(Runner.prototype);
+            Runner.prototype.on.returnsThis();
+            Runner.prototype.run.returns(q());
+
+            return new Gemini({
+                    rootUrl: 'stubRootUrl',
+                    system: {
+                        projectRoot: 'stubProjectRoot',
+                        tempDir: opts.tempDir
+                    }
+                })
+                .test([]);
+        }
+
+        it('should initialize temp with specified temp dir', function() {
+            test_({tempDir: '/some/dir'});
+
+            assert.calledOnce(temp.init);
+            assert.calledWith(temp.init, '/some/dir');
+        });
+
+        it('should initialize temp before start runner', function() {
+            return test_()
+                .then(function() {
+                    assert.callOrder(
+                        temp.init,
+                        Runner.prototype.run
+                    );
                 });
         });
     });

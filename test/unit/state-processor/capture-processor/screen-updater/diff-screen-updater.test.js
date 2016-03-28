@@ -3,25 +3,17 @@
 var DiffScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/diff-screen-updater'),
     ImageProcessor = require('../../../../../lib/image-processor'),
     Image = require('../../../../../lib/image'),
+    temp = require('../../../../../lib/temp'),
     q = require('q'),
-    _ = require('lodash'),
     QEmitter = require('qemitter'),
-    fs = require('q-io/fs'),
-    temp = require('temp');
+    fs = require('q-io/fs');
 
 describe('diff-screen-updater', function() {
     var sandbox = sinon.sandbox.create();
 
-    function makeUpdater(opts) {
-        opts = _.defaults(opts || {}, {
-            tempDir: '/default/temp/dir'
-        });
-        return new DiffScreenUpdater({}, {tempDir: opts.tempDir});
-    }
-
     function exec_(opts) {
         opts = opts || {};
-        var updater = opts.updater || makeUpdater(),
+        var updater = new DiffScreenUpdater(),
             capture = {
                 image: new Image()
             },
@@ -44,20 +36,10 @@ describe('diff-screen-updater', function() {
         Image.prototype.save.returns(q());
 
         fs.exists.returns(q.resolve(true));
-        fs.makeTree.returns(q.resolve());
     });
 
     afterEach(function() {
         sandbox.restore();
-    });
-
-    it('should prepare temp directory for images', function() {
-        var updater = makeUpdater({tempDir: '/temp/path'});
-
-        return updater.prepare(new QEmitter())
-            .then(function() {
-                assert.calledWith(fs.makeTree, '/temp/path');
-            });
     });
 
     it('should save image to the temp directory before comparing', function() {
@@ -99,14 +81,12 @@ describe('diff-screen-updater', function() {
             });
     });
 
-    it('should save image with correct path', function() {
-        var updater = makeUpdater({tempDir: '/temp/path'});
-
+    it('should save image with correct suffix', function() {
         ImageProcessor.prototype.compare.returns(q.resolve(false));
 
-        return exec_({updater: updater})
+        return exec_()
             .then(function() {
-                assert.calledWith(temp.path, {dir: '/temp/path', suffix: '.png'});
+                assert.calledWith(temp.path, {suffix: '.png'});
             });
     });
 });

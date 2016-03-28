@@ -172,9 +172,6 @@ Options:
   (to use corresponding built-in reporter) or reporter function (to use
   a custom reporter).
 
-* `tempDir` – directory to save temporary images (current states) to. By
-  default, new temp directory will be created.
-
 * `grep` – regular expression to filter suites to run. By default, all tests
   will be executed. If this option is set, only suites with name matching the
   pattern will be executed.

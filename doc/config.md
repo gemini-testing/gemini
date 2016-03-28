@@ -77,6 +77,12 @@ settings. These settings can not be set per-browser.
   the sources can not be downloaded via URLs from the test pages. By default,
   it is equal to `projectRoot`.
 
+* `tempDir` – directory to save temporary images (current states) to. This
+  directory should exist. Gemini will create own temp directory in it with name
+  starting with `.gemini.tmp.` where all temporary images will be saved.
+  After run created directory will be removed. If not set system temp
+  directory will be used.
+
 * `plugins` - list of plugins to enable. Should have form of `pluginName:
   settings`.  For example:
 

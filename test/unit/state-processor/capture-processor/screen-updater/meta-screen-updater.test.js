@@ -5,8 +5,8 @@ var q = require('q'),
     MetaScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/meta-screen-updater'),
     ImageProcessor = require('../../../../../lib/image-processor'),
     Image = require('../../../../../lib/image'),
-    fs = require('q-io/fs'),
-    temp = require('temp');
+    temp = require('../../../../../lib/temp'),
+    fs = require('q-io/fs');
 
 describe('meta-screen-updater', function() {
     var sandbox = sinon.sandbox.create();
