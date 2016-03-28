@@ -9,7 +9,7 @@
   "dependencies": {
     "aliasify": "^1.7.2",
     "browserify": "^9.0.4",
-    "chalk": "^0.5.1",
+    "chalk": "^1.1.2",
     "commander": "^2.8.1",
     "css": "^2.1.0",
     "debug": "^2.2.0",
