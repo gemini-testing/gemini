@@ -41,6 +41,26 @@ describe('suite', function() {
 
             assert.include(parent.children, child);
         });
+
+        it('child suite should have same data in context as parent', function() {
+            var parent = createSuite('parent');
+            parent.context.some = 'data';
+
+            var child = createSuite('child', parent);
+
+            assert.deepEqual(child.context, {some: 'data'});
+        });
+
+        it('modifications of child context should not affect parent context', function() {
+            var parent = createSuite('parent');
+            parent.context.some = 'data';
+
+            var child = createSuite('child', parent);
+            child.context.some = 'other-data';
+            child.context.other = 'data';
+
+            assert.deepEqual(parent.context, {some: 'data'});
+        });
     });
 
     describe('states', function() {
