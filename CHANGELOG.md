@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2 - 2016-03-30
+
+* Fix: Child suite context should have same data as parent has (@j0tunn)
+
 ## 3.0.1 - 2016-03-24
 
 * Fixed element find caching (@j0tunn)
