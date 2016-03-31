@@ -4,7 +4,7 @@ var _ = require('lodash'),
     q = require('q'),
     Suite = require('./suite'),
     pathUtils = require('./path-utils'),
-    publicApi = require('./public-api'),
+    publicApi = require('..'),
     exposeTestsApi = require('./tests-api'),
     utils = require('./utils');
 
