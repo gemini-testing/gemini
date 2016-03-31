@@ -2,7 +2,8 @@
 
 var _ = require('lodash'),
     Config = require('../../lib/config'),
-    FailCollector = require('../../lib/fail-collector');
+    FailCollector = require('../../lib/fail-collector'),
+    NoRefImageError = require('../../lib/errors/no-ref-image-error');
 
 describe('FailCollector', function() {
     var sandbox = sinon.sandbox.create(),
@@ -34,6 +35,13 @@ describe('FailCollector', function() {
             assert.throws(function() {
                 failCollector.tryToSubmitError({suite: {}});
             }, 'browserId');
+        });
+
+        it('should not submit NoRefImageError', function() {
+            var candidate = sinon.createStubInstance(NoRefImageError),
+                failCollector = createFailCollector_();
+
+            assert.equal(failCollector.tryToSubmitError(candidate), false);
         });
 
         it('should not submit candidate if no retries set for browser', function() {
