@@ -3,10 +3,11 @@ var q = require('q'),
     StateRunner = require('../../../../lib/runner/state-runner/state-runner'),
     CaptureSession = require('../../../../lib/capture-session'),
     StateError = require('../../../../lib/errors/state-error'),
+    StateProcessor = require('../../../../lib/state-processor/state-processor'),
     Config = require('../../../../lib/config'),
     util = require('../../../util');
 
-describe('runner/StateRunner', function() {
+describe('runner/state-runner/state-runner', function() {
     function mkBrowserSessionStub_(opts) {
         opts = opts || {};
         var session = sinon.createStubInstance(CaptureSession);
@@ -14,7 +15,7 @@ describe('runner/StateRunner', function() {
         session.browser.sessionId = opts.sessionId || 'default-session-id';
 
         session.runActions.returns(q.resolve());
-        session.capture.returns(q.resolve());
+        session.capture.returns(q.resolve({}));
         session.handleError.returns(q.resolve());
 
         return session;
@@ -26,6 +27,17 @@ describe('runner/StateRunner', function() {
         var config = sinon.createStubInstance(Config);
 
         return new StateRunner(state, browserSession, config);
+    }
+
+    function mkStateProcessor_() {
+        var stateProcessor = sinon.createStubInstance(StateProcessor);
+        stateProcessor.exec.returns(q());
+        return stateProcessor;
+    }
+
+    function run_(runner, stateProcessor) {
+        stateProcessor = stateProcessor || mkStateProcessor_();
+        return runner.run(stateProcessor);
     }
 
     describe('run', function() {
@@ -40,7 +52,7 @@ describe('runner/StateRunner', function() {
 
             runner.on('beginState', onBeginState);
 
-            return runner.run()
+            return run_(runner)
                 .then(function() {
                     assert.calledWith(onBeginState, {
                         suite: state.suite,
@@ -62,7 +74,7 @@ describe('runner/StateRunner', function() {
 
             runner.on('endState', onEndState);
 
-            return runner.run()
+            return run_(runner)
                 .then(function() {
                     assert.calledWith(onEndState, {
                         suite: state.suite,
@@ -78,42 +90,58 @@ describe('runner/StateRunner', function() {
                 state = util.makeStateStub(),
                 runner = mkRunner_(state, browserSession);
 
-            return runner.run()
+            return run_(runner)
                 .then(function() {
                     assert.calledOnce(browserSession.runActions);
                     assert.calledWith(browserSession.runActions, state.actions);
                 });
         });
 
-        it('should perform state actions before capture', function() {
+        it('should perform state actions before processing state', function() {
             var browserSession = mkBrowserSessionStub_(),
                 state = util.makeStateStub(),
                 runner = mkRunner_(state, browserSession),
-                mediator = sinon.spy().named('mediator');
+                mediator = sinon.spy().named('mediator'),
+                stateProcessor = mkStateProcessor_();
 
             browserSession.runActions.returns(q.delay(1).then(mediator));
 
-            return runner.run()
+            return run_(runner, stateProcessor)
                 .then(function() {
                     assert.callOrder(
                         browserSession.runActions,
                         mediator,
-                        browserSession.capture
+                        stateProcessor.exec
                     );
+                });
+        });
+
+        it('should process state', function() {
+            var browserSession = mkBrowserSessionStub_(),
+                state = util.makeStateStub(),
+                runner = mkRunner_(state, browserSession),
+                stateProcessor = mkStateProcessor_();
+
+            stateProcessor.exec.returns(q());
+
+            return runner.run(stateProcessor)
+                .then(function() {
+                    assert.calledOnce(stateProcessor.exec);
+                    assert.calledWithMatch(stateProcessor.exec, state, browserSession);
                 });
         });
 
         it('should extend state errors with metadata', function() {
             var onStateError = sinon.spy().named('onError'),
-                browserSession = mkBrowserSessionStub_(),
                 state = util.makeStateStub(),
-                runner = mkRunner_(state, browserSession);
+                runner = mkRunner_(state),
+                stateProcessor = mkStateProcessor_();
 
             runner.on('err', onStateError);
 
-            browserSession.capture.returns(q.reject(new StateError()));
+            stateProcessor.exec.returns(q.reject(new StateError()));
 
-            return runner.run()
+            return run_(runner, stateProcessor)
                 .then(function() {
                     var error = onStateError.firstCall.args[0];
                     assert.equal(error.state, state);
@@ -129,7 +157,7 @@ describe('runner/StateRunner', function() {
             var error = new StateError('some error');
             browserSession.runActions.returns(q.reject(error));
 
-            return runner.run()
+            return run_(runner)
                 .then(function() {
                     assert.calledOnce(browserSession.handleError);
                     assert.calledWith(browserSession.handleError, error);
@@ -144,7 +172,7 @@ describe('runner/StateRunner', function() {
             runner.on('beginState', onBeginState);
             runner.on('endState', onEndState);
 
-            return runner.run()
+            return run_(runner)
                 .then(function() {
                     assert.callOrder(
                         onBeginState,

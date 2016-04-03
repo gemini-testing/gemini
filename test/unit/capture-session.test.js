@@ -6,7 +6,8 @@ var _ = require('lodash'),
     CaptureSession = require('../../lib/capture-session'),
     ActionsBuilder = require('../../lib/tests-api/actions-builder'),
     createSuite = require('../../lib/suite').create,
-    StateError = require('../../lib/errors/state-error');
+    StateError = require('../../lib/errors/state-error'),
+    temp = require('../../lib/temp');
 
 describe('capture session', function() {
     var sandbox = sinon.sandbox.create();
@@ -14,6 +15,8 @@ describe('capture session', function() {
     beforeEach(function() {
         sandbox.stub(promiseUtils);
         promiseUtils.sequence.returns(q());
+
+        sandbox.stub(temp);
     });
 
     afterEach(function() {
@@ -196,9 +199,12 @@ describe('capture session', function() {
             var error = new Error('Some error');
             this.browser.prepareScreenshot.returns(q.reject(error));
 
+            var img = {save: sinon.stub()};
+            this.browser.captureFullscreenImage.returns(q(img));
+
             return this.session.capture(this.state).fail(function(e) {
                 assert.propertyVal(e, 'message', error.message);
-                assert.property(e, 'image');
+                assert.property(e, 'imagePath');
             });
         });
 
@@ -584,7 +590,9 @@ describe('capture session', function() {
     describe('handleError', function() {
         beforeEach(function() {
             this.browser = {
-                captureFullscreenImage: sinon.stub().returns(q({}))
+                captureFullscreenImage: sinon.stub().returns(q({
+                    save: sinon.stub()
+                }))
             };
             this.session = new CaptureSession(this.browser);
             this.error = {};
@@ -602,14 +610,13 @@ describe('capture session', function() {
             });
         });
 
-        it('should add an image to error', function() {
+        it('should add an image path to error', function() {
             var _this = this;
 
-            var image = {some: 'thing'};
-            _this.browser.captureFullscreenImage.returns(q.resolve(image));
+            temp.path.returns('/path/to/img');
 
             return this.session.handleError(this.error).fail(function() {
-                assert.deepEqual(_this.error.image, image);
+                assert.deepEqual(_this.error.imagePath, '/path/to/img');
             });
         });
 

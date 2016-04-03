@@ -134,11 +134,11 @@ describe('FailCollector', function() {
         });
     });
 
-    describe('tryToSubmitCapture', function() {
+    describe('tryToSubmitStateResult', function() {
         it('should not submit candidate with missing `equal` property', function() {
             var failCollector = createFailCollector_();
 
-            assert.equal(failCollector.tryToSubmitCapture(candidate), false);
+            assert.equal(failCollector.tryToSubmitStateResult(candidate), false);
         });
 
         it('should not submit candidate with no diff', function() {
@@ -149,7 +149,7 @@ describe('FailCollector', function() {
                     equal: true
                 };
 
-            assert.equal(failCollector.tryToSubmitCapture(candidate), false);
+            assert.equal(failCollector.tryToSubmitStateResult(candidate), false);
         });
 
         it('should submit candidate in case of diff', function() {
@@ -160,7 +160,7 @@ describe('FailCollector', function() {
                     equal: false
                 };
 
-            assert.equal(failCollector.tryToSubmitCapture(candidate), true);
+            assert.equal(failCollector.tryToSubmitStateResult(candidate), true);
         });
     });
 

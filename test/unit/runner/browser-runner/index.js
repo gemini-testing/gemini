@@ -91,6 +91,16 @@ describe('runner/BrowserRunner', function() {
                 });
         });
 
+        it('should passthrough stateProcessor to suite runner', function() {
+            var suites = [makeSuiteStub({browsers: ['browser']})],
+                runner = mkRunner_('browser');
+
+            return runner.run(suites, 'stateProcessor')
+                .then(function() {
+                    assert.calledWith(suiteRunner.run, 'stateProcessor');
+                });
+        });
+
         it('should not run suites after cancel', function() {
             var runner = mkRunner_('browser'),
                 suites = [
