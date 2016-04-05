@@ -7,8 +7,7 @@ New contributions are welcomed. Follow this guide if you want to make one.
 Follow [Github guide](https://help.github.com/articles/creating-a-pull-request) to fork a repo
 and create a pull request.
 
-Generally, bug fixes should go to the [`stable`](https://github.com/gemini-testing/gemini/tree/stable) branch
-and new features should go to [`master`](https://github.com/gemini-testing/gemini/tree/master).
+All bug fixes and new features should go to the [`master`](https://github.com/gemini-testing/gemini/tree/master) branch.
 
 ## Commit messages
 
@@ -32,7 +31,7 @@ Some functional tests are launched on [SauceLabs](https://saucelabs.com).
 In order to run them you'll need to:
 
 1. [Register](https://saucelabs.com/opensauce/) open source SauceLans account.
-2. Set your username and key to `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` environment 
+2. Set your username and key to `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` environment
    variables respectively.
 
 ## Tests
