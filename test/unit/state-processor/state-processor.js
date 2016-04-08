@@ -2,10 +2,10 @@
 
 var StateProcessor = require('../../../lib/state-processor/state-processor'),
     CaptureProcessor = require('../../../lib/state-processor/capture-processor/capture-processor'),
-    Env = require('../../../lib/state-processor/env'),
     CaptureSession = require('../../../lib/capture-session'),
     util = require('../../util'),
-    q = require('q');
+    q = require('q'),
+    _ = require('lodash');
 
 describe('state-processor/state-processor', function() {
     var sandbox = sinon.sandbox.create(),
@@ -42,6 +42,9 @@ describe('state-processor/state-processor', function() {
         beforeEach(function() {
             browserSession = sinon.createStubInstance(CaptureSession);
             browserSession.capture.returns(q({}));
+            _.set(browserSession, 'browser.config', {
+                getScreenshotPath: sinon.stub()
+            });
         });
 
         function exec_(opts) {
@@ -77,15 +80,46 @@ describe('state-processor/state-processor', function() {
                 });
         });
 
-        it('should process capture with correct environment', function() {
+        it('should use browser config options in processing', function() {
             var state = util.makeStateStub();
 
-            sandbox.stub(Env.prototype, '__constructor').returns({some: 'env'});
+            browserSession.browser.config.getScreenshotPath.returns('/some/path');
+            browserSession.browser.config.tolerance = 100500;
 
             return exec_({state: state})
                 .then(function() {
-                    assert.calledWith(Env.prototype.__constructor, state, browserSession);
-                    assert.calledWith(captureProcessor.exec, sinon.match.any, {some: 'env'});
+                    assert.calledWith(captureProcessor.exec, sinon.match.any, {
+                        refPath: '/some/path',
+                        tolerance: 100500
+                    });
+                });
+        });
+
+        it('should use state tolerance if it set', function() {
+            var state = util.makeStateStub();
+            state.tolerance = 1;
+
+            browserSession.browser.config.tolerance = 100500;
+
+            return exec_({state: state})
+                .then(function() {
+                    assert.calledWithMatch(captureProcessor.exec, sinon.match.any, {
+                        tolerance: 1
+                    });
+                });
+        });
+
+        it('should use state tolerance even if it set to 0', function() {
+            var state = util.makeStateStub();
+            state.tolerance = 0;
+
+            browserSession.browser.config.tolerance = 100500;
+
+            return exec_({state: state})
+                .then(function() {
+                    assert.calledWithMatch(captureProcessor.exec, sinon.match.any, {
+                        tolerance: 0
+                    });
                 });
         });
 
