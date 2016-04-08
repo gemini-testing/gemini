@@ -55,12 +55,14 @@ describe('state-processor/state-processor', function() {
 
         it('should capture screenshot', function() {
             var state = util.makeStateStub(),
-                captureOpts = {some: 'opts'};
+                pageDisposition = {
+                    captureArea: {}
+                };
 
-            return stateProcessor.exec(state, browserSession, captureOpts)
+            return stateProcessor.exec(state, browserSession, pageDisposition)
                 .then(function() {
                     assert.calledOnce(browserSession.capture);
-                    assert.calledWith(browserSession.capture, state, captureOpts);
+                    assert.calledWith(browserSession.capture, pageDisposition);
                 });
         });
 
