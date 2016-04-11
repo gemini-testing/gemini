@@ -137,8 +137,8 @@ You can also set up each browser to have its own node:
 rootUrl: http://yandex.com
 
 browsers:
-  gridUrl: http://chrome-node.example.com:4444/wd/hub
   chrome:
+    gridUrl: http://chrome-node.example.com:4444/wd/hub
     desiredCapabilities:
       browserName: chrome
       version: "45.0"
