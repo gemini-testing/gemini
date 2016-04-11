@@ -8,12 +8,12 @@ var utils = require('../../lib/utils'),
 
 describe('test-reader', function() {
     var sandbox = sinon.sandbox.create(),
-        exposeTestsApi = sandbox.spy(),
+        testsApi = sandbox.stub(),
         readTests;
 
     before(function() {
         readTests = proxyquire('../../lib/test-reader', {
-            './tests-api': exposeTestsApi
+            './tests-api': testsApi
         });
     });
 
@@ -24,7 +24,7 @@ describe('test-reader', function() {
 
     afterEach(function() {
         sandbox.restore();
-        exposeTestsApi.reset();
+        testsApi.reset();
     });
 
     function readTests_(opts) {
@@ -43,6 +43,63 @@ describe('test-reader', function() {
 
         return readTests(opts.paths, opts.config);
     }
+
+    describe('global "gemini" variable', function() {
+        var config;
+
+        beforeEach(function() {
+            config = {
+                getBrowserIds: function() {
+                    return [];
+                }
+            };
+            utils.requireWithNoCache.restore();
+        });
+
+        it('should use global "gemini" variable', function() {
+            var gemini,
+                api = {suite: 'api'};
+
+            testsApi.returns(api);
+            pathUtils.expandPaths.returns(q(['some-test.js']));
+            sandbox.stub(utils, 'requireWithNoCache', function() {
+                gemini = global.gemini;
+            });
+
+            return readTests_({config: config})
+                .then(function() {
+                    assert.deepEqual(gemini, api);
+                });
+        });
+
+        it('should rewrite global "gemini" variable for each file', function() {
+            var gemini = [];
+
+            pathUtils.expandPaths.returns(q(['/some/path/file1.js', '/some/path/file2.js']));
+            testsApi
+                .onFirstCall().returns({suite: 'apiInstance'})
+                .onSecondCall().returns({suite: 'anotherApiInstance'});
+            sandbox.stub(utils, 'requireWithNoCache', function() {
+                gemini.push(global.gemini.suite);
+            });
+
+            return readTests_({config: config})
+                .then(function() {
+                    assert.deepEqual(gemini, ['apiInstance', 'anotherApiInstance']);
+                });
+        });
+
+        it('should delete global "gemini" variable after test reading', function() {
+            testsApi.returns({suite: 'api'});
+            pathUtils.expandPaths.returns(q(['some-test.js']));
+            sandbox.stub(utils, 'requireWithNoCache');
+
+            return readTests_({config: config})
+                .then(function() {
+                    assert.notProperty(global, 'gemini');
+                });
+        });
+    });
 
     it('should not load any suites if no paths or sets specified', function() {
         pathUtils.expandPaths
@@ -169,8 +226,8 @@ describe('test-reader', function() {
 
         return readTests_({config: config})
             .then(function() {
-                assert.calledWith(exposeTestsApi, sinon.match.any, sinon.match.any, ['b1']);
-                assert.callOrder(exposeTestsApi, utils.requireWithNoCache);
+                assert.calledWith(testsApi, sinon.match.any, ['b1']);
+                assert.callOrder(testsApi, utils.requireWithNoCache);
             });
     });
 
@@ -193,8 +250,8 @@ describe('test-reader', function() {
 
         return readTests_({paths: ['other/path'], config: config})
             .then(function() {
-                assert.calledOnce(exposeTestsApi);
-                assert.calledWith(exposeTestsApi, sinon.match.any, sinon.match.any, ['b1', 'b2']);
+                assert.calledOnce(testsApi);
+                assert.calledWith(testsApi, sinon.match.any, ['b1', 'b2']);
             });
     });
 });
