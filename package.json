@@ -20,7 +20,7 @@
     "inherit": "~2.2.1",
     "install": "^0.6.1",
     "js-yaml": "^3.2.5",
-    "lodash": "^4.6.1",
+    "lodash": "^4.9.0",
     "looks-same": "^2.2.2",
     "minimatch": "^3.0.0",
     "png-img": "~1.1.0",
