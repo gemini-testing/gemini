@@ -866,4 +866,26 @@ describe('config', function() {
             });
         });
     });
+
+    describe('util functions', function() {
+        it('should return true if path is relative', function() {
+            assert.strictEqual(Config.isRelativePath('./foo/bar'), true);
+            assert.strictEqual(Config.isRelativePath('foo/bar'), true);
+        });
+
+        it('should return false if path is absolute', function() {
+            assert.strictEqual(Config.isRelativePath('/foo/bar'), false);
+        });
+
+        it('should return absolute path by pass relative', function() {
+            var relativePath = 'foo/bar/gemini.config';
+            var relativePathWithLeadedDot = './foo/bar/gemini.config';
+            assert.strictEqual(
+              Config.getAbsPath(relativePath),
+              process.cwd() + '/' + relativePath);
+            assert.strictEqual(
+              Config.getAbsPath(relativePathWithLeadedDot),
+              process.cwd() + '/' + relativePathWithLeadedDot);
+        });
+    });
 });

@@ -51,6 +51,16 @@ describe('config', function() {
                     return new Config(configPath('notExists.js'));
                 }, GeminiError);
             });
+
+            it('should read relative to current working directory', function() {
+                assert.deepPropertyVal(
+                  new Config(configPath('validConfig.js').replace(process.cwd() + '/', '')),
+                  'system.projectRoot', '/it/works');
+
+                assert.deepPropertyVal(
+                  new Config(configPath('validConfig.js').replace(process.cwd() + '/', './')),
+                  'system.projectRoot', '/it/works');
+            });
         });
 
         describe('.json', function() {
@@ -63,6 +73,16 @@ describe('config', function() {
                 assert.throws(function() {
                     return new Config(configPath('notExists.json'));
                 }, GeminiError);
+            });
+
+            it('should read relative to current working directory', function() {
+                assert.deepPropertyVal(
+                  new Config(configPath('validConfig.json').replace(process.cwd() + '/', '')),
+                  'system.projectRoot', '/it/works');
+
+                assert.deepPropertyVal(
+                  new Config(configPath('validConfig.json').replace(process.cwd() + '/', './')),
+                  'system.projectRoot', '/it/works');
             });
         });
     });
