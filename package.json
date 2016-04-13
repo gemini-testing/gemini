@@ -5,7 +5,7 @@
   "bin": {
     "gemini": "./bin/gemini"
   },
-  "main": "lib/public-api.js",
+  "main": "api.js",
   "dependencies": {
     "aliasify": "^1.7.2",
     "browserify": "^13.0.0",
