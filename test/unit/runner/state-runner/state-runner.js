@@ -16,7 +16,7 @@ describe('runner/state-runner/state-runner', function() {
 
         session.runActions.returns(q.resolve());
         session.capture.returns(q.resolve({}));
-        session.handleError.returns(q.resolve());
+        session.extendWithPageScreenshot.returns(q.resolve());
 
         return session;
     }
@@ -116,6 +116,55 @@ describe('runner/state-runner/state-runner', function() {
                 });
         });
 
+        it('should extend error in state actions with page screenshot', function() {
+            var browserSession = mkBrowserSessionStub_(),
+                state = util.makeStateStub(),
+                runner = mkRunner_(state, browserSession);
+
+            var error = new StateError('some error');
+            browserSession.runActions.returns(q.reject(error));
+
+            return run_(runner)
+                .then(function() {
+                    assert.calledOnce(browserSession.extendWithPageScreenshot);
+                    assert.calledWith(browserSession.extendWithPageScreenshot, error);
+                });
+        });
+
+        it('should prepare screenshot before processing state', function() {
+            var browserSession = mkBrowserSessionStub_(),
+                state = util.makeStateStub(),
+                runner = mkRunner_(state, browserSession),
+                mediator = sinon.spy().named('mediator'),
+                stateProcessor = mkStateProcessor_();
+
+            browserSession.prepareScreenshot.returns(q.delay(1).then(mediator));
+
+            return run_(runner, stateProcessor)
+                .then(function() {
+                    assert.callOrder(
+                        browserSession.prepareScreenshot,
+                        mediator,
+                        stateProcessor.exec
+                    );
+                });
+        });
+
+        it('should extend prepare screenshot error with page screenshot', function() {
+            var browserSession = mkBrowserSessionStub_(),
+                state = util.makeStateStub(),
+                runner = mkRunner_(state, browserSession);
+
+            var error = new StateError('some error');
+            browserSession.prepareScreenshot.returns(q.reject(error));
+
+            return run_(runner)
+                .then(function() {
+                    assert.calledOnce(browserSession.extendWithPageScreenshot);
+                    assert.calledWith(browserSession.extendWithPageScreenshot, error);
+                });
+        });
+
         it('should process state', function() {
             var browserSession = mkBrowserSessionStub_(),
                 state = util.makeStateStub(),
@@ -146,21 +195,6 @@ describe('runner/state-runner/state-runner', function() {
                     var error = onStateError.firstCall.args[0];
                     assert.equal(error.state, state);
                     assert.equal(error.suite, state.suite);
-                });
-        });
-
-        it('should handle error in state actions', function() {
-            var browserSession = mkBrowserSessionStub_(),
-                state = util.makeStateStub(),
-                runner = mkRunner_(state, browserSession);
-
-            var error = new StateError('some error');
-            browserSession.runActions.returns(q.reject(error));
-
-            return run_(runner)
-                .then(function() {
-                    assert.calledOnce(browserSession.handleError);
-                    assert.calledWith(browserSession.handleError, error);
                 });
         });
 

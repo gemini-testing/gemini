@@ -1,13 +1,13 @@
 'use strict';
-var Calibrator = require('../../lib/calibrator'),
-    Browser = require('../../lib/browser'),
-    ClientBridge = require('../../lib/browser/client-bridge'),
+
+var Calibrator = require('../../../lib/calibrator'),
+    Browser = require('../../../lib/browser'),
+    ClientBridge = require('../../../lib/browser/client-bridge'),
+    Camera = require('../../../lib/browser/camera'),
     q = require('q'),
     wd = require('wd'),
-    fs = require('fs'),
-    path = require('path'),
     polyfillService = require('polyfill-service'),
-    makeBrowser = require('../util').makeBrowser;
+    makeBrowser = require('../../util').makeBrowser;
 
 describe('browser', function() {
     beforeEach(function() {
@@ -59,6 +59,8 @@ describe('browser', function() {
             this.launchBrowser = function() {
                 return this.browser.launch(this.calibrator);
             };
+
+            this.sinon.stub(Camera.prototype);
         });
 
         it('should init browser with browserName and version capabilites', function() {
@@ -82,21 +84,52 @@ describe('browser', function() {
             });
         });
 
-        it('should calibrate if config.calibrate=true', function() {
-            var _this = this;
+        describe('if config.calibrate=true', function() {
+            beforeEach(function() {
+                this.browser.config.calibrate = true;
+            });
 
-            this.browser.config.calibrate = true;
-            this.calibrator.calibrate.returns(q());
-            return this.browser.launch(this.calibrator).then(function() {
-                assert.calledWith(_this.calibrator.calibrate);
+            it('should calibrate', function() {
+                var _this = this;
+
+                this.calibrator.calibrate.returns(q());
+                return this.browser.launch(this.calibrator)
+                    .then(function() {
+                        assert.calledOnce(_this.calibrator.calibrate);
+                    });
+            });
+
+            it('should calibrate camera object', function() {
+                var calibration = {some: 'data'};
+
+                this.calibrator.calibrate.returns(q(calibration));
+                return this.browser.launch(this.calibrator)
+                    .then(function() {
+                        assert.calledOnce(Camera.prototype.calibrate);
+                        assert.calledWith(Camera.prototype.calibrate, calibration);
+                    });
             });
         });
 
-        it('should not call calibrate() when config.calibrate=false', function() {
-            var _this = this;
-            this.browser.config.calibrate = false;
-            return this.browser.launch(this.calibrator).then(function() {
-                assert.notCalled(_this.calibrator.calibrate);
+        describe('if config.calibrate=false', function() {
+            beforeEach(function() {
+                this.browser.config.calibrate = false;
+            });
+
+            it('should not calibrate', function() {
+                var _this = this;
+
+                return this.browser.launch(this.calibrator)
+                    .then(function() {
+                        assert.notCalled(_this.calibrator.calibrate);
+                    });
+            });
+
+            it('should not calibrate camera object', function() {
+                return this.browser.launch(this.calibrator)
+                    .then(function() {
+                        assert.notCalled(Camera.prototype.calibrate);
+                    });
             });
         });
 
@@ -267,128 +300,12 @@ describe('browser', function() {
 
     describe('captureFullscreenImage', function() {
         beforeEach(function() {
-            var img = path.join(__dirname, '..', 'functional', 'data', 'image', 'image1.png'),
-                imgData = fs.readFileSync(img);
+            this.sinon.stub(Camera.prototype);
 
-            this.stubWd = {
-                takeScreenshot: sinon.stub().returns(q(imgData)),
-                currentContext: sinon.stub().returns(q()),
-                context: sinon.stub().returns(q()),
-                on: sinon.stub()
-            };
-
-            this.sinon.stub(wd, 'promiseRemote').returns(this.stubWd);
-        });
-
-        it('should call to the driver', function() {
-            var _this = this,
-                browser = makeBrowser();
-            return browser.captureFullscreenImage().then(function() {
-                assert.calledOnce(_this.stubWd.takeScreenshot);
-            });
-        });
-
-        it('should not switch appium context', function() {
-            var _this = this,
-                browser = makeBrowser();
-
-            return browser.captureFullscreenImage().then(function() {
-                assert.notCalled(_this.stubWd.context);
-            });
-        });
-
-        it('should not switch appium context if capture succeeds for the first, but fails for the second time', function() {
-            var _this = this,
-                browser = makeBrowser(),
-                error = new Error('not today');
-
-            this.stubWd.takeScreenshot
-                .onSecondCall().returns(q.reject(error));
-
-            var result = browser.captureFullscreenImage()
-                .then(function() {
-                    return browser.captureFullscreenImage();
-                });
-
-            return assert.isRejected(result, error)
-                .then(function() {
-                    assert.notCalled(_this.stubWd.context);
-                });
-        });
-
-        it('should try to switch appium context if taking screenshot fails', function() {
-            var _this = this,
-                browser = makeBrowser();
-            this.stubWd.takeScreenshot
-                .onFirstCall().returns(q.reject(new Error('not today')));
-
-            return browser.captureFullscreenImage().then(function() {
-                assert.calledWithExactly(_this.stubWd.context, 'NATIVE_APP');
-            });
-        });
-
-        it('should try to take screenshot after switching context', function() {
-            var _this = this,
-                browser = makeBrowser();
-            this.stubWd.takeScreenshot
-                .onFirstCall().returns(q.reject(new Error('not today')));
-
-            return browser.captureFullscreenImage().then(function() {
-                assert.calledTwice(_this.stubWd.takeScreenshot);
-            });
-        });
-
-        it('should restore original context after taking screenshot', function() {
-            var _this = this,
-                browser = makeBrowser();
-            this.stubWd.currentContext.returns(q('Original'));
-            this.stubWd.takeScreenshot
-                .onFirstCall().returns(q.reject(new Error('not today')));
-
-            return browser.captureFullscreenImage().then(function() {
-                assert.calledWithExactly(_this.stubWd.context, 'Original');
-            });
-        });
-
-        it('should fail with original error if switching context does not helps', function() {
-            var browser = makeBrowser(),
-                originalError = new Error('Original');
-
-            this.stubWd.takeScreenshot
-                .onFirstCall().returns(q.reject(originalError))
-                .onSecondCall().returns(q.reject(new Error('still does not work')));
-
-            return assert.isRejected(browser.captureFullscreenImage(), originalError);
-        });
-
-        it('should not try to take screenshot without switching context if it failed first time', function() {
-            var _this = this,
-                browser = makeBrowser(),
-                error = new Error('not today');
-
-            this.stubWd.takeScreenshot
-                .onFirstCall().returns(q.reject(error))
-                .onThirdCall().returns(q.reject(error));
-
-            return assert.isRejected(browser.captureFullscreenImage()
-                .then(function() {
-                    return browser.captureFullscreenImage();
-                }))
-                .then(function() {
-                    assert.calledThrice(_this.stubWd.takeScreenshot);
-                });
-        });
-    });
-
-    describe('calibration', function() {
-        beforeEach(function() {
-            var img = path.join(__dirname, '..', 'functional', 'data', 'image', 'calibrate.png'),
-                imgData = fs.readFileSync(img);
             this.wd = {
-                init: sinon.stub().returns(q(imgData)),
+                init: sinon.stub().returns(q({})),
                 configureHttp: sinon.stub().returns(q()),
                 eval: sinon.stub().returns(q('')),
-                takeScreenshot: sinon.stub().returns(q(imgData)),
                 on: sinon.stub()
             };
 
@@ -399,21 +316,21 @@ describe('browser', function() {
             });
         });
 
-        it('captureFullscreenImage() should crop according to calibration result', function() {
-            var _this = this,
-                calibrator = {
-                    calibrate: sinon.stub().returns(q({top: 6, left: 4}))
-                };
+        it('should delegate actual capturing to camera object', function() {
+            this.browser = makeBrowser({browserName: 'browser', version: '1.0'}, {
+                calibrate: false
+            });
 
-            var size = this.browser.launch(calibrator)
+            Camera.prototype.captureFullscreenImage.returns(q({some: 'image'}));
+
+            return this.browser.launch()
                 .then(function() {
-                    return _this.browser.captureFullscreenImage();
-                })
+                    return this.browser.captureFullscreenImage();
+                }.bind(this))
                 .then(function(image) {
-                    return image.getSize();
+                    assert.calledOnce(Camera.prototype.captureFullscreenImage);
+                    assert.deepEqual(image, {some: 'image'});
                 });
-
-            return assert.eventually.deepEqual(size, {width: 1000, height: 13});
         });
     });
 
