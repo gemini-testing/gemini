@@ -1,11 +1,9 @@
 'use strict';
 
 var DiffScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/diff-screen-updater'),
-    ImageProcessor = require('../../../../../lib/image-processor'),
     Image = require('../../../../../lib/image'),
     temp = require('../../../../../lib/temp'),
     q = require('q'),
-    QEmitter = require('qemitter'),
     fs = require('q-io/fs');
 
 describe('diff-screen-updater', function() {
@@ -21,16 +19,13 @@ describe('diff-screen-updater', function() {
                 refPath: opts.refPath
             };
 
-        return updater.prepare(new QEmitter())
-            .then(function() {
-                return updater.exec(capture, env);
-            });
+        return updater.exec(capture, env);
     }
 
     beforeEach(function() {
         sandbox.stub(fs);
         sandbox.stub(temp);
-        sandbox.stub(ImageProcessor.prototype);
+        sandbox.stub(Image, 'compare');
 
         sandbox.stub(Image.prototype);
         Image.prototype.save.returns(q());
@@ -43,7 +38,7 @@ describe('diff-screen-updater', function() {
     });
 
     it('should save image to the temp directory before comparing', function() {
-        ImageProcessor.prototype.compare.returns(q());
+        Image.compare.returns(q());
         temp.path.returns('/temp/path');
 
         return exec_()
@@ -58,12 +53,12 @@ describe('diff-screen-updater', function() {
 
         return exec_()
             .then(function() {
-                assert.notCalled(ImageProcessor.prototype.compare);
+                assert.notCalled(Image.compare);
             });
     });
 
     it('should not save image if images are the same', function() {
-        ImageProcessor.prototype.compare.returns(q.resolve(true));
+        Image.compare.returns(q.resolve(true));
 
         return exec_()
             .then(function() {
@@ -72,7 +67,7 @@ describe('diff-screen-updater', function() {
     });
 
     it('should save image if images are different', function() {
-        ImageProcessor.prototype.compare.returns(q.resolve(false));
+        Image.compare.returns(q.resolve(false));
         temp.path.returns('/temp/path');
 
         return exec_({refPath: '/ref/path'})
@@ -82,7 +77,7 @@ describe('diff-screen-updater', function() {
     });
 
     it('should save image with correct suffix', function() {
-        ImageProcessor.prototype.compare.returns(q.resolve(false));
+        Image.compare.returns(q.resolve(false));
 
         return exec_()
             .then(function() {

@@ -29,13 +29,6 @@ describe('state-processor/state-processor', function() {
         assert.calledOnce(captureProcessor.getProcessedCaptureEventName);
     });
 
-    it('should passthrough prepare call to capture processor', function() {
-        stateProcessor.prepare('some-emitter');
-
-        assert.calledOnce(captureProcessor.prepare);
-        assert.calledWith(captureProcessor.prepare, 'some-emitter');
-    });
-
     describe('exec', function() {
         var browserSession;
 

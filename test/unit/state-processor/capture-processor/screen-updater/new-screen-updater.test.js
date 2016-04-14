@@ -3,7 +3,6 @@
 var NewScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/new-screen-updater'),
     Image = require('../../../../../lib/image'),
     q = require('q'),
-    QEmitter = require('qemitter'),
     fs = require('q-io/fs');
 
 describe('new-screen-updater', function() {
@@ -30,10 +29,7 @@ describe('new-screen-updater', function() {
                 refPath: opts.refPath
             };
 
-        return updater.prepare(new QEmitter())
-            .then(function() {
-                return updater.exec(capture, env);
-            });
+        return updater.exec(capture, env);
     }
 
     it('should make directory before saving the image', function() {
