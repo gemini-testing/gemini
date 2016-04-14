@@ -12,11 +12,11 @@ function makeBrowser(capabilities, config) {
             coverage: {}
         }
     }, config);
-    return new Browser(config);
+    return Browser.create(config);
 }
 
 function browserWithId(id) {
-    return new Browser({
+    return Browser.create({
         id: id,
         desiredCapabilities: {
             browserName: id

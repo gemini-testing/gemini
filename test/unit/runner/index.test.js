@@ -22,7 +22,7 @@ describe('runner', function() {
     function createStateProcessor_() {
         var stateProcessor = sinon.createStubInstance(StateProcessor);
 
-        stateProcessor.getProcessedCaptureEventName.returns('onCaptureProcessed');
+        stateProcessor.jobDoneEvent = 'onCaptureProcessed';
         stateProcessor.exec.returns(q());
         return stateProcessor;
     }

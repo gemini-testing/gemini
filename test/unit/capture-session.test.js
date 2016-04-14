@@ -514,4 +514,19 @@ describe('capture session', function() {
                 });
         });
     });
+
+    describe('serialize', function() {
+        it('should create object with serialized browser', function() {
+            var browser = {
+                    serialize: sinon.stub().returns({some: 'data'})
+                },
+                session = new CaptureSession(browser);
+
+            var obj = session.serialize();
+
+            assert.deepEqual(obj, {
+                browser: {some: 'data'}
+            });
+        });
+    });
 });

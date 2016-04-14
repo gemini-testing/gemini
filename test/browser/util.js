@@ -102,7 +102,7 @@ function runTestsInBrowser(browserId, callback) {
     browserDescribe('in ' + browserId, function() {
         beforeEach(function() {
             var browserConfig = testsConfig.forBrowser(browserId);
-            this.browser = new Browser(browserConfig);
+            this.browser = Browser.create(browserConfig);
         });
 
         callback();

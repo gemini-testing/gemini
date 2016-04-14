@@ -15,8 +15,7 @@ describe('UnlimitedPool', function() {
         this.browser = sinon.stub(browserWithId('id'));
         this.browser.launch.returns(q());
         this.browser.quit.returns(q());
-        this.sinon.stub(Browser.prototype, '__constructor')
-            .returns(this.browser);
+        this.sinon.stub(Browser, 'create').returns(this.browser);
         this.pool = new BasicPool(this.config);
 
         this.requestBrowser = function() {
@@ -32,7 +31,7 @@ describe('UnlimitedPool', function() {
         var _this = this;
         return this.requestBrowser()
             .then(function() {
-                assert.calledWith(Browser.prototype.__constructor, _this.browserConfig);
+                assert.calledWith(Browser.create, _this.browserConfig);
             });
     });
 

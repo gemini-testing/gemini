@@ -13,7 +13,6 @@
     "commander": "^2.8.1",
     "css": "^2.1.0",
     "debug": "^2.2.0",
-    "es6-weak-map": "^2.0.1",
     "gemini-configparser": "^0.1.1",
     "gemini-coverage": "~0.3.0",
     "handlebars": "^4.0.5",

@@ -1,32 +1,18 @@
 'use strict';
 
-var StateProcessor = require('../../../lib/state-processor/state-processor'),
-    CaptureProcessor = require('../../../lib/state-processor/capture-processor/capture-processor'),
-    CaptureSession = require('../../../lib/capture-session'),
+var CaptureSession = require('../../../lib/capture-session'),
     util = require('../../util'),
-    q = require('q'),
+    proxyquire = require('proxyquire'),
     _ = require('lodash');
 
 describe('state-processor/state-processor', function() {
-    var sandbox = sinon.sandbox.create(),
-        captureProcessor,
-        stateProcessor;
-
-    beforeEach(function() {
-        captureProcessor = sinon.createStubInstance(CaptureProcessor);
-        captureProcessor.exec.returns(q({}));
-
-        stateProcessor = new StateProcessor(captureProcessor);
-    });
+    var job = sinon.stub(),
+        StateProcessor = proxyquire('../../../lib/state-processor/state-processor', {
+            './job': job
+        });
 
     afterEach(function() {
-        sandbox.restore();
-    });
-
-    it('should passthrough getProcessedCaptureEventName call to capture processor', function() {
-        stateProcessor.getProcessedCaptureEventName();
-
-        assert.calledOnce(captureProcessor.getProcessedCaptureEventName);
+        job.reset();
     });
 
     describe('exec', function() {
@@ -34,7 +20,6 @@ describe('state-processor/state-processor', function() {
 
         beforeEach(function() {
             browserSession = sinon.createStubInstance(CaptureSession);
-            browserSession.capture.returns(q({}));
             _.set(browserSession, 'browser.config', {
                 getScreenshotPath: sinon.stub()
             });
@@ -42,35 +27,34 @@ describe('state-processor/state-processor', function() {
 
         function exec_(opts) {
             opts = opts || {};
-            return stateProcessor.exec(
-                opts.state || util.makeStateStub(),
-                browserSession,
-                opts.captureOpts || {}
-            );
+            opts.captureProcessorInfo = opts.captureProcessorInfo || {};
+
+            new StateProcessor(opts.captureProcessorInfo)
+                .exec(
+                    opts.state || util.makeStateStub(),
+                    browserSession,
+                    opts.pageDisposition || {}
+                );
         }
 
-        it('should capture screenshot', function() {
-            var state = util.makeStateStub(),
-                pageDisposition = {
-                    captureArea: {}
-                };
+        it('should perform job', function() {
+            exec_({
+                pageDisposition: {some: 'data'},
+                captureProcessorInfo: {
+                    module: '/some/module',
+                    constructorArg: {some: 'arg'}
+                }
+            });
 
-            return stateProcessor.exec(state, browserSession, pageDisposition)
-                .then(function() {
-                    assert.calledOnce(browserSession.capture);
-                    assert.calledWith(browserSession.capture, pageDisposition);
-                });
-        });
-
-        it('should process captured screenshot', function() {
-            var capture = {some: 'capture'};
-            browserSession.capture.returns(q(capture));
-
-            return exec_()
-                .then(function() {
-                    assert.calledOnce(captureProcessor.exec);
-                    assert.calledWith(captureProcessor.exec, capture);
-                });
+            assert.calledOnce(job);
+            assert.calledWithMatch(job, {
+                browserSession: browserSession.serialize(),
+                captureProcessorInfo: {
+                    module: '/some/module',
+                    constructorArg: {some: 'arg'}
+                },
+                pageDisposition: {some: 'data'}
+            });
         });
 
         it('should use browser config options in processing', function() {
@@ -79,13 +63,14 @@ describe('state-processor/state-processor', function() {
             browserSession.browser.config.getScreenshotPath.returns('/some/path');
             browserSession.browser.config.tolerance = 100500;
 
-            return exec_({state: state})
-                .then(function() {
-                    assert.calledWith(captureProcessor.exec, sinon.match.any, {
-                        refPath: '/some/path',
-                        tolerance: 100500
-                    });
-                });
+            exec_({state: state});
+
+            assert.calledWithMatch(job, {
+                execOpts: {
+                    refPath: '/some/path',
+                    tolerance: 100500
+                }
+            });
         });
 
         it('should use state tolerance if it set', function() {
@@ -94,12 +79,13 @@ describe('state-processor/state-processor', function() {
 
             browserSession.browser.config.tolerance = 100500;
 
-            return exec_({state: state})
-                .then(function() {
-                    assert.calledWithMatch(captureProcessor.exec, sinon.match.any, {
-                        tolerance: 1
-                    });
-                });
+            exec_({state: state});
+
+            assert.calledWithMatch(job, {
+                execOpts: {
+                    tolerance: 1
+                }
+            });
         });
 
         it('should use state tolerance even if it set to 0', function() {
@@ -108,32 +94,13 @@ describe('state-processor/state-processor', function() {
 
             browserSession.browser.config.tolerance = 100500;
 
-            return exec_({state: state})
-                .then(function() {
-                    assert.calledWithMatch(captureProcessor.exec, sinon.match.any, {
-                        tolerance: 0
-                    });
-                });
-        });
+            exec_({state: state});
 
-        it('should extend processed result with capture coverage', function() {
-            var processedResult = {
-                    some: 'data'
-                },
-                capture = {
-                    coverage: 'some-coverage'
-                };
-
-            browserSession.capture.returns(q(capture));
-            captureProcessor.exec.returns(q(processedResult));
-
-            return exec_()
-                .then(function(result) {
-                    assert.deepEqual(result, {
-                        some: 'data',
-                        coverage: 'some-coverage'
-                    });
-                });
+            assert.calledWithMatch(job, {
+                execOpts: {
+                    tolerance: 0
+                }
+            });
         });
     });
 });
