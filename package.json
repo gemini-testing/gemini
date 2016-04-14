@@ -49,7 +49,7 @@
     "coveralls": "^2.11.2",
     "husky": "^0.11.4",
     "istanbul": "^0.4.2",
-    "jscs": "^2.11.0",
+    "jscs": "^3.0.1",
     "jshint": "^2.7.0",
     "mocha": "^2.1.0",
     "proxyquire": "^1.7.3",
