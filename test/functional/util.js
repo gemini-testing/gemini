@@ -1,10 +1,9 @@
 'use strict';
 
-var q = require('q'),
-    fs = require('fs'),
+var fs = require('fs'),
     path = require('path'),
     temp = require('temp'),
-    compareAdapter = require('../../lib/image-processor/compare-adapter');
+    Image = require('../../lib/image');
 
 function imagePath(name) {
     return path.join(__dirname, 'data', 'image', name);
@@ -23,10 +22,7 @@ exports.withTempFile = function(func) {
 
 exports.assertSameImages = function(refName, filePath) {
     return assert.eventually.isTrue(
-        q.nfcall(compareAdapter.compare, {
-            path1: imagePath(refName),
-            path2: filePath
-        }),
+        Image.compare(imagePath(refName), filePath),
         'expected image to be equal to ' + refName
     );
 };

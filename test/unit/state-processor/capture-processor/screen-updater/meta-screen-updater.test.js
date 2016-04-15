@@ -1,9 +1,7 @@
 'use strict';
 
 var q = require('q'),
-    QEmitter = require('qemitter'),
     MetaScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/meta-screen-updater'),
-    ImageProcessor = require('../../../../../lib/image-processor'),
     Image = require('../../../../../lib/image'),
     temp = require('../../../../../lib/temp'),
     fs = require('q-io/fs');
@@ -21,16 +19,13 @@ describe('meta-screen-updater', function() {
                 refPath: opts.refPath
             };
 
-        return updater.prepare(new QEmitter())
-            .then(function() {
-                return updater.exec(capture, env);
-            });
+        return updater.exec(capture, env);
     }
 
     beforeEach(function() {
         sandbox.stub(fs);
         sandbox.stub(temp);
-        sandbox.stub(ImageProcessor.prototype);
+        sandbox.stub(Image, 'compare');
 
         sandbox.stub(Image.prototype);
         Image.prototype.save.returns(q());
@@ -44,7 +39,7 @@ describe('meta-screen-updater', function() {
     });
 
     it('should check file to exist once', function() {
-        ImageProcessor.prototype.compare.returns(q());
+        Image.compare.returns(q());
 
         return exec_()
             .then(function() {
@@ -53,7 +48,7 @@ describe('meta-screen-updater', function() {
     });
 
     it('should save temp image if reference image exists', function() {
-        ImageProcessor.prototype.compare.returns(q());
+        Image.compare.returns(q());
         fs.exists.returns(q.resolve(true));
         temp.path.returns('/temp/path');
 

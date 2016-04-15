@@ -23,7 +23,7 @@ describe('LimitedPool', function() {
                 desiredCapabilities: {browserName: 'id'}
             };
 
-            return this.sinon.stub(new Browser(config, 'id'));
+            return this.sinon.stub(Browser.create(config, 'id'));
         };
     });
 

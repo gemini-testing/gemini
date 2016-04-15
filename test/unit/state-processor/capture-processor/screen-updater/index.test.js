@@ -7,31 +7,31 @@ var screenUpdater = require('../../../../../lib/state-processor/capture-processo
 
 describe('state-processor/screen-updater/create', function() {
     it('should create MetaUpdater by default', function() {
-        var updater = screenUpdater.create(null, {});
+        var updater = screenUpdater.create({});
 
         assert.instanceOf(updater, MetaUpdater);
     });
 
     it('should create DiffUpdater if "diff" option is exists', function() {
-        var updater = screenUpdater.create(null, {diff: true});
+        var updater = screenUpdater.create({diff: true});
 
         assert.instanceOf(updater, DiffUpdater);
     });
 
     it('should create NewUpdater if "new" option is exists', function() {
-        var updater = screenUpdater.create(null, {new: true});
+        var updater = screenUpdater.create({new: true});
 
         assert.instanceOf(updater, NewUpdater);
     });
 
     it('should create MetaUpdater if "new" and "diff" options were applied', function() {
-        var updater = screenUpdater.create(null, {diff: true, new: true});
+        var updater = screenUpdater.create({diff: true, new: true});
 
         assert.instanceOf(updater, MetaUpdater);
     });
 
     it('should create MetaUpdater if unknown option was applied', function() {
-        var updater = screenUpdater.create(null, {unknownOption: true});
+        var updater = screenUpdater.create({unknownOption: true});
 
         assert.instanceOf(updater, MetaUpdater);
     });

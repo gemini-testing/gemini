@@ -1,146 +1,158 @@
 'use strict';
 
-var StateProcessor = require('../../../lib/state-processor/state-processor'),
+var CaptureSession = require('../../../lib/capture-session'),
     CaptureProcessor = require('../../../lib/state-processor/capture-processor/capture-processor'),
-    CaptureSession = require('../../../lib/capture-session'),
+    temp = require('../../../lib/temp'),
     util = require('../../util'),
-    q = require('q'),
-    _ = require('lodash');
+    proxyquire = require('proxyquire').noCallThru(),
+    _ = require('lodash'),
+    QEmitter = require('qemitter');
 
-describe('state-processor/state-processor', function() {
+describe('state-processor/state-processor', () => {
     var sandbox = sinon.sandbox.create(),
-        captureProcessor,
-        stateProcessor;
+        job = sinon.stub(),
+        captureProcessor;
 
-    beforeEach(function() {
-        captureProcessor = sinon.createStubInstance(CaptureProcessor);
-        captureProcessor.exec.returns(q({}));
-
-        stateProcessor = new StateProcessor(captureProcessor);
+    beforeEach(() => {
+        sandbox.stub(temp);
+        job.returns({});
     });
 
-    afterEach(function() {
+    afterEach(() => {
         sandbox.restore();
+        job.reset();
     });
 
-    it('should passthrough getProcessedCaptureEventName call to capture processor', function() {
-        stateProcessor.getProcessedCaptureEventName();
-
-        assert.calledOnce(captureProcessor.getProcessedCaptureEventName);
-    });
-
-    it('should passthrough prepare call to capture processor', function() {
-        stateProcessor.prepare('some-emitter');
-
-        assert.calledOnce(captureProcessor.prepare);
-        assert.calledWith(captureProcessor.prepare, 'some-emitter');
-    });
-
-    describe('exec', function() {
+    describe('exec', () => {
         var browserSession;
 
-        beforeEach(function() {
+        beforeEach(() => {
             browserSession = sinon.createStubInstance(CaptureSession);
-            browserSession.capture.returns(q({}));
             _.set(browserSession, 'browser.config', {
                 getScreenshotPath: sinon.stub()
             });
+
+            captureProcessor = sinon.createStubInstance(CaptureProcessor);
         });
 
         function exec_(opts) {
-            opts = opts || {};
-            return stateProcessor.exec(
-                opts.state || util.makeStateStub(),
-                browserSession,
-                opts.captureOpts || {}
-            );
+            opts = _.defaultsDeep(opts || {}, {
+                captureProcessorInfo: {
+                    module: '/some/default/module'
+                },
+                state: util.makeStateStub(),
+                pageDisposition: {}
+            });
+
+            var stubs = {
+                'worker-farm': () => {
+                    return (args, cb) => cb(null, job(args));
+                }
+            };
+            stubs[opts.captureProcessorInfo.module] = {create: () => captureProcessor};
+
+            var StateProcessor = proxyquire('../../../lib/state-processor/state-processor', stubs),
+                stateProcessor = new StateProcessor(opts.captureProcessorInfo);
+
+            stateProcessor.prepare(new QEmitter());
+            return stateProcessor.exec(opts.state, browserSession, opts.pageDisposition);
         }
 
-        it('should capture screenshot', function() {
-            var state = util.makeStateStub(),
-                pageDisposition = {
-                    captureArea: {}
-                };
-
-            return stateProcessor.exec(state, browserSession, pageDisposition)
-                .then(function() {
-                    assert.calledOnce(browserSession.capture);
-                    assert.calledWith(browserSession.capture, pageDisposition);
-                });
+        it('should perform job', () => {
+            return exec_()
+                .then(() => assert.calledOnce(job));
         });
 
-        it('should process captured screenshot', function() {
-            var capture = {some: 'capture'};
-            browserSession.capture.returns(q(capture));
+        it('should pass serialized browser session to job', () => {
+            browserSession.serialize.returns('serialized-browser-session');
 
             return exec_()
-                .then(function() {
-                    assert.calledOnce(captureProcessor.exec);
-                    assert.calledWith(captureProcessor.exec, capture);
-                });
+                .then(() => assert.calledWithMatch(job, {
+                    browserSession: 'serialized-browser-session'
+                }));
         });
 
-        it('should use browser config options in processing', function() {
+        it('should pass capture processor info to job', () => {
+            var captureProcessorInfo = {
+                    module: '/some/module',
+                    constructorArg: {some: 'arg'}
+                };
+
+            return exec_({captureProcessorInfo})
+                .then(() => assert.calledWithMatch(job, {captureProcessorInfo}));
+        });
+
+        it('should pass page disposition to job', () => {
+            return exec_({
+                    pageDisposition: {some: 'data'}
+                })
+                .then(() => assert.calledWithMatch(job, {
+                    pageDisposition: {some: 'data'}
+                }));
+        });
+
+        it('should not pass coverage data to job', () => {
+            return exec_({
+                    pageDisposition: {
+                        coverage: 'some-big-object'
+                    }
+                }).then(() => assert.neverCalledWithMatch(job, {
+                    pageDisposition: {
+                        coverage: 'some-big-object'
+                    }
+                }));
+        });
+
+        it('should pass serialized temp to job', () => {
+            temp.serialize.returns('serialized-temp');
+
+            return exec_()
+                .then(() => assert.calledWithMatch(job, {
+                    temp: 'serialized-temp'
+                }));
+        });
+
+        it('should use browser config options in processing', () => {
             var state = util.makeStateStub();
 
             browserSession.browser.config.getScreenshotPath.returns('/some/path');
             browserSession.browser.config.tolerance = 100500;
 
             return exec_({state: state})
-                .then(function() {
-                    assert.calledWith(captureProcessor.exec, sinon.match.any, {
+                .then(() => assert.calledWithMatch(job, {
+                    execOpts: {
                         refPath: '/some/path',
                         tolerance: 100500
-                    });
-                });
+                    }
+                }));
         });
 
-        it('should use state tolerance if it set', function() {
+        it('should use state tolerance if it set', () => {
             var state = util.makeStateStub();
             state.tolerance = 1;
 
             browserSession.browser.config.tolerance = 100500;
 
             return exec_({state: state})
-                .then(function() {
-                    assert.calledWithMatch(captureProcessor.exec, sinon.match.any, {
+                .then(() => assert.calledWithMatch(job, {
+                    execOpts: {
                         tolerance: 1
-                    });
-                });
+                    }
+                }));
         });
 
-        it('should use state tolerance even if it set to 0', function() {
+        it('should use state tolerance even if it set to 0', () => {
             var state = util.makeStateStub();
             state.tolerance = 0;
 
             browserSession.browser.config.tolerance = 100500;
 
             return exec_({state: state})
-                .then(function() {
-                    assert.calledWithMatch(captureProcessor.exec, sinon.match.any, {
+                .then(() => assert.calledWithMatch(job, {
+                    execOpts: {
                         tolerance: 0
-                    });
-                });
-        });
-
-        it('should extend processed result with capture coverage', function() {
-            var processedResult = {
-                    some: 'data'
-                },
-                capture = {
-                    coverage: 'some-coverage'
-                };
-
-            browserSession.capture.returns(q(capture));
-            captureProcessor.exec.returns(q(processedResult));
-
-            return exec_()
-                .then(function(result) {
-                    assert.deepEqual(result, {
-                        some: 'data',
-                        coverage: 'some-coverage'
-                    });
-                });
+                    }
+                }));
         });
     });
 });
