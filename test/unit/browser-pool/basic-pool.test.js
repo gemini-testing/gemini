@@ -1,9 +1,9 @@
 'use strict';
 var q = require('q'),
-    Browser = require('../../lib/browser'),
-    BasicPool = require('../../lib/browser-pool/basic-pool'),
-    signalHandler = require('../../lib/signal-handler'),
-    browserWithId = require('../util').browserWithId;
+    Browser = require('../../../lib/browser'),
+    BasicPool = require('../../../lib/browser-pool/basic-pool'),
+    signalHandler = require('../../../lib/signal-handler'),
+    browserWithId = require('../../util').browserWithId;
 
 describe('UnlimitedPool', function() {
     beforeEach(function() {

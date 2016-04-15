@@ -1,7 +1,7 @@
 'use strict';
 var q = require('q'),
-    Pool = require('../../lib/browser-pool/caching-pool'),
-    browserWithId = require('../util').browserWithId;
+    Pool = require('../../../lib/browser-pool/caching-pool'),
+    browserWithId = require('../../util').browserWithId;
 
 describe('CachingPool', function() {
     function makeStubBrowser(id) {

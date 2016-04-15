@@ -1,7 +1,7 @@
 'use strict';
-var Browser = require('../../lib/browser'),
+var Browser = require('../../../lib/browser'),
     q = require('q'),
-    LimitedPool = require('../../lib/browser-pool/limited-pool');
+    LimitedPool = require('../../../lib/browser-pool/limited-pool');
 
 describe('LimitedPool', function() {
     beforeEach(function() {
