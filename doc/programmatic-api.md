@@ -1,6 +1,6 @@
 # Programmatic API (experimental)
 
-With the help of `geminin/api` module you can use **Gemini** programmatically
+With the help of `gemini/api` module you can use **Gemini** programmatically
 in your scripts or build tools plugins.
 
 First step is to create **Gemini** instance with a config:
@@ -129,9 +129,10 @@ Methods:
 * `shouldSkip(browserId)` – returns `true` if this state should be skipped for
   a browser.
 
-## Gathering reference screenshots
+## Updating reference screenshots
 
-Use `gemini.gather(paths, options)` method.
+Use `gemini.update(paths, options)` method.
+By default, this command will update reference images that have diff and generate new reference images for new tests.
 
 `paths` is the array of file paths or directories to run the suites from
 or `SuiteCollection` instance.
@@ -148,6 +149,10 @@ Options:
 
 * `browsers` — array of browser ids to execute tests in. By default, tests are
   executed in all browsers, specified in config.
+
+* `diff`(Boolean) - update only existing images with some diff, states with no reference images will be ignored.
+
+* `new`(Boolean) - generate only missing images.
 
 Returns promise that resolve to a stats object with following keys:
 
@@ -204,9 +209,8 @@ Rejects promise if critical error occurred.
 `gemini` instance emits some events, which can be used by external scripts or
 plugins:
 
-* `startRunner` - emitted before the start of `test` or `gather` command. If
+* `startRunner` - emitted before the start of `test` or `update` command. If
   you return a promise from the event handler, the start of the command will
   be delayed until the promise resolves.
 
-* `endRunner` - emitted after the end of the `test` or `gather` command.
-
+* `endRunner` - emitted after the end of the `test` or `update` command.

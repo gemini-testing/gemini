@@ -11,20 +11,6 @@ used. In this case, run PhantomJS in webdriver mode before executing
 phantomjs --webdriver=4444
 ```
 
-## Gathering reference images [deprecated]
-
-**This command is deprecated. Use `gemini update` command instead.**
-
-Once you have few suites written you need to capture reference images:
-
-```
-gemini gather [paths to suites]
-```
-
-If no paths are specified, each `.js` file from `gemini` directory will be
-processed. By default, configuration will be loaded from `.gemini.yml` in the
-current directory. To specify other config, use `--config` or `-c` option.
-
 ## Updating reference images
 
 Once you have few suites written or some code changed you need to capture or update reference images:
@@ -53,7 +39,7 @@ To compare you reference screenshots with current state of blocks, use:
 gemini test [paths to suites]
 ```
 
-Paths and configuration are treated the same way as in `gather` command.
+Paths and configuration are treated the same way as in `update` command.
 
 Each state with appearance different from reference image will be treated as
 the failed test.

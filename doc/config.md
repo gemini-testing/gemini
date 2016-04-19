@@ -254,7 +254,7 @@ To save screenshots for IE9 to different location (considering you have
 browser with `ie9` id in the config):
 
 ```
-gemini gather --browsers-ie9-screenshots-dir ./ie9-screens
+gemini update --browsers-ie9-screenshots-dir ./ie9-screens
 ```
 
 To override setting with environment variable, convert its full path to
@@ -263,5 +263,5 @@ environment variables instead of CLI options:
 
 ```
 gemini_root_url=http://example.com gemini test
-gemini_browsers_ie9_screenshots_dir=./ie9-screens gemini gather
+gemini_browsers_ie9_screenshots_dir=./ie9-screens gemini update
 ```
