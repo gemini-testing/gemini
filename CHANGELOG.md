@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.1 - 2016-04-20
+
+* Fix documentation
+* Fix: require default config by absolute path
+
 ## 4.0.0 - 2016-04-20
 
 * Fixed hang in browser pool queue when using `parallelLimit` option
