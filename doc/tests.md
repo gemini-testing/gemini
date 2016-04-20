@@ -12,8 +12,6 @@ Test suite is defined with `gemini.suite` method.
 **Example**:
 
 ```js
-var gemini = require('gemini');
-
 gemini.suite('button', function(suite) {
     suite
         .setUrl('/path/to/page')
@@ -178,8 +176,6 @@ suites without affecting the outer. Each new suite causes reload of the
 browser, even if URL was not changed.
 
 ```js
-var gemini = require('gemini');
-
 gemini.suite('parent', function(parent) {
     parent.setUrl('/some/path')
         .setCaptureElements('.selector1', '.selector2');
