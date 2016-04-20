@@ -19,6 +19,8 @@ describe('config/config-reader', () => {
     function initReader_(files) {
         fs.readdirSync.returns(_.keys(files));
 
+        files = _.mapKeys(files, (content, filePath) => path.resolve(filePath));
+
         return proxyquire('../../../lib/config/config-reader', files);
     }
 
