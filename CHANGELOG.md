@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.0.0 - 2016-04-20
+
+* Fixed hang in browser pool queue when using `parallelLimit` option
+* Image processing moved to workers (test speed increased, memory usage decreased)
+* Added ability to set `tempDir` option from cli
+* Do not retry failed test if it hasn't reference image
+
+**BREAKING CHANGES**:
+
+* Do not support node lower than 4.0
+* Changed suite declaration. You don't need now to require gemini for each suite file
+* Removed `gather command`. Use `update` command instead
+* Now error data will be extended with path to image instead of image itself: `error.image` => `error.imagePath`
+
 ## 3.0.2 - 2016-03-30
 
 * Fix: Child suite context should have same data as parent has (@j0tunn)
