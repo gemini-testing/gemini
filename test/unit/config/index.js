@@ -1,8 +1,23 @@
 'use strict';
-var Config = require('../../lib/config'),
+var Config = require('../../../lib/config'),
+    configReader = require('../../../lib/config/config-reader'),
     _ = require('lodash');
 
 describe('config', function() {
+    var sandbox = sinon.sandbox.create();
+
+    afterEach(function() {
+        sandbox.restore();
+    });
+
+    it('should read config file', function() {
+        sandbox.stub(configReader, 'read').returns({rootUrl: ''});
+
+        new Config('/some/path'); // jshint ignore:line
+
+        assert.calledWith(configReader.read, '/some/path');
+    });
+
     describe('overrides', function() {
         beforeEach(function() {
             /*jshint -W069*/
