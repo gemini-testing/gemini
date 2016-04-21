@@ -120,6 +120,7 @@ describe('capture session', function() {
             sandbox.stub(Image.prototype);
             Image.prototype.crop.returns(q({}));
             Image.prototype.getSize.returns({});
+            Image.prototype.save.returns(q());
         });
 
         function mkBrowserStub_() {
@@ -221,13 +222,87 @@ describe('capture session', function() {
                     });
             });
 
+            it('should return error if left boundary is outside of image', function() {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {left: 1001}
+                };
+
+                return assert.isRejected(doCapture_(captureParams), StateError);
+            });
+
+            it('should save page screenshot if left boundary is outside of image', () => {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {left: 1001}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.calledWith(Image.prototype.save, '/path/to/img');
+                    });
+            });
+
+            it('should extend error with path to page screenshot if left boundary is outside of image', function() {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {left: 1001}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.equal(error.imagePath, '/path/to/img');
+                    });
+            });
+
             it('should not crop image if left boundary is outside of image', function() {
                 return doCapture_({
                         documentSize: {width: 1000, height: 1000},
                         captureArea: {left: 1001}
                     })
-                    .then(function() {
+                    .fail(function() {
                         assert.notCalled(Image.prototype.crop);
+                    });
+            });
+
+            it('should return error if right boundary is outside of image', function() {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {left: 900, width: 101}
+                };
+
+                return assert.isRejected(doCapture_(captureParams), StateError);
+            });
+
+            it('should save page screenshot if right boundary is outside of image', () => {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {left: 900, width: 101}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.calledWith(Image.prototype.save, '/path/to/img');
+                    });
+            });
+
+            it('should extend error with path to page screenshot if right boundary is outside of image', function() {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {left: 900, width: 101}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.equal(error.imagePath, '/path/to/img');
                     });
             });
 
@@ -236,8 +311,45 @@ describe('capture session', function() {
                         documentSize: {width: 1000, height: 1000},
                         captureArea: {left: 900, width: 101}
                     })
-                    .then(function() {
+                    .fail(function() {
                         assert.notCalled(Image.prototype.crop);
+                    });
+            });
+
+            it('should return error if top boundary is outside of image', function() {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {top: 1001}
+                };
+
+                return assert.isRejected(doCapture_(captureParams), StateError);
+            });
+
+            it('should save page screenshot if top boundary is outside of image', () => {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {top: 1001}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.calledWith(Image.prototype.save, '/path/to/img');
+                    });
+            });
+
+            it('should extend error with path to page screenshot if top boundary is outside of image', function() {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {top: 1001}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.deepEqual(error.imagePath, '/path/to/img');
                     });
             });
 
@@ -246,8 +358,45 @@ describe('capture session', function() {
                         documentSize: {width: 1000, height: 1000},
                         captureArea: {top: 1001}
                     })
-                    .then(function() {
+                    .fail(function() {
                         assert.notCalled(Image.prototype.crop);
+                    });
+            });
+
+            it('should return error if bottom boundary is outside of image', function() {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {top: 900, height: 101}
+                };
+
+                return assert.isRejected(doCapture_(captureParams), StateError);
+            });
+
+            it('should save page screenshot if bottom boundary is outside of image', () => {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {top: 900, height: 101}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.calledWith(Image.prototype.save, '/path/to/img');
+                    });
+            });
+
+            it('should extend error with path to page screenshot if bottom boundary is outside of image', function() {
+                const captureParams = {
+                    documentSize: {width: 1000, height: 1000},
+                    captureArea: {top: 900, height: 101}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.equal(error.imagePath, '/path/to/img');
                     });
             });
 
@@ -256,7 +405,7 @@ describe('capture session', function() {
                         documentSize: {width: 1000, height: 1000},
                         captureArea: {top: 900, height: 101}
                     })
-                    .then(function() {
+                    .fail(function() {
                         assert.notCalled(Image.prototype.crop);
                     });
             });
@@ -340,13 +489,38 @@ describe('capture session', function() {
                     });
             });
 
+            it('should return error if capture area is outside image', function() {
+                const captureParams = {
+                    imageSize: {width: 1000, height: 1000},
+                    captureArea: {top: 900, height: 101 + 1},
+                    viewportOffset: {top: 1}
+                };
+
+                assert.isRejected(doCapture_(captureParams), StateError);
+            });
+
+            it('should extend error with path to page screenshot if capture area is outside image', function() {
+                const captureParams = {
+                    imageSize: {width: 1000, height: 1000},
+                    captureArea: {top: 900, height: 101 + 1},
+                    viewportOffset: {top: 1}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.equal(error.imagePath, '/path/to/img');
+                    });
+            });
+
             it('should not crop image if capture area is outside of image', function() {
                 return doCapture_({
                         imageSize: {width: 1000, height: 1000},
                         captureArea: {top: 900, height: 101 + 1},
                         viewportOffset: {top: 1}
                     })
-                    .then(function(data) {
+                    .fail(function(data) {
                         assert.notCalled(Image.prototype.crop);
                     });
             });
@@ -400,12 +574,52 @@ describe('capture session', function() {
                     });
             });
 
+            it('should throw error if capture area is outside of image', function() {
+                const captureParams = {
+                    imageSize: {width: 1000, height: 1000},
+                    captureArea: {left: 900, width: 102},
+                    viewportOffset: {left: 1}
+                };
+
+                return assert.isRejected(doCapture_(captureParams), StateError);
+            });
+
+            it('should save page screenshot if capture area is outside image', function() {
+                const captureParams = {
+                    imageSize: {width: 1000, height: 1000},
+                    captureArea: {left: 900, width: 102},
+                    viewportOffset: {left: 1}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.calledWith(Image.prototype.save, '/path/to/img');
+                    });
+            });
+
+            it('should extend error with path to page screenshot if capture area is outside image', function() {
+                const captureParams = {
+                    imageSize: {width: 1000, height: 1000},
+                    captureArea: {left: 900, width: 102},
+                    viewportOffset: {left: 1}
+                };
+
+                temp.path.returns('/path/to/img');
+
+                return doCapture_(captureParams)
+                    .fail(function(error) {
+                        assert.equal(error.imagePath, '/path/to/img');
+                    });
+            });
+
             it('should not crop image if capture area outside of image', function() {
                 return doCapture_({
                         imageSize: {width: 1000, height: 1000},
                         captureArea: {left: 900, width: 102},
                         viewportOffset: {left: 1}
-                    }).then(function(data) {
+                    }).fail(function(data) {
                         assert.notCalled(Image.prototype.crop);
                     });
             });
