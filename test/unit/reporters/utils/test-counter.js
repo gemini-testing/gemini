@@ -116,8 +116,17 @@ function testCounter_(name) {
         assert.equal(counter.getResult()[name.toLowerCase()], 1);
     });
 
-    it('should not count test result if it does not have state', function() {
+    it('should count test result if it does not have state', function() {
         var completed = mkCompleted_({state: undefined}),
+            counter = new TestCounter();
+
+        counter['on' + name](completed);
+
+        assert.equal(counter.getResult()[name.toLowerCase()], 1);
+    });
+
+    it('should not count test result if it does not have state or suite', function() {
+        var completed = {browserId: 'some_browser'},
             counter = new TestCounter();
 
         counter['on' + name](completed);
