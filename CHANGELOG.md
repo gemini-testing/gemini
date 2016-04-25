@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.2 - 2016-04-25
+
+* Fix failed suites count in summary line
+* Throw error on image validation fail
+* Show page screenshot on image validation error
+
 ## 4.0.1 - 2016-04-20
 
 * Fix documentation
