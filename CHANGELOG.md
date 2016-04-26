@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.3 - 2016-04-26
+
+* Fix image processing: use pixel ratio in subprocesses
+
 ## 4.0.2 - 2016-04-25
 
 * Fix failed suites count in summary line
