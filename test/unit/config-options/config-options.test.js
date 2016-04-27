@@ -697,6 +697,35 @@ describe('config', function() {
                 });
                 assert.deepEqual(config.windowSize, {width: 1000, height: 2000});
             });
+
+            it('should accept object', function() {
+                var config = createBrowserConfig({
+                    windowSize: {width: 1000, height: 2000}
+                });
+                assert.deepEqual(config.windowSize, {width: 1000, height: 2000});
+            });
+
+            it('should be settable from top-level', function() {
+                var config = createConfig({
+                    windowSize: '1000x2000',
+                    browsers: {
+                        browser: {}
+                    }
+                });
+
+                assert.deepEqual(config.browsers.browser.windowSize, {width: 1000, height: 2000});
+            });
+
+            it('should override top-level value', function() {
+                var config = createConfig({
+                    windowSize: '1000x2000',
+                    browsers: {
+                        browser: {windowSize: '800x600'}
+                    }
+                });
+
+                assert.deepEqual(config.browsers.browser.windowSize, {width: 800, height: 600});
+            });
         });
 
         describe('httpTimeout', function() {
