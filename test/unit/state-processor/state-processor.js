@@ -4,9 +4,11 @@ var CaptureSession = require('../../../lib/capture-session'),
     CaptureProcessor = require('../../../lib/state-processor/capture-processor/capture-processor'),
     temp = require('../../../lib/temp'),
     util = require('../../util'),
+    errorUtils = require('../../../lib/errors/utils'),
     proxyquire = require('proxyquire').noCallThru(),
     _ = require('lodash'),
-    QEmitter = require('qemitter');
+    QEmitter = require('qemitter'),
+    q = require('q');
 
 describe('state-processor/state-processor', () => {
     var sandbox = sinon.sandbox.create(),
@@ -153,6 +155,19 @@ describe('state-processor/state-processor', () => {
                         tolerance: 0
                     }
                 }));
+        });
+
+        it('should restore error object inheritance', () => {
+            sinon.stub(q, 'nfcall').returns(q.reject({name: 'NoRefImageError'}));
+            sinon.stub(errorUtils, 'fromPlainObject')
+                .withArgs({name: 'NoRefImageError'})
+                .returns({restored: 'object'});
+
+            return exec_()
+                .fail((err) => {
+                    assert.calledOnce(errorUtils.fromPlainObject);
+                    assert.deepEqual(err, {restored: 'object'});
+                });
         });
     });
 });
