@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.4 - 2016-04-29
+
+* Fix: use top level windowSize
+* Fix error object instance after serializing
+
 ## 4.0.3 - 2016-04-26
 
 * Fix image processing: use pixel ratio in subprocesses
