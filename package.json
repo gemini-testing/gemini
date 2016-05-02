@@ -20,7 +20,7 @@
     "gemini-coverage": "~0.3.0",
     "handlebars": "^4.0.5",
     "inherit": "~2.2.1",
-    "install": "^0.6.1",
+    "install": "^0.7.2",
     "js-yaml": "^3.2.5",
     "lodash": "^3.10.1",
     "looks-same": "^2.2.2",
