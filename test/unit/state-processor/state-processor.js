@@ -158,8 +158,8 @@ describe('state-processor/state-processor', () => {
         });
 
         it('should restore error object inheritance', () => {
-            sinon.stub(q, 'nfcall').returns(q.reject({name: 'NoRefImageError'}));
-            sinon.stub(errorUtils, 'fromPlainObject')
+            sandbox.stub(q, 'nfcall').returns(q.reject({name: 'NoRefImageError'}));
+            sandbox.stub(errorUtils, 'fromPlainObject')
                 .withArgs({name: 'NoRefImageError'})
                 .returns({restored: 'object'});
 
