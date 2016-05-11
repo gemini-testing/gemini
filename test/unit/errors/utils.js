@@ -30,4 +30,31 @@ describe('errors utils', () => {
             assert.instanceOf(error, StateError);
         });
     });
+
+    describe('cloneError', () => {
+        it('should clone an error', () => {
+            const err = new Error();
+            const cloned = errorUtils.cloneError(err);
+
+            cloned.key = 'value';
+
+            assert.instanceOf(cloned, Error);
+            assert.notProperty(err, 'key');
+        });
+
+        it('should clone an error with its message', () => {
+            const err = new Error('some-message');
+            const cloned = errorUtils.cloneError(err);
+
+            assert.equal(cloned.message, 'some-message');
+        });
+
+        it('should clone an error with its properties', () => {
+            const err = new Error();
+            err.key = 'value';
+
+            const cloned = errorUtils.cloneError(err);
+            assert.equal(cloned.key, 'value');
+        });
+    });
 });
