@@ -26,7 +26,7 @@ describe('runner/suite-runner/regular-suite-runner', function() {
 
         sandbox.stub(CaptureSession.prototype);
         CaptureSession.prototype.runActions.returns(q.resolve());
-        CaptureSession.prototype.browser = {};
+        CaptureSession.prototype.browser = browser;
     });
 
     afterEach(function() {
@@ -169,6 +169,89 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                 });
         });
 
+        describe('if can not get a browser', function() {
+            beforeEach(function() {
+                BrowserAgent.prototype.getBrowser.returns(q.reject(new Error()));
+            });
+
+            it('should pass an error to all states', function() {
+                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
+                    runner = mkRunner_(suiteTree.suite),
+                    onErrorHandler = sinon.spy();
+
+                runner.on('err', onErrorHandler);
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledTwice(onErrorHandler);
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
+                    });
+            });
+
+            it('should pass a browser id to an error', function() {
+                var state = util.makeStateStub(),
+                    runner = mkRunner_(state.suite, 'browser'),
+                    onErrorHandler = sinon.spy();
+
+                runner.on('err', onErrorHandler);
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledWithMatch(onErrorHandler, {browserId: 'browser'});
+                    });
+            });
+
+            it('should not run states', function() {
+                return run_()
+                    .then(function() {
+                        assert.notCalled(StateRunner.prototype.run);
+                    });
+            });
+        });
+
+        describe('if can not open url in a browser', function() {
+            beforeEach(function() {
+                browser.openRelative.returns(q.reject(new Error()));
+            });
+
+            it('should pass an error to all states', function() {
+                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
+                    runner = mkRunner_(suiteTree.suite),
+                    onErrorHandler = sinon.spy();
+
+                runner.on('err', onErrorHandler);
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledTwice(onErrorHandler);
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
+                    });
+            });
+
+            it('should pass a session id to an error', function() {
+                var state = util.makeStateStub(),
+                    runner = mkRunner_(state.suite),
+                    onErrorHandler = sinon.spy();
+
+                runner.on('err', onErrorHandler);
+                browser.sessionId = 100500;
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledWithMatch(onErrorHandler, {sessionId: 100500});
+                    });
+            });
+
+            it('should not run states', function() {
+                return run_()
+                    .then(function() {
+                        assert.notCalled(StateRunner.prototype.run);
+                    });
+            });
+        });
+
         describe('if `beforeActions` failed', function() {
             var suite;
 
@@ -177,13 +260,35 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                     states: [util.makeStateStub()]
                 });
 
-                CaptureSession.prototype.runActions.withArgs(suite.beforeActions).returns(q.reject());
+                CaptureSession.prototype.runActions.withArgs(suite.beforeActions).returns(q.reject(new Error()));
             });
 
-            it('should fail', function() {
-                CaptureSession.prototype.runActions.withArgs(suite.beforeActions).returns(q.reject('some-error'));
+            it('should pass an error to all states', function() {
+                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
+                    runner = mkRunner_(suiteTree.suite),
+                    onErrorHandler = sinon.spy();
 
-                return assert.isRejected(run_(suite), /some-error/);
+                runner.on('err', onErrorHandler);
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledTwice(onErrorHandler);
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
+                    });
+            });
+
+            it('should pass a session id to an error', function() {
+                var runner = mkRunner_(suite),
+                    onErrorHandler = sinon.spy();
+
+                runner.on('err', onErrorHandler);
+                browser.sessionId = 100500;
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledWithMatch(onErrorHandler, {sessionId: 100500});
+                    });
             });
 
             it('should not run states', function() {
@@ -241,17 +346,6 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                 });
         });
 
-        it('should fail if some state failed', function() {
-            var state = util.makeStateStub(),
-                suite = makeSuiteStub({
-                    states: [state]
-                });
-
-            StateRunner.prototype.run.returns(q.reject('some-error'));
-
-            return assert.isRejected(run_(suite), /some-error/);
-        });
-
         it('should not run state after failed state', function() {
             var state1 = util.makeStateStub(),
                 state2 = util.makeStateStub(),
@@ -292,28 +386,22 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                     });
             });
 
-            it('should fail if `afterActions` failed', function() {
-                var state = util.makeStateStub(),
-                    suite = makeSuiteStub({
-                        states: [state]
+            it('should pass an error to all states if `afterActions` failed', function() {
+                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
+                    runner = mkRunner_(suiteTree.suite),
+                    onErrorHandler = sinon.spy();
+
+                CaptureSession.prototype.runActions.withArgs(suiteTree.suite.afterActions)
+                    .returns(q.reject(new Error()));
+
+                runner.on('err', onErrorHandler);
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledWith(onErrorHandler);
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
                     });
-
-                CaptureSession.prototype.runActions.withArgs(suite.afterActions)
-                    .returns(q.reject('some-error'));
-
-                return assert.isRejected(run_(suite), /some-error/);
-            });
-
-            it('should reject with state error if state and `afterActions` failed', function() {
-                var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
-
-                StateRunner.prototype.run.returns(q.reject('state-error'));
-                CaptureSession.prototype.runActions.withArgs(suite.afterActions)
-                    .returns(q.reject('after-actions-error'));
-
-                return assert.isRejected(run_(suite), /state-error/);
             });
         });
 
@@ -325,10 +413,21 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                     });
             });
 
-            it('should fail if post actions failed', function() {
-                CaptureSession.prototype.runPostActions.returns(q.reject('some-error'));
+            it('should pass an error to all states if post actions failed', function() {
+                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
+                    runner = mkRunner_(suiteTree.suite),
+                    onErrorHandler = sinon.spy();
 
-                return assert.isRejected(run_(), /some-error/);
+                CaptureSession.prototype.runPostActions.returns(q.reject(new Error()));
+
+                runner.on('err', onErrorHandler);
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledTwice(onErrorHandler);
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
+                        assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
+                    });
             });
 
             it('should run post actions if state failed', function() {
@@ -353,23 +452,22 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                     });
             });
 
-            it('should reject with state error if state and post actions failed', function() {
-                StateRunner.prototype.run.returns(q.reject('state-error'));
-                CaptureSession.prototype.runPostActions.returns(q.reject('post-actions-error'));
-
-                return assert.isRejected(run_(), /state-error/);
-            });
-
-            it('should reject with afterActions error if afterActions and postActions failed', function() {
-                var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
+            it('should pass an afterActions error to all states if afterActions and postActions failed', function() {
+                var suite = util.makeSuiteStub({states: [util.makeStateStub()]}),
+                    runner = mkRunner_(suite),
+                    onErrorHandler = sinon.spy();
 
                 CaptureSession.prototype.runActions.withArgs(suite.afterActions)
-                    .returns(q.reject('after-actions-error'));
-                CaptureSession.prototype.runPostActions.returns(q.reject('post-actions-error'));
+                    .returns(q.reject(new Error('after-actions-error')));
+                CaptureSession.prototype.runPostActions.returns(q.reject(new Error('post-actions-error')));
 
-                return assert.isRejected(run_(suite), /after-actions-error/);
+                runner.on('err', onErrorHandler);
+
+                return runner.run()
+                    .then(function() {
+                        assert.calledWithMatch(onErrorHandler, {message: 'after-actions-error'});
+                        assert.neverCalledWithMatch(onErrorHandler, {message: 'post-actions-error'});
+                    });
             });
         });
 

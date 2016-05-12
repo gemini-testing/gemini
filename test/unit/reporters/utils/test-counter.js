@@ -30,15 +30,6 @@ describe('TestCounter', function() {
             assert.equal(counter.getResult().retries, 1);
         });
 
-        it('should not count test result twice for same suite and browser', function() {
-            var completed = mkCompleted_({state: 'defaultState'});
-
-            counter.onRetry(completed);
-            counter.onRetry(completed);
-
-            assert.equal(counter.getResult().retries, 1);
-        });
-
         it('should clear stats for retried suite', function() {
             var completed = mkCompleted_({state: 'defaultState'});
 
@@ -46,27 +37,6 @@ describe('TestCounter', function() {
             counter.onRetry(completed);
 
             assert.equal(counter.getResult().passed, 0);
-        });
-
-        it('should add suite to ignored for this suite session', function() {
-            var completed = mkCompleted_({state: 'defaultState'});
-
-            counter.onRetry(completed);
-            counter.onPassed(completed);
-
-            assert.equal(counter.getResult().passed, 0);
-        });
-    });
-
-    describe('onEndSession', function() {
-        it('should clean ignored suites', function() {
-            var completed = mkCompleted_({state: 'defaultState'});
-
-            counter.onRetry(completed);
-            counter.onEndSession(completed);
-            counter.onPassed(completed);
-
-            assert.equal(counter.getResult().passed, 1);
         });
     });
 
@@ -145,16 +115,6 @@ function testCounter_(name) {
         counter['on' + name](completed);
 
         assert.equal(counter.getResult()[name.toLowerCase()], 1);
-    });
-
-    it('should not count test result if suite was retried', function() {
-        var completed = mkCompleted_({state: 'test_state'}),
-            counter = new TestCounter();
-
-        counter.onRetry(completed);
-        counter['on' + name](completed);
-
-        assert.equal(counter.getResult()[name.toLowerCase()], 0);
     });
 }
 
