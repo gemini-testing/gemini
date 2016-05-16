@@ -129,28 +129,26 @@
     font: 12px Consolas, Monaco, monospace;
 }
 
-.cswitcher {
-    padding: 5px;
-}
-
-.cswitcher__item {
-    width: 20px;
-    height: 20px;
+.state-button {
+    position: relative;
+    width: 22px;
+    height: 22px;
     display: inline-block;
     box-shadow: 0 0 1px #000;
     border: 1px solid #fff;
+    outline: none;
+    background: #fff;
+    cursor: pointer;
 }
 
 .cswitcher__item_selected.cswitcher__item::before {
     content: '';
     position: absolute;
+    top: 0;
+    left: 0;
     background: rgba(4, 4, 4, 0.3) no-repeat 3px 2px url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 97.619 97.618" fill="#eee" fill-opacity="0.8"><path d="m96.94 17.358l-12.971-11.399c-.398-.352-.927-.531-1.449-.494-.529.035-1.023.278-1.373.677l-47.05 53.55-16.728-22.14c-.319-.422-.794-.701-1.319-.773-.524-.078-1.059.064-1.481.385l-13.778 10.408c-.881.666-1.056 1.92-.39 2.801l30.974 40.996c.362.479.922.771 1.522.793.024 0 .049 0 .073 0 .574 0 1.122-.246 1.503-.68l62.64-71.3c.73-.829.649-2.094-.181-2.822"/></svg>');
     height: 20px;
     width: 20px;
-}
-
-.cswitcher__item:hover {
-    cursor: pointer;
 }
 
 .cswitcher_color_1 {
@@ -183,4 +181,32 @@ a:visited {
 a:hover,
 a:active {
     text-decoration: underline;
+}
+
+.tab__item {
+    display: none;
+}
+
+.tab__item_active {
+    display: block;
+}
+
+.tab-switcher, .cswitcher {
+    display: inline-block;
+    vertical-align: top;
+    padding: 5px;
+}
+
+.cswitcher:before {
+    content: 'Background:';
+    padding-right: 4px;
+}
+
+.tab-switcher:before {
+    content: 'Attempts:';
+    padding-right: 4px;
+}
+
+.tab-switcher__button_active {
+    background: #ffeba0;
 }

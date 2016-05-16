@@ -1,0 +1,57 @@
+<div class="section {{collapse}} {{section-status}} {{has-retries}}">
+    <div class="section__title">{{name}}</div>
+    <div class="section__body section__body_guided">
+        {{#each browsers}}
+            <div class="section section_collapsed {{section-status}} {{has-retries}}">
+                {{#if result.skipped}}
+                    {{#if result.reason}}
+                        <div class="section__title">[skipped] {{result.name}}, reason: {{result.reason}}</div>
+                    {{/if}}
+                    {{#unless result.reason}}
+                        <div class="section__title">[skipped] {{result.name}}</div>
+                    {{/unless}}
+                {{/if}}
+                {{#unless result.skipped}}
+                    <div class="section__title">{{name}}</div>
+                    <div class="section__body">
+                        <div class="image-box {{image-box-status}}">
+                            <div class="cswitcher">
+                                <button data-id="1" class="state-button cswitcher__item cswitcher_color_1 cswitcher__item_selected">&nbsp;</button>
+                                <button data-id="2" class="state-button cswitcher__item cswitcher_color_2">&nbsp;</button>
+                                <button data-id="3" class="state-button cswitcher__item cswitcher_color_3">&nbsp;</button>
+                            </div>
+                            {{#if retries}}
+                                <div class="tab-switcher">
+                                    {{#each retries}}
+                                        <button class="state-button tab-switcher__button" data-position="{{@index}}">
+                                            {{inc @index}}
+                                        </button>
+                                    {{/each}}
+                                    <button class="state-button tab-switcher__button tab-switcher__button_active" data-position="{{retries.length}}">
+                                        {{inc retries.length}}
+                                    </button>
+                                </div>
+                            {{/if}}
+                            <div class="tab">
+                                {{#each retries}}
+                                    <div class="tab__item" data-position="{{@index}}">
+                                        {{> state}}
+                                    </div>
+                                {{/each}}
+                                {{#with result}}
+                                    <div class="tab__item tab__item_active" data-position="{{../retries.length}}">
+                                        {{> state}}
+                                    </div>
+                                {{/with}}
+                            </div>
+                        </div>
+                    </div>
+                {{/unless}}
+            </div>
+        {{/each}}
+
+        {{#each children}}
+            {{> suite}}
+        {{/each}}
+    </div>
+</div>

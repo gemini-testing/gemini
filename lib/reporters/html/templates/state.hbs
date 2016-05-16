@@ -1,0 +1,34 @@
+{{#if error}}
+    <div class="image-box__image">
+        <pre class="reason">{{{reason}}}</pre>
+        {{#if image}}
+            {{image "actual"}}
+        {{/if}}
+    </div>
+{{/if}}
+{{#if warning}}
+    <div class="image-box__image">
+        <div class="image-box__title">New image</div>
+        {{image "actual"}}
+        <pre class="reason">{{{reason}}}</pre>
+    </div>
+{{/if}}
+{{#if success}}
+    <div class="image-box__image">
+        {{image "actual"}}
+    </div>
+{{/if}}
+{{#if fail}}
+    <div class="image-box__image">
+        <div class="image-box__title">Expected</div>
+        {{image "expected"}}
+    </div>
+    <div class="image-box__image">
+        <div class="image-box__title">Actual</div>
+        {{image "actual"}}
+    </div>
+    <div class="image-box__image">
+        <div class="image-box__title">Diff</div>
+        {{image "diff"}}
+    </div>
+{{/if}}
