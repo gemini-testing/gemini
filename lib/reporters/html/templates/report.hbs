@@ -11,12 +11,14 @@
             <dt class="summary__key">Passed</dt><dd class="summary__value">{{passed}}</dd>
             <dt class="summary__key {{has-fails}}">Failed</dt><dd class="summary__value">{{failed}}</dd>
             <dt class="summary__key">Skipped</dt><dd class="summary__value">{{skipped}}</dd>
+            <dt class="summary__key">Retries</dt><dd class="summary__value">{{retries}}</dd>
         </dl>
 
         <button id="expandAll" class="button">Expand all</button>
         <button id="collapseAll" class="button">Collapse all</button>
         <button id="expandErrors" class="button">Expand errors</button>
         <button id="showSkipped" class="button">Show skipped</button>
+        <button id="showRetries" class="button">Expand retries</button>
 
         <div id="skippedList" class="skipped__list collapsed">
             {{#if skips}}
