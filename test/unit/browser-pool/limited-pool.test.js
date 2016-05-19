@@ -38,12 +38,60 @@ describe('LimitedPool', function() {
         return assert.eventually.equal(pool.getBrowser('id'), browser);
     });
 
-    it('should return browser to underlying pool when freed', function() {
-        var _this = this,
-            browser = this.makeBrowser(),
+    describe('should return browser to underlying pool', function() {
+        let browser;
+        let pool;
+
+        beforeEach(function() {
+            browser = this.makeBrowser();
             pool = this.makePool();
-        return pool.freeBrowser(browser).then(function() {
-            assert.calledWith(_this.underlyingPool.freeBrowser, browser);
+            this.underlyingPool.getBrowser.returns(q(browser));
+        });
+
+        it('when freed', function() {
+            return pool.freeBrowser(browser)
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser));
+        });
+
+        it('for release if there are no more requests', function() {
+            return pool.getBrowser('first')
+                .then(() => pool.freeBrowser(browser))
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: true}));
+        });
+
+        it('for caching if there is at least one pending request', function() {
+            return pool.getBrowser('first')
+                .then(() => {
+                    pool.getBrowser('second');
+                    return pool.freeBrowser(browser);
+                })
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: false}));
+        });
+
+        it('for caching if there are pending requests', function() {
+            return pool.getBrowser('first')
+                .then(() => {
+                    pool.getBrowser('second');
+                    pool.getBrowser('third');
+                    return pool.freeBrowser(browser);
+                })
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: false}));
+        });
+
+        it('taking into account number of failed browser requests', function() {
+            const browser = this.makeBrowser();
+            const pool = this.makePool(2);
+
+            this.underlyingPool.getBrowser
+                .withArgs('first').returns(q(browser))
+                .withArgs('second').returns(q.reject());
+
+            return q.allSettled([
+                    pool.getBrowser('first'),
+                    pool.getBrowser('second')
+                ])
+                .then(() => pool.freeBrowser(browser))
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: true}));
         });
     });
 
@@ -151,30 +199,25 @@ describe('LimitedPool', function() {
         });
 
         it('should not wait for queued browser to start after release browser', function() {
-            var pool = this.makePool(1),
-                afterFree = sinon.spy().named('afterFree'),
-                afterSecondGet = sinon.spy().named('afterSecondGet');
+            const pool = this.makePool(1);
+            const afterFree = sinon.spy().named('afterFree');
+            const afterSecondGet = sinon.spy().named('afterSecondGet');
 
             this.underlyingPool.getBrowser
                 .withArgs('first').returns(q(this.makeBrowser()))
                 .withArgs('second').returns(q.resolve());
 
             return pool.getBrowser('first')
-                .then(function(browser) {
-                    pool.getBrowser('second')
+                .then((browser) => {
+                    const freeFirstBrowser = q.delay(100)
+                        .then(() => pool.freeBrowser(browser))
+                        .then(afterFree);
+
+                    const getSecondBrowser = pool.getBrowser('second')
                         .then(afterSecondGet);
 
-                    return q.delay(100)
-                        .then(function() {
-                            return pool.freeBrowser(browser);
-                        })
-                        .then(afterFree)
-                        .then(function() {
-                            assert.callOrder(
-                                afterFree,
-                                afterSecondGet
-                            );
-                        });
+                    return q.all([getSecondBrowser, freeFirstBrowser])
+                        .then(() => assert.callOrder(afterFree, afterSecondGet));
                 });
         });
 
