@@ -92,16 +92,21 @@ describe('CachingPool', function() {
     });
 
     it('should not quit browser when freed', function() {
+        const pool = this.makePool();
         this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
-        var _this = this,
-            pool = this.makePool();
+
         return pool.getBrowser('id')
-            .then(function(browser) {
-                return pool.freeBrowser(browser);
-            })
-            .then(function() {
-                assert.notCalled(_this.underlyingPool.freeBrowser);
-            });
+            .then((browser) => pool.freeBrowser(browser, {noMoreRequests: false}))
+            .then(() => assert.notCalled(this.underlyingPool.freeBrowser));
+    });
+
+    it('should quit browser when there are no more requests', function() {
+        const pool = this.makePool();
+        this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
+
+        return pool.getBrowser('id')
+            .then((browser) => pool.freeBrowser(browser, {noMoreRequests: true}))
+            .then(() => assert.calledOnce(this.underlyingPool.freeBrowser));
     });
 
     describe('when there is free browser with same id', function() {
