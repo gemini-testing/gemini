@@ -1,9 +1,10 @@
 'use strict';
-var LimitedPool = require('lib/browser-pool/limited-pool'),
-    PerBrowserLimitedPool = require('lib/browser-pool/per-browser-limited-pool'),
-    pool = require('lib/browser-pool');
 
-describe('browser-pool', function() {
+const LimitedPool = require('lib/browser-pool/limited-pool');
+const PerBrowserLimitedPool = require('lib/browser-pool/per-browser-limited-pool');
+const pool = require('lib/browser-pool');
+
+describe('browser-pool', () => {
     function mkConfig(opts) {
         return {
             system: opts || {},
@@ -12,24 +13,24 @@ describe('browser-pool', function() {
         };
     }
 
-    it('should create pool according perBrowserLimit by default', function() {
-        var browserPool = pool.create(mkConfig());
+    it('should create pool according perBrowserLimit by default', () => {
+        const browserPool = pool.create(mkConfig());
 
         assert.instanceOf(browserPool, PerBrowserLimitedPool);
     });
 
-    it('should create pool according parallelLimit if that option exist', function() {
-        var browserPool = pool.create(mkConfig({
-                parallelLimit: 10
-            }));
+    it('should create pool according parallelLimit if that option exist', () => {
+        const  browserPool = pool.create(mkConfig({
+            parallelLimit: 10
+        }));
 
         assert.instanceOf(browserPool, LimitedPool);
     });
 
-    it('should ignore parallelLimit if it value is Infinity', function() {
-        var browserPool = pool.create(mkConfig({
-                parallelLimit: Infinity
-            }));
+    it('should ignore parallelLimit if it value is Infinity', () => {
+        const browserPool = pool.create(mkConfig({
+            parallelLimit: Infinity
+        }));
 
         assert.instanceOf(browserPool, PerBrowserLimitedPool);
     });
