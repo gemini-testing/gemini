@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.1.0 - 2016-05-20
+
+* Supported displaying of meta-info in HTML reporter which contains suite/state url
+* Supported displaying of retry reasons in reporters
+* Supported passing of a suite error to all states of this suite
+* Dropped throwing of critical errors in states, this means that a state failure always emits an `err` event
+* Fix: browser sessions will be freed immediately if there are no states to run instead of waiting for the end of all remaining running states in other browser sessions
+
 ## 4.0.4 - 2016-04-29
 
 * Fix: use top level windowSize
