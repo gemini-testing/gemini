@@ -431,10 +431,11 @@ describe('browser/new-browser', function() {
     });
 
     describe('serialize', function() {
-        it('should add config with browser id and gridUrl to object', function() {
+        it('should add config with browser id, gridUrl and httpTimeout to object', function() {
             var browser = makeBrowser({}, {
                     id: 'someBrowser',
                     gridUrl: 'http://grid.url',
+                    httpTimeout: 100500,
                     some: 'otherProperty'
                 });
 
@@ -442,7 +443,8 @@ describe('browser/new-browser', function() {
 
             assert.deepEqual(obj.config, {
                 id: 'someBrowser',
-                gridUrl: 'http://grid.url'
+                gridUrl: 'http://grid.url',
+                httpTimeout: 100500
             });
         });
 
