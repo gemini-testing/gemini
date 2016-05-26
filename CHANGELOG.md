@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.0 - 2016-05-26
+
+* Added option `sessionRequestTimeout` which sets a timeout for getting of browser sessions
+
 ## 4.1.0 - 2016-05-20
 
 * Supported displaying of meta-info in HTML reporter which contains suite/state url
