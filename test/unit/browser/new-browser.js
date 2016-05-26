@@ -431,10 +431,11 @@ describe('browser/new-browser', function() {
     });
 
     describe('serialize', function() {
-        it('should add config with browser id and gridUrl to object', function() {
+        it('should add config with browser id, gridUrl and httpTimeout to object', function() {
             var browser = makeBrowser({}, {
                     id: 'someBrowser',
                     gridUrl: 'http://grid.url',
+                    httpTimeout: 100500,
                     some: 'otherProperty'
                 });
 
@@ -442,7 +443,8 @@ describe('browser/new-browser', function() {
 
             assert.deepEqual(obj.config, {
                 id: 'someBrowser',
-                gridUrl: 'http://grid.url'
+                gridUrl: 'http://grid.url',
+                httpTimeout: 100500
             });
         });
 
@@ -474,6 +476,55 @@ describe('browser/new-browser', function() {
 
                     assert.deepEqual(obj.calibration, {some: 'data'});
                 });
+        });
+    });
+
+    describe('initSession', () => {
+        let wdRemote;
+
+        const settingOfTimeout = (timeout) =>
+            wdRemote.configureHttp.withArgs({retries: 'never', timeout}).named('configureHttp');
+
+        beforeEach(function() {
+            wdRemote = {
+                configureHttp: sinon.stub().returns(q()),
+                init: sinon.stub().returns(q([])),
+                on: sinon.stub()
+            };
+
+            this.sinon.stub(wd, 'promiseRemote').returns(wdRemote);
+        });
+
+        it('should init a browser session', () => {
+            return makeBrowser({browserName: 'some-browser'})
+                .initSession()
+                .then(() => assert.calledWith(wdRemote.init, {browserName: 'some-browser'}));
+        });
+
+        it('should set session id after getting of a session', () => {
+            wdRemote.init.returns(q(['100500']));
+
+            const browser = makeBrowser();
+            return browser.initSession()
+                .then(() => assert.equal(browser.sessionId, '100500'));
+        });
+
+        it('should set session request timeout before getting of a session', () => {
+            return makeBrowser(null, {sessionRequestTimeout: 100500})
+                .initSession()
+                .then(() => assert.callOrder(settingOfTimeout(100500), wdRemote.init));
+        });
+
+        it('should use http timeout for getting of a session if request session timeout is not specified', () => {
+            return makeBrowser(null, {httpTimeout: 100500, sessionRequestTimeout: null})
+                .initSession()
+                .then(() => assert.callOrder(settingOfTimeout(100500), wdRemote.init));
+        });
+
+        it('should set http timeout for all other requests after getting of a session', () => {
+            return makeBrowser(null, {httpTimeout: 100500})
+                .initSession()
+                .then(() => assert.callOrder(wdRemote.init, settingOfTimeout(100500)));
         });
     });
 });
