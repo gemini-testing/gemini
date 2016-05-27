@@ -208,6 +208,11 @@ Settings list:
   - second retry: run tests failed during first retry
   - ...
 
+* `screenshotMode` - image capture mode. There are 3 allowed values for this option: 
+    * `auto` (default). Mode will be obtained automatically 
+    * `fullpage`. Gemini will deal with screenshot of full page.
+    * `viewport`. Only viewport area will be used. 
+
 ## Sets
 
 You can link some set of tests with certain browsers using `sets`.
