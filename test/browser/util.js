@@ -42,7 +42,7 @@ var Config = require('../../lib/config'),
 
         'android4.4': {
             browserName: 'Browser',
-            appiumVersion: '1.4.11',
+            appiumVersion: '1.5.2',
             deviceName: 'Android Emulator',
             deviceOrientation: 'portrait',
             platformVersion: '4.4',
@@ -52,7 +52,7 @@ var Config = require('../../lib/config'),
 
         'android5': {
             browserName: 'Browser',
-            appiumVersion: '1.4.11',
+            appiumVersion: '1.5.2',
             deviceName: 'Android Emulator',
             deviceOrientation: 'portrait',
             platformVersion: '5.0',
