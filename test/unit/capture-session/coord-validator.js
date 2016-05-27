@@ -66,16 +66,6 @@ describe('CoordValidator', () => {
         });
     });
 
-    it('should save page screenshot', () => {
-        return validate_({left: -1})
-            .catch(() => assert.calledOnce(Image.prototype.save));
-    });
-
-    it('should extend error with path to page screenshot', () => {
-        return validate_({left: -1})
-            .catch((error) => assert.equal(error.imagePath, '/path/to/img'));
-    });
-
     it('should be resolved on passed validation', () => {
         return assert.isFulfilled(validate_({left: 0}));
     });

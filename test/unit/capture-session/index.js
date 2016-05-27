@@ -187,6 +187,8 @@ describe('capture session', () => {
             Image.prototype.getSize.returns({});
             Image.prototype.save.returns(q());
 
+            temp.path.returns('/path/to/img');
+
             browserStub = {
                 config: {},
                 captureFullscreenImage: sinon.stub().returns(q(new Image()))
@@ -202,7 +204,7 @@ describe('capture session', () => {
                 ignoreAreas: [{left: 4, top: 4, width: 1, height: 1}]
             };
 
-            sandbox.stub(CoordValidator.prototype, 'validate').returns(q());
+            sandbox.stub(CoordValidator.prototype, 'validate').returns({failed: false});
             sandbox.stub(DefaultTransformer.prototype, 'transform').returnsArg(0);
             sandbox.stub(CoordTransformer.prototype, 'create').returns(new DefaultTransformer());
 
@@ -262,14 +264,36 @@ describe('capture session', () => {
         });
 
         it('should not crop image if crop area is not completely inside of image borders', () => {
-            CoordValidator.prototype.validate.returns(q.reject(new StateError('error')));
+            CoordValidator.prototype.validate.returns({
+                failed: true
+            });
 
             return captureSession.capture(pageDisposition)
                 .catch(() => assert.notCalled(Image.prototype.crop));
         });
 
+        it('should save page screenshot', () => {
+            CoordValidator.prototype.validate.returns({
+                failed: true
+            });
+
+            return captureSession.capture(pageDisposition)
+                .catch(() => assert.calledOnce(Image.prototype.save));
+        });
+
+        it('should extend error with path to page screenshot', () => {
+            CoordValidator.prototype.validate.returns({
+                failed: true
+            });
+
+            return captureSession.capture(pageDisposition)
+                .catch((error) => assert.equal(error.imagePath, '/path/to/img'));
+        });
+
         it('should return rejected promise if crop area is not completely inside of image borders', () => {
-            CoordValidator.prototype.validate.returns(q.reject(new StateError('error')));
+            CoordValidator.prototype.validate.returns({
+                failed: true
+            });
 
             return assert.isRejected(captureSession.capture(pageDisposition), StateError);
         });
