@@ -263,39 +263,31 @@ describe('capture session', () => {
                 });
         });
 
-        it('should not crop image if crop area is not completely inside of image borders', () => {
-            CoordValidator.prototype.validate.returns({
-                failed: true
+        describe('if crop area is not completely inside of image borders', () => {
+            beforeEach(() => {
+                CoordValidator.prototype.validate.returns({
+                    failed: true
+                });
             });
 
-            return captureSession.capture(pageDisposition)
-                .catch(() => assert.notCalled(Image.prototype.crop));
-        });
-
-        it('should save page screenshot', () => {
-            CoordValidator.prototype.validate.returns({
-                failed: true
+            it('should not crop image', () => {
+                return captureSession.capture(pageDisposition)
+                    .catch(() => assert.notCalled(Image.prototype.crop));
             });
 
-            return captureSession.capture(pageDisposition)
-                .catch(() => assert.calledOnce(Image.prototype.save));
-        });
-
-        it('should extend error with path to page screenshot', () => {
-            CoordValidator.prototype.validate.returns({
-                failed: true
+            it('should save page screenshot', () => {
+                return captureSession.capture(pageDisposition)
+                    .catch(() => assert.calledOnce(Image.prototype.save));
             });
 
-            return captureSession.capture(pageDisposition)
-                .catch((error) => assert.equal(error.imagePath, '/path/to/img'));
-        });
-
-        it('should return rejected promise if crop area is not completely inside of image borders', () => {
-            CoordValidator.prototype.validate.returns({
-                failed: true
+            it('should extend error with path to page screenshot', () => {
+                return captureSession.capture(pageDisposition)
+                    .catch((error) => assert.equal(error.imagePath, '/path/to/img'));
             });
 
-            return assert.isRejected(captureSession.capture(pageDisposition), StateError);
+            it('should return rejected promise', () => {
+                return assert.isRejected(captureSession.capture(pageDisposition), StateError);
+            });
         });
     });
 });

@@ -1,11 +1,7 @@
 'use strict';
 
-const q = require('q');
 const _ = require('lodash');
 
-const temp = require('../../../lib/temp');
-const Image = require('../../../lib/image');
-const StateError = require('../../../lib/errors/state-error');
 const CoordValidator = require('../../../lib/capture-session/coord-validator');
 
 describe('CoordValidator', () => {
@@ -14,8 +10,9 @@ describe('CoordValidator', () => {
     let coordValidator;
 
     function validate_(areaModification) {
-        const imageSize = {
-            width: 10, height: 10
+        const viewport = {
+            width: 10,
+            height: 10
         };
 
         areaModification = _.defaults(areaModification || {}, {
@@ -28,21 +25,14 @@ describe('CoordValidator', () => {
         const cropArea = {
             left: areaModification.left,
             top: areaModification.top,
-            width: imageSize.width + areaModification.width,
-            height: imageSize.height + areaModification.height
+            width: viewport.width + areaModification.width,
+            height: viewport.height + areaModification.height
         };
 
-        Image.prototype.getSize.returns(imageSize);
-
-        return coordValidator.validate(new Image(), cropArea);
+        return coordValidator.validate(viewport, cropArea);
     }
 
     beforeEach(() => {
-        sandbox.stub(Image.prototype);
-        Image.prototype.save.returns(q());
-
-        sandbox.stub(temp, 'path').returns('/path/to/img');
-
         coordValidator = new CoordValidator({id: 'some-browser-id'});
     });
 
@@ -50,23 +40,29 @@ describe('CoordValidator', () => {
 
     describe('validation failed', () => {
         it('if crop area left boundary is outside of image', () => {
-            return assert.isRejected(validate_({left: -1}), StateError);
+            return assert.propertyVal(validate_({left: -1}), 'failed', true);
         });
 
         it('if crop area top boundary is outside of image', () => {
-            return assert.isRejected(validate_({top: -1}), StateError);
+            return assert.propertyVal(validate_({top: -1}), 'failed', true);
         });
 
         it('if crop area right boundary is outside of image', () => {
-            return assert.isRejected(validate_({width: +1}), StateError);
+            return assert.propertyVal(validate_({width: +1}), 'failed', true);
         });
 
         it('if crop area bottom boundary is outside of image', () => {
-            return assert.isRejected(validate_({height: +1}), StateError);
+            return assert.propertyVal(validate_({height: +1}), 'failed', true);
+        });
+
+        it('should attach non-empty error message', () => {
+            const validation = validate_({left: -1});
+            assert.isString(validation.message);
+            assert.isAbove(validation.message.length, 0);
         });
     });
 
-    it('should be resolved on passed validation', () => {
-        return assert.isFulfilled(validate_({left: 0}));
+    it('should return non-failed result on passed validation', () => {
+        return assert.propertyVal(validate_({left: 0}), 'failed', false);
     });
 });
