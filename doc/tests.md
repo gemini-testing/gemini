@@ -301,3 +301,5 @@ Full list of special keys (there are shortcuts for commonly used keys):
 * `setWindowSize(width, height)` – change browser window dimensions.
 
 * `tap(element)` - tap specified element on touch enabled device.
+
+* `changeOrientation()` – change orientation on touch enabled device (from `PORTRAIT` to `LANDSCAPE` and vice versa). :warning: Does not work on mobile emulation.
