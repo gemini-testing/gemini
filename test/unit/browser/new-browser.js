@@ -436,6 +436,7 @@ describe('browser/new-browser', function() {
                     id: 'someBrowser',
                     gridUrl: 'http://grid.url',
                     httpTimeout: 100500,
+                    screenshotMode: 'viewport',
                     some: 'otherProperty'
                 });
 
@@ -444,7 +445,8 @@ describe('browser/new-browser', function() {
             assert.deepEqual(obj.config, {
                 id: 'someBrowser',
                 gridUrl: 'http://grid.url',
-                httpTimeout: 100500
+                httpTimeout: 100500,
+                screenshotMode: 'viewport'
             });
         });
 
