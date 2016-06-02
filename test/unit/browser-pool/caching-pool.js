@@ -156,38 +156,6 @@ describe('CachingPool', function() {
                 return assert.isRejected(this.pool.getBrowser('id'), /reset-error/);
             });
         });
-
-        it('should free cached instance when browser finished', function() {
-            var _this = this;
-            return this.pool.finalizeBrowsers('id')
-                .then(function() {
-                    assert.calledOnce(_this.underlyingPool.freeBrowser);
-                });
-        });
-
-        it('should clear existing browser when browser finished', function() {
-            var anotherBrowser = makeStubBrowser('id'),
-                pool = this.pool;
-
-            this.underlyingPool.getBrowser
-                .onFirstCall().returns(q(anotherBrowser));
-
-            return pool.finalizeBrowsers('id') //this.browser already added to pool in beforeEach
-                .then(function() {
-                    return pool.getBrowser('id');
-                })
-                .then(function(browser) {
-                    assert.deepEqual(browser, anotherBrowser);
-                });
-        });
-
-        it('should call finalize on underlying pool when browser finished', function() {
-            var _this = this;
-            return this.pool.finalizeBrowsers('id')
-                .then(function() {
-                    assert.calledWith(_this.underlyingPool.finalizeBrowsers);
-                });
-        });
     });
 
     describe('when there are multiple browsers with same id', function() {

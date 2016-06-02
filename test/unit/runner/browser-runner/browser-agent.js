@@ -31,12 +31,4 @@ describe('runner/browser-runner/browser-agent', function() {
 
         assert.calledWith(browserPool.freeBrowser, browser);
     });
-
-    it('should finalize browsers associated with agent', function() {
-        var browserAgent = BrowserAgent.create('browser', browserPool);
-
-        browserAgent.finalizeBrowsers();
-
-        assert.calledWith(browserPool.finalizeBrowsers, 'browser');
-    });
 });

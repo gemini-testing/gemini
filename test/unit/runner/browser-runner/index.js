@@ -7,7 +7,6 @@ var q = require('q'),
     pool = require('../../../../lib/browser-pool'),
     BasicPool = require('../../../../lib/browser-pool/basic-pool'),
     Config = require('../../../../lib/config'),
-    MetaError = require('../../../../lib/errors/meta-error'),
 
     makeSuiteStub = require('../../../util').makeSuiteStub;
 
@@ -23,7 +22,6 @@ describe('runner/BrowserRunner', function() {
         suiteRunnerFabric.create.returns(suiteRunner);
 
         sandbox.stub(BrowserAgent.prototype);
-        BrowserAgent.prototype.finalizeBrowsers.returns(q.resolve());
     });
 
     afterEach(function() {
@@ -137,22 +135,6 @@ describe('runner/BrowserRunner', function() {
             return runner.run([])
                 .then(function() {
                     assert.calledWith(onStopBrowser, {browserId: 'browser'});
-                });
-        });
-
-        it('should not emit `criticalError` if error is an instance of MetaError', function() {
-            var onCriticalError = sinon.spy().named('onCriticalError'),
-                suites = [
-                    {browsers: ['browser']}
-                ],
-                runner = mkRunner_('browser');
-
-            runner.on('criticalError', onCriticalError);
-            BrowserAgent.prototype.finalizeBrowsers.returns(q.reject(new MetaError('meta-error')));
-
-            return runner.run(suites)
-                .then(function() {
-                    assert.notCalled(onCriticalError);
                 });
         });
 
