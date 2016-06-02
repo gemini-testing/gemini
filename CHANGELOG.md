@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.3.0 - 2016-06-02
+
+* Added new browser option `screenshotMode` which allows to set an image capture mode, see the [documentation](https://github.com/gemini-testing/gemini/blob/v4.3.0/doc/config.md#browsers-settings) for more details.
+* Added new action `changeOrientation` to tests API which allows to change orientation on touch enabled device, see the [documentation](https://github.com/gemini-testing/gemini/blob/v4.3.0/doc/tests.md#available-actions) for more details.
+* Supported displaying of `sessionId` in meta-info of HTML reporter.
+* Fix: do not emit an error if `browser.quit` fails, warning will be logged.
+* Fix: support passing of `sessionId` to an error if launching of a browser fails.
+
 ## 4.2.0 - 2016-05-26
 
 * Added option `sessionRequestTimeout` which sets a timeout for getting of browser sessions
