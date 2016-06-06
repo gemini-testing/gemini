@@ -10,7 +10,8 @@ var Gemini = require('gemini/api');
 
 var gemini = new Gemini({
     projectRoot: '/path/to/project',
-    gridUrl: 'http://example.com/grid'
+    gridUrl: 'http://example.com/grid',
+    rootUrl: 'http://test.com'
     ...
 });
 ```
