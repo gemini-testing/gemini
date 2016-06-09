@@ -6,8 +6,7 @@ const promiseUtils = require('q-promise-utils');
 
 const CaptureSession = require('../../../lib/capture-session');
 const ActionsBuilder = require('../../../lib/tests-api/actions-builder');
-const CoordTransformer = require('../../../lib/capture-session/transformer');
-const DefaultTransformer = require('../../../lib/capture-session/transformer/identity-transformer');
+const MoveTransformer = require('../../../lib/capture-session/move-transformer');
 const CoordValidator = require('../../../lib/capture-session/coord-validator');
 const StateError = require('../../../lib/errors/state-error');
 const Image = require('../../../lib/image');
@@ -187,6 +186,8 @@ describe('capture session', () => {
             Image.prototype.getSize.returns({});
             Image.prototype.save.returns(q());
 
+            temp.path.returns('/path/to/img');
+
             browserStub = {
                 config: {},
                 captureFullscreenImage: sinon.stub().returns(q(new Image()))
@@ -199,22 +200,22 @@ describe('capture session', () => {
                     width: 2,
                     height: 3
                 },
+                viewport: {top: 1, left: 1, width: 10, height: 10},
                 ignoreAreas: [{left: 4, top: 4, width: 1, height: 1}]
             };
 
-            sandbox.stub(CoordValidator.prototype, 'validate').returns(q());
-            sandbox.stub(DefaultTransformer.prototype, 'transform').returnsArg(0);
-            sandbox.stub(CoordTransformer.prototype, 'create').returns(new DefaultTransformer());
+            sandbox.stub(CoordValidator.prototype, 'validate').returns({failed: false});
+            sandbox.stub(MoveTransformer.prototype, 'transform').returnsArg(0);
 
             captureSession = new CaptureSession(browserStub);
         });
 
-        it('should take screenshot', function() {
+        it('should take screenshot', () => {
             return captureSession.capture(_.assign({}, pageDisposition))
                 .then(() => assert.called(browserStub.captureFullscreenImage));
         });
 
-        it('should crop image of passed size', function() {
+        it('should crop image of passed size', () => {
             return captureSession
                 .capture(pageDisposition)
                 .then(() => assert.calledWithMatch(Image.prototype.crop, pageDisposition.captureArea));
@@ -223,21 +224,16 @@ describe('capture session', () => {
         it('should use coordinate transformer for crop area calculation', () => {
             return captureSession.capture(pageDisposition)
                 .then(() => {
-                    assert.calledWithMatch(
-                        CoordTransformer.prototype.create,
-                        sinon.match.instanceOf(Image),
-                        pageDisposition
-                    );
-                    assert.calledWith(DefaultTransformer.prototype.transform, pageDisposition.captureArea);
+                    assert.calledWith(MoveTransformer.prototype.transform, pageDisposition.captureArea);
                 });
         });
 
         it('should clear configured ignore area before cropping image', () => {
             return captureSession.capture(pageDisposition)
                 .then(() => {
-                    assert.calledTwice(DefaultTransformer.prototype.transform);
+                    assert.calledTwice(MoveTransformer.prototype.transform);
                     assert.calledWith(
-                        DefaultTransformer.prototype.transform.secondCall,
+                        MoveTransformer.prototype.transform.secondCall,
                         pageDisposition.ignoreAreas[0]
                     );
                 });
@@ -261,17 +257,31 @@ describe('capture session', () => {
                 });
         });
 
-        it('should not crop image if crop area is not completely inside of image borders', () => {
-            CoordValidator.prototype.validate.returns(q.reject(new StateError('error')));
+        describe('if crop area is not completely inside of image borders', () => {
+            beforeEach(() => {
+                CoordValidator.prototype.validate.returns({
+                    failed: true
+                });
+            });
 
-            return captureSession.capture(pageDisposition)
-                .catch(() => assert.notCalled(Image.prototype.crop));
-        });
+            it('should not crop image', () => {
+                return captureSession.capture(pageDisposition)
+                    .catch(() => assert.notCalled(Image.prototype.crop));
+            });
 
-        it('should return rejected promise if crop area is not completely inside of image borders', () => {
-            CoordValidator.prototype.validate.returns(q.reject(new StateError('error')));
+            it('should save page screenshot', () => {
+                return captureSession.capture(pageDisposition)
+                    .catch(() => assert.calledOnce(Image.prototype.save));
+            });
 
-            return assert.isRejected(captureSession.capture(pageDisposition), StateError);
+            it('should extend error with path to page screenshot', () => {
+                return captureSession.capture(pageDisposition)
+                    .catch((error) => assert.equal(error.imagePath, '/path/to/img'));
+            });
+
+            it('should return rejected promise', () => {
+                return assert.isRejected(captureSession.capture(pageDisposition), StateError);
+            });
         });
     });
 });

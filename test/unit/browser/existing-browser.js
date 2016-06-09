@@ -33,12 +33,6 @@ describe('browser/existing-browser', () => {
 
     afterEach(() => sandbox.restore());
 
-    it('should use pixel ratio if it set in calibration', () => {
-        const browser = mkExistingBrowser({calibration: {usePixelRatio: true}});
-
-        assert.equal(browser.usePixelRatio, true);
-    });
-
     describe('attach', () => {
         it('should attach the browser with the specified session id', () => {
             return mkExistingBrowser({sessionId: '100500'})

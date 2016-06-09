@@ -1,8 +1,9 @@
 'use strict';
 
-var Camera = require('../../../lib/browser/camera'),
-    Image = require('../../../lib/image'),
-    q = require('q');
+const q = require('q');
+const Camera = require('../../../lib/browser/camera');
+const Image = require('../../../lib/image');
+const util = require('../../../lib/browser/util');
 
 describe('browser/camera', function() {
     var sandbox = sinon.sandbox.create();
@@ -134,26 +135,100 @@ describe('browser/camera', function() {
                 });
         });
 
-        it('captureFullscreenImage() should crop according to calibration result', function() {
-            var image = sinon.createStubInstance(Image);
+        describe('captureFullscreenImage() crop', () => {
+            let image, wd, camera;
 
-            image.getSize.returns({width: 100, height: 200});
-            Image.fromBase64.returns(image);
+            beforeEach(() => {
+                image = sinon.createStubInstance(Image);
+                wd = mkWdStub_();
+                Image.fromBase64.returns(image);
+            });
 
-            var wd = mkWdStub_(),
-                camera = new Camera(wd);
-
-            camera.calibrate({top: 6, left: 4});
-
-            return camera.captureFullscreenImage()
-                .then(function() {
-                    assert.calledWith(image.crop, {
-                        left: 4,
-                        top: 6,
-                        width: 100 - 4,
-                        height: 200 - 6
-                    });
+            describe('calibrate', () => {
+                beforeEach(() => {
+                    image.getSize.returns({width: 100, height: 200});
+                    camera = new Camera(wd);
                 });
+
+                it('should crop according to calibration result', () => {
+                    camera.calibrate({top: 6, left: 4});
+
+                    return camera.captureFullscreenImage()
+                        .then(() => {
+                            assert.calledWith(image.crop, {
+                                left: 4,
+                                top: 6,
+                                width: 100 - 4,
+                                height: 200 - 6
+                            });
+                        });
+                });
+
+                it('should not crop image if calibration was not set', () => {
+                    return camera.captureFullscreenImage()
+                        .then(() => {
+                            assert.notCalled(image.crop);
+                        });
+                });
+            });
+
+            describe('crop to viewport', () => {
+                const mkCamera_ = (browserOptions) => {
+                    const screenshotMode = (browserOptions || {}).screenshotMode || 'auto';
+                    return new Camera(wd, screenshotMode);
+                };
+                const pageDisposition = {
+                    viewport: {
+                        top: 1,
+                        left: 1,
+                        width: 100,
+                        height: 100
+                    }
+                };
+
+                it('should not crop image if page disposition was not set', () => {
+                    return mkCamera_().captureFullscreenImage()
+                        .then(() => {
+                            assert.notCalled(image.crop);
+                        });
+                });
+
+                it('should crop fullPage image with viewport value if page disposition was set', () => {
+                    sandbox.stub(util, 'isFullPage').returns(true);
+
+                    return mkCamera_().captureFullscreenImage(pageDisposition)
+                        .then(() => {
+                            assert.calledWith(image.crop, pageDisposition.viewport);
+                        });
+                });
+
+                it('should crop not fullPage image to the left and right', () => {
+                    sandbox.stub(util, 'isFullPage').returns(false);
+
+                    return mkCamera_().captureFullscreenImage(pageDisposition)
+                        .then(() => {
+                            assert.calledWith(image.crop, {
+                                top: 0, left: 0,
+                                width: pageDisposition.viewport.width,
+                                height: pageDisposition.viewport.height
+                            });
+                        });
+                });
+
+                it('should crop image to the left and right if "viewport" mode was set in config', () => {
+                    camera = mkCamera_({screenshotMode: 'viewport'});
+                    sandbox.stub(util, 'isFullPage').returns(true);
+
+                    return camera.captureFullscreenImage(pageDisposition)
+                        .then(() => {
+                            assert.calledWith(image.crop, {
+                                top: 0, left: 0,
+                                width: pageDisposition.viewport.width,
+                                height: pageDisposition.viewport.height
+                            });
+                        });
+                });
+            });
         });
     });
 });
