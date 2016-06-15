@@ -59,14 +59,14 @@ describe('state-processor/job', () => {
     });
 
     it('should capture screenshot', () => {
-        var pageDisposition = {
+        var page = {
                 captureArea: {}
             };
 
-        return execJob_({pageDisposition})
+        return execJob_({page})
             .then(() => {
                 assert.calledOnce(browserSession.capture);
-                assert.calledWith(browserSession.capture, pageDisposition);
+                assert.calledWith(browserSession.capture, page);
             });
     });
 

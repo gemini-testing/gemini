@@ -25,12 +25,12 @@ describe('browser/camera', function() {
         };
     }
 
-    describe('captureFullscreenImage', function() {
+    describe('captureViewportImage', function() {
         it('should take screenshot', function() {
             var wd = mkWdStub_(),
                 camera = new Camera(wd);
 
-            return camera.captureFullscreenImage()
+            return camera.captureViewportImage()
                 .then(function() {
                     assert.calledOnce(wd.takeScreenshot);
                 });
@@ -40,7 +40,7 @@ describe('browser/camera', function() {
             var wd = mkWdStub_(),
                 camera = new Camera(wd);
 
-            return camera.captureFullscreenImage()
+            return camera.captureViewportImage()
                 .then(function() {
                     assert.notCalled(wd.context);
                 });
@@ -54,9 +54,9 @@ describe('browser/camera', function() {
                 .onSecondCall().returns(q.reject(error));
 
             var camera = new Camera(wd),
-                result = camera.captureFullscreenImage()
+                result = camera.captureViewportImage()
                     .then(function() {
-                        return camera.captureFullscreenImage();
+                        return camera.captureViewportImage();
                     });
 
             return assert.isRejected(result, error)
@@ -72,7 +72,7 @@ describe('browser/camera', function() {
                 .onFirstCall().returns(q.reject(new Error('not today')));
 
             var camera = new Camera(wd);
-            return camera.captureFullscreenImage()
+            return camera.captureViewportImage()
                 .then(function() {
                     assert.calledWithExactly(wd.context, 'NATIVE_APP');
                 });
@@ -85,7 +85,7 @@ describe('browser/camera', function() {
                 .onFirstCall().returns(q.reject(new Error('not today')));
 
             var camera = new Camera(wd);
-            return camera.captureFullscreenImage()
+            return camera.captureViewportImage()
                 .then(function() {
                     assert.calledTwice(wd.takeScreenshot);
                 });
@@ -99,7 +99,7 @@ describe('browser/camera', function() {
                 .onFirstCall().returns(q.reject(new Error('not today')));
 
             var camera = new Camera(wd);
-            return camera.captureFullscreenImage()
+            return camera.captureViewportImage()
                 .then(function() {
                     assert.calledWithExactly(wd.context, 'Original');
                 });
@@ -114,7 +114,7 @@ describe('browser/camera', function() {
                 .onSecondCall().returns(q.reject(new Error('still does not work')));
 
             var camera = new Camera(wd);
-            return assert.isRejected(camera.captureFullscreenImage(), originalError);
+            return assert.isRejected(camera.captureViewportImage(), originalError);
         });
 
         it('should not try to take screenshot without switching context if it failed first time', function() {
@@ -126,16 +126,16 @@ describe('browser/camera', function() {
                 .onThirdCall().returns(q.reject(error));
 
             var camera = new Camera(wd);
-            return assert.isRejected(camera.captureFullscreenImage()
+            return assert.isRejected(camera.captureViewportImage()
                 .then(function() {
-                    return camera.captureFullscreenImage();
+                    return camera.captureViewportImage();
                 }))
                 .then(function() {
                     assert.calledThrice(wd.takeScreenshot);
                 });
         });
 
-        describe('captureFullscreenImage() crop', () => {
+        describe('captureViewportImage() crop', () => {
             let image, wd, camera;
 
             beforeEach(() => {
@@ -153,7 +153,7 @@ describe('browser/camera', function() {
                 it('should crop according to calibration result', () => {
                     camera.calibrate({top: 6, left: 4});
 
-                    return camera.captureFullscreenImage()
+                    return camera.captureViewportImage()
                         .then(() => {
                             assert.calledWith(image.crop, {
                                 left: 4,
@@ -165,7 +165,7 @@ describe('browser/camera', function() {
                 });
 
                 it('should not crop image if calibration was not set', () => {
-                    return camera.captureFullscreenImage()
+                    return camera.captureViewportImage()
                         .then(() => {
                             assert.notCalled(image.crop);
                         });
@@ -177,7 +177,7 @@ describe('browser/camera', function() {
                     const screenshotMode = (browserOptions || {}).screenshotMode || 'auto';
                     return new Camera(wd, screenshotMode);
                 };
-                const pageDisposition = {
+                const page = {
                     viewport: {
                         top: 1,
                         left: 1,
@@ -187,7 +187,7 @@ describe('browser/camera', function() {
                 };
 
                 it('should not crop image if page disposition was not set', () => {
-                    return mkCamera_().captureFullscreenImage()
+                    return mkCamera_().captureViewportImage()
                         .then(() => {
                             assert.notCalled(image.crop);
                         });
@@ -196,21 +196,21 @@ describe('browser/camera', function() {
                 it('should crop fullPage image with viewport value if page disposition was set', () => {
                     sandbox.stub(util, 'isFullPage').returns(true);
 
-                    return mkCamera_().captureFullscreenImage(pageDisposition)
+                    return mkCamera_().captureViewportImage(page)
                         .then(() => {
-                            assert.calledWith(image.crop, pageDisposition.viewport);
+                            assert.calledWith(image.crop, page.viewport);
                         });
                 });
 
                 it('should crop not fullPage image to the left and right', () => {
                     sandbox.stub(util, 'isFullPage').returns(false);
 
-                    return mkCamera_().captureFullscreenImage(pageDisposition)
+                    return mkCamera_().captureViewportImage(page)
                         .then(() => {
                             assert.calledWith(image.crop, {
                                 top: 0, left: 0,
-                                width: pageDisposition.viewport.width,
-                                height: pageDisposition.viewport.height
+                                width: page.viewport.width,
+                                height: page.viewport.height
                             });
                         });
                 });
@@ -219,12 +219,12 @@ describe('browser/camera', function() {
                     camera = mkCamera_({screenshotMode: 'viewport'});
                     sandbox.stub(util, 'isFullPage').returns(true);
 
-                    return camera.captureFullscreenImage(pageDisposition)
+                    return camera.captureViewportImage(page)
                         .then(() => {
                             assert.calledWith(image.crop, {
                                 top: 0, left: 0,
-                                width: pageDisposition.viewport.width,
-                                height: pageDisposition.viewport.height
+                                width: page.viewport.width,
+                                height: page.viewport.height
                             });
                         });
                 });

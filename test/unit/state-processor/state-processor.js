@@ -43,7 +43,7 @@ describe('state-processor/state-processor', () => {
                     module: '/some/default/module'
                 },
                 state: util.makeStateStub(),
-                pageDisposition: {}
+                page: {}
             });
 
             var stubs = {
@@ -57,7 +57,7 @@ describe('state-processor/state-processor', () => {
                 stateProcessor = new StateProcessor(opts.captureProcessorInfo);
 
             stateProcessor.prepare(new QEmitter());
-            return stateProcessor.exec(opts.state, browserSession, opts.pageDisposition);
+            return stateProcessor.exec(opts.state, browserSession, opts.page);
         }
 
         it('should perform job', () => {
@@ -86,20 +86,20 @@ describe('state-processor/state-processor', () => {
 
         it('should pass page disposition to job', () => {
             return exec_({
-                    pageDisposition: {some: 'data'}
+                    page: {some: 'data'}
                 })
                 .then(() => assert.calledWithMatch(job, {
-                    pageDisposition: {some: 'data'}
+                    page: {some: 'data'}
                 }));
         });
 
         it('should not pass coverage data to job', () => {
             return exec_({
-                    pageDisposition: {
+                    page: {
                         coverage: 'some-big-object'
                     }
                 }).then(() => assert.neverCalledWithMatch(job, {
-                    pageDisposition: {
+                    page: {
                         coverage: 'some-big-object'
                     }
                 }));

@@ -14,7 +14,7 @@ describe('calibrator', function() {
         var imgPath = path.join(__dirname, '..', 'functional', 'data', 'image', imageName),
             imgData = fs.readFileSync(imgPath);
 
-        browser.captureFullscreenImage.returns(q(new Image(imgData)));
+        browser.captureViewportImage.returns(q(new Image(imgData)));
     }
 
     beforeEach(function() {
@@ -50,7 +50,7 @@ describe('calibrator', function() {
             .then(function() {
                 assert.calledOnce(browser.open);
                 assert.calledOnce(browser.evalScript);
-                assert.calledOnce(browser.captureFullscreenImage);
+                assert.calledOnce(browser.captureViewportImage);
             });
     });
 

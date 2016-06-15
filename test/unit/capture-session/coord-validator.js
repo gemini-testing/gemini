@@ -3,10 +3,10 @@
 const _ = require('lodash');
 
 const CoordValidator = require('../../../lib/capture-session/coord-validator');
+const HeightViewportError = require('../../../lib/capture-session/coord-validator/errors/height-viewport-error');
+const OffsetViewportError = require('../../../lib/capture-session/coord-validator/errors/offset-viewport-error');
 
 describe('CoordValidator', () => {
-    const sandbox = sinon.sandbox.create();
-
     let coordValidator;
 
     function validate_(areaModification) {
@@ -22,47 +22,41 @@ describe('CoordValidator', () => {
             height: 0
         });
 
-        const cropArea = {
+        const captureArea = {
             left: areaModification.left,
             top: areaModification.top,
             width: viewport.width + areaModification.width,
             height: viewport.height + areaModification.height
         };
 
-        return coordValidator.validate(viewport, cropArea);
+        return coordValidator.validate(viewport, captureArea);
     }
 
     beforeEach(() => {
         coordValidator = new CoordValidator({id: 'some-browser-id'});
     });
 
-    afterEach(() => sandbox.restore());
-
     describe('validation failed', () => {
-        it('if crop area left boundary is outside of image', () => {
-            return assert.propertyVal(validate_({left: -1}), 'failed', true);
+        it('if crop area left boundary is outside of viewport', () => {
+            assert.throws(() => validate_({left: -1}), OffsetViewportError);
         });
 
-        it('if crop area top boundary is outside of image', () => {
-            return assert.propertyVal(validate_({top: -1}), 'failed', true);
+        it('if crop area top boundary is outside of viewport', () => {
+            assert.throws(() => validate_({top: -1}), OffsetViewportError);
         });
 
-        it('if crop area right boundary is outside of image', () => {
-            return assert.propertyVal(validate_({width: +1}), 'failed', true);
+        it('if crop area right boundary is outside of viewport', () => {
+            assert.throws(() => validate_({width: +1}), OffsetViewportError);
         });
 
-        it('if crop area bottom boundary is outside of image', () => {
-            return assert.propertyVal(validate_({height: +1}), 'failed', true);
-        });
-
-        it('should attach non-empty error message', () => {
-            const validation = validate_({left: -1});
-            assert.isString(validation.message);
-            assert.isAbove(validation.message.length, 0);
+        it('if crop area height bigger than viewport height', () => {
+            assert.throws(() => validate_({height: +1}), HeightViewportError);
         });
     });
 
-    it('should return non-failed result on passed validation', () => {
-        return assert.propertyVal(validate_({left: 0}), 'failed', false);
+    it('should not throw on passed validation', () => {
+        const fn = () => validate_({left: 0});
+
+        return assert.doesNotThrow(fn);
     });
 });

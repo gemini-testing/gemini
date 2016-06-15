@@ -298,7 +298,7 @@ describe('browser/new-browser', function() {
         });
     });
 
-    describe('captureFullscreenImage', function() {
+    describe('captureViewportImage', function() {
         beforeEach(function() {
             this.sinon.stub(Camera.prototype);
 
@@ -321,14 +321,14 @@ describe('browser/new-browser', function() {
                 calibrate: false
             });
 
-            Camera.prototype.captureFullscreenImage.returns(q({some: 'image'}));
+            Camera.prototype.captureViewportImage.returns(q({some: 'image'}));
 
             return this.browser.launch()
                 .then(function() {
-                    return this.browser.captureFullscreenImage();
+                    return this.browser.captureViewportImage();
                 }.bind(this))
                 .then(function(image) {
-                    assert.calledOnce(Camera.prototype.captureFullscreenImage);
+                    assert.calledOnce(Camera.prototype.captureViewportImage);
                     assert.deepEqual(image, {some: 'image'});
                 });
         });
