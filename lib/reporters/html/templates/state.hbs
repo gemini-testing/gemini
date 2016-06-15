@@ -6,7 +6,7 @@
 </div>
 {{#if error}}
     <div class="image-box__image">
-        <pre class="reason">{{{reason}}}</pre>
+        <pre class="reason">{{reason}}</pre>
         {{#if image}}
             {{image "actual"}}
         {{/if}}
@@ -16,7 +16,7 @@
     <div class="image-box__image">
         <div class="image-box__title">New image</div>
         {{image "actual"}}
-        <pre class="reason">{{{reason}}}</pre>
+        <pre class="reason">{{reason}}</pre>
     </div>
 {{/if}}
 {{#if success}}
