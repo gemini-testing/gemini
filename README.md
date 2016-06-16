@@ -166,8 +166,6 @@ For example, let's write a test for a search block at
 [yandex.com](http://www.yandex.com):
 
 ```javascript
-var gemini = require('gemini');
-
 gemini.suite('yandex-search', function(suite) {
     suite.setUrl('/')
         .setCaptureElements('.main-table')
