@@ -16,10 +16,10 @@ Its key features are:
 
 * Compatibility with different browsers:
 
-  - Google Chrome (testeg in latest version)
+  - Google Chrome (tested in latest version)
   - Mozilla Firefox (tested in latest version)
-  - [IE8+](doc/ie-support.md)
-  - Opera 12+;
+  - IE8+
+  - Opera 12+
 
 * Ability to test separate sections of a web page;
 
