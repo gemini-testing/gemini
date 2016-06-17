@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.4.0 - 2016-06-17
+
+* Added option `compositeImage` which allows to test areas with height larger than viewport one,
+  see [documentation](https://github.com/gemini-testing/gemini/blob/v4.4.0/doc/config.md#browsers-settings)
+  for more details.
+* Capture a viewport instead of a full page for all browsers. :warning: Tests in firefox will fail after updating to
+  this version if you test areas which bottom bounds are outside of a viewport height.
+* Removed the hack for IE browsers related with two-step movement to `(0, 0)` on browser reset.
+* Fix: do not fail test if a hidden element was added to method `ignoreElements`.
+* Fix displaying of retries in HTML report after adding of `sessionId` in meta-info of HTML reporter.
+
 ## 4.3.0 - 2016-06-02
 
 * Added new browser option `screenshotMode` which allows to set an image capture mode, see the [documentation](https://github.com/gemini-testing/gemini/blob/v4.3.0/doc/config.md#browsers-settings) for more details.
