@@ -200,7 +200,7 @@ Settings list:
 * `retry` – maximum amount of relaunch fallen tests with a critical error. If not
   specified, the fallen tests will not be relaunched (by default it's 0).
 
-  Note that fallen test will not be retried immediatelly, it will be delayed until
+  Note that fallen test will not be retried immediately, it will be delayed until
   all tests finish and then restarted in new browser session. So the tests will be
   performed in waves:
   - run all tests
@@ -208,10 +208,14 @@ Settings list:
   - second retry: run tests failed during first retry
   - ...
 
-* `screenshotMode` - image capture mode. There are 3 allowed values for this option: 
-    * `auto` (default). Mode will be obtained automatically 
+* `screenshotMode` - image capture mode. There are 3 allowed values for this option:
+    * `auto` (default). Mode will be obtained automatically.
     * `fullpage`. Gemini will deal with screenshot of full page.
-    * `viewport`. Only viewport area will be used. 
+    * `viewport`. Only viewport area will be used.
+
+* `compositeImage` – allows testing of regions which bottom bounds are outside of a viewport height (default: `false`).
+  In the resulting screenshot the area which fits the viewport bounds will be **joined** with the area which is outside
+  of the viewport height.
 
 ## Sets
 
