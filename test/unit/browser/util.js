@@ -13,14 +13,14 @@ describe('browser util.isFullPage', () => {
 
     afterEach(() => sandbox.restore());
 
-    const isFullPage_ = (image, browserOpts, pageDisposition) => {
-        pageDisposition = _.defaults(pageDisposition || {}, {
+    const isFullPage_ = (image, browserOpts, page) => {
+        page = _.defaults(page || {}, {
             documentWidth: 100,
             documentHeight: 100,
             pixelRatio: 1
         });
 
-        return util.isFullPage(image, pageDisposition, browserOpts.screenshotMode);
+        return util.isFullPage(image, page, browserOpts.screenshotMode);
     };
 
     const imageStub_ = (imageSize) => {

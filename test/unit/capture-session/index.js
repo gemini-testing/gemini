@@ -6,8 +6,7 @@ const promiseUtils = require('q-promise-utils');
 
 const CaptureSession = require('../../../lib/capture-session');
 const ActionsBuilder = require('../../../lib/tests-api/actions-builder');
-const MoveTransformer = require('../../../lib/capture-session/move-transformer');
-const CoordValidator = require('../../../lib/capture-session/coord-validator');
+const Viewport = require('../../../lib/capture-session/viewport');
 const StateError = require('../../../lib/errors/state-error');
 const Image = require('../../../lib/image');
 const temp = require('../../../lib/temp');
@@ -128,7 +127,7 @@ describe('capture session', () => {
         beforeEach(() => {
             browser = {
                 config: {},
-                captureFullscreenImage: sinon.stub().returns(q({
+                captureViewportImage: sinon.stub().returns(q({
                     save: sinon.stub()
                 }))
             };
@@ -136,9 +135,9 @@ describe('capture session', () => {
             error = {};
         });
 
-        it('should call captureFullscreenImage method', () => {
+        it('should call captureViewportImage method', () => {
             return session.extendWithPageScreenshot(error)
-                .then(() => assert.called(browser.captureFullscreenImage));
+                .then(() => assert.called(browser.captureViewportImage));
         });
 
         it('should add an image path to error', () => {
@@ -148,8 +147,8 @@ describe('capture session', () => {
                 .then(() => assert.deepEqual(error.imagePath, '/path/to/img'));
         });
 
-        it('should not add an image to error if can not captureFullscreenImage', () => {
-            browser.captureFullscreenImage = sinon.stub().returns(q.reject({}));
+        it('should not add an image to error if can not captureViewportImage', () => {
+            browser.captureViewportImage = sinon.stub().returns(q.reject({}));
 
             error = new StateError('some error');
 
@@ -176,7 +175,7 @@ describe('capture session', () => {
     });
 
     describe('capture', () => {
-        let pageDisposition;
+        let page;
         let browserStub;
         let captureSession;
 
@@ -190,10 +189,11 @@ describe('capture session', () => {
 
             browserStub = {
                 config: {},
-                captureFullscreenImage: sinon.stub().returns(q(new Image()))
+                captureViewportImage: sinon.stub().returns(q(new Image())),
+                scrollBy: sinon.stub().returns(q())
             };
 
-            pageDisposition = {
+            page = {
                 documentWidth: 10,
                 documentHeight: 10,
                 captureArea: {
@@ -201,86 +201,170 @@ describe('capture session', () => {
                     height: 3
                 },
                 viewport: {top: 1, left: 1, width: 10, height: 10},
-                ignoreAreas: [{left: 4, top: 4, width: 1, height: 1}]
+                ignoreAreas: [{left: 4, top: 4, width: 1, height: 1}],
+                canHaveCaret: true
             };
 
-            sandbox.stub(CoordValidator.prototype, 'validate').returns({failed: false});
-            sandbox.stub(MoveTransformer.prototype, 'transform').returnsArg(0);
+            sandbox.stub(Viewport.prototype, 'crop').returns(q());
+            sandbox.stub(Viewport.prototype, 'ignoreAreas');
+
+            sandbox.spy(Viewport, 'create');
+            sandbox.spy(Viewport.prototype, 'extendBy');
 
             captureSession = new CaptureSession(browserStub);
         });
 
         it('should take screenshot', () => {
-            return captureSession.capture(_.assign({}, pageDisposition))
-                .then(() => assert.called(browserStub.captureFullscreenImage));
+            return captureSession.capture(_.assign({}, page))
+                .then(() => assert.called(browserStub.captureViewportImage));
+        });
+
+        it('should create viewport instance', () => {
+            browserStub.captureViewportImage.withArgs(page).returns(q('image'));
+
+            return captureSession.capture(page)
+                .then(() => {
+                    assert.calledWith(Viewport.create, page.viewport, 'image', page.pixelRatio);
+                });
         });
 
         it('should crop image of passed size', () => {
             return captureSession
-                .capture(pageDisposition)
-                .then(() => assert.calledWithMatch(Image.prototype.crop, pageDisposition.captureArea));
+                .capture(page)
+                .then(() => assert.calledWith(Viewport.prototype.crop, page.captureArea));
         });
 
-        it('should use coordinate transformer for crop area calculation', () => {
-            return captureSession.capture(pageDisposition)
-                .then(() => {
-                    assert.calledWith(MoveTransformer.prototype.transform, pageDisposition.captureArea);
-                });
+        it('should return object with cropped image and `canHaveCaret` property', () => {
+            Viewport.prototype.crop.returns(q('image'));
+
+            assert.eventually.equal(captureSession.capture(page), {
+                image: 'image',
+                canHaveCaret: page.canHaveCaret
+            });
         });
 
         it('should clear configured ignore area before cropping image', () => {
-            return captureSession.capture(pageDisposition)
-                .then(() => {
-                    assert.calledTwice(MoveTransformer.prototype.transform);
-                    assert.calledWith(
-                        MoveTransformer.prototype.transform.secondCall,
-                        pageDisposition.ignoreAreas[0]
-                    );
-                });
+            return captureSession.capture(page)
+                .then(() => assert.calledWith(Viewport.prototype.ignoreAreas, page.ignoreAreas));
         });
 
-        it('should use coordinate transformer for ignore image areas calculation', () => {
-            return captureSession.capture(pageDisposition)
-                .then(() => {
-                    assert.calledOnce(Image.prototype.clear);
-                    assert.callOrder(Image.prototype.clear, Image.prototype.crop);
+        describe('if validation fails', () => {
+            const testValidationFail = () => {
+                it('should not crop image', () => {
+                    return captureSession.capture(page)
+                        .catch(() => assert.notCalled(Image.prototype.crop));
                 });
-        });
 
-        it('should clear multiple ignore areas', () => {
-            pageDisposition.ignoreAreas.push({left: 5, top: 5, width: 1, height: 1});
-            return captureSession.capture(pageDisposition)
-                .then(() => {
-                    assert.calledTwice(Image.prototype.clear);
-                    assert.calledWith(Image.prototype.clear.firstCall, pageDisposition.ignoreAreas[0]);
-                    assert.calledWith(Image.prototype.clear.secondCall, pageDisposition.ignoreAreas[1]);
+                it('should save page screenshot', () => {
+                    return captureSession.capture(page)
+                        .catch(() => assert.calledOnce(Image.prototype.save));
                 });
-        });
 
-        describe('if crop area is not completely inside of image borders', () => {
-            beforeEach(() => {
-                CoordValidator.prototype.validate.returns({
-                    failed: true
+                it('should extend error with path to page screenshot', () => {
+                    return captureSession.capture(page)
+                        .catch((error) => assert.equal(error.imagePath, '/path/to/img'));
                 });
+
+                it('should return rejected promise', () => {
+                    return assert.isRejected(captureSession.capture(page), StateError);
+                });
+            };
+
+            describe('with NOT `HeightViewportError`', () => {
+                beforeEach(() => {
+                    page = {captureArea: {top: -1}};
+                });
+
+                testValidationFail();
             });
 
-            it('should not crop image', () => {
-                return captureSession.capture(pageDisposition)
-                    .catch(() => assert.notCalled(Image.prototype.crop));
-            });
+            describe('with `HeightViewportError`', () => {
+                describe('option `compositeImage` is switched off', () => {
+                    beforeEach(() => {
+                        page = {captureArea: {height: 7}, viewport: {height: 5}};
+                    });
 
-            it('should save page screenshot', () => {
-                return captureSession.capture(pageDisposition)
-                    .catch(() => assert.calledOnce(Image.prototype.save));
-            });
+                    testValidationFail();
+                });
 
-            it('should extend error with path to page screenshot', () => {
-                return captureSession.capture(pageDisposition)
-                    .catch((error) => assert.equal(error.imagePath, '/path/to/img'));
-            });
+                describe('option `compositeImage` is switched on', () => {
+                    beforeEach(() => {
+                        browserStub.config.compositeImage = true;
+                    });
 
-            it('should return rejected promise', () => {
-                return assert.isRejected(captureSession.capture(pageDisposition), StateError);
+                    it('should scroll vertically if capture area is higher then viewport', () => {
+                        page = {captureArea: {height: 7}, viewport: {top: 0, height: 5}};
+
+                        return captureSession.capture(page)
+                            .then(() => assert.calledWith(browserStub.scrollBy, 0, 2));
+                    });
+
+                    it('should scroll vertically until the end of capture area', () => {
+                        page = {captureArea: {height: 11}, viewport: {top: 0, height: 5}};
+
+                        return captureSession.capture(page)
+                            .then(() => {
+                                assert.calledTwice(browserStub.scrollBy);
+                                assert.calledWith(browserStub.scrollBy, 0, 5);
+                                assert.calledWith(browserStub.scrollBy, 0, 1);
+                            });
+                    });
+
+                    it('should capture scrolled viewport image', () => {
+                        page = {captureArea: {height: 7}, viewport: {top: 0, height: 5}};
+
+                        return captureSession.capture(page)
+                            .then(() => assert.calledWithMatch(browserStub.captureViewportImage, {viewport: {top: 2}}));
+                    });
+
+                    // Test does not fairly check that `captureViewportImage` was called after resolving of `scrollBy`
+                    it.skip('should capture viewport image after scroll', () => {
+                        page = {captureArea: {height: 7}, viewport: {top: 0, height: 5}};
+
+                        const scrolledPage = {captureArea: {height: 7}, viewport: {top: 2, height: 5}};
+
+                        const scroll = browserStub.scrollBy.withArgs(0, 2).named('scroll');
+                        const captureViewportImage = browserStub.captureViewportImage
+                            .withArgs(scrolledPage).named('captureViewportImage');
+
+                        return captureSession.capture(page)
+                            .then(() => assert.callOrder(scroll, captureViewportImage));
+                    });
+
+                    it('should extend original image by scrolled viewport image', () => {
+                        page = {captureArea: {height: 7}, viewport: {top: 0, height: 5}};
+
+                        const scrolledPage = {captureArea: {height: 7}, viewport: {top: 2, height: 5}};
+                        const scrolledViewportScreenshot = new Image();
+
+                        browserStub.captureViewportImage
+                            .withArgs(scrolledPage).returns(q(scrolledViewportScreenshot));
+
+                        return captureSession.capture(page)
+                            .then(() => assert.calledWith(Viewport.prototype.extendBy, 2, scrolledViewportScreenshot));
+                    });
+
+                    it('should crop capture area which is higher then viewport', () => {
+                        page = {captureArea: {height: 7}, viewport: {top: 0, height: 5}};
+
+                        return captureSession.capture(page)
+                            .then(() => assert.calledWith(Viewport.prototype.crop, page.captureArea));
+                    });
+
+                    it('should return object with cropped image and `canHaveCaret` property', () => {
+                        Viewport.prototype.crop.returns(q('image'));
+
+                        assert.eventually.equal(captureSession.capture(page), {
+                            image: 'image',
+                            canHaveCaret: page.canHaveCaret
+                        });
+                    });
+
+                    it('should clear configured ignore area before cropping image', () => {
+                        return captureSession.capture(page)
+                            .then(() => assert.calledWith(Viewport.prototype.ignoreAreas, page.ignoreAreas));
+                    });
+                });
             });
         });
     });
