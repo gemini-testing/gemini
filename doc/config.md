@@ -186,7 +186,7 @@ Settings list:
   instead.
 
 * `windowSize` – specify browser window dimensions (i.e. `1600x1200`). If not
-  specified, the size of the window depends on WebDriver.
+  specified, the size of the window depends on WebDriver. :warning: You can't set specific resolutions for browser Opera or mobile platforms. They use only full-screen resolution.
 
 * `sessionsPerBrowser` - how many WebDriver sessions  can be launched
   simultaneously for this browser. Default is 1. Increase the value if you

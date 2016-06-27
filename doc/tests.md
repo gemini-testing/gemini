@@ -298,7 +298,7 @@ Full list of special keys (there are shortcuts for commonly used keys):
 
 * `focus(element)` – set a focus to a specified element.
 
-* `setWindowSize(width, height)` – change browser window dimensions.
+* `setWindowSize(width, height)` – change browser window dimensions. :warning: You can't set specific resolutions for browser Opera or mobile platforms. They use only full-screen resolution.
 
 * `tap(element)` - tap specified element on touch enabled device.
 
