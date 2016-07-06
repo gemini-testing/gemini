@@ -8,13 +8,15 @@ const CaptureSession = require('../../../lib/capture-session');
 const ActionsBuilder = require('../../../lib/tests-api/actions-builder');
 const Viewport = require('../../../lib/capture-session/viewport');
 const StateError = require('../../../lib/errors/state-error');
-const Image = require('../../../lib/image');
 const temp = require('../../../lib/temp');
+const Image = require('../../../lib/image');
 
 describe('capture session', () => {
     const sandbox = sinon.sandbox.create();
+    let imageStub;
 
     beforeEach(() => {
+        imageStub = sinon.createStubInstance(Image);
         sandbox.stub(promiseUtils);
         promiseUtils.sequence.returns(q());
 
@@ -180,16 +182,15 @@ describe('capture session', () => {
         let captureSession;
 
         beforeEach(() => {
-            sandbox.stub(Image.prototype);
-            Image.prototype.crop.returns(q({}));
-            Image.prototype.getSize.returns({});
-            Image.prototype.save.returns(q());
+            imageStub.crop.returns(q({}));
+            imageStub.getSize.returns({});
+            imageStub.save.returns(q());
 
             temp.path.returns('/path/to/img');
 
             browserStub = {
                 config: {},
-                captureViewportImage: sinon.stub().returns(q(new Image())),
+                captureViewportImage: sinon.stub().returns(q(imageStub)),
                 scrollBy: sinon.stub().returns(q())
             };
 
@@ -252,12 +253,12 @@ describe('capture session', () => {
             const testValidationFail = () => {
                 it('should not crop image', () => {
                     return captureSession.capture(page)
-                        .catch(() => assert.notCalled(Image.prototype.crop));
+                        .catch(() => assert.notCalled(imageStub.crop));
                 });
 
                 it('should save page screenshot', () => {
                     return captureSession.capture(page)
-                        .catch(() => assert.calledOnce(Image.prototype.save));
+                        .catch(() => assert.calledOnce(imageStub.save));
                 });
 
                 it('should extend error with path to page screenshot', () => {
@@ -335,7 +336,7 @@ describe('capture session', () => {
                         page = {captureArea: {height: 7}, viewport: {top: 0, height: 5}};
 
                         const scrolledPage = {captureArea: {height: 7}, viewport: {top: 2, height: 5}};
-                        const scrolledViewportScreenshot = new Image();
+                        const scrolledViewportScreenshot = imageStub;
 
                         browserStub.captureViewportImage
                             .withArgs(scrolledPage).returns(q(scrolledViewportScreenshot));
