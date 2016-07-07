@@ -241,6 +241,23 @@ describe('CachingPool', function() {
                 });
         });
 
+        it('should get new session for each suite if reuse limit equal 1', function() {
+            this.underlyingPool.getBrowser
+                .onFirstCall().returns(q(makeStubBrowser('browserId')))
+                .onSecondCall().returns(q(makeStubBrowser('browserId')));
+            var _this = this,
+                pool = this.poolWithReuseLimits({
+                    browserId: 1
+                });
+            return this.launchAndFree(pool, 'browserId')
+                .then(function() {
+                    return pool.getBrowser('browserId');
+                })
+                .then(function() {
+                    assert.calledTwice(_this.underlyingPool.getBrowser);
+                });
+        });
+
         it('should close old session when reached reuse limit', function() {
             var browser = makeStubBrowser('id');
             this.underlyingPool.getBrowser.returns(q(browser));
