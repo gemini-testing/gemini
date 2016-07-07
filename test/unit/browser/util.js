@@ -7,10 +7,6 @@ const Image = require('../../../lib/image');
 describe('browser util.isFullPage', () => {
     const sandbox = sinon.sandbox.create();
 
-    beforeEach(() => {
-        sandbox.stub(Image.prototype);
-    });
-
     afterEach(() => sandbox.restore());
 
     const isFullPage_ = (image, browserOpts, page) => {
@@ -24,8 +20,9 @@ describe('browser util.isFullPage', () => {
     };
 
     const imageStub_ = (imageSize) => {
-        Image.prototype.getSize.returns(imageSize);
-        return new Image();
+        const imageStub = sinon.createStubInstance(Image);
+        imageStub.getSize.returns(imageSize);
+        return imageStub;
     };
 
     it('should return true for "fullpage" screenshotMode', () => {

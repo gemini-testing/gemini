@@ -1,86 +1,91 @@
 'use strict';
 
-var DiffScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/diff-screen-updater'),
-    Image = require('../../../../../lib/image'),
-    temp = require('../../../../../lib/temp'),
-    q = require('q'),
-    fs = require('q-io/fs');
+const DiffScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/diff-screen-updater');
+const temp = require('../../../../../lib/temp');
+const q = require('q');
+const fs = require('q-io/fs');
+const Image = require('../../../../../lib/image');
 
-describe('diff-screen-updater', function() {
-    var sandbox = sinon.sandbox.create();
+describe('diff-screen-updater', () => {
+    const sandbox = sinon.sandbox.create();
+    let imageStub;
+    let imageCompareStub;
 
     function exec_(opts) {
         opts = opts || {};
-        var updater = new DiffScreenUpdater(),
+        const updater = new DiffScreenUpdater(),
             capture = {
-                image: new Image()
+                image: imageStub
             },
             env = {
                 refPath: opts.refPath
             };
 
+        capture.image.save.returns(q());
+
         return updater.exec(capture, env);
     }
 
-    beforeEach(function() {
+    beforeEach(() => {
         sandbox.stub(fs);
         sandbox.stub(temp);
-        sandbox.stub(Image, 'compare');
 
-        sandbox.stub(Image.prototype);
-        Image.prototype.save.returns(q());
+        imageStub = sinon.createStubInstance(Image);
+        imageCompareStub = sandbox.stub(Image, 'compare');
+        imageStub.save.returns(q());
 
-        fs.exists.returns(q.resolve(true));
+        fs.exists.returns(q(true));
     });
 
-    afterEach(function() {
+    afterEach(() => {
         sandbox.restore();
     });
 
-    it('should save image to the temp directory before comparing', function() {
-        Image.compare.returns(q());
+    it('should save image to the temp directory before comparing', () => {
+        imageCompareStub.returns(q());
         temp.path.returns('/temp/path');
 
         return exec_()
-            .then(function() {
-                assert.calledOnce(Image.prototype.save);
-                assert.calledWith(Image.prototype.save, '/temp/path');
+            .then(() => {
+                assert.calledOnce(imageStub.save);
+                assert.calledWith(imageStub.save, '/temp/path');
             });
     });
 
-    it('should not compare images if reference image does not exist', function() {
-        fs.exists.returns(q.resolve(false));
+    it('should not compare images if reference image does not exist', () => {
+        fs.exists.returns(q(false));
+        imageCompareStub.returns(q());
 
         return exec_()
-            .then(function() {
+            .then(() => {
                 assert.notCalled(Image.compare);
             });
     });
 
-    it('should not save image if images are the same', function() {
-        Image.compare.returns(q.resolve(true));
+    it('should not save image if images are the same', () => {
+        imageCompareStub.returns(q(true));
 
         return exec_()
-            .then(function() {
+            .then(() => {
                 assert.notCalled(fs.copy);
             });
     });
 
-    it('should save image if images are different', function() {
-        Image.compare.returns(q.resolve(false));
+    it('should save image if images are different', () => {
+        imageCompareStub.returns(q(false));
         temp.path.returns('/temp/path');
 
         return exec_({refPath: '/ref/path'})
-            .then(function() {
+            .then(() => {
                 assert.calledWith(fs.copy, '/temp/path', '/ref/path');
             });
     });
 
-    it('should save image with correct suffix', function() {
-        Image.compare.returns(q.resolve(false));
+    it('should save image with correct suffix', () => {
+        imageCompareStub.returns(q(false));
 
         return exec_()
-            .then(function() {
+            .then(() => {
                 assert.calledWith(temp.path, {suffix: '.png'});
             });
     });
