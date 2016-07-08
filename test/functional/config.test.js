@@ -1,7 +1,7 @@
 'use strict';
 var path = require('path'),
-    Config = require('../../lib/config'),
-    GeminiError = require('../../lib/errors/gemini-error'),
+    Config = require('lib/config'),
+    GeminiError = require('lib/errors/gemini-error'),
 
     DATA_ROOT = path.join(__dirname, 'data', 'config');
 

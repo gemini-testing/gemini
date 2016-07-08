@@ -1,8 +1,8 @@
 'use strict';
 
-const browserFabric = require('../../../lib/browser');
-const NewBrowser = require('../../../lib/browser/new-browser');
-const ExistingBrowser = require('../../../lib/browser/existing-browser');
+const browserFabric = require('lib/browser');
+const NewBrowser = require('lib/browser/new-browser');
+const ExistingBrowser = require('lib/browser/existing-browser');
 
 describe('browser', () => {
     const createBrowser = () => browserFabric.create({});

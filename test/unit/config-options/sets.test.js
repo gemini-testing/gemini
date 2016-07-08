@@ -1,6 +1,6 @@
 'use strict';
-var parser = require('../../../lib/config/options'),
-    GeminiError = require('../../../lib/errors/gemini-error'),
+var parser = require('lib/config/options'),
+    GeminiError = require('lib/errors/gemini-error'),
     _ = require('lodash');
 
 describe('config.sets', function() {

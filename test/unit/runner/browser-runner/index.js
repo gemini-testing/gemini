@@ -1,12 +1,12 @@
 'use strict';
 var q = require('q'),
-    BrowserRunner = require('../../../../lib/runner/browser-runner'),
-    BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
-    SuiteRunner = require('../../../../lib/runner/suite-runner/suite-runner'),
-    suiteRunnerFabric = require('../../../../lib/runner/suite-runner'),
-    pool = require('../../../../lib/browser-pool'),
-    BasicPool = require('../../../../lib/browser-pool/basic-pool'),
-    Config = require('../../../../lib/config'),
+    BrowserRunner = require('lib/runner/browser-runner'),
+    BrowserAgent = require('lib/runner/browser-runner/browser-agent'),
+    SuiteRunner = require('lib/runner/suite-runner/suite-runner'),
+    suiteRunnerFabric = require('lib/runner/suite-runner'),
+    pool = require('lib/browser-pool'),
+    BasicPool = require('lib/browser-pool/basic-pool'),
+    Config = require('lib/config'),
 
     makeSuiteStub = require('../../../util').makeSuiteStub;
 

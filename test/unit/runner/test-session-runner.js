@@ -1,10 +1,10 @@
 'use strict';
 var q = require('q'),
-    TestSessionRunner = require('../../../lib/runner/test-session-runner'),
-    BrowserRunner = require('../../../lib/runner/browser-runner'),
-    pool = require('../../../lib/browser-pool'),
-    BasicPool = require('../../../lib/browser-pool/basic-pool'),
-    Config = require('../../../lib/config');
+    TestSessionRunner = require('lib/runner/test-session-runner'),
+    BrowserRunner = require('lib/runner/browser-runner'),
+    pool = require('lib/browser-pool'),
+    BasicPool = require('lib/browser-pool/basic-pool'),
+    Config = require('lib/config');
 
 describe('runner/TestSessionRunner', function() {
     var sandbox = sinon.sandbox.create(),

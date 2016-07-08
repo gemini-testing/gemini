@@ -3,7 +3,7 @@
 var fs = require('fs'),
     path = require('path'),
     temp = require('temp'),
-    Image = require('../../lib/image');
+    Image = require('lib/image');
 
 function imagePath(name) {
     return path.join(__dirname, 'data', 'image', name);

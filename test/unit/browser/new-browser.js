@@ -1,9 +1,9 @@
 'use strict';
 
-var Calibrator = require('../../../lib/calibrator'),
-    ClientBridge = require('../../../lib/browser/client-bridge'),
-    Camera = require('../../../lib/browser/camera'),
-    WdErrors = require('../../../lib/constants/wd-errors'),
+var Calibrator = require('lib/calibrator'),
+    ClientBridge = require('lib/browser/client-bridge'),
+    Camera = require('lib/browser/camera'),
+    WdErrors = require('lib/constants/wd-errors'),
     q = require('q'),
     wd = require('wd'),
     polyfillService = require('polyfill-service'),

@@ -1,7 +1,7 @@
 'use strict';
 
-var BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
-    BasicPool = require('../../../../lib/browser-pool/basic-pool');
+var BrowserAgent = require('lib/runner/browser-runner/browser-agent'),
+    BasicPool = require('lib/browser-pool/basic-pool');
 
 describe('runner/browser-runner/browser-agent', function() {
     var sandbox = sinon.sandbox.create(),

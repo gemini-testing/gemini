@@ -1,6 +1,6 @@
 'use strict';
 var q = require('q'),
-    PerBrowserLimitedPool = require('../../../lib/browser-pool/per-browser-limited-pool'),
+    PerBrowserLimitedPool = require('lib/browser-pool/per-browser-limited-pool'),
     browserWithId = require('../../util').makeBrowser;
 
 describe('PerBrowserLimitedPool', function() {

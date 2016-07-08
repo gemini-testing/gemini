@@ -2,8 +2,8 @@
 var EventEmitter = require('events').EventEmitter,
     inherit = require('inherit'),
 
-    Stats = require('../../lib/stats'),
-    RunnerEvents = require('../../lib/constants/runner-events');
+    Stats = require('lib/stats'),
+    RunnerEvents = require('lib/constants/runner-events');
 
 describe('stats', function() {
     var stats;
@@ -92,4 +92,3 @@ describe('stats listener', function() {
         assert.equal(stats.get('failed'), 1);
     });
 });
-

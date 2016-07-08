@@ -1,9 +1,9 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
-    FlatVerboseReporter = require('../../../../lib/reporters/flat-factory/flat-verbose'),
-    RunnerEvents = require('../../../../lib/constants/runner-events'),
-    logger = require('../../../../lib/utils').logger,
+    FlatVerboseReporter = require('lib/reporters/flat-factory/flat-verbose'),
+    RunnerEvents = require('lib/constants/runner-events'),
+    logger = require('lib/utils').logger,
     chalk = require('chalk');
 
 describe('Reporter#FlatVerbose', function() {

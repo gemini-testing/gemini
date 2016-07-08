@@ -3,9 +3,9 @@
 const _ = require('lodash');
 const q = require('q');
 
-const CoordValidator = require('../../../lib/capture-session/coord-validator');
-const Image = require('../../../lib/image');
-const Viewport = require('../../../lib/capture-session/viewport');
+const CoordValidator = require('lib/capture-session/coord-validator');
+const Image = require('lib/image');
+const Viewport = require('lib/capture-session/viewport');
 
 describe('Viewport', () => {
     const sandbox = sinon.sandbox.create();

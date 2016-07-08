@@ -21,7 +21,7 @@ describe('config/config-reader', () => {
 
         files = _.mapKeys(files, (content, filePath) => path.resolve(filePath));
 
-        return proxyquire('../../../lib/config/config-reader', files);
+        return proxyquire('lib/config/config-reader', files);
     }
 
     describe('default config (js|json)', () => {

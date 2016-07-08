@@ -1,10 +1,10 @@
 'use strict';
 
-var CaptureSession = require('../../../lib/capture-session'),
-    CaptureProcessor = require('../../../lib/state-processor/capture-processor/capture-processor'),
-    temp = require('../../../lib/temp'),
+var CaptureSession = require('lib/capture-session'),
+    CaptureProcessor = require('lib/state-processor/capture-processor/capture-processor'),
+    temp = require('lib/temp'),
     util = require('../../util'),
-    errorUtils = require('../../../lib/errors/utils'),
+    errorUtils = require('lib/errors/utils'),
     proxyquire = require('proxyquire').noCallThru(),
     _ = require('lodash'),
     QEmitter = require('qemitter'),
@@ -53,7 +53,7 @@ describe('state-processor/state-processor', () => {
             };
             stubs[opts.captureProcessorInfo.module] = {create: () => captureProcessor};
 
-            var StateProcessor = proxyquire('../../../lib/state-processor/state-processor', stubs),
+            var StateProcessor = proxyquire('lib/state-processor/state-processor', stubs),
                 stateProcessor = new StateProcessor(opts.captureProcessorInfo);
 
             stateProcessor.prepare(new QEmitter());

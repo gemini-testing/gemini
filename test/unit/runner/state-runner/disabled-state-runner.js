@@ -1,8 +1,8 @@
 'use strict';
 var q = require('q'),
-    DisabledStateRunner = require('../../../../lib/runner/state-runner/disabled-state-runner'),
-    CaptureSession = require('../../../../lib/capture-session'),
-    Config = require('../../../../lib/config'),
+    DisabledStateRunner = require('lib/runner/state-runner/disabled-state-runner'),
+    CaptureSession = require('lib/capture-session'),
+    Config = require('lib/config'),
     util = require('../../../util');
 
 describe('runner/state-runner/disabled-state-runner', function() {

@@ -1,10 +1,10 @@
 'use strict';
 var q = require('q'),
-    StateRunner = require('../../../../lib/runner/state-runner/state-runner'),
-    CaptureSession = require('../../../../lib/capture-session'),
-    StateError = require('../../../../lib/errors/state-error'),
-    StateProcessor = require('../../../../lib/state-processor/state-processor'),
-    Config = require('../../../../lib/config'),
+    StateRunner = require('lib/runner/state-runner/state-runner'),
+    CaptureSession = require('lib/capture-session'),
+    StateError = require('lib/errors/state-error'),
+    StateProcessor = require('lib/state-processor/state-processor'),
+    Config = require('lib/config'),
     util = require('../../../util');
 
 describe('runner/state-runner/state-runner', function() {

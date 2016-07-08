@@ -1,8 +1,8 @@
 'use strict';
 
-var CaptureSession = require('../../../lib/capture-session'),
-    CaptureProcessor = require('../../../lib/state-processor/capture-processor/capture-processor'),
-    temp = require('../../../lib/temp'),
+var CaptureSession = require('lib/capture-session'),
+    CaptureProcessor = require('lib/state-processor/capture-processor/capture-processor'),
+    temp = require('lib/temp'),
     proxyquire = require('proxyquire').noCallThru(),
     q = require('q'),
     _ = require('lodash');
@@ -41,7 +41,7 @@ describe('state-processor/job', () => {
         });
 
         var stubs = _.set({}, opts.captureProcessorInfo.module, CaptureProcessorStub),
-            job = proxyquire('../../../lib/state-processor/job', stubs);
+            job = proxyquire('lib/state-processor/job', stubs);
 
         return job(opts, _.noop);
     }

@@ -1,7 +1,7 @@
 'use strict';
 
-var utils = require('../../lib/utils'),
-    pathUtils = require('../../lib/path-utils'),
+var utils = require('lib/utils'),
+    pathUtils = require('lib/path-utils'),
     proxyquire = require('proxyquire'),
     _ = require('lodash'),
     q = require('q');
@@ -12,7 +12,7 @@ describe('test-reader', function() {
         readTests;
 
     before(function() {
-        readTests = proxyquire('../../lib/test-reader', {
+        readTests = proxyquire('lib/test-reader', {
             './tests-api': testsApi
         });
     });

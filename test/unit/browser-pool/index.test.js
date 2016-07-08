@@ -1,7 +1,7 @@
 'use strict';
-var LimitedPool = require('../../../lib/browser-pool/limited-pool'),
-    PerBrowserLimitedPool = require('../../../lib/browser-pool/per-browser-limited-pool'),
-    pool = require('../../../lib/browser-pool');
+var LimitedPool = require('lib/browser-pool/limited-pool'),
+    PerBrowserLimitedPool = require('lib/browser-pool/per-browser-limited-pool'),
+    pool = require('lib/browser-pool');
 
 describe('browser-pool', function() {
     function mkConfig(opts) {

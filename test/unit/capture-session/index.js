@@ -4,12 +4,12 @@ const q = require('q');
 const _ = require('lodash');
 const promiseUtils = require('q-promise-utils');
 
-const CaptureSession = require('../../../lib/capture-session');
-const ActionsBuilder = require('../../../lib/tests-api/actions-builder');
-const Viewport = require('../../../lib/capture-session/viewport');
-const StateError = require('../../../lib/errors/state-error');
-const temp = require('../../../lib/temp');
-const Image = require('../../../lib/image');
+const CaptureSession = require('lib/capture-session');
+const ActionsBuilder = require('lib/tests-api/actions-builder');
+const Viewport = require('lib/capture-session/viewport');
+const StateError = require('lib/errors/state-error');
+const temp = require('lib/temp');
+const Image = require('lib/image');
 
 describe('capture session', () => {
     const sandbox = sinon.sandbox.create();
