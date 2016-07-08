@@ -1,9 +1,9 @@
 'use strict';
 
-var SuiteBuilder = require('../../../lib/tests-api/suite-builder'),
-    Suite = require('../../../lib/suite'),
-    ActionsBuilder = require('../../../lib/tests-api/actions-builder'),
-    find = require('../../../lib/tests-api/find-func').find;
+var SuiteBuilder = require('lib/tests-api/suite-builder'),
+    Suite = require('lib/suite'),
+    ActionsBuilder = require('lib/tests-api/actions-builder'),
+    find = require('lib/tests-api/find-func').find;
 
 describe('tests-api/suite-builder', function() {
     var sandbox = sinon.sandbox.create(),

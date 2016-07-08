@@ -1,6 +1,6 @@
 'use strict';
 
-var ClientBridge = require('../../lib/browser/client-bridge'),
+var ClientBridge = require('lib/browser/client-bridge'),
     eachSupportedBrowser = require('./util').eachSupportedBrowser,
 
     TEST_SCRIPT = 'window.__gemini = {}; window.__gemini.add2 = function(x) { return x + 2; }';

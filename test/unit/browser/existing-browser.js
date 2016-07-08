@@ -4,7 +4,7 @@ const _ = require('lodash');
 const wd = require('wd');
 const q = require('q');
 
-const ExistingBrowser = require('../../../lib/browser/existing-browser');
+const ExistingBrowser = require('lib/browser/existing-browser');
 
 describe('browser/existing-browser', () => {
     const sandbox = sinon.sandbox.create();

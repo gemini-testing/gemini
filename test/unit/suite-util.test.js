@@ -1,6 +1,6 @@
 'use strict';
 var _ = require('lodash'),
-    suiteUtil = require('../../lib/suite-util'),
+    suiteUtil = require('lib/suite-util'),
     shouldSkip = suiteUtil.shouldSkip;
 
 describe('suite-util', function() {

@@ -1,11 +1,11 @@
 'use strict';
 var q = require('q'),
     QEmitter = require('qemitter'),
-    Runner = require('../../../lib/runner'),
-    TestSessionRunner = require('../../../lib/runner/test-session-runner'),
-    StateProcessor = require('../../../lib/state-processor/state-processor'),
-    Config = require('../../../lib/config'),
-    FailCollector = require('../../../lib/fail-collector'),
+    Runner = require('lib/runner'),
+    TestSessionRunner = require('lib/runner/test-session-runner'),
+    StateProcessor = require('lib/state-processor/state-processor'),
+    Config = require('lib/config'),
+    FailCollector = require('lib/fail-collector'),
     util = require('../../util');
 
 describe('runner', function() {

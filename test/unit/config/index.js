@@ -1,6 +1,6 @@
 'use strict';
-var Config = require('../../../lib/config'),
-    configReader = require('../../../lib/config/config-reader'),
+var Config = require('lib/config'),
+    configReader = require('lib/config/config-reader'),
     _ = require('lodash');
 
 describe('config', function() {

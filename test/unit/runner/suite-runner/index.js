@@ -1,10 +1,10 @@
 'use strict';
 
-var suiteRunner = require('../../../../lib/runner/suite-runner'),
-    RegularSuiteRunner = require('../../../../lib/runner/suite-runner/regular-suite-runner'),
-    StatelessSuiteRunner = require('../../../../lib/runner/suite-runner/stateless-suite-runner'),
-    SkippedSuiteRunner = require('../../../../lib/runner/suite-runner/skipped-suite-runner'),
-    suiteUtil = require('../../../../lib/suite-util'),
+var suiteRunner = require('lib/runner/suite-runner'),
+    RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner'),
+    StatelessSuiteRunner = require('lib/runner/suite-runner/stateless-suite-runner'),
+    SkippedSuiteRunner = require('lib/runner/suite-runner/skipped-suite-runner'),
+    suiteUtil = require('lib/suite-util'),
     util = require('../../../util');
 
 describe('runner/suite-runner/create', function() {

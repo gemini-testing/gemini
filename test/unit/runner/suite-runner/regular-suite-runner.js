@@ -1,10 +1,10 @@
 'use strict';
 var q = require('q'),
-    CaptureSession = require('../../../../lib/capture-session'),
-    suiteRunner = require('../../../../lib/runner/suite-runner'),
-    StateRunner = require('../../../../lib/runner/state-runner/state-runner'),
-    BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
-    Config = require('../../../../lib/config'),
+    CaptureSession = require('lib/capture-session'),
+    suiteRunner = require('lib/runner/suite-runner'),
+    StateRunner = require('lib/runner/state-runner/state-runner'),
+    BrowserAgent = require('lib/runner/browser-runner/browser-agent'),
+    Config = require('lib/config'),
     util = require('../../../util'),
     makeSuiteStub = util.makeSuiteStub;
 

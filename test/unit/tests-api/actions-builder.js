@@ -2,7 +2,7 @@
 
 const q = require('q');
 
-const ActionsBuilder = require('../../../lib/tests-api/actions-builder');
+const ActionsBuilder = require('lib/tests-api/actions-builder');
 const util = require('../../util');
 
 describe('tests-api/actions-builder', () => {

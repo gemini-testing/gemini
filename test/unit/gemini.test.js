@@ -2,10 +2,10 @@
 
 var q = require('q'),
     proxyquire = require('proxyquire'),
-    SuiteCollection = require('../../lib/suite-collection'),
-    Config = require('../../lib/config'),
-    Runner = require('../../lib/runner'),
-    temp = require('../../lib/temp'),
+    SuiteCollection = require('lib/suite-collection'),
+    Config = require('lib/config'),
+    Runner = require('lib/runner'),
+    temp = require('lib/temp'),
 
     mkSuiteStub = require('../util').makeSuiteStub;
 
@@ -21,7 +21,7 @@ describe('gemini', function() {
             rootSuite = rootSuite || mkSuiteStub();
 
             var testReaderStub = sandbox.stub().named('TestReader').returns(q(rootSuite)),
-                Gemini = proxyquire('../../lib/gemini', {
+                Gemini = proxyquire('lib/gemini', {
                     './test-reader': testReaderStub
                 });
 
@@ -133,7 +133,7 @@ describe('gemini', function() {
 
         function test_(opts) {
             opts = opts || {};
-            var Gemini = require('../../lib/gemini');
+            var Gemini = require('lib/gemini');
 
             sandbox.stub(Runner.prototype);
             Runner.prototype.on.returnsThis();

@@ -1,8 +1,8 @@
 'use strict';
 
 const _ = require('lodash');
-const util = require('../../../lib/browser/util');
-const Image = require('../../../lib/image');
+const util = require('lib/browser/util');
+const Image = require('lib/image');
 
 describe('browser util.isFullPage', () => {
     const sandbox = sinon.sandbox.create();

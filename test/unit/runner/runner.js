@@ -1,5 +1,5 @@
 'use strict';
-var Runner = require('../../../lib/runner/runner');
+var Runner = require('lib/runner/runner');
 
 describe('runner/base', function() {
     describe('passthroughEvent', function() {

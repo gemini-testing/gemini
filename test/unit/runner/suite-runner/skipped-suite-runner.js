@@ -1,7 +1,7 @@
 'use strict';
 
-var BrowserAgent = require('../../../../lib/runner/browser-runner/browser-agent'),
-    SkippedSuiteRunner = require('../../../../lib/runner/suite-runner/skipped-suite-runner'),
+var BrowserAgent = require('lib/runner/browser-runner/browser-agent'),
+    SkippedSuiteRunner = require('lib/runner/suite-runner/skipped-suite-runner'),
     util = require('../../../util');
 
 describe('runner/suite-runner/skipped-suite-runner', function() {

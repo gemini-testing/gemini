@@ -1,10 +1,10 @@
 'use strict';
 
 const q = require('q');
-const MetaScreenUpdater = require('../../../../../lib/state-processor/capture-processor/screen-updater/meta-screen-updater');
-const temp = require('../../../../../lib/temp');
+const MetaScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/meta-screen-updater');
+const temp = require('lib/temp');
 const fs = require('q-io/fs');
-const Image = require('../../../../../lib/image');
+const Image = require('lib/image');
 
 describe('meta-screen-updater', () => {
     const sandbox = sinon.sandbox.create();

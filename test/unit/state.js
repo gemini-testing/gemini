@@ -1,8 +1,8 @@
 'use strict';
 
-const State = require('../../lib/state');
+const State = require('lib/state');
 const util = require('../util');
-const suiteUtil = require('../../lib/suite-util');
+const suiteUtil = require('lib/suite-util');
 
 describe('state methods', () => {
     describe('shouldSkip', () => {

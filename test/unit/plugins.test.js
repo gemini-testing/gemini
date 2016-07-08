@@ -9,7 +9,7 @@ describe('plugins', function() {
 
         plugins = proxyquire
             .noCallThru()
-            .load('../../lib/plugins', {
+            .load('lib/plugins', {
                 'gemini-foobar': this.foobarPlugin
             });
     });

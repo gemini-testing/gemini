@@ -1,6 +1,6 @@
 'use strict';
 
-var requireWithNoCache = require('../../lib/utils').requireWithNoCache,
+var requireWithNoCache = require('lib/utils').requireWithNoCache,
     nodeTemp = require('temp');
 
 describe('temp', function() {
@@ -9,7 +9,7 @@ describe('temp', function() {
 
     beforeEach(function() {
         sandbox.stub(nodeTemp);
-        temp = requireWithNoCache(require.resolve('../../lib/temp'));
+        temp = requireWithNoCache(require.resolve('lib/temp'));
     });
 
     afterEach(function() {

@@ -1,8 +1,8 @@
 'use strict';
 
-const errorUtils = require('../../../lib/errors/utils');
-const NoRefImageError = require('../../../lib/errors/no-ref-image-error');
-const StateError = require('../../../lib/errors/state-error');
+const errorUtils = require('lib/errors/utils');
+const NoRefImageError = require('lib/errors/no-ref-image-error');
+const StateError = require('lib/errors/state-error');
 
 describe('errors utils', () => {
     describe('fromPlainObject', () => {

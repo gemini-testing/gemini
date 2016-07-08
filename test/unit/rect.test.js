@@ -1,6 +1,6 @@
 'use strict';
 
-var Rect = require('../../lib/browser/client-scripts/rect').Rect;
+var Rect = require('lib/browser/client-scripts/rect').Rect;
 
 describe('Rect', function() {
     describe('constructor', function() {
