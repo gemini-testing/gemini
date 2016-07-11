@@ -52,7 +52,7 @@
     "mocha": "^2.1.0",
     "proxyquire": "^1.7.3",
     "sinon": "^1.17.3",
-    "uglify-js": "^2.4.24"
+    "uglify-js": "2.6.4"
   },
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
