@@ -1,29 +1,29 @@
 'use strict';
-var q = require('q'),
-    Pool = require('lib/browser-pool/caching-pool'),
-    browserWithId = require('../../util').browserWithId;
+const q = require('q');
+const Pool = require('lib/browser-pool/caching-pool');
+const browserWithId = require('../../util').browserWithId;
 
-describe('CachingPool', function() {
-    function makeStubBrowser(id) {
-        var browser = sinon.stub(browserWithId(id));
+describe('CachingPool', () => {
+    const makeStubBrowser = (id) => {
+        const browser = sinon.stub(browserWithId(id));
         browser.launch.returns(q());
         browser.reset.returns(q());
         return browser;
-    }
+    };
 
-    beforeEach(function() {
+    beforeEach(() => {
         this.underlyingPool = {
             getBrowser: sinon.stub(),
             freeBrowser: sinon.stub().returns(q()),
             finalizeBrowsers: sinon.stub().returns(q())
         };
 
-        this.poolWithReuseLimits = function(limits) {
-            var config = {
+        this.poolWithReuseLimits = (limits) => {
+            const config = {
                 getBrowserIds: sinon.stub().returns(Object.keys(limits)),
-                forBrowser: function(id) {
+                forBrowser: (id) => {
                     return {
-                        id: id,
+                        id,
                         suitesPerSession: limits[id],
                         desiredCapabilities: {}
                     };
@@ -32,66 +32,49 @@ describe('CachingPool', function() {
             return new Pool(config, this.underlyingPool);
         };
 
-        this.makePool = function() {
-            return this.poolWithReuseLimits({id: Infinity});
-        };
+        this.makePool = () => this.poolWithReuseLimits({id: Infinity});
 
         this.sinon = sinon.sandbox.create();
     });
 
-    afterEach(function() {
-        this.sinon.restore();
-    });
+    afterEach(() => this.sinon.restore());
 
-    it('should create new browser when requested first time', function() {
+    it('should create new browser when requested first time', () => {
         this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
-        var _this = this,
-            pool = this.makePool();
+        const pool = this.makePool();
         return pool.getBrowser('id')
-            .then(function() {
-                assert.calledWith(_this.underlyingPool.getBrowser, 'id');
-            });
+            .then(() => assert.calledWith(this.underlyingPool.getBrowser, 'id'));
     });
 
-    it('should return same browser as returned by underlying pool', function() {
-        var browser = makeStubBrowser('id');
+    it('should return same browser as returned by underlying pool', () => {
+        const browser = makeStubBrowser('id');
         this.underlyingPool.getBrowser.returns(q(browser));
-        var pool = this.makePool();
+        const pool = this.makePool();
         return assert.eventually.equal(pool.getBrowser('id'), browser);
     });
 
-    it('should not reset the new browser', function() {
-        var browser = makeStubBrowser('id');
+    it('should not reset the new browser', () => {
+        const browser = makeStubBrowser('id');
         this.underlyingPool.getBrowser.returns(q(browser));
         return this.makePool().getBrowser('id')
-            .then(function() {
-                assert.notCalled(browser.reset);
-            });
+            .then(() => assert.notCalled(browser.reset));
     });
 
-    it('should create and launch new browser if there is free browser with different id', function() {
-        var _this = this;
-
+    it('should create and launch new browser if there is free browser with different id', () => {
         this.underlyingPool.getBrowser
             .withArgs('first').returns(q(makeStubBrowser('first')))
             .withArgs('second').returns(q(makeStubBrowser('second')));
-        var pool = this.poolWithReuseLimits({
+        const pool = this.poolWithReuseLimits({
             first: 1,
             second: 1
         });
         return pool.getBrowser('first')
-            .then(function(browser) {
-                return pool.freeBrowser(browser);
-            })
-            .then(function() {
-                return pool.getBrowser('second');
-            })
-            .then(function() {
-                assert.calledWith(_this.underlyingPool.getBrowser, 'second');
-            });
+            .then((browser) => pool.freeBrowser(browser))
+            .then(() => pool.getBrowser('second'))
+            .then(() => assert.calledWith(this.underlyingPool.getBrowser, 'second'));
     });
 
-    it('should not quit browser when freed', function() {
+    it('should not quit browser when freed', () => {
         const pool = this.makePool();
         this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
 
@@ -100,7 +83,7 @@ describe('CachingPool', function() {
             .then(() => assert.notCalled(this.underlyingPool.freeBrowser));
     });
 
-    it('should quit browser when there are no more requests', function() {
+    it('should quit browser when there are no more requests', () => {
         const pool = this.makePool();
         this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
 
@@ -109,47 +92,40 @@ describe('CachingPool', function() {
             .then(() => assert.calledOnce(this.underlyingPool.freeBrowser));
     });
 
-    describe('when there is free browser with same id', function() {
-        beforeEach(function() {
+    describe('when there is free browser with same id', () => {
+        beforeEach(() => {
             this.browser = makeStubBrowser('id');
             this.pool = this.makePool();
             return this.pool.freeBrowser(this.browser);
         });
 
-        it('should not create second instance', function() {
-            var _this = this;
+        it('should not create second instance', () => {
             return this.pool.getBrowser('id')
-                .then(function() {
-                    assert.notCalled(_this.underlyingPool.getBrowser);
-                });
+                .then(() => assert.notCalled(this.underlyingPool.getBrowser));
         });
 
-        it('should reset the browser', function() {
-            var _this = this;
+        it('should reset the browser', () => {
             return this.pool.getBrowser('id')
-                .then(function() {
-                    assert.calledOnce(_this.browser.reset);
-                });
+                .then(() => assert.calledOnce(this.browser.reset));
         });
 
-        describe('when reset failed', function() {
-            it('should fail to get browser', function() {
+        describe('when reset failed', () => {
+            it('should fail to get browser', () => {
                 this.browser.reset.returns(q.reject('some-error'));
                 return assert.isRejected(this.pool.getBrowser('id'), /some-error/);
             });
 
-            it('should put browser back', function() {
-                var _this = this;
+            it('should put browser back', () => {
                 this.browser.reset.returns(q.reject());
 
                 return this.pool.getBrowser('id')
-                    .fail(function() {
-                        assert.calledOnce(_this.underlyingPool.freeBrowser);
-                        assert.calledWith(_this.underlyingPool.freeBrowser, _this.browser);
+                    .fail(() => {
+                        assert.calledOnce(this.underlyingPool.freeBrowser);
+                        assert.calledWith(this.underlyingPool.freeBrowser, this.browser);
                     });
             });
 
-            it('should keep original error if failed to put browser back', function() {
+            it('should keep original error if failed to put browser back', () => {
                 this.browser.reset.returns(q.reject('reset-error'));
                 this.underlyingPool.freeBrowser.returns(q.reject('free-error'));
 
@@ -158,8 +134,8 @@ describe('CachingPool', function() {
         });
     });
 
-    describe('when there are multiple browsers with same id', function() {
-        beforeEach(function() {
+    describe('when there are multiple browsers with same id', () => {
+        beforeEach(() => {
             this.firstBrowser = makeStubBrowser('id');
             this.secondBrowser = makeStubBrowser('id');
             this.pool = this.makePool();
@@ -169,119 +145,85 @@ describe('CachingPool', function() {
             ]);
         });
 
-        it('should return last browser in cache on first getBrowser', function() {
+        it('should return last browser in cache on first getBrowser', () => {
             return assert.becomes(this.pool.getBrowser('id'), this.secondBrowser);
         });
 
-        it('should return first browser on second getBrowser', function() {
-            var _this = this;
+        it('should return first browser on second getBrowser', () => {
             return this.pool.getBrowser('id')
-                .then(function() {
-                    return assert.becomes(_this.pool.getBrowser('id'), _this.firstBrowser);
-                });
+                .then(() => assert.becomes(this.pool.getBrowser('id'), this.firstBrowser));
         });
 
-        it('should launch new session when there are no free browsers left', function() {
-            var _this = this;
+        it('should launch new session when there are no free browsers left', () => {
             return this.pool.getBrowser('id')
-                .then(function() {
-                    return _this.pool.getBrowser('id');
-                })
-                .then(function() {
-                    return _this.pool.getBrowser('id');
-                })
-                .then(function() {
-                    assert.calledWith(_this.underlyingPool.getBrowser, 'id');
-                });
+                .then(() => this.pool.getBrowser('id'))
+                .then(() => this.pool.getBrowser('id'))
+                .then(() => assert.calledWith(this.underlyingPool.getBrowser, 'id'));
         });
     });
 
-    describe('when there is reuse limit', function() {
-        beforeEach(function() {
-            this.launchAndFree = function(pool, id) {
+    describe('when there is reuse limit', () => {
+        beforeEach(() => {
+            this.launchAndFree = (pool, id) => {
                 return pool.getBrowser(id)
-                    .then(function(browser) {
-                        return pool.freeBrowser(browser);
-                    });
+                    .then((browser) => pool.freeBrowser(browser));
             };
         });
 
-        it('should launch only one session within the reuse limit', function() {
+        it('should launch only one session within the reuse limit', () => {
             this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
-            var _this = this,
-                pool = this.poolWithReuseLimits({
-                    id: 2
-                });
+            const pool = this.poolWithReuseLimits({id: 2});
             return this.launchAndFree(pool, 'id')
-                .then(function(browser) {
-                    return pool.getBrowser('id');
-                })
-                .then(function() {
-                    assert.calledOnce(_this.underlyingPool.getBrowser);
-                });
+                .then(() => pool.getBrowser('id'))
+                .then(() => assert.calledOnce(this.underlyingPool.getBrowser));
         });
 
-        it('should launch next session when over reuse limit', function() {
+        it('should launch next session when over reuse limit', () => {
             this.underlyingPool.getBrowser
                 .onFirstCall().returns(q(makeStubBrowser('id')))
                 .onSecondCall().returns(q(makeStubBrowser('id')));
-            var _this = this,
-                pool = this.poolWithReuseLimits({
-                    id: 2
-                });
+            const pool = this.poolWithReuseLimits({id: 2});
             return this.launchAndFree(pool, 'id')
-                .then(function(browser) {
-                    return _this.launchAndFree(pool, 'id');
-                })
-                .then(function() {
-                    return pool.getBrowser('id');
-                })
-                .then(function() {
-                    assert.calledTwice(_this.underlyingPool.getBrowser);
-                });
+                .then(() => this.launchAndFree(pool, 'id'))
+                .then(() => pool.getBrowser('id'))
+                .then(() => assert.calledTwice(this.underlyingPool.getBrowser));
         });
 
-        it('should close old session when reached reuse limit', function() {
-            var browser = makeStubBrowser('id');
+        it('should get new session for each suite if reuse limit equal 1', () => {
+            this.underlyingPool.getBrowser
+                .onFirstCall().returns(q(makeStubBrowser('browserId')))
+                .onSecondCall().returns(q(makeStubBrowser('browserId')));
+            const pool = this.poolWithReuseLimits({browserId: 1});
+            return this.launchAndFree(pool, 'browserId')
+                .then(() => pool.getBrowser('browserId'))
+                .then(() => assert.calledTwice(this.underlyingPool.getBrowser));
+        });
+
+        it('should close old session when reached reuse limit', () => {
+            const browser = makeStubBrowser('id');
             this.underlyingPool.getBrowser.returns(q(browser));
-            var _this = this,
-                pool = this.poolWithReuseLimits({
-                    id: 2
-                });
+            const pool = this.poolWithReuseLimits({id: 2});
             return this.launchAndFree(pool, 'id')
-                .then(function() {
-                    return _this.launchAndFree(pool, 'id');
-                })
-                .then(function() {
-                    assert.calledWith(_this.underlyingPool.freeBrowser, browser);
-                });
+                .then(() => this.launchAndFree(pool, 'id'))
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser));
         });
 
-        it('should cache browser with different id even if the first one is over limit', function() {
+        it('should cache browser with different id even if the first one is over limit', () => {
             this.underlyingPool.getBrowser
                 .withArgs('first').returns(q(makeStubBrowser('first')));
 
-            var createSecondBrowser = this.underlyingPool.getBrowser.withArgs('second');
+            const createSecondBrowser = this.underlyingPool.getBrowser.withArgs('second');
             createSecondBrowser.returns(q(makeStubBrowser('second')));
 
-            var _this = this,
-                pool = this.poolWithReuseLimits({
-                    first: 2,
-                    second: 2
-                });
+            const pool = this.poolWithReuseLimits({
+                first: 2,
+                second: 2
+            });
             return this.launchAndFree(pool, 'first')
-                .then(function() {
-                    return _this.launchAndFree(pool, 'second');
-                })
-                .then(function() {
-                    return _this.launchAndFree(pool, 'first');
-                })
-                .then(function() {
-                    return pool.getBrowser('second');
-                })
-                .then(function() {
-                    assert.calledOnce(createSecondBrowser);
-                });
+                .then(() => this.launchAndFree(pool, 'second'))
+                .then(() => this.launchAndFree(pool, 'first'))
+                .then(() => pool.getBrowser('second'))
+                .then(() => assert.calledOnce(createSecondBrowser));
         });
     });
 });
