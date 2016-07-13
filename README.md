@@ -210,6 +210,7 @@ more clearly, use HTML reporter:
 ```
 gemini test --reporter html [paths to test suites]
 ```
+After all tests are performed, you can see a link to your HTML report.
 
 You can use both console and HTML reporters at the same time:
 
