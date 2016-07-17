@@ -106,13 +106,15 @@ describe('unit-image', () => {
 
         return Image.compare('some/path', 'other/path', {
                 canHaveCaret: true,
-                tolerance: 250
+                tolerance: 250,
+                pixelRatio: 11
             })
             .then(() => {
                 assert.calledOnce(looksSameStub);
                 assert.calledWith(looksSameStub, 'some/path', 'other/path', {
                     ignoreCaret: true,
-                    tolerance: 250
+                    tolerance: 250,
+                    pixelRatio: 11
                 });
             });
     });
