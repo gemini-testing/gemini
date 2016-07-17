@@ -157,6 +157,21 @@ describe('state-processor/state-processor', () => {
                 }));
         });
 
+        it('should use page pixel ratio', () => {
+            const opts = {
+                page: {
+                    pixelRatio: 11
+                }
+            };
+
+            return exec_(opts)
+                .then(() => assert.calledWithMatch(job, {
+                    execOpts: {
+                        pixelRatio: 11
+                    }
+                }));
+        });
+
         it('should restore error object inheritance', () => {
             sandbox.stub(q, 'nfcall').returns(q.reject({name: 'NoRefImageError'}));
             sandbox.stub(errorUtils, 'fromPlainObject')
