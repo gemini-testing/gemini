@@ -1,79 +1,64 @@
 'use strict';
-var q = require('q'),
-    Browser = require('lib/browser'),
-    BasicPool = require('lib/browser-pool/basic-pool'),
-    signalHandler = require('lib/signal-handler'),
-    browserWithId = require('../../util').browserWithId;
+
+const q = require('q');
+const Browser = require('lib/browser');
+const BasicPool = require('lib/browser-pool/basic-pool');
+const signalHandler = require('lib/signal-handler');
+const browserWithId = require('test/util').browserWithId;
 
 describe('UnlimitedPool', function() {
-    beforeEach(function() {
-        this.browserConfig = {id: 'id'};
-        this.config = {
-            forBrowser: sinon.stub().returns(this.browserConfig)
+    const sandbox = sinon.sandbox.create();
+    const browserConfig = {id: 'id'};
+
+    let config;
+    let browser;
+    let pool;
+    let requestBrowser;
+
+    beforeEach(() => {
+        config = {
+            forBrowser: sinon.stub().returns(browserConfig)
         };
-        this.sinon = sinon.sandbox.create();
-        this.browser = sinon.stub(browserWithId('id'));
-        this.browser.launch.returns(q());
-        this.browser.quit.returns(q());
-        this.sinon.stub(Browser, 'create').returns(this.browser);
-        this.pool = new BasicPool(this.config);
+        browser = sandbox.stub(browserWithId('id'));
+        browser.launch.returns(q());
+        browser.quit.returns(q());
 
-        this.requestBrowser = function() {
-            return this.pool.getBrowser('id');
-        };
+        sandbox.stub(Browser, 'create').returns(browser);
+        pool = new BasicPool(config);
+        requestBrowser = () => pool.getBrowser('id');
     });
 
-    afterEach(function() {
-        this.sinon.restore();
+    afterEach(() => sandbox.restore());
+
+    it('should create new browser when requested', () => {
+        return requestBrowser()
+            .then(() => assert.calledWith(Browser.create, browserConfig));
     });
 
-    it('should create new browser when requested', function() {
-        var _this = this;
-        return this.requestBrowser()
-            .then(function() {
-                assert.calledWith(Browser.create, _this.browserConfig);
-            });
+    it('should launch a browser', () => {
+        return requestBrowser()
+            .then(() => assert.calledOnce(browser.launch));
     });
 
-    it('should launch a browser', function() {
-        var _this = this;
-        return this.requestBrowser()
-            .then(function() {
-                assert.calledOnce(_this.browser.launch);
-            });
-    });
+    it('should finalize browser if failed to create it', () => {
+        const freeBrowser = sinon.spy(pool, 'freeBrowser');
+        const assertCalled = () => assert.called(freeBrowser);
 
-    it('should finalize browser if failed to create it', function() {
-        var freeBrowser = this.sinon.spy(this.pool, 'freeBrowser'),
-            assertCalled = function() {
-                assert.called(freeBrowser);
-            };
+        browser.reset.returns(q.reject());
 
-        this.browser.reset.returns(q.reject());
-
-        return this.requestBrowser()
+        return requestBrowser()
             .then(assertCalled, assertCalled);
     });
 
-    it('should quit a browser when freed', function() {
-        var _this = this;
-        return this.requestBrowser()
-            .then(function(browser) {
-                return _this.pool.freeBrowser(browser);
-            })
-            .then(function() {
-                assert.calledOnce(_this.browser.quit);
-            });
+    it('should quit a browser when freed', () => {
+        return requestBrowser()
+            .then((browser) => pool.freeBrowser(browser))
+            .then(() => assert.calledOnce(browser.quit));
     });
 
-    it('should quit a browser on exit signal', function() {
-        var _this = this;
-        return this.requestBrowser()
-            .then(function() {
-                signalHandler.emit('exit');
-            })
-            .then(function() {
-                assert.calledOnce(_this.browser.quit);
-            });
+    it('should quit a browser on exit signal', () => {
+        return requestBrowser()
+            .then(() => signalHandler.emit('exit'))
+            .then(() => assert.calledOnce(browser.quit));
     });
 });
