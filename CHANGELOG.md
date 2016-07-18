@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.4.1 - 2016-07-18
+
+* Froze uglify-js version at v2.6.4
+* Fixed bug with suites per browser limit
+* Fixed ignoring of a caret for devices with pixel ratio different from 1
+* Output path to html report to a console
+* Updated version of looks-same dependency to 3.0.0
+
 ## 4.4.0 - 2016-06-17
 
 * Added option `compositeImage` which allows to test areas with height larger than viewport one,
