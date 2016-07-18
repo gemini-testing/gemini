@@ -1,9 +1,4 @@
-.gitignore
-.travis.yml
-.jshintignore
-.jshintrc
-.npmignore
-.sublime-project*
+**/.*
 test/
 coverage/
 CONTRIBUTING.md
