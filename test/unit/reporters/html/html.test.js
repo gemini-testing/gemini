@@ -18,7 +18,7 @@ describe('HTML Reporter', () => {
         emitter = new EventEmitter();
 
         // calling constructor for its side effect
-        new HtmlReporter(emitter); // jshint ignore:line
+        new HtmlReporter(emitter); // eslint-disable-line no-new
     });
 
     afterEach(() => sandbox.restore());

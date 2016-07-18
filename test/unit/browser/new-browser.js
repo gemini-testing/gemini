@@ -153,7 +153,7 @@ describe('browser/new-browser', () => {
         });
 
         describe('open', () => {
-            const open = (browser, params) =>  {
+            const open = (browser, params) => {
                 params = params || {};
 
                 return browser.launch()
@@ -329,12 +329,12 @@ describe('browser/new-browser', () => {
     describe('serialize', () => {
         it('should add config with browser id, gridUrl and httpTimeout to object', () => {
             const browser = makeBrowser({}, {
-                    id: 'someBrowser',
-                    gridUrl: 'http://grid.url',
-                    httpTimeout: 100500,
-                    screenshotMode: 'viewport',
-                    some: 'otherProperty'
-                });
+                id: 'someBrowser',
+                gridUrl: 'http://grid.url',
+                httpTimeout: 100500,
+                screenshotMode: 'viewport',
+                some: 'otherProperty'
+            });
 
             const obj = browser.serialize();
 

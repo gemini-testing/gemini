@@ -36,7 +36,7 @@ describe('calibrator', function() {
 
     it('should return also features detected by script', function() {
         setScreenshot('calibrate.png');
-        browser.evalScript.returns(q({feature: 'value', innerWidth:984}));
+        browser.evalScript.returns(q({feature: 'value', innerWidth: 984}));
         var result = calibrator.calibrate(browser);
         return assert.eventually.propertyVal(result, 'feature', 'value');
     });

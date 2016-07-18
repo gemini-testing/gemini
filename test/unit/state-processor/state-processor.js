@@ -76,9 +76,9 @@ describe('state-processor/state-processor', () => {
 
         it('should pass capture processor info to job', () => {
             var captureProcessorInfo = {
-                    module: '/some/module',
-                    constructorArg: {some: 'arg'}
-                };
+                module: '/some/module',
+                constructorArg: {some: 'arg'}
+            };
 
             return exec_({captureProcessorInfo})
                 .then(() => assert.calledWithMatch(job, {captureProcessorInfo}));
@@ -86,8 +86,8 @@ describe('state-processor/state-processor', () => {
 
         it('should pass page disposition to job', () => {
             return exec_({
-                    page: {some: 'data'}
-                })
+                page: {some: 'data'}
+            })
                 .then(() => assert.calledWithMatch(job, {
                     page: {some: 'data'}
                 }));
@@ -95,14 +95,14 @@ describe('state-processor/state-processor', () => {
 
         it('should not pass coverage data to job', () => {
             return exec_({
-                    page: {
-                        coverage: 'some-big-object'
-                    }
-                }).then(() => assert.neverCalledWithMatch(job, {
-                    page: {
-                        coverage: 'some-big-object'
-                    }
-                }));
+                page: {
+                    coverage: 'some-big-object'
+                }
+            }).then(() => assert.neverCalledWithMatch(job, {
+                page: {
+                    coverage: 'some-big-object'
+                }
+            }));
         });
 
         it('should pass serialized temp to job', () => {

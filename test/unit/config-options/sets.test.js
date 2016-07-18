@@ -26,22 +26,22 @@ describe('config.sets', function() {
     describe('files', function() {
         it('should be `gemini` by default', function() {
             var config = createConfig({
-                    sets: {
-                        someSet: {}
-                    }
-                });
+                sets: {
+                    someSet: {}
+                }
+            });
 
             assert.deepEqual(config.sets.someSet.files, ['gemini']);
         });
 
         it('should convert string to array of strings', function() {
             var config = createConfig({
-                    sets: {
-                        someSet: {
-                            files: 'some/path'
-                        }
+                sets: {
+                    someSet: {
+                        files: 'some/path'
                     }
-                });
+                }
+            });
 
             assert.deepEqual(config.sets.someSet.files, ['some/path']);
         });

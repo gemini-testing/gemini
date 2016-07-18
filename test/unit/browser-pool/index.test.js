@@ -20,7 +20,7 @@ describe('browser-pool', () => {
     });
 
     it('should create pool according parallelLimit if that option exist', () => {
-        const  browserPool = pool.create(mkConfig({
+        const browserPool = pool.create(mkConfig({
             parallelLimit: 10
         }));
 

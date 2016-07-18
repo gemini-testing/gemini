@@ -13,7 +13,7 @@ describe('config', function() {
     it('should read config file', function() {
         sandbox.stub(configReader, 'read').returns({rootUrl: ''});
 
-        new Config('/some/path'); // jshint ignore:line
+        new Config('/some/path'); // eslint-disable-line
 
         assert.calledWith(configReader.read, '/some/path');
     });

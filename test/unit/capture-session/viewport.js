@@ -10,7 +10,7 @@ const Viewport = require('lib/capture-session/viewport');
 describe('Viewport', () => {
     const sandbox = sinon.sandbox.create();
 
-    const createViewport = (opts) => new Viewport(opts.coords || {top: 0, left:0}, opts.image, opts.pixelRatio);
+    const createViewport = (opts) => new Viewport(opts.coords || {top: 0, left: 0}, opts.image, opts.pixelRatio);
 
     afterEach(() => sandbox.restore());
 

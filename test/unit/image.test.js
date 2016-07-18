@@ -105,10 +105,10 @@ describe('unit-image', () => {
         looksSameStub.yields();
 
         return Image.compare('some/path', 'other/path', {
-                canHaveCaret: true,
-                tolerance: 250,
-                pixelRatio: 11
-            })
+            canHaveCaret: true,
+            tolerance: 250,
+            pixelRatio: 11
+        })
             .then(() => {
                 assert.calledOnce(looksSameStub);
                 assert.calledWith(looksSameStub, 'some/path', 'other/path', {
@@ -125,12 +125,12 @@ describe('unit-image', () => {
         createDiffStub.yields();
 
         return Image.buildDiff({
-                reference: 100,
-                current: 200,
-                diff: 500,
-                tolerance: 300,
-                diffColor: 400
-            })
+            reference: 100,
+            current: 200,
+            diff: 500,
+            tolerance: 300,
+            diffColor: 400
+        })
             .then(() => {
                 assert.calledOnce(createDiffStub);
                 assert.calledWith(createDiffStub, {

@@ -115,9 +115,9 @@ describe('runner/suite-runner/regular-suite-runner', function() {
 
         it('should open suite url in browser', function() {
             var suite = makeSuiteStub({
-                    states: [util.makeStateStub()],
-                    url: '/path'
-                });
+                states: [util.makeStateStub()],
+                url: '/path'
+            });
 
             return run_(suite)
                 .then(function() {
@@ -136,8 +136,8 @@ describe('runner/suite-runner/regular-suite-runner', function() {
 
         it('should run `before` actions if there are some states', function() {
             var suite = makeSuiteStub({
-                    states: [util.makeStateStub()]
-                });
+                states: [util.makeStateStub()]
+            });
 
             return run_(suite)
                 .then(function() {
@@ -160,8 +160,8 @@ describe('runner/suite-runner/regular-suite-runner', function() {
 
         it('should passthrough capture processor to state runner', function() {
             var suite = makeSuiteStub({
-                    states: [util.makeStateStub()]
-                });
+                states: [util.makeStateStub()]
+            });
 
             return run_(suite, 'stateProcessor')
                 .then(function() {
@@ -364,8 +364,8 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         describe('afterActions', function() {
             it('should perform afterActions', function() {
                 var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
+                    states: [util.makeStateStub()]
+                });
 
                 return run_(suite)
                     .then(function() {
@@ -375,8 +375,8 @@ describe('runner/suite-runner/regular-suite-runner', function() {
 
             it('should perform afterActions even if state failed', function() {
                 var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
+                    states: [util.makeStateStub()]
+                });
 
                 StateRunner.prototype.run.returns(q.reject());
 
@@ -441,8 +441,8 @@ describe('runner/suite-runner/regular-suite-runner', function() {
 
             it('should run post actions if `afterActions` failed', function() {
                 var suite = makeSuiteStub({
-                        states: [util.makeStateStub()]
-                    });
+                    states: [util.makeStateStub()]
+                });
 
                 CaptureSession.prototype.runActions.withArgs(suite.afterActions).returns(q.reject());
 
