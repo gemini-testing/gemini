@@ -7,6 +7,7 @@ const logger = require('lib/utils').logger;
 const chalk = require('chalk');
 const path = require('path');
 const view = require('lib/reporters/html/view');
+const lib = require('lib/reporters/html/lib');
 
 describe('HTML Reporter', () => {
     const sandbox = sinon.sandbox.create();
@@ -30,5 +31,19 @@ describe('HTML Reporter', () => {
 
         const reportPath = `file://${path.resolve('gemini-report/index.html')}`;
         assert.calledWith(logger.log, `Your HTML report is here: ${chalk.yellow(reportPath)}`);
+    });
+
+    it('should escape special chars in paths', () => {
+        const data = {
+            suite: {
+                path: 'fake/long+path'
+            },
+            state: {
+                name: 'fakeName'
+            },
+            browserId: 'fakeId'
+        };
+
+        assert.equal(lib.currentPath(data), 'images/fake/long%2Bpath/fakeName/fakeId~current.png');
     });
 });
