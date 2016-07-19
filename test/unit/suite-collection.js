@@ -78,10 +78,10 @@ describe('suite-collection', function() {
     describe('enable/disable', function() {
         it('all tests should be enabled by default', function() {
             var tree = mkTree({
-                    parent: {
-                        child: ['state1', 'state2']
-                    }
-                }, {browsers: ['b1', 'b2']});
+                parent: {
+                    child: ['state1', 'state2']
+                }
+            }, {browsers: ['b1', 'b2']});
 
             assert.deepEqual(tree.parent.browsers, ['b1', 'b2']);
             assert.deepEqual(tree.child.browsers, ['b1', 'b2']);
@@ -92,10 +92,10 @@ describe('suite-collection', function() {
         describe('disableAll', function() {
             it('should disable all suites', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: []
-                        }
-                    });
+                    parent: {
+                        child: []
+                    }
+                });
 
                 new SuiteCollection([tree.parent])
                     .disableAll();
@@ -106,10 +106,10 @@ describe('suite-collection', function() {
 
             it('should not disable parent suite if it not in collection', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: []
-                        }
-                    }, {browsers: ['b1', 'b2']});
+                    parent: {
+                        child: []
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.child])
                     .disableAll();
@@ -119,10 +119,10 @@ describe('suite-collection', function() {
 
             it('should disable all suites after enable', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: []
-                        }
-                    });
+                    parent: {
+                        child: []
+                    }
+                });
 
                 new SuiteCollection([tree.parent])
                     .enableAll()
@@ -136,12 +136,12 @@ describe('suite-collection', function() {
         describe('disable', function() {
             it('should disable only passed suite and its subtree', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: {
-                                grandchild: []
-                            }
+                    parent: {
+                        child: {
+                            grandchild: []
                         }
-                    }, {browsers: ['b1', 'b2']});
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.parent])
                     .disable(tree.child);
@@ -153,10 +153,10 @@ describe('suite-collection', function() {
 
             it('should disable suite by full name', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: []
-                        }
-                    });
+                    parent: {
+                        child: []
+                    }
+                });
 
                 new SuiteCollection([tree.parent])
                     .disable(tree.child.fullName);
@@ -177,11 +177,11 @@ describe('suite-collection', function() {
 
             it('should disable whole subtree including states', function() {
                 var tree = mkTree({
-                        parent: {
-                            child1: ['state1'],
-                            child2: ['state2', 'state3']
-                        }
-                    });
+                    parent: {
+                        child1: ['state1'],
+                        child2: ['state2', 'state3']
+                    }
+                });
 
                 new SuiteCollection([tree.parent])
                     .disable(tree.parent);
@@ -196,12 +196,12 @@ describe('suite-collection', function() {
 
             it('should disable subtree even if it was enabled', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: {
-                                grandchild: []
-                            }
+                    parent: {
+                        child: {
+                            grandchild: []
                         }
-                    }, {browsers: ['b1', 'b2']});
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.parent])
                     .enableAll()
@@ -214,8 +214,8 @@ describe('suite-collection', function() {
 
             it('should disable only specified state', function() {
                 var tree = mkTree({
-                        suite: ['someState', 'otherState']
-                    }, {browsers: ['b1', 'b2']});
+                    suite: ['someState', 'otherState']
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.suite])
                     .disable(tree.suite, {state: 'someState'});
@@ -237,10 +237,10 @@ describe('suite-collection', function() {
 
             it('should not disable whole tree down to disabled state', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: ['someState']
-                        }
-                    }, {browsers: ['b1', 'b2']});
+                    parent: {
+                        child: ['someState']
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.parent])
                     .disable(tree.child, {state: 'someState'});
@@ -251,8 +251,8 @@ describe('suite-collection', function() {
 
             it('should apply all disable rules', function() {
                 var tree = mkTree({
-                        suite: ['someState', 'otherState']
-                    });
+                    suite: ['someState', 'otherState']
+                });
 
                 new SuiteCollection([tree.suite])
                     .disable(tree.suite, {state: 'someState'})
@@ -264,8 +264,8 @@ describe('suite-collection', function() {
 
             it('should disable only specified state in specified browser', function() {
                 var tree = mkTree({
-                        suite: ['someState']
-                    }, {browsers: ['b1', 'b2']});
+                    suite: ['someState']
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.suite])
                     .disable(tree.suite, {state: 'someState', browser: 'b1'});
@@ -275,11 +275,11 @@ describe('suite-collection', function() {
 
             it('should apply browser rule to whole tree', function() {
                 var tree = mkTree({
-                        parent: {
-                            child1: ['state1'],
-                            child2: ['state2', 'state3']
-                        }
-                    }, {browsers: ['b1', 'b2']});
+                    parent: {
+                        child1: ['state1'],
+                        child2: ['state2', 'state3']
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.parent])
                     .disable(tree.parent, {browser: 'b1'});
@@ -296,10 +296,10 @@ describe('suite-collection', function() {
         describe('enableAll', function() {
             it('should enable all suites', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: []
-                        }
-                    }, {browsers: ['b1', 'b2']});
+                    parent: {
+                        child: []
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.parent])
                     .enableAll();
@@ -310,10 +310,10 @@ describe('suite-collection', function() {
 
             it('should enable all suites after disable', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: []
-                        }
-                    }, {browsers: ['b1', 'b2']});
+                    parent: {
+                        child: []
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.parent])
                     .disableAll()
@@ -327,10 +327,10 @@ describe('suite-collection', function() {
         describe('enable', function() {
             it('should enable suite by full name', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: []
-                        }
-                    }, {browsers: ['b1', 'b2']});
+                    parent: {
+                        child: []
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.parent])
                     .disableAll()
@@ -352,8 +352,8 @@ describe('suite-collection', function() {
 
             it('should enable only specified state', function() {
                 var tree = mkTree({
-                        suite: ['someState', 'otherState']
-                    }, {browsers: ['b1', 'b2']});
+                    suite: ['someState', 'otherState']
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.suite])
                     .disableAll()
@@ -365,8 +365,8 @@ describe('suite-collection', function() {
 
             it('should apply all enable rules', function() {
                 var tree = mkTree({
-                        suite: ['someState', 'otherState']
-                    }, {browsers: ['b1', 'b2']});
+                    suite: ['someState', 'otherState']
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.suite])
                     .disableAll()
@@ -379,8 +379,8 @@ describe('suite-collection', function() {
 
             it('should enable only specified state in specified browser', function() {
                 var tree = mkTree({
-                        suite: ['someState']
-                    }, {browsers: ['b1', 'b2']});
+                    suite: ['someState']
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.suite])
                     .disableAll()
@@ -391,8 +391,8 @@ describe('suite-collection', function() {
 
             it('should apply all browser enable rules', function() {
                 var tree = mkTree({
-                        suite: ['someState']
-                    }, {browsers: ['b1', 'b2']});
+                    suite: ['someState']
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.suite])
                     .disableAll()
@@ -404,12 +404,12 @@ describe('suite-collection', function() {
 
             it('should enable whole tree down to enabled state', function() {
                 var tree = mkTree({
-                        parent: {
-                            child: {
-                                grandchild: ['someState']
-                            }
+                    parent: {
+                        child: {
+                            grandchild: ['someState']
                         }
-                    }, {browsers: ['b1', 'b2']});
+                    }
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.parent])
                     .disableAll()
@@ -423,8 +423,8 @@ describe('suite-collection', function() {
 
             it('should be able to enable in some unknown browser', function() {
                 var tree = mkTree({
-                        suite: []
-                    }, {browsers: ['b1', 'b2']});
+                    suite: []
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.suite])
                     .enable(tree.suite, {browser: 'b3'});
@@ -434,8 +434,8 @@ describe('suite-collection', function() {
 
             it('should not remove new browser on second enable', function() {
                 var tree = mkTree({
-                        suite: []
-                    }, {browsers: ['b1', 'b2']});
+                    suite: []
+                }, {browsers: ['b1', 'b2']});
 
                 new SuiteCollection([tree.suite])
                     .disableAll()

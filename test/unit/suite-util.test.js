@@ -15,8 +15,8 @@ describe('suite-util', function() {
 
         it('should skip browser if its id matches skip list', function() {
             var matcher = {
-                    matches: _.isEqual.bind(null, 'some-browser')
-                };
+                matches: _.isEqual.bind(null, 'some-browser')
+            };
 
             assert.isTrue(shouldSkip(
                 {skipped: [matcher]},
@@ -26,8 +26,8 @@ describe('suite-util', function() {
 
         it('should not skip the browser if its id does not match skip list', function() {
             var matcher = {
-                    matches: _.isEqual.bind(null, 'some-browser')
-                };
+                matches: _.isEqual.bind(null, 'some-browser')
+            };
             assert.isFalse(shouldSkip(
                 {skipped: [matcher]},
                 'another-browser'

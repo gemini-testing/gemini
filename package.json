@@ -47,12 +47,12 @@
     "coveralls": "^2.11.2",
     "husky": "^0.11.4",
     "istanbul": "^0.4.2",
-    "jscs": "^2.11.0",
-    "jshint": "^2.7.0",
+    "eslint": "^3.0.1",
     "mocha": "^2.1.0",
     "proxyquire": "^1.7.3",
     "sinon": "^1.17.3",
-    "uglify-js": "2.6.4"
+    "uglify-js": "2.6.4",
+    "eslint-config-gemini-testing": "^2.0.0"
   },
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
@@ -60,7 +60,7 @@
     "test-func": "istanbul test _mocha test/functional",
     "test-browser": "istanbul test _mocha test/browser",
     "test": "istanbul test _mocha -- --recursive test/unit test/functional test/browser",
-    "lint": "jshint . && jscs .",
+    "lint": "eslint .",
     "precommit": "npm run lint",
     "preversion": "npm run lint && npm test"
   },

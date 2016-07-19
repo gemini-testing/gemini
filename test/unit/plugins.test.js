@@ -52,7 +52,7 @@ describe('plugins', function() {
         });
 
         it('should handle empty plugins', function() {
-            var _this = this.gemini,
+            var _this = this,
                 options = {system: {plugins: {}}};
 
             assert.doesNotThrow(function() {

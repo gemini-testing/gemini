@@ -24,8 +24,8 @@ describe('runner/suite-runner/create', function() {
 
     it('should create RegularSuiteRunner for suite with states', function() {
         var suite = util.makeSuiteStub({
-                states: [util.makeStateStub()]
-            });
+            states: [util.makeStateStub()]
+        });
 
         var runner = suiteRunner.create(suite, {});
 
@@ -34,8 +34,8 @@ describe('runner/suite-runner/create', function() {
 
     it('should create SkippedSuiteRunner for skipped suite', function() {
         var suite = util.makeSuiteStub({
-                states: [util.makeStateStub()]
-            });
+            states: [util.makeStateStub()]
+        });
         sandbox.stub(suiteUtil, 'shouldSkip').returns(true);
 
         var runner = suiteRunner.create(suite, {});

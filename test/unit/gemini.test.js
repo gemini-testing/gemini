@@ -26,9 +26,9 @@ describe('gemini', function() {
                 });
 
             return new Gemini({
-                    rootUrl: 'stubRootUrl',
-                    system: {projectRoot: 'stubProjectRoot'}
-                })
+                rootUrl: 'stubRootUrl',
+                system: {projectRoot: 'stubProjectRoot'}
+            })
                 .readTests(null, grep);
         }
 
@@ -140,12 +140,12 @@ describe('gemini', function() {
             Runner.prototype.run.returns(q());
 
             return new Gemini({
-                    rootUrl: 'stubRootUrl',
-                    system: {
-                        projectRoot: 'stubProjectRoot',
-                        tempDir: opts.tempDir
-                    }
-                })
+                rootUrl: 'stubRootUrl',
+                system: {
+                    projectRoot: 'stubProjectRoot',
+                    tempDir: opts.tempDir
+                }
+            })
                 .test([]);
         }
 

@@ -87,9 +87,9 @@ describe('LimitedPool', function() {
                 .withArgs('second').returns(q.reject());
 
             return q.allSettled([
-                    pool.getBrowser('first'),
-                    pool.getBrowser('second')
-                ])
+                pool.getBrowser('first'),
+                pool.getBrowser('second')
+            ])
                 .then(() => pool.freeBrowser(browser))
                 .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: true}));
         });

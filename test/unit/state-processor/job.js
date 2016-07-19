@@ -60,8 +60,8 @@ describe('state-processor/job', () => {
 
     it('should capture screenshot', () => {
         var page = {
-                captureArea: {}
-            };
+            captureArea: {}
+        };
 
         return execJob_({page})
             .then(() => {
