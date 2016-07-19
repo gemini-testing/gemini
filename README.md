@@ -43,11 +43,11 @@ Required software:
 
 1. WebDriver server implementation. There are few possible options:
 
-   - [Selenium Server](http://docs.seleniumhq.org/download/) – for testing in
-     different browsers.
+   - [Selenium Server](http://docs.seleniumhq.org/download/) — for testing in
+     different browsers. Launch with `selenium-standalone start` command.
 
-   - [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/) - for
-     testing in Google Chrome.
+   - [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/) — for
+     testing in Google Chrome. Launch with `chromedriver --port=4444 --url-base=wd/hub` command.
 
    - [PhantomJS](http://phantomjs.org/) — launch with `phantomjs
      --webdriver=4444` command.
