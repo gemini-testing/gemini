@@ -27,7 +27,9 @@ describe('browser/new-browser', () => {
             windowHandle: sinon.stub().returns(q({})),
             moveTo: sinon.stub().returns(q()),
             elementByCssSelector: sinon.stub().returns(q()),
-            on: sinon.stub()
+            on: sinon.stub(),
+            currentContext: sinon.stub().returns(q()),
+            context: sinon.stub().returns(q())
         };
 
         sandbox.stub(wdAgent, 'promiseRemote').returns(wd);
@@ -46,6 +48,60 @@ describe('browser/new-browser', () => {
             const browser = makeBrowser({version: '1.0'});
 
             assert.equal(browser.version, '1.0');
+        });
+    });
+
+    describe('should expose wd API', () => {
+        const testExposedWdMethod = (method) => {
+            wd[method] = sinon.stub().withArgs('firstArg', 'secondArg').returns(q('awesome-res'));
+
+            return assert.eventually.equal(makeBrowser()[method]('firstArg', 'secondArg'), 'awesome-res');
+        };
+
+        [
+            'sleep', 'waitForElementByCssSelector', 'waitForElementByCssSelector', 'waitFor', 'moveTo',
+            'click', 'doubleClick', 'buttonDown', 'buttonUp', 'keys', 'type', 'tapElement', 'execute',
+            'setWindowSize', 'getWindowSize', 'getOrientation', 'setOrientation'
+        ].forEach((method) => it(method, () => testExposedWdMethod(method)));
+
+        describe('getOrientation', () => {
+            beforeEach(() => wd.getOrientation = sinon.stub());
+
+            it('should be applied in context `NATIVE_APP`', () => {
+                const context = wd.context.withArgs('NATIVE_APP').named('context');
+
+                return makeBrowser().getOrientation()
+                    .then(() => assert.callOrder(context, wd.getOrientation));
+            });
+
+            it('should restore original context after applying', () => {
+                wd.currentContext.returns(q('ORIGINAL_CONTEXT'));
+
+                const context = wd.context.withArgs('ORIGINAL_CONTEXT').named('context');
+
+                return makeBrowser().getOrientation()
+                    .then(() => assert.callOrder(wd.getOrientation, context));
+            });
+        });
+
+        describe('setOrientation', () => {
+            beforeEach(() => wd.setOrientation = sinon.stub());
+
+            it('should be applied in context `NATIVE_APP`', () => {
+                const context = wd.context.withArgs('NATIVE_APP').named('context');
+
+                return makeBrowser().setOrientation()
+                    .then(() => assert.callOrder(context, wd.setOrientation));
+            });
+
+            it('should restore original context after applying', () => {
+                wd.currentContext.returns(q('ORIGINAL_CONTEXT'));
+
+                const context = wd.context.withArgs('ORIGINAL_CONTEXT').named('context');
+
+                return makeBrowser().setOrientation()
+                    .then(() => assert.callOrder(wd.setOrientation, context));
+            });
         });
     });
 
