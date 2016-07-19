@@ -319,7 +319,7 @@ describe('capture session', () => {
                     });
 
                     // Test does not fairly check that `captureViewportImage` was called after resolving of `scrollBy`
-                    it.skip('should capture viewport image after scroll', () => {
+                    it('should capture viewport image after scroll', () => {
                         page = {captureArea: {height: 7}, viewport: {top: 0, height: 5}};
 
                         const scrolledPage = {captureArea: {height: 7}, viewport: {top: 2, height: 5}};
