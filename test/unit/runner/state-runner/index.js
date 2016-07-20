@@ -7,10 +7,17 @@ var stateRunner = require('lib/runner/state-runner'),
 
 describe('runner/state-runner', function() {
     var sandbox = sinon.sandbox.create(),
-        sessionStub;
+        sessionStub,
+        configStub;
 
     beforeEach(function() {
+        sandbox.stub(DisabledStateRunner.prototype, '__constructor');
+
         sessionStub = {browser: {}};
+        configStub = {
+            id: 'some-default-id',
+            system: 'some-default-system'
+        };
     });
 
     afterEach(function() {
@@ -34,5 +41,13 @@ describe('runner/state-runner', function() {
         var runner = stateRunner.create(state, sessionStub);
 
         assert.instanceOf(runner, StateRunner);
+    });
+
+    it('should pass state, browser session and config to the constructor of DisabledStateRunner', () => {
+        const state = util.makeStateStub();
+
+        stateRunner.create(state, sessionStub, configStub);
+
+        assert.calledWith(DisabledStateRunner.prototype.__constructor, state, sessionStub, configStub);
     });
 });
