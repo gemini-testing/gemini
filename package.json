@@ -37,7 +37,6 @@
     "sizzle": "^2.2.0",
     "source-map": "^0.5.3",
     "temp": "~0.8.0",
-    "uglify-js": "2.6.4",
     "uglifyify": "^3.0.1",
     "wd": "^0.4.0",
     "worker-farm": "^1.3.1"
@@ -52,11 +51,12 @@
     "istanbul": "^0.4.2",
     "mocha": "^2.1.0",
     "proxyquire": "^1.7.3",
-    "sinon": "^1.17.3"
+    "sinon": "^1.17.3",
+    "uglify-js": "^2.7.0"
   },
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
-    "prepublish": "uglifyjs ./lib/browser/client-scripts/gemini.calibrate.js -m > ./lib/browser/client-scripts/gemini.calibrate.min.js",
+    "prepublish": "uglifyjs ./lib/browser/client-scripts/gemini.calibrate.js -m > ./lib/browser/client-scripts/gemini.calibrate.min.js --support-ie8",
     "test-func": "istanbul test _mocha test/functional",
     "test-browser": "istanbul test _mocha test/browser",
     "test": "istanbul test _mocha -- --recursive test/unit test/functional test/browser",
