@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.4.2 - 2016-07-20
+
+* Fixed retry of individual states (error with 'isCoverageEnabled on undefined')
+* Support `changeOrientation` for `appium` below 1.5.x
+* Back to upstream of `uglify-js`
+
 ## 4.4.1 - 2016-07-18
 
 * Froze uglify-js version at v2.6.4
