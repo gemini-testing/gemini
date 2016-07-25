@@ -8,23 +8,29 @@ var utils = require('lib/utils'),
 
 describe('test-reader', function() {
     var sandbox = sinon.sandbox.create(),
-        testsApi = sandbox.stub(),
+        testsApi,
+        glob,
         readTests;
 
-    before(function() {
+    const stubTestReader = () => {
+        testsApi = sandbox.stub();
+        glob = sandbox.stub();
         readTests = proxyquire('lib/test-reader', {
-            './tests-api': testsApi
+            './tests-api': testsApi,
+            'glob': glob
         });
-    });
+    }
 
     beforeEach(function() {
+        stubTestReader();
+
         sandbox.stub(utils);
         sandbox.stub(pathUtils);
+        glob.yields();
     });
 
     afterEach(function() {
         sandbox.restore();
-        testsApi.reset();
     });
 
     function readTests_(opts) {
@@ -124,6 +130,9 @@ describe('test-reader', function() {
     it('should expand paths from config.sets', function() {
         pathUtils.expandPaths
             .returns(q([]));
+        glob
+            .withArgs('some/files').yields(null, 'some/files')
+            .withArgs('other/files').yields(null, 'other/files');
 
         var config = {
             system: {
@@ -175,6 +184,10 @@ describe('test-reader', function() {
             }
         };
 
+        glob
+            .withArgs('some/path').yields(null, 'some/path')
+            .withArgs('other/path').yields(null, 'other/path');
+
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']))
             .withArgs(['other/path']).returns(q(['/other/path/file3.js']))
@@ -197,6 +210,10 @@ describe('test-reader', function() {
                 }
             }
         };
+
+        glob
+            .withArgs('some/path').yields(null, 'some/path')
+            .withArgs('some/other/path').yields(null, 'some/other/path');
 
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']))
@@ -221,6 +238,9 @@ describe('test-reader', function() {
             }
         };
 
+        glob
+            .withArgs('some/path').yields(null, 'some/path');
+
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file.js']));
 
@@ -244,6 +264,9 @@ describe('test-reader', function() {
             }
         };
 
+        glob
+            .withArgs('some/path').yields(null, 'some/path');
+
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file.js']))
             .withArgs(['other/path']).returns(q(['/other/path/file2.js']));
@@ -252,6 +275,30 @@ describe('test-reader', function() {
             .then(function() {
                 assert.calledOnce(testsApi);
                 assert.calledWith(testsApi, sinon.match.any, ['b1', 'b2']);
+            });
+    });
+
+    it('should get files using all templates', () => {
+        pathUtils.expandPaths.returns(q([]));
+        var config = {
+            sets: {
+                set1: {
+                    files: ['some/path']
+                },
+                set2: {
+                    files: ['other/path']
+                }
+            }
+        };
+
+        glob
+            .withArgs('some/path').yields(null, 'some/path')
+            .withArgs('other/path').yields(null, 'other/path');
+
+        return readTests_({config: config})
+            .then(function() {
+                assert.calledWith(pathUtils.expandPaths, ['some/path']);
+                assert.calledWith(pathUtils.expandPaths, ['other/path']);
             });
     });
 });
