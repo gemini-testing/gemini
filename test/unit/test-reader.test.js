@@ -1,40 +1,32 @@
 'use strict';
 
-var utils = require('lib/utils'),
-    pathUtils = require('lib/path-utils'),
-    proxyquire = require('proxyquire'),
-    _ = require('lodash'),
-    q = require('q');
+const utils = require('lib/utils');
+const pathUtils = require('lib/path-utils');
+const proxyquire = require('proxyquire');
+const _ = require('lodash');
+const q = require('q');
 
-describe('test-reader', function() {
-    var sandbox = sinon.sandbox.create(),
-        testsApi,
-        glob,
-        readTests;
+describe('test-reader', () => {
+    const sandbox = sinon.sandbox.create();
+    const testsApi = sandbox.stub();
 
-    const stubTestReader = () => {
-        testsApi = sandbox.stub();
-        glob = sandbox.stub();
-        readTests = proxyquire('lib/test-reader', {
-            './tests-api': testsApi,
-            'glob': glob
-        });
-    }
+    let readTests;
 
-    beforeEach(function() {
-        stubTestReader();
-
-        sandbox.stub(utils);
+    beforeEach(() => {
+        sandbox.stub(utils, 'requireWithNoCache');
         sandbox.stub(pathUtils);
-        glob.yields();
+        readTests = proxyquire('lib/test-reader', {
+            './tests-api': testsApi
+        });
     });
 
-    afterEach(function() {
+    afterEach(() => {
         sandbox.restore();
+        testsApi.reset();
     });
 
-    function readTests_(opts) {
-        var REQUIRED_OPTS = {
+    const readTests_ = (opts) => {
+        const REQUIRED_OPTS = {
             system: {
                 projectRoot: '/root'
             }
@@ -48,93 +40,76 @@ describe('test-reader', function() {
         opts.config = _.merge(opts.config, REQUIRED_OPTS);
 
         return readTests(opts.paths, opts.config);
-    }
+    };
 
-    describe('global "gemini" variable', function() {
-        var config;
+    describe('global "gemini" variable', () => {
+        let gemini;
+        let config;
 
-        beforeEach(function() {
+        beforeEach(() => {
             config = {
-                getBrowserIds: function() {
-                    return [];
-                }
+                getBrowserIds: () => []
             };
             utils.requireWithNoCache.restore();
         });
 
-        it('should use global "gemini" variable', function() {
-            var gemini,
-                api = {suite: 'api'};
+        it('should use global "gemini" variable', () => {
+            sandbox.stub(utils, 'requireWithNoCache', () => gemini = global.gemini);
+
+            const api = {suite: 'api'};
 
             testsApi.returns(api);
             pathUtils.expandPaths.returns(q(['some-test.js']));
-            sandbox.stub(utils, 'requireWithNoCache', function() {
-                gemini = global.gemini;
-            });
 
             return readTests_({config: config})
-                .then(function() {
-                    assert.deepEqual(gemini, api);
-                });
+                .then(() => assert.deepEqual(gemini, api));
         });
 
-        it('should rewrite global "gemini" variable for each file', function() {
-            var gemini = [];
+        it('should rewrite global "gemini" variable for each file', () => {
+            let gemini = [];
 
             pathUtils.expandPaths.returns(q(['/some/path/file1.js', '/some/path/file2.js']));
+
             testsApi
                 .onFirstCall().returns({suite: 'apiInstance'})
                 .onSecondCall().returns({suite: 'anotherApiInstance'});
-            sandbox.stub(utils, 'requireWithNoCache', function() {
+
+            sandbox.stub(utils, 'requireWithNoCache', () => {
                 gemini.push(global.gemini.suite);
             });
 
             return readTests_({config: config})
-                .then(function() {
-                    assert.deepEqual(gemini, ['apiInstance', 'anotherApiInstance']);
-                });
+                .then(() => assert.deepEqual(gemini, ['apiInstance', 'anotherApiInstance']));
         });
 
-        it('should delete global "gemini" variable after test reading', function() {
+        it('should delete global "gemini" variable after test reading', () => {
             testsApi.returns({suite: 'api'});
             pathUtils.expandPaths.returns(q(['some-test.js']));
             sandbox.stub(utils, 'requireWithNoCache');
 
             return readTests_({config: config})
-                .then(function() {
-                    assert.notProperty(global, 'gemini');
-                });
+                .then(() => assert.notProperty(global, 'gemini'));
         });
     });
 
-    it('should not load any suites if no paths or sets specified', function() {
-        pathUtils.expandPaths
-            .returns(q([]));
+    it('should not load any suites if no paths or sets specified', () => {
+        pathUtils.expandPaths.returns(q([]));
 
         return readTests_()
-            .then(function() {
-                assert.notCalled(utils.requireWithNoCache);
-            });
+            .then(() => assert.notCalled(utils.requireWithNoCache));
     });
 
-    it('should expand passed paths', function() {
-        pathUtils.expandPaths
-            .returns(q([]));
+    it('should expand passed paths', () => {
+        pathUtils.expandPaths.returns(q([]));
 
         return readTests_({paths: ['some/path/*']})
-            .then(function() {
-                assert.calledWithExactly(pathUtils.expandPaths, ['some/path/*']);
-            });
+            .then(() => assert.calledWithExactly(pathUtils.expandPaths, ['some/path/*']));
     });
 
-    it('should expand paths from config.sets', function() {
-        pathUtils.expandPaths
-            .returns(q([]));
-        glob
-            .withArgs('some/files').yields(null, 'some/files')
-            .withArgs('other/files').yields(null, 'other/files');
+    it('should expand paths from config.sets', () => {
+        pathUtils.expandPaths.returns(q([]));
 
-        var config = {
+        const config = {
             system: {
                 projectRoot: '/root'
             },
@@ -149,31 +124,29 @@ describe('test-reader', function() {
         };
 
         return readTests_({config: config})
-            .then(function() {
+            .then(() => {
                 assert.calledWithExactly(pathUtils.expandPaths, ['some/files'], '/root');
                 assert.calledWithExactly(pathUtils.expandPaths, ['other/files'], '/root');
             });
     });
 
-    it('should load suites related to passed paths', function() {
-        var config = {
-            getBrowserIds: function() {
-                return [];
-            }
+    it('should load suites related to passed paths', () => {
+        const config = {
+            getBrowserIds: () => []
         };
 
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']));
 
         return readTests_({paths: ['some/path'], config: config})
-            .then(function() {
+            .then(() => {
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file1.js');
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file2.js');
             });
     });
 
-    it('should load suites related to sets if no passed paths', function() {
-        var config = {
+    it('should load suites related to sets if no passed paths', () => {
+        const config = {
             sets: {
                 set1: {
                     files: ['some/path']
@@ -183,10 +156,6 @@ describe('test-reader', function() {
                 }
             }
         };
-
-        glob
-            .withArgs('some/path').yields(null, 'some/path')
-            .withArgs('other/path').yields(null, 'other/path');
 
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']))
@@ -194,7 +163,7 @@ describe('test-reader', function() {
             .withArgs([]).returns(q([]));
 
         return readTests_({config: config})
-            .then(function() {
+            .then(() => {
                 assert.calledThrice(utils.requireWithNoCache);
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file1.js');
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file2.js');
@@ -202,8 +171,8 @@ describe('test-reader', function() {
             });
     });
 
-    it('should load only passed paths', function() {
-        var config = {
+    it('should load only passed paths', () => {
+        const config = {
             sets: {
                 all: {
                     files: ['some/path', 'some/other/path']
@@ -211,25 +180,21 @@ describe('test-reader', function() {
             }
         };
 
-        glob
-            .withArgs('some/path').yields(null, 'some/path')
-            .withArgs('some/other/path').yields(null, 'some/other/path');
-
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']))
             .withArgs(['some/path', 'some/other/path'])
             .returns(q(['/some/path/file1.js', '/some/path/file2.js', '/some/other/path/file3.js']));
 
         return readTests_({paths: ['some/path'], config: config})
-            .then(function() {
+            .then(() => {
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file1.js');
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file2.js');
                 assert.neverCalledWith(utils.requireWithNoCache, '/some/other/path/file3.js');
             });
     });
 
-    it('should configure suite for certain browsers', function() {
-        var config = {
+    it('should configure suite for certain browsers', () => {
+        const config = {
             sets: {
                 all: {
                     files: ['some/path'],
@@ -238,67 +203,34 @@ describe('test-reader', function() {
             }
         };
 
-        glob
-            .withArgs('some/path').yields(null, 'some/path');
-
-        pathUtils.expandPaths
-            .withArgs(['some/path']).returns(q(['/some/path/file.js']));
+        pathUtils.expandPaths.withArgs(['some/path']).returns(q(['/some/path/file.js']));
 
         return readTests_({config: config})
-            .then(function() {
+            .then(() => {
                 assert.calledWith(testsApi, sinon.match.any, ['b1']);
                 assert.callOrder(testsApi, utils.requireWithNoCache);
             });
     });
 
-    it('should configure suite for all browsers if file not configured in sets', function() {
-        var config = {
+    it('should configure suite for all browsers if file not configured in sets', () => {
+        const config = {
             sets: {
                 all: {
                     files: ['some/path'],
                     browsers: ['b1']
                 }
             },
-            getBrowserIds: function() {
-                return ['b1', 'b2'];
-            }
+            getBrowserIds: () => ['b1', 'b2']
         };
-
-        glob
-            .withArgs('some/path').yields(null, 'some/path');
 
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file.js']))
             .withArgs(['other/path']).returns(q(['/other/path/file2.js']));
 
         return readTests_({paths: ['other/path'], config: config})
-            .then(function() {
+            .then(() => {
                 assert.calledOnce(testsApi);
                 assert.calledWith(testsApi, sinon.match.any, ['b1', 'b2']);
-            });
-    });
-
-    it('should get files using all templates', () => {
-        pathUtils.expandPaths.returns(q([]));
-        var config = {
-            sets: {
-                set1: {
-                    files: ['some/path']
-                },
-                set2: {
-                    files: ['other/path']
-                }
-            }
-        };
-
-        glob
-            .withArgs('some/path').yields(null, 'some/path')
-            .withArgs('other/path').yields(null, 'other/path');
-
-        return readTests_({config: config})
-            .then(function() {
-                assert.calledWith(pathUtils.expandPaths, ['some/path']);
-                assert.calledWith(pathUtils.expandPaths, ['other/path']);
             });
     });
 });

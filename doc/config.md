@@ -241,7 +241,7 @@ sets:
      ...
 ```
 
-* `files` - list of test files or directories with test files. Should be relative to project root directory. `gemini` by default. Also, you can use a mask for this property. For example: `gemini/test-suites/*.gemini.js`. Can be a string if you want to specify just one file or directory.
+* `files` - list of test files or directories with test files. Should be relative to project root directory. `gemini` by default. Also, you can use masks for this property. For example: `gemini/test-suites/*.gemini.js`. Can be a string if you want to specify just one file or directory.
 
 * `browsers` - list of browser ids to run tests specified in `files`. All browsers by default.
 
