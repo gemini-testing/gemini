@@ -1,72 +1,102 @@
 'use strict';
 
-var _ = require('lodash'),
-    Config = require('lib/config'),
-    FailCollector = require('lib/fail-collector'),
-    NoRefImageError = require('lib/errors/no-ref-image-error');
+const _ = require('lodash');
+const q = require('q');
+const Config = require('lib/config');
+const FailCollector = require('lib/fail-collector');
+const NoRefImageError = require('lib/errors/no-ref-image-error');
 
-describe('FailCollector', function() {
-    var sandbox = sinon.sandbox.create(),
-        candidate;
+describe('FailCollector', () => {
+    const sandbox = sinon.sandbox.create();
+    let candidate;
+    let suiteCollection;
 
-    beforeEach(function() {
+    const createConfig_ = (defaults) => {
+        const config = sinon.createStubInstance(Config);
+
+        _.forEach(defaults, function(retries, browserId) {
+            config.forBrowser.withArgs(browserId).returns({retry: retries});
+        });
+
+        return config;
+    };
+
+    const createFailCollector_ = (defaults) => {
+        defaults = defaults || {browser: 1};
+
+        return new FailCollector(createConfig_(defaults));
+    };
+
+    beforeEach(() => {
+        suiteCollection = {
+            disableAll: sinon.stub(),
+            enable: sinon.stub()
+        };
         candidate = {
             browserId: 'browser',
-            suite: {}
+            suite: {},
+            state: {}
         };
     });
 
-    afterEach(function() {
-        sandbox.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    describe('tryToSubmitError', function() {
-        it('should throw if retry candidate missing `suite` field', function() {
-            var failCollector = createFailCollector_();
+    describe('tryToSubmitError', () => {
+        it('should throw if retry candidate missing `suite` field', () => {
+            const failCollector = createFailCollector_();
 
-            assert.throws(function() {
+            assert.throws(() => {
                 failCollector.tryToSubmitError({browserId: 'id'});
             }, 'suite');
         });
 
-        it('should throw if retry candidate missing `browserId` field', function() {
-            var failCollector = createFailCollector_();
+        it('should throw if retry candidate missing `state` field', () => {
+            const failCollector = createFailCollector_();
 
-            assert.throws(function() {
-                failCollector.tryToSubmitError({suite: {}});
+            assert.throws(() => {
+                failCollector.tryToSubmitError({suite: {}, browserId: 'id'});
+            }, 'state');
+        });
+
+        it('should throw if retry candidate missing `browserId` field', () => {
+            const failCollector = createFailCollector_();
+
+            assert.throws(() => {
+                failCollector.tryToSubmitError({suite: {}, state: {}});
             }, 'browserId');
         });
 
-        it('should not submit NoRefImageError', function() {
-            var candidate = sinon.createStubInstance(NoRefImageError),
-                failCollector = createFailCollector_();
+        it('should not submit NoRefImageError', () => {
+            const candidate = sinon.createStubInstance(NoRefImageError);
+            const failCollector = createFailCollector_();
 
             assert.equal(failCollector.tryToSubmitError(candidate), false);
         });
 
-        it('should not submit candidate if no retries set for browser', function() {
-            var failCollector = createFailCollector_({browser: 0});
+        it('should not submit candidate if no retries set for browser', () => {
+            const failCollector = createFailCollector_({browser: 0});
 
             assert.equal(failCollector.tryToSubmitError(candidate), false);
         });
 
-        it('should not submit candidate if performed more retries than available for browser', function() {
-            var failCollector = createFailCollector_({browser: 1});
+        it('should not submit candidate if performed more retries than available for browser', () => {
+            const failCollector = createFailCollector_({browser: 1});
 
-            failCollector.retry(_.noop);
-
-            assert.equal(failCollector.tryToSubmitError(candidate), false);
+            failCollector.tryToSubmitError(candidate);
+            return failCollector
+                .retry(q, suiteCollection)
+                .then(() => assert.equal(failCollector.tryToSubmitError(candidate), false));
         });
 
-        it('should return true if candidate was submitted for retry', function() {
-            var failCollector = createFailCollector_();
+        it('should return true if candidate was submitted for retry', () => {
+            const failCollector = createFailCollector_();
 
             assert.equal(failCollector.tryToSubmitError(candidate), true);
         });
 
-        it('should emit `retry` event if candidate was submitted for retry', function() {
-            var failCollector = createFailCollector_(),
-                onRetry = sandbox.spy();
+        it('should emit `retry` event if candidate was submitted for retry', () => {
+            const failCollector = createFailCollector_();
+            const onRetry = sandbox.spy();
 
             failCollector.on('retry', onRetry);
             failCollector.tryToSubmitError(candidate);
@@ -74,9 +104,9 @@ describe('FailCollector', function() {
             assert.calledOnce(onRetry);
         });
 
-        it('should extend retry candidate with info about retry', function() {
-            var failCollector = createFailCollector_({browser: 1}),
-                onRetry = sandbox.spy();
+        it('should extend retry candidate with info about retry', () => {
+            const failCollector = createFailCollector_({browser: 1});
+            const onRetry = sandbox.spy();
 
             failCollector.on('retry', onRetry);
             failCollector.tryToSubmitError(candidate);
@@ -87,198 +117,131 @@ describe('FailCollector', function() {
             });
         });
 
-        it('should add suite to retry queue', function() {
-            var failCollector = createFailCollector_(),
-                suite = {
-                    fullName: 'test_name'
-                },
-                candidate = {
-                    browserId: 'browser',
-                    suite: suite
-                },
-                retryFunc = sandbox.spy();
+        it('should add state to retry queue', () => {
+            const failCollector = createFailCollector_();
+            const candidate = {
+                suite: {fullName: 'suiteFullName'},
+                state: {name: 'stateName'},
+                browserId: 'browser'
+            };
 
             failCollector.tryToSubmitError(candidate);
-            failCollector.retry(retryFunc);
 
-            assert.calledWith(retryFunc, [suite]);
-        });
-
-        it('should submit candidate with same suite for different browsers', function() {
-            var suite = {
-                    fullName: 'test_name'
-                },
-                firstCandidate = {
-                    browserId: 'browser',
-                    suite: suite
-                },
-                secondCandidate = {
-                    browserId: 'anotherBrowser',
-                    suite: suite,
-                    equal: false
-                },
-                failCollector = createFailCollector_({
-                    browser: 1,
-                    anotherBrowser: 1
-                }),
-                retryFunc = sandbox.spy().named('retryFunc');
-
-            failCollector.tryToSubmitError(firstCandidate);
-            failCollector.tryToSubmitError(secondCandidate);
-            failCollector.retry(retryFunc);
-
-            assert.calledWithMatch(retryFunc, [{
-                fullName: 'test_name',
-                browsers: ['browser', 'anotherBrowser']
-            }]);
+            return failCollector
+                .retry(q, suiteCollection)
+                .then(() => {
+                    assert.calledWith(
+                        suiteCollection.enable,
+                        'suiteFullName',
+                        {state: 'stateName', browser: 'browser'}
+                    );
+                });
         });
     });
 
-    describe('tryToSubmitStateResult', function() {
-        it('should not submit candidate with missing `equal` property', function() {
-            var failCollector = createFailCollector_();
+    describe('tryToSubmitStateResult', () => {
+        it('should not submit candidate with missing `equal` property', () => {
+            const failCollector = createFailCollector_();
 
             assert.equal(failCollector.tryToSubmitStateResult(candidate), false);
         });
 
-        it('should not submit candidate with no diff', function() {
-            var failCollector = createFailCollector_(),
-                candidate = {
-                    browserId: 'browser',
-                    suite: {},
-                    equal: true
-                };
+        it('should not submit candidate with no diff', () => {
+            const failCollector = createFailCollector_();
+            const candidate = {
+                browserId: 'browser',
+                suite: {},
+                equal: true
+            };
 
             assert.equal(failCollector.tryToSubmitStateResult(candidate), false);
         });
 
-        it('should submit candidate in case of diff', function() {
-            var failCollector = createFailCollector_(),
-                candidate = {
-                    browserId: 'browser',
-                    suite: {},
-                    equal: false
-                };
+        it('should submit candidate in case of diff', () => {
+            const failCollector = createFailCollector_();
+            const candidate = {
+                browserId: 'browser',
+                suite: {},
+                state: {},
+                equal: false
+            };
 
             assert.equal(failCollector.tryToSubmitStateResult(candidate), true);
         });
     });
 
-    describe('retry', function() {
-        it('should call `retry performer` function if suites for retry were added', function() {
-            var failCollector = createFailCollector_(),
-                retryFunc = sandbox.spy();
+    describe('retry', () => {
+        it('should call `retry performer` function if states for retry were added', () => {
+            const failCollector = createFailCollector_();
+            const retryFunc = sandbox.stub().returns(q());
 
             failCollector.tryToSubmitError(candidate);
-            failCollector.retry(retryFunc);
-
-            assert.calledOnce(retryFunc);
+            return failCollector
+                .retry(retryFunc, suiteCollection)
+                .then(() => assert.calledOnce(retryFunc));
         });
 
-        it('should return result of `retry performer` function', function() {
-            var failCollector = createFailCollector_(),
-                retryFunc = sandbox.stub();
+        it('should return result of `retry performer` function', () => {
+            const failCollector = createFailCollector_();
+            const retryFunc = sandbox.stub();
 
             failCollector.tryToSubmitError(candidate);
-            retryFunc.returns('foo');
+            retryFunc.returns(q('foo'));
 
-            assert.equal(failCollector.retry(retryFunc), 'foo');
+            return failCollector
+                .retry(retryFunc, suiteCollection)
+                .then((result) => assert.equal(result, 'foo'));
         });
 
-        it('should not call `retry performer` function if suites for retry are not added', function() {
-            var failCollector = createFailCollector_(),
-                retryFunc = sandbox.stub();
+        it('should not call `retry performer` function if states for retry are not added', () => {
+            const failCollector = createFailCollector_();
+            const retryFunc = sandbox.stub();
 
-            failCollector.retry(retryFunc);
-
-            assert.notCalled(retryFunc);
+            return failCollector
+                .retry(retryFunc, suiteCollection)
+                .then(() => assert.notCalled(retryFunc));
         });
 
-        it('should return resolved promise if suites for retry are not added', function() {
-            var failCollector = createFailCollector_();
-
-            return assert.isFulfilled(failCollector.retry());
-        });
-
-        it('should pass suites to retry to `retry performer` function', function() {
-            var failCollector = createFailCollector_(),
-                suite = {
-                    fullName: 'test_suite'
-                },
-                candidate = {
-                    browserId: 'browser',
-                    suite: suite
-                },
-                retryFunc = sandbox.stub().named('retryFunc');
-
-            failCollector.tryToSubmitError(candidate);
-            failCollector.retry(retryFunc);
-
-            var suites = retryFunc.lastCall.args[0];
-
-            assert.lengthOf(suites, 1);
-            assert.include(suites, suite);
-        });
-
-        it('should clear previously submitted suites', function() {
-            var failCollector = createFailCollector_({
-                    browser: 10
-                }),
-                firstSuite = {
-                    fullName: 'first_suite'
-                },
-                firstCandidate = {
-                    browserId: 'browser',
-                    suite: firstSuite
-                },
-                secondSuite = {
-                    fullName: 'second_suite'
-                },
-                secondCandidate = {
-                    browserId: 'browser',
-                    suite: secondSuite
-                },
-                retryFunc = sandbox.stub();
+        it('should clear previously submitted states', () => {
+            const failCollector = createFailCollector_({browser: 10});
+            const firstCandidate = {
+                browserId: 'browser',
+                suite: {fullName: 'first_suite'},
+                state: {name: 'stateName'}
+            };
+            const secondCandidate = {
+                browserId: 'browser',
+                suite: {fullName: 'second_suite'},
+                state: {name: 'stateName'}
+            };
 
             failCollector.tryToSubmitError(firstCandidate);
-            failCollector.retry(_.noop);
-
-            failCollector.tryToSubmitError(secondCandidate);
-            failCollector.retry(retryFunc);
-
-            var suitesToRetry = retryFunc.lastCall.args[0];
-
-            assert.notInclude(suitesToRetry, firstSuite);
-            assert.include(suitesToRetry, secondSuite);
+            return failCollector
+                .retry(q, suiteCollection)
+                .then(() => failCollector.tryToSubmitError(secondCandidate))
+                .then(() => {
+                    return failCollector
+                        .retry(q, suiteCollection)
+                        .then(() => {
+                            assert.calledWith(suiteCollection.enable.firstCall, 'first_suite');
+                            assert.calledWith(suiteCollection.enable.secondCall, 'second_suite');
+                            assert.notInclude(suiteCollection.enable.secondCall.args, 'first_suite');
+                        });
+                });
         });
 
-        it('should increase performed retries counter', function() {
-            var failCollector = createFailCollector_({
-                    browser: 10
-                }),
-                onRetry = sandbox.stub();
+        it('should increase performed retries counter', () => {
+            const failCollector = createFailCollector_({
+                browser: 10
+            });
+            const onRetry = sandbox.stub();
 
             failCollector.on('retry', onRetry);
-            failCollector.retry(_.noop);
             failCollector.tryToSubmitError(candidate);
-
-            assert.calledWithMatch(onRetry, {attempt: 1});
+            return failCollector
+                .retry(q, suiteCollection)
+                .then(() => failCollector.tryToSubmitError(candidate))
+                .then(() => assert.calledWithMatch(onRetry, {attempt: 1}));
         });
     });
 });
-
-function createFailCollector_(defaults) {
-    defaults = defaults || {browser: 1};
-
-    return new FailCollector(createConfig_(defaults));
-}
-
-function createConfig_(defaults) {
-    var config = sinon.createStubInstance(Config);
-
-    _.forEach(defaults, function(retries, browserId) {
-        config.forBrowser.withArgs(browserId).returns({retry: retries});
-    });
-
-    return config;
-}

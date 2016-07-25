@@ -129,13 +129,14 @@ describe('gemini', function() {
     describe('test', function() {
         beforeEach(function() {
             sandbox.stub(temp);
+            sandbox.stub(Runner.prototype, 'on');
+            sandbox.stub(Runner.prototype, 'run');
         });
 
         function test_(opts) {
             opts = opts || {};
             var Gemini = require('lib/gemini');
 
-            sandbox.stub(Runner.prototype);
             Runner.prototype.on.returnsThis();
             Runner.prototype.run.returns(q());
 
