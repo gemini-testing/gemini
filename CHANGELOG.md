@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.3 - 2016-07-26
+
+* Fix bug with resolving source paths in gemini coverage module
+
 ## 4.4.2 - 2016-07-20
 
 * Fixed retry of individual states (error with 'isCoverageEnabled on undefined')
