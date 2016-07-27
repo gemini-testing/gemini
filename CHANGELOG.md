@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.4 - 2016-07-27
+
+* Revert code changes made for version 4.4.3
+
 ## 4.4.3 - 2016-07-26
 
 * Fix bug with resolving source paths in gemini coverage module
