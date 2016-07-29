@@ -10,7 +10,8 @@ var q = require('q'),
 
 describe('runner/suite-runner/regular-suite-runner', function() {
     var sandbox = sinon.sandbox.create(),
-        browser;
+        browser,
+        config;
 
     beforeEach(function() {
         browser = util.browserWithId('default-browser');
@@ -27,6 +28,11 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         sandbox.stub(CaptureSession.prototype);
         CaptureSession.prototype.runActions.returns(q.resolve());
         CaptureSession.prototype.browser = browser;
+
+        config = sinon.createStubInstance(Config);
+        config.forBrowser.returns({
+            rootUrl: 'http://localhost/foo/default'
+        });
     });
 
     afterEach(function() {
@@ -40,7 +46,7 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         return suiteRunner.create(
             suite || makeSuiteStub(),
             browserAgent,
-            sinon.createStubInstance(Config)
+            config
         );
     }
 
