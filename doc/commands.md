@@ -83,6 +83,8 @@ report), partially (yellow) or was not captured at all (red).
 * `--browser ID` — execute suite only for specified browser id. Can be used
   multiple times. Can be also specified with `GEMINI_BROWSERS` environment
   variable. If both CLI option and env variable are set, CLI has precedence.
+  Also, you can use `GEMINI_SKIP_BROWSERS` environment variable to skip
+  some browsers.
 
 * `--help` – display help message.
 

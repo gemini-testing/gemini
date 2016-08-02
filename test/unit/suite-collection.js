@@ -1,9 +1,22 @@
 'use strict';
 
-var SuiteCollection = require('lib/suite-collection'),
-    mkTree = require('../util').makeSuiteTree;
+var mkTree = require('../util').makeSuiteTree,
+    proxyquire = require('proxyquire');
 
 describe('suite-collection', function() {
+    const sandbox = sinon.sandbox.create();
+    let SuiteBuilder;
+    let SuiteCollection;
+
+    beforeEach(() => {
+        SuiteBuilder = sandbox.stub();
+        SuiteCollection = proxyquire('lib/suite-collection', {
+            './tests-api/suite-builder': SuiteBuilder
+        });
+    });
+
+    afterEach(() => sandbox.restore());
+
     describe('topLevelSuites', function() {
         it('should return empty list on empty collection', function() {
             var collection = new SuiteCollection();
@@ -444,6 +457,29 @@ describe('suite-collection', function() {
 
                 assert.deepEqual(tree.suite.browsers, ['b3', 'b1', 'b2']);
             });
+        });
+    });
+
+    describe('skip browsers by SuiteBuilder', () => {
+        let skip;
+
+        beforeEach(() => {
+            skip = sandbox.stub();
+
+            SuiteBuilder.returns({skip});
+        });
+
+        afterEach(() => sandbox.restore());
+
+        it('should skip passed browsers', () => {
+            const tree = mkTree({
+                suite: []
+            }, {browsers: ['b1', 'b2']});
+
+            new SuiteCollection([tree.suite]).skipBrowsers(tree.suite.browsers);
+
+            assert.calledWith(skip, 'b1');
+            assert.calledWith(skip, 'b2');
         });
     });
 });

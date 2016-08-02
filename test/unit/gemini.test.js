@@ -2,6 +2,7 @@
 
 var q = require('q'),
     proxyquire = require('proxyquire'),
+    chalk = require('chalk'),
     SuiteCollection = require('lib/suite-collection'),
     Config = require('lib/config'),
     Runner = require('lib/runner'),
@@ -163,6 +164,71 @@ describe('gemini', function() {
                     assert.callOrder(
                         temp.init,
                         Runner.prototype.run
+                    );
+                });
+        });
+    });
+
+    describe('environment variables', function() {
+        const Gemini = require('lib/gemini');
+
+        beforeEach(function() {
+            sandbox.stub(SuiteCollection.prototype, 'skipBrowsers');
+            sandbox.stub(Runner.prototype);
+            sandbox.stub(console, 'warn');
+            sandbox.stub(temp);
+        });
+
+        afterEach(() => sandbox.restore());
+
+        const createFakeBrowsers = (browserIds) => {
+            const fakeBrowsers = {};
+
+            browserIds.map((browser) => {
+                fakeBrowsers[browser] = {
+                    desiredCapabilities: {}
+                };
+            });
+
+            return fakeBrowsers;
+        };
+
+        const test_ = (opts) => {
+            opts = opts || {};
+
+            const browsers = createFakeBrowsers(opts.browserIds);
+            const gemini = new Gemini({
+                rootUrl: 'stubRootUrl',
+                system: {
+                    projectRoot: 'stubProjectRoot',
+                    tempDir: opts.tempDir
+                },
+                browsers
+            });
+
+            Runner.prototype.on.returnsThis();
+            Runner.prototype.run.returns(q());
+
+            return gemini.test([]);
+        };
+
+        it('should skip browsers by GEMINI_SKIP_BROWSERS environment variable', () => {
+            process.env.GEMINI_SKIP_BROWSERS = 'b1, b2, b3';
+
+            return test_({browserIds: ['b1', 'b2']})
+                .then(() => {
+                    assert.calledWith(SuiteCollection.prototype.skipBrowsers, ['b1', 'b2']);
+                });
+        });
+
+        it('should warn about unknown browsers', () => {
+            process.env.GEMINI_SKIP_BROWSERS = 'b1, b2, b3';
+
+            return test_({browserIds: ['b1', 'b2']})
+                .then(() => {
+                    assert.calledWith(console.warn,
+                        `${chalk.yellow('WARNING:')} Unknown browsers id: b3. Use one of the browser ` +
+                        'ids specified in config file: b1, b2'
                     );
                 });
         });
