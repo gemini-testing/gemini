@@ -11,7 +11,6 @@ const mkSuiteStub = require('../util').makeSuiteStub;
 
 describe('gemini', () => {
     const sandbox = sinon.sandbox.create();
-
     let Gemini = require('lib/gemini');
 
     afterEach(() => sandbox.restore());
@@ -21,7 +20,7 @@ describe('gemini', () => {
             rootSuite = rootSuite || mkSuiteStub();
 
             const testReaderStub = sandbox.stub().named('TestReader').returns(q(rootSuite));
-            const Gemini = proxyquire('lib/gemini', {
+            Gemini = proxyquire('lib/gemini', {
                 './test-reader': testReaderStub
             });
 
@@ -125,11 +124,14 @@ describe('gemini', () => {
     });
 
     describe('test', () => {
-        beforeEach(() => sandbox.stub(temp));
+        beforeEach(function() {
+            sandbox.stub(temp, 'init');
+            sandbox.stub(Runner.prototype, 'on');
+            sandbox.stub(Runner.prototype, 'run');
+        });
 
         const test_ = (opts) => {
             opts = opts || {};
-            const Gemini = require('lib/gemini');
 
             Runner.prototype.on.returnsThis();
             Runner.prototype.run.returns(q());
@@ -170,6 +172,11 @@ describe('gemini', () => {
             sandbox.stub(Runner.prototype, 'setTestBrowsers');
             sandbox.stub(console, 'warn');
             sandbox.stub(temp, 'init');
+        });
+
+        afterEach(() => {
+            delete process.env.GEMINI_BROWSERS;
+            delete process.env.GEMINI_SKIP_BROWSERS;
         });
 
         const stubBrowsers = (browserIds) => {
