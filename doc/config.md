@@ -116,6 +116,12 @@ settings. These settings can not be set per-browser.
 
   - `enabled` – set to `true` to enable coverage reporting.
 
+  - `map` - function which can be used for overriding default logic of source root path resolving.
+  By default it returns path to CSS file relative to the source root.
+  This function accepts 2 arguments:
+    * `url` - full url of source file which coverage should be obtained
+    * `rootUrl` - root url specified in the config for current browser
+
   - `exclude` – array of file paths or glob patterns to exclude from coverage
     report. For example:
 
@@ -154,7 +160,9 @@ for constructing screens file names.
 Settings list:
 
 * `rootUrl` (required) – the root URL of your website. Target URLs of your
-  test suites will be resolved relatively to it.
+  test suites will be resolved relatively to it. If top level `rootUrl` value is set
+  and browser `rootUrl` - is relative url, then resolved `rootUrl` will be result of
+  concatenation of top level `rootUrl` and individual browser `rootUrl`.
 
 * `desiredCapabilities` (required) - WebDriver
   [DesiredCapabilites](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities)
