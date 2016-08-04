@@ -56,5 +56,12 @@ describe('errors utils', () => {
             const cloned = errorUtils.cloneError(err);
             assert.equal(cloned.key, 'value');
         });
+
+        it('should keep original stack trace when cloning', () => {
+            const err = new Error();
+            const cloned = errorUtils.cloneError(err);
+
+            assert.equal(cloned.stack, err.stack);
+        });
     });
 });
