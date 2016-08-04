@@ -17,6 +17,7 @@ describe('config', function() {
             browser: {}
         }
     };
+
     function parseConfig(options) {
         return parser({
             options: options,
@@ -351,6 +352,42 @@ describe('config', function() {
                 testBooleanOption('system.coverage.html', {default: true});
             });
 
+            describe('map', () => {
+                const createConfigWithCoverageMap = (map) => {
+                    return () => {
+                        createConfig({
+                            system: {
+                                coverage: {map}
+                            }
+                        });
+                    };
+                };
+
+                it('should cut browser root url from passed url by default', () => {
+                    const config = new Config({
+                        rootUrl: 'http://some/root/url',
+                        system: {
+                            projectRoot: '/some/project/root'
+                        }
+                    });
+                    const resolvedPath = config.system.coverage
+                        .map('http://some/root/url/rel/path', 'http://some/root/url');
+
+                    assert.equal(resolvedPath, 'rel/path');
+                });
+
+                it('should not accept non-function value types', () => {
+                    assert.throws(createConfigWithCoverageMap(null), GeminiError);
+                    assert.throws(createConfigWithCoverageMap(10), GeminiError);
+                    assert.throws(createConfigWithCoverageMap('foo'), GeminiError);
+                    assert.throws(createConfigWithCoverageMap({}), GeminiError);
+                });
+
+                it('should accept function', () => {
+                    assert.doesNotThrow(createConfigWithCoverageMap(_.noop), GeminiError);
+                });
+            });
+
             describe('exclude', function() {
                 it('should be [] by default', function() {
                     var config = createConfig();
@@ -477,6 +514,34 @@ describe('config', function() {
             shouldOverrideTopLevelValue('rootUrl', {
                 top: 'http://top.example.com',
                 browser: 'http://browser.example.com'
+            });
+
+            it('should append relative browser rootUrl to top level value', () => {
+                const config = createConfig({
+                    rootUrl: 'http://top.example.com',
+                    browsers: {
+                        browser: {
+                            rootUrl: 'browser.example',
+                            desiredCapabilities: {}
+                        }
+                    }
+                });
+
+                assert.propertyVal(config.browsers.browser, 'rootUrl', 'http://top.example.com/browser.example');
+            });
+
+            it('should remove first slash from relative browser rootUrl', () => {
+                const config = createConfig({
+                    rootUrl: 'http://top.example.com',
+                    browsers: {
+                        browser: {
+                            rootUrl: '/browser.example',
+                            desiredCapabilities: {}
+                        }
+                    }
+                });
+
+                assert.propertyVal(config.browsers.browser, 'rootUrl', 'http://top.example.com/browser.example');
             });
         });
 
