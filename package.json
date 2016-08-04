@@ -19,6 +19,7 @@
     "debug": "^2.2.0",
     "gemini-configparser": "^0.1.1",
     "gemini-coverage": "~0.3.0",
+    "glob": "^7.0.5",
     "handlebars": "^4.0.5",
     "inherit": "~2.2.1",
     "install": "^0.6.1",
