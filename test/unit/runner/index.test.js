@@ -1,45 +1,46 @@
 'use strict';
-var q = require('q'),
-    QEmitter = require('qemitter'),
-    Runner = require('lib/runner'),
-    TestSessionRunner = require('lib/runner/test-session-runner'),
-    StateProcessor = require('lib/state-processor/state-processor'),
-    Config = require('lib/config'),
-    FailCollector = require('lib/fail-collector'),
-    util = require('../../util');
 
-describe('runner', function() {
-    var sandbox = sinon.sandbox.create(),
-        config,
-        stateProcessor,
-        testSessionRunner,
-        runner;
+const q = require('q');
+const QEmitter = require('qemitter');
+const Runner = require('lib/runner');
+const TestSessionRunner = require('lib/runner/test-session-runner');
+const StateProcessor = require('lib/state-processor/state-processor');
+const Config = require('lib/config');
+const FailCollector = require('lib/fail-collector');
+const util = require('../../util');
 
-    function run_(suites) {
-        return runner.run(suites || []);
-    }
+describe('runner', () => {
+    const sandbox = sinon.sandbox.create();
+    let config;
+    let stateProcessor;
+    let testSessionRunner;
+    let runner;
+    let suiteCollectionStub;
 
-    function createStateProcessor_() {
-        var stateProcessor = sinon.createStubInstance(StateProcessor);
+    const run_ = (suiteCollection) => {
+        return runner.run(suiteCollection || suiteCollectionStub);
+    };
+
+    const createStateProcessor_ = () => {
+        const stateProcessor = sinon.createStubInstance(StateProcessor);
 
         stateProcessor.jobDoneEvent = 'onCaptureProcessed';
         stateProcessor.exec.returns(q());
         return stateProcessor;
-    }
+    };
 
-    function createTestSessionRunner_() {
-        var runner = new QEmitter();
-        runner.run = function() {
-            return q();
-        };
+    const createTestSessionRunner_ = () => {
+        const runner = new QEmitter();
+        runner.run = () => q();
         return runner;
-    }
+    };
 
-    beforeEach(function() {
+    beforeEach(() => {
         config = sinon.createStubInstance(Config);
         testSessionRunner = createTestSessionRunner_();
         stateProcessor = createStateProcessor_();
         runner = new Runner(config, stateProcessor);
+        suiteCollectionStub = {allSuites: sinon.stub()};
 
         sandbox.stub(TestSessionRunner, 'create');
         TestSessionRunner.create.returns(testSessionRunner);
@@ -48,202 +49,185 @@ describe('runner', function() {
         sandbox.stub(FailCollector.prototype, 'tryToSubmitError');
     });
 
-    afterEach(function() {
-        sandbox.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    describe('run', function() {
-        it('should emit `begin` event when tests start', function() {
-            var onBegin = sandbox.spy().named('onBegin');
+    describe('run', () => {
+        it('should emit `begin` event when tests start', () => {
+            const onBegin = sandbox.spy().named('onBegin');
             runner.on('begin', onBegin);
-            return run_().then(function() {
-                assert.calledOnce(onBegin);
-            });
+            return run_().then(() => assert.calledOnce(onBegin));
         });
 
-        it('should pass total number of states when emitting `begin`', function() {
-            var suites = [
+        it('should pass total number of states when emitting `begin`', () => {
+            const suites = [
                 {states: []},
                 {states: [1, 2]},
                 {states: [3]}
             ];
 
-            var onBegin = sandbox.spy().named('onBegin');
+            suiteCollectionStub.allSuites.returns(suites);
+
+            const onBegin = sandbox.spy().named('onBegin');
             runner.on('begin', onBegin);
 
-            return run_(suites).then(function() {
+            return run_(suiteCollectionStub).then(() => {
                 assert.calledWith(onBegin, sinon.match({totalStates: 3}));
             });
         });
 
-        it('should pass all browser ids when emitting `begin`', function() {
+        it('should pass all browser ids when emitting `begin`', () => {
             runner.config.getBrowserIds
                 .returns(['browser1', 'browser2']);
 
-            var onBegin = sandbox.spy().named('onBegin');
+            const onBegin = sandbox.spy().named('onBegin');
             runner.on('begin', onBegin);
 
-            return run_().then(function() {
+            return run_().then(() => {
                 assert.calledWith(onBegin, sinon.match({
                     browserIds: ['browser1', 'browser2']
                 }));
             });
         });
 
-        it('should pass config when emitting `begin`', function() {
-            var onBegin = sandbox.spy().named('onBegin');
+        it('should pass config when emitting `begin`', () => {
+            const onBegin = sandbox.spy().named('onBegin');
             runner.on('begin', onBegin);
 
-            return run_().then(function() {
+            return run_().then(() => {
                 assert.calledWith(onBegin, sinon.match({
                     config: runner.config
                 }));
             });
         });
 
-        it('should launch only browsers specified in testBrowsers', function() {
+        it('should launch only browsers specified in testBrowsers', () => {
             runner.config.getBrowserIds
                 .returns(['browser1', 'browser2']);
             runner.setTestBrowsers(['browser1']);
 
-            return run_().then(function() {
+            return run_().then(() => {
                 assert.calledWith(TestSessionRunner.create, sinon.match.any, ['browser1']);
             });
         });
 
-        it('should run suites in test session runner', function() {
-            var suites = [util.makeSuiteStub()];
+        it('should run suites in test session runner', () => {
+            const suites = [util.makeSuiteStub()];
 
+            suiteCollectionStub.allSuites.returns(suites);
             sandbox.stub(testSessionRunner, 'run').returns(q());
 
-            return run_(suites)
-                .then(function() {
+            return run_(suiteCollectionStub)
+                .then(() => {
                     assert.calledOnce(testSessionRunner.run);
                     assert.calledWith(testSessionRunner.run, suites, stateProcessor);
                 });
         });
 
-        it('should emit `end`', function() {
-            var onEnd = sandbox.spy();
+        it('should emit `end`', () => {
+            const onEnd = sandbox.spy();
             runner.on('end', onEnd);
 
-            return run_().then(function() {
-                assert.calledOnce(onEnd);
-            });
+            return run_().then(() => assert.calledOnce(onEnd));
         });
 
-        it('should emit events in correct order', function() {
-            var begin = sandbox.spy().named('onBegin'),
-                end = sandbox.spy().named('onEnd');
+        it('should emit events in correct order', () => {
+            const begin = sandbox.spy().named('onBegin');
+            const end = sandbox.spy().named('onEnd');
 
             runner.on('begin', begin);
             runner.on('end', end);
 
-            return run_().then(function() {
-                assert.callOrder(begin, end);
-            });
+            return run_().then(() => assert.callOrder(begin, end));
         });
 
-        describe('retries', function() {
-            function mkRetryCandidate_() {
+        describe('retries', () => {
+            const mkRetryCandidate_ = () => {
                 return {
                     browserId: 'id',
                     suite: {fullName: 'default_name'},
+                    state: {name: 'stateName'},
                     equal: false
                 };
-            }
+            };
 
-            function runAndEmit_(event, data) {
-                return run_().then(function() {
-                    return testSessionRunner.emitAndWait(event, data);
-                });
-            }
+            const runAndEmit_ = (event, data) => {
+                return run_().then(() => testSessionRunner.emitAndWait(event, data));
+            };
 
-            beforeEach(function() {
+            beforeEach(() => {
                 config.forBrowser.returns({retry: Infinity});
             });
 
-            it('should try to submit state result for retry', function() {
+            it('should try to submit state result for retry', () => {
                 return runAndEmit_('stateResult')
-                    .then(function() {
-                        assert.called(FailCollector.prototype.tryToSubmitStateResult);
-                    });
+                    .then(() => assert.called(FailCollector.prototype.tryToSubmitStateResult));
             });
 
-            it('should emit state result event if it was not submitted for retry', function() {
-                var onProcessedCapture = sandbox.spy();
+            it('should emit state result event if it was not submitted for retry', () => {
+                const onProcessedCapture = sandbox.spy();
 
                 runner.on('onCaptureProcessed', onProcessedCapture);
 
                 return runAndEmit_('stateResult')
-                    .then(function() {
-                        assert.called(onProcessedCapture);
-                    });
+                    .then(() => assert.called(onProcessedCapture));
             });
 
-            it('should try to submit non-critical error for retry', function() {
+            it('should try to submit non-critical error for retry', () => {
                 return runAndEmit_('err')
-                    .then(function() {
-                        assert.called(FailCollector.prototype.tryToSubmitError);
-                    });
+                    .then(() => assert.called(FailCollector.prototype.tryToSubmitError));
             });
 
-            it('should emit `err` event if non-critical error was not submit for retry', function() {
-                var onErr = sandbox.spy();
+            it('should emit `err` event if non-critical error was not submit for retry', () => {
+                const onErr = sandbox.spy();
 
                 runner.on('err', onErr);
                 return runAndEmit_('err')
-                    .then(function() {
-                        assert.called(onErr);
-                    });
+                    .then(() => assert.called(onErr));
             });
 
-            it('should reject promise if critical error was not submitted for retry', function() {
+            it('should reject promise if critical error was not submitted for retry', () => {
                 FailCollector.prototype.tryToSubmitError.returns(false);
                 return assert.isRejected(runAndEmit_('criticalError'));
             });
 
-            it('should try to submit critical error for retry', function() {
+            it('should try to submit critical error for retry', () => {
                 FailCollector.prototype.tryToSubmitError.returns(false);
                 return runAndEmit_('criticalError')
-                    .fail(function() {
-                        assert.called(FailCollector.prototype.tryToSubmitError);
-                    });
+                    .fail(() => assert.called(FailCollector.prototype.tryToSubmitError));
             });
 
-            it('should emit `err` event before failing on critical error', function() {
-                var onErr = sandbox.spy();
+            it('should emit `err` event before failing on critical error', () => {
+                const onErr = sandbox.spy();
 
                 runner.on('err', onErr);
                 return runAndEmit_('err')
-                    .fail(function() {
-                        assert.called(onErr);
-                    });
+                    .fail(() => assert.called(onErr));
             });
 
-            describe('`retry` event', function() {
-                beforeEach(function() {
+            describe('`retry` event', () => {
+                beforeEach(() => {
                     FailCollector.prototype.tryToSubmitStateResult.restore();
                     FailCollector.prototype.tryToSubmitError.restore();
                 });
 
-                it('should emit `retry` event if candidate was submitted for retry', function() {
-                    var onRetry = sandbox.spy();
+                it('should emit `retry` event if candidate was submitted for retry', () => {
+                    const onRetry = sandbox.spy();
                     runner.on('retry', onRetry);
 
                     return runAndEmit_('stateResult', mkRetryCandidate_())
-                        .then(function() {
-                            assert.called(onRetry);
-                        });
+                        .then(() => assert.called(onRetry));
                 });
 
-                it('should add info about retry to `retry` event data', function() {
-                    var onRetry = sandbox.spy();
+                it('should add info about retry to `retry` event data', () => {
+                    const onRetry = sandbox.spy();
                     runner.on('retry', onRetry);
 
                     return runAndEmit_('stateResult', mkRetryCandidate_())
-                        .then(function() {
-                            assert.calledWithMatch(onRetry, {attempt: 1, retriesLeft: Infinity});
+                        .then(() => {
+                            const retryArgs = onRetry.lastCall.args[0];
+
+                            assert.property(retryArgs, 'attempt');
+                            assert.property(retryArgs, 'retriesLeft');
                         });
                 });
             });
