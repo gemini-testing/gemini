@@ -1,56 +1,53 @@
 'use strict';
 
-var q = require('q'),
-    proxyquire = require('proxyquire'),
-    SuiteCollection = require('lib/suite-collection'),
-    Config = require('lib/config'),
-    Runner = require('lib/runner'),
-    temp = require('lib/temp'),
+const q = require('q');
+const proxyquire = require('proxyquire');
+const SuiteCollection = require('lib/suite-collection');
+const Config = require('lib/config');
+const Runner = require('lib/runner');
+const temp = require('lib/temp');
 
-    mkSuiteStub = require('../util').makeSuiteStub;
+const mkSuiteStub = require('../util').makeSuiteStub;
 
-describe('gemini', function() {
-    var sandbox = sinon.sandbox.create();
+describe('gemini', () => {
+    const sandbox = sinon.sandbox.create();
+    let Gemini = require('lib/gemini');
 
-    afterEach(function() {
-        sandbox.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    describe('readTests', function() {
-        function readTests_(rootSuite, grep) {
+    describe('readTests', () => {
+        const readTests_ = (rootSuite, grep) => {
             rootSuite = rootSuite || mkSuiteStub();
 
-            var testReaderStub = sandbox.stub().named('TestReader').returns(q(rootSuite)),
-                Gemini = proxyquire('lib/gemini', {
-                    './test-reader': testReaderStub
-                });
+            const testReaderStub = sandbox.stub().named('TestReader').returns(q(rootSuite));
+            Gemini = proxyquire('lib/gemini', {
+                './test-reader': testReaderStub
+            });
 
             return new Gemini({
                 rootUrl: 'stubRootUrl',
                 system: {projectRoot: 'stubProjectRoot'}
             })
-                .readTests(null, grep);
-        }
+            .readTests(null, grep);
+        };
 
-        beforeEach(function() {
-            sandbox.stub(Config.prototype);
-        });
+        beforeEach(() => sandbox.stub(Config.prototype));
 
-        it('should return SuiteCollection instance', function() {
+        it('should return SuiteCollection instance', () => {
             return readTests_()
-                .then(function(result) {
+                .then((result) => {
                     assert.instanceOf(result, SuiteCollection);
                 });
         });
 
-        it('should add to suite collection all read tests excluding root', function() {
-            var parent = mkSuiteStub(),
-                child = mkSuiteStub({parent: parent}),
-                anotherChild = mkSuiteStub({parent: parent});
+        it('should add to suite collection all read tests excluding root', () => {
+            const parent = mkSuiteStub();
+            const child = mkSuiteStub({parent: parent});
+            const anotherChild = mkSuiteStub({parent: parent});
 
             return readTests_(parent)
-                .then(function(collection) {
-                    var allSuites = collection.allSuites();
+                .then((collection) => {
+                    const allSuites = collection.allSuites();
 
                     assert.notInclude(allSuites, parent);
                     assert.include(allSuites, child);
@@ -58,67 +55,67 @@ describe('gemini', function() {
                 });
         });
 
-        it('should grep leaf suites by fullname', function() {
-            var grandParent = mkSuiteStub(),
-                parent = mkSuiteStub({parent: grandParent}),
-                matchingChild = mkSuiteStub({
-                    states: [1],
-                    name: 'ok',
-                    parent: parent
-                }),
-                nonMatchingChild = mkSuiteStub({
-                    states: [1],
-                    name: 'fail',
-                    parent: parent
-                });
+        it('should grep leaf suites by fullname', () => {
+            const grandParent = mkSuiteStub();
+            const parent = mkSuiteStub({parent: grandParent});
+            const matchingChild = mkSuiteStub({
+                states: [1],
+                name: 'ok',
+                parent: parent
+            });
+            const nonMatchingChild = mkSuiteStub({
+                states: [1],
+                name: 'fail',
+                parent: parent
+            });
 
             return readTests_(parent, /ok/)
-                .then(function(collection) {
-                    var allSuites = collection.allSuites();
+                .then((collection) => {
+                    const allSuites = collection.allSuites();
 
                     assert.include(allSuites, matchingChild);
                     assert.notInclude(allSuites, nonMatchingChild);
                 });
         });
 
-        it('should remove tree branch if it does not have leaf suites', function() {
-            var grandParent = mkSuiteStub(),
-                parent = mkSuiteStub({parent: grandParent}),
-                nonMatchingBranchRoot = mkSuiteStub({
-                    name: 'nonMatchingBranchRoot',
-                    parent: parent
-                }),
-                nonMatchingBranchLeaf = mkSuiteStub({
-                    states: [1],
-                    name: 'nonMatchingBranchLeaf',
-                    parent: nonMatchingBranchRoot
-                });
+        it('should remove tree branch if it does not have leaf suites', () => {
+            const grandParent = mkSuiteStub();
+            const parent = mkSuiteStub({parent: grandParent});
+            const nonMatchingBranchRoot = mkSuiteStub({
+                name: 'nonMatchingBranchRoot',
+                parent: parent
+            });
+            const nonMatchingBranchLeaf = mkSuiteStub({
+                states: [1],
+                name: 'nonMatchingBranchLeaf',
+                parent: nonMatchingBranchRoot
+            });
 
             return readTests_(grandParent, /matchingBranchLeaf/)
-                .then(function(collection) {
-                    var allSuites = collection.allSuites();
+                .then((collection) => {
+                    const allSuites = collection.allSuites();
 
                     assert.notInclude(allSuites, nonMatchingBranchRoot);
                     assert.notInclude(allSuites, nonMatchingBranchLeaf);
                 });
         });
 
-        it('should keep in tree branch that have matching leaf suites', function() {
-            var grandParent = mkSuiteStub(),
-                parent = mkSuiteStub({parent: grandParent}),
-                matchingBranchRoot = mkSuiteStub({
-                    name: 'matchingBranchRoot',
-                    parent: parent
-                }),
-                matchingBranchLeaf = mkSuiteStub({
-                    states: [1],
-                    name: 'matchingBranchLeaf',
-                    parent: matchingBranchRoot
-                });
+        it('should keep in tree branch that have matching leaf suites', () => {
+            const grandParent = mkSuiteStub();
+            const parent = mkSuiteStub({parent: grandParent});
+            const matchingBranchRoot = mkSuiteStub({
+                name: 'matchingBranchRoot',
+                parent: parent
+            });
+            const matchingBranchLeaf = mkSuiteStub({
+                states: [1],
+                name: 'matchingBranchLeaf',
+                parent: matchingBranchRoot
+            });
 
             return readTests_(grandParent, /matchingBranchLeaf/)
-                .then(function(collection) {
-                    var allSuites = collection.allSuites();
+                .then((collection) => {
+                    const allSuites = collection.allSuites();
 
                     assert.include(allSuites, matchingBranchRoot);
                     assert.include(allSuites, matchingBranchLeaf);
@@ -126,16 +123,15 @@ describe('gemini', function() {
         });
     });
 
-    describe('test', function() {
+    describe('test', () => {
         beforeEach(function() {
-            sandbox.stub(temp);
+            sandbox.stub(temp, 'init');
             sandbox.stub(Runner.prototype, 'on');
             sandbox.stub(Runner.prototype, 'run');
         });
 
-        function test_(opts) {
+        const test_ = (opts) => {
             opts = opts || {};
-            var Gemini = require('lib/gemini');
 
             Runner.prototype.on.returnsThis();
             Runner.prototype.run.returns(q());
@@ -147,24 +143,114 @@ describe('gemini', function() {
                     tempDir: opts.tempDir
                 }
             })
-                .test([]);
-        }
+            .test([]);
+        };
 
-        it('should initialize temp with specified temp dir', function() {
+        it('should initialize temp with specified temp dir', () => {
             test_({tempDir: '/some/dir'});
 
             assert.calledOnce(temp.init);
             assert.calledWith(temp.init, '/some/dir');
         });
 
-        it('should initialize temp before start runner', function() {
+        it('should initialize temp before start runner', () => {
             return test_()
-                .then(function() {
+                .then(() => {
                     assert.callOrder(
                         temp.init,
                         Runner.prototype.run
                     );
                 });
+        });
+    });
+
+    describe('environment variables', () => {
+        beforeEach(() => {
+            sandbox.stub(SuiteCollection.prototype, 'skipBrowsers');
+            sandbox.stub(Runner.prototype, 'on');
+            sandbox.stub(Runner.prototype, 'run');
+            sandbox.stub(Runner.prototype, 'setTestBrowsers');
+            sandbox.stub(console, 'warn');
+            sandbox.stub(temp, 'init');
+        });
+
+        afterEach(() => {
+            delete process.env.GEMINI_BROWSERS;
+            delete process.env.GEMINI_SKIP_BROWSERS;
+        });
+
+        const stubBrowsers = (browserIds) => {
+            const fakeBrowsers = {};
+
+            browserIds.map((browser) => {
+                fakeBrowsers[browser] = {
+                    desiredCapabilities: {}
+                };
+            });
+
+            return fakeBrowsers;
+        };
+
+        const runGeminiTest = (opts) => {
+            opts = opts || {};
+
+            const gemini = new Gemini({
+                rootUrl: 'stubRootUrl',
+                system: {
+                    projectRoot: 'stubProjectRoot',
+                    tempDir: opts.tempDir
+                },
+                browsers: stubBrowsers(opts.browserIds)
+            });
+
+            Runner.prototype.on.returnsThis();
+            Runner.prototype.run.returns(q());
+
+            return gemini.test([]);
+        };
+
+        it('should use browsers from GEMINI_BROWSERS', () => {
+            process.env.GEMINI_BROWSERS = 'b1';
+
+            return runGeminiTest({browserIds: ['b1', 'b2']})
+                .then(() => assert.calledWith(Runner.prototype.setTestBrowsers, ['b1']));
+        });
+
+        it('should handle spaces in value of GEMINI_BROWSERS', () => {
+            process.env.GEMINI_BROWSERS = 'b1, b2';
+
+            return runGeminiTest({browserIds: ['b1', 'b2']})
+                .then(() => assert.calledWith(Runner.prototype.setTestBrowsers, ['b1', 'b2']));
+        });
+
+        it('should warn about unknown browsers in GEMINI_BROWSERS', () => {
+            process.env.GEMINI_BROWSERS = 'b1, b2';
+
+            return runGeminiTest({browserIds: ['b1']})
+                .then(() => {
+                    assert.calledWith(console.warn, sinon.match('Unknown browsers id: b2'));
+                });
+        });
+
+        it('should skip browsers from GEMINI_SKIP_BROWSERS', () => {
+            process.env.GEMINI_SKIP_BROWSERS = 'b1';
+
+            return runGeminiTest({browserIds: ['b1', 'b2']})
+                .then(() => assert.calledWith(SuiteCollection.prototype.skipBrowsers, ['b1']));
+        });
+
+        it('should remove spaces from GEMINI_SKIP_BROWSERS', () => {
+            process.env.GEMINI_SKIP_BROWSERS = 'b1, b2';
+
+            return runGeminiTest({browserIds: ['b1', 'b2']})
+                .then(() => assert.calledWith(SuiteCollection.prototype.skipBrowsers, ['b1', 'b2']));
+        });
+
+        it('should warn about unknown browsers in GEMINI_SKIP_BROWSERS', () => {
+            process.env.GEMINI_SKIP_BROWSERS = 'b1,b2';
+
+            return runGeminiTest({browserIds: ['b1']})
+                .then(() => assert.calledWith(console.warn, sinon.match('Unknown browsers id: b2')));
         });
     });
 });

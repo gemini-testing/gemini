@@ -81,8 +81,9 @@ report), partially (yellow) or was not captured at all (red).
   expression pattern.
 
 * `--browser ID` — execute suite only for specified browser id. Can be used
-  multiple times. Can be also specified with `GEMINI_BROWSERS` environment
-  variable. If both CLI option and env variable are set, CLI has precedence.
+  multiple times. Can be also specified with `GEMINI_BROWSERS` and `GEMINI_SKIP_BROWSERS`
+  environment variables (browsers should be separated by a coma). If both CLI option
+  and env variable are set, CLI has precedence.
 
 * `--help` – display help message.
 
