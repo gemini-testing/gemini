@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.5.0 - 2016-08-05
+
+* Retry only failed states on fail instead of all states of the suite
+* Add ability to set file masks for test paths in a `sets` option
+* Add ability to implement custom source path resolving for CSS files in coverage
+* Fix: keep original stack when cloning error
+
 ## 4.4.4 - 2016-07-27
 
 * Revert code changes made for version 4.4.3
