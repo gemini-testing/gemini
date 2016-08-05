@@ -2,7 +2,7 @@ language: node_js
 sudo: false
 script: npm run ${NPM_SCRIPT}
 after_success: cat ${TRAVIS_BUILD_DIR}/coverage/lcov.info | coveralls
-node_js: '4'
+node_js: '6'
 env:
   global:
   # SAUCE_USERNAME
