@@ -1,6 +1,7 @@
 'use strict';
 
 const NewScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/new-screen-updater');
+const path = require('path');
 const q = require('q');
 const fs = require('q-io/fs');
 const Image = require('lib/image');
@@ -11,6 +12,7 @@ describe('new-screen-updater', () => {
 
     beforeEach(() => {
         sandbox.stub(fs);
+        sandbox.stub(path, 'dirname');
         fs.makeTree.returns(q());
 
         imageStub = sinon.createStubInstance(Image);

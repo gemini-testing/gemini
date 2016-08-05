@@ -176,7 +176,7 @@ describe('runner/state-runner/state-runner', function() {
             return runner.run(stateProcessor)
                 .then(function() {
                     assert.calledOnce(stateProcessor.exec);
-                    assert.calledWithMatch(stateProcessor.exec, state, browserSession);
+                    assert.calledWith(stateProcessor.exec, state, browserSession);
                 });
         });
 
