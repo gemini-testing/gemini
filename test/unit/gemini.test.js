@@ -193,6 +193,7 @@ describe('gemini', () => {
 
         const runGeminiTest = (opts) => {
             opts = opts || {};
+            opts.browserIds = opts.browserIds || [];
 
             const gemini = new Gemini({
                 rootUrl: 'stubRootUrl',
@@ -230,6 +231,11 @@ describe('gemini', () => {
                 .then(() => {
                     assert.calledWith(console.warn, sinon.match('Unknown browsers id: b2'));
                 });
+        });
+
+        it('should not set tests browsers if browsers are not specified from cli option and env variable', () => {
+            return runGeminiTest()
+                .then(() => assert.notCalled(Runner.prototype.setTestBrowsers));
         });
 
         it('should skip browsers from GEMINI_SKIP_BROWSERS', () => {
