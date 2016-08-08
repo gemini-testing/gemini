@@ -5,6 +5,7 @@ const pathUtils = require('lib/path-utils');
 const proxyquire = require('proxyquire');
 const _ = require('lodash');
 const q = require('q');
+const EventEmitter = require('events').EventEmitter;
 
 describe('test-reader', () => {
     const sandbox = sinon.sandbox.create();
@@ -32,14 +33,16 @@ describe('test-reader', () => {
             }
         };
 
+
         opts = _.defaults(opts || {}, {
             paths: [],
-            config: {}
+            config: {},
+            emitter: new EventEmitter()
         });
 
         opts.config = _.merge(opts.config, REQUIRED_OPTS);
 
-        return readTests(opts.paths, opts.config);
+        return readTests(opts.paths, opts.config, opts.emitter);
     };
 
     describe('global "gemini" variable', () => {
@@ -232,5 +235,57 @@ describe('test-reader', () => {
                 assert.calledOnce(testsApi);
                 assert.calledWith(testsApi, sinon.match.any, ['b1', 'b2']);
             });
+    });
+
+    describe('events', () => {
+        function readTestsWithEmitter(absolutePath, emitter) {
+            const relativePath = 'some/path';
+
+            const config = {
+                sets: {
+                    all: {
+                        files: relativePath
+                    }
+                }
+            };
+
+            pathUtils.expandPaths
+                .withArgs(relativePath).returns(q([absolutePath]));
+
+            return readTests_({
+                paths: [relativePath],
+                emitter: emitter,
+                config: config
+            });
+        }
+
+        it('should emit "beforeFileRead" before reading each file', () => {
+            const filePath = '/some/path/file.js';
+            const beforeReadSpy = sandbox.spy().named('OnBeforeFileRead');
+
+            const emitter = new EventEmitter();
+            emitter.on('beforeFileRead', beforeReadSpy);
+
+            return readTestsWithEmitter(filePath, emitter)
+                .then(() => {
+                    assert.calledWithExactly(beforeReadSpy, filePath);
+                    assert.callOrder(beforeReadSpy, utils.requireWithNoCache);
+                });
+        });
+
+
+        it('should emit "afterFileRead" after reading each file', () => {
+            const filePath = '/some/path/file.js';
+            const afterReadSpy = sandbox.spy().named('OnAfterFileRead');
+
+            const emitter = new EventEmitter();
+            emitter.on('afterFileRead', afterReadSpy);
+
+            return readTestsWithEmitter(filePath, emitter)
+                .then(() => {
+                    assert.calledWithExactly(afterReadSpy, filePath);
+                    assert.callOrder(utils.requireWithNoCache, afterReadSpy);
+                });
+        });
     });
 });

@@ -215,3 +215,10 @@ plugins:
   be delayed until the promise resolves.
 
 * `endRunner` - emitted after the end of the `test` or `update` command.
+
+* `beforeFileRead` – emitted before each test file is read. The event is emitted
+  with 1 argument `filePath` which is the absolute path to the file to be read.
+
+* `afterFileRead` – emitted after each test file have been read. The event is
+  emitted with 1 argument `filePath` which is the absolute path to the file that
+  was read.
