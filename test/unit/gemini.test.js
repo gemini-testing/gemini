@@ -1,6 +1,7 @@
 'use strict';
 
 const q = require('q');
+const _ = require('lodash');
 const proxyquire = require('proxyquire');
 const SuiteCollection = require('lib/suite-collection');
 const Config = require('lib/config');
@@ -11,27 +12,75 @@ const mkSuiteStub = require('../util').makeSuiteStub;
 
 describe('gemini', () => {
     const sandbox = sinon.sandbox.create();
-    let Gemini = require('lib/gemini');
+
+    let Gemini;
+    let gemini;
+    let testReaderStub;
+
+    const stubBrowsers = (browserIds) => {
+        return browserIds.reduce((fakeBrowsers, browser) => {
+            return _.set(fakeBrowsers, browser, {desiredCapabilities: {}});
+        }, {});
+    };
+
+    const initGemini = (opts) => {
+        opts.rootSuite = opts.rootSuite || mkSuiteStub();
+
+        testReaderStub = sandbox.stub().named('TestReader').returns(q(opts.rootSuite));
+
+        Gemini = proxyquire('lib/gemini', {'./test-reader': testReaderStub});
+
+        return new Gemini({
+            rootUrl: 'http://localhost',
+            system: {
+                projectRoot: 'stub/project/root',
+                tempDir: opts.tempDir || 'stub/temp/dir'
+            },
+            browsers: opts.browserIds ? stubBrowsers(opts.browserIds) : []
+        });
+    };
+
+    const runGeminiTest = (opts) => {
+        opts = _.defaults(opts || {}, {
+            browserIds: []
+        });
+
+        gemini = initGemini(opts);
+        gemini.config.sets = opts.sets;
+
+        return gemini.test([], opts.cliOpts);
+    };
+
+    beforeEach(() => {
+        sandbox.stub(Runner.prototype, 'on').returnsThis();
+        sandbox.stub(Runner.prototype, 'run').returns(q());
+        sandbox.stub(console, 'warn');
+    });
 
     afterEach(() => sandbox.restore());
 
     describe('readTests', () => {
-        const readTests_ = (rootSuite, grep) => {
-            rootSuite = rootSuite || mkSuiteStub();
+        const readTests_ = (rootSuite, options) => {
+            gemini = initGemini({rootSuite});
 
-            const testReaderStub = sandbox.stub().named('TestReader').returns(q(rootSuite));
-            Gemini = proxyquire('lib/gemini', {
-                './test-reader': testReaderStub
-            });
-
-            return new Gemini({
-                rootUrl: 'stubRootUrl',
-                system: {projectRoot: 'stubProjectRoot'}
-            })
-            .readTests(null, grep);
+            return gemini.readTests(null, options);
         };
 
-        beforeEach(() => sandbox.stub(Config.prototype));
+        beforeEach(() => {
+            sandbox.stub(temp, 'init');
+            sandbox.stub(Config.prototype);
+        });
+
+        it('should pass sets from cli to test-reader', () => {
+            const opts = {
+                cliOpts: {sets: ['set1']}
+            };
+
+            return runGeminiTest(opts)
+                .then(() => {
+                    assert.calledWithMatch(testReaderStub, sinon.match({sets: ['set1']}));
+                });
+        });
 
         it('should return SuiteCollection instance', () => {
             return readTests_()
@@ -69,7 +118,7 @@ describe('gemini', () => {
                 parent: parent
             });
 
-            return readTests_(parent, /ok/)
+            return readTests_(parent, {grep: /ok/})
                 .then((collection) => {
                     const allSuites = collection.allSuites();
 
@@ -91,7 +140,7 @@ describe('gemini', () => {
                 parent: nonMatchingBranchRoot
             });
 
-            return readTests_(grandParent, /matchingBranchLeaf/)
+            return readTests_(grandParent, {grep: /matchingBranchLeaf/})
                 .then((collection) => {
                     const allSuites = collection.allSuites();
 
@@ -113,7 +162,7 @@ describe('gemini', () => {
                 parent: matchingBranchRoot
             });
 
-            return readTests_(grandParent, /matchingBranchLeaf/)
+            return readTests_(grandParent, {grep: /matchingBranchLeaf/})
                 .then((collection) => {
                     const allSuites = collection.allSuites();
 
@@ -121,40 +170,29 @@ describe('gemini', () => {
                     assert.include(allSuites, matchingBranchLeaf);
                 });
         });
+
+        it('should warn if a string was passed instead of object', () => {
+            return readTests_(null, 'string')
+                .then(() => assert.calledWith(console.warn, sinon.match(
+                    'Passing grep to readTests is deprecated. You should pass an object with options: {grep: \'string\'}.'
+                )));
+        });
     });
 
     describe('test', () => {
         beforeEach(function() {
             sandbox.stub(temp, 'init');
-            sandbox.stub(Runner.prototype, 'on');
-            sandbox.stub(Runner.prototype, 'run');
         });
 
-        const test_ = (opts) => {
-            opts = opts || {};
-
-            Runner.prototype.on.returnsThis();
-            Runner.prototype.run.returns(q());
-
-            return new Gemini({
-                rootUrl: 'stubRootUrl',
-                system: {
-                    projectRoot: 'stubProjectRoot',
-                    tempDir: opts.tempDir
-                }
-            })
-            .test([]);
-        };
-
         it('should initialize temp with specified temp dir', () => {
-            test_({tempDir: '/some/dir'});
+            runGeminiTest({tempDir: '/some/dir'});
 
             assert.calledOnce(temp.init);
             assert.calledWith(temp.init, '/some/dir');
         });
 
         it('should initialize temp before start runner', () => {
-            return test_()
+            return runGeminiTest()
                 .then(() => {
                     assert.callOrder(
                         temp.init,
@@ -167,10 +205,7 @@ describe('gemini', () => {
     describe('environment variables', () => {
         beforeEach(() => {
             sandbox.stub(SuiteCollection.prototype, 'skipBrowsers');
-            sandbox.stub(Runner.prototype, 'on');
-            sandbox.stub(Runner.prototype, 'run');
             sandbox.stub(Runner.prototype, 'setTestBrowsers');
-            sandbox.stub(console, 'warn');
             sandbox.stub(temp, 'init');
         });
 
@@ -178,37 +213,6 @@ describe('gemini', () => {
             delete process.env.GEMINI_BROWSERS;
             delete process.env.GEMINI_SKIP_BROWSERS;
         });
-
-        const stubBrowsers = (browserIds) => {
-            const fakeBrowsers = {};
-
-            browserIds.map((browser) => {
-                fakeBrowsers[browser] = {
-                    desiredCapabilities: {}
-                };
-            });
-
-            return fakeBrowsers;
-        };
-
-        const runGeminiTest = (opts) => {
-            opts = opts || {};
-            opts.browserIds = opts.browserIds || [];
-
-            const gemini = new Gemini({
-                rootUrl: 'stubRootUrl',
-                system: {
-                    projectRoot: 'stubProjectRoot',
-                    tempDir: opts.tempDir
-                },
-                browsers: stubBrowsers(opts.browserIds)
-            });
-
-            Runner.prototype.on.returnsThis();
-            Runner.prototype.run.returns(q());
-
-            return gemini.test([]);
-        };
 
         it('should use browsers from GEMINI_BROWSERS', () => {
             process.env.GEMINI_BROWSERS = 'b1';

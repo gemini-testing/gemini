@@ -85,6 +85,8 @@ report), partially (yellow) or was not captured at all (red).
   environment variables (browsers should be separated by a coma). If both CLI option
   and env variable are set, CLI has precedence.
 
+* `--set`, `-s` - specify set to run
+
 * `--help` – display help message.
 
 * `--version` – display version.
