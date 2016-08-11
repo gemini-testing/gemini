@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.6.0 - 2016-08-11
+
+* Added `GEMINI_SKIP_BROWSERS` environment variable support
+* Added the ability to log config for each browser using `DEBUG=gemini:config` environment variable
+* Fix: escape special symbols in HTML report
+* Fix: correct displaying of test url in meta-info of an HTML report
+
 ## 4.5.0 - 2016-08-05
 
 * Retry only failed states on fail instead of all states of the suite
