@@ -1,45 +1,99 @@
 'use strict';
 
-var suiteRunner = require('lib/runner/suite-runner'),
-    RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner'),
-    StatelessSuiteRunner = require('lib/runner/suite-runner/stateless-suite-runner'),
-    SkippedSuiteRunner = require('lib/runner/suite-runner/skipped-suite-runner'),
-    suiteUtil = require('lib/suite-util'),
-    util = require('../../../util');
+const proxyquire = require('proxyquire');
 
-describe('runner/suite-runner/create', function() {
-    var sandbox = sinon.sandbox.create();
+const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
+const StatelessSuiteRunner = require('lib/runner/suite-runner/stateless-suite-runner');
+const SkippedSuiteRunner = require('lib/runner/suite-runner/skipped-suite-runner');
+const DecoratorSuiteRunner = require('lib/runner/suite-runner/decorator-suite-runner');
+const Config = require('lib/config');
+const suiteUtil = require('lib/suite-util');
+const util = require('../../../util');
 
-    afterEach(function() {
-        sandbox.restore();
+describe('runner/suite-runner/create', () => {
+    const sandbox = sinon.sandbox.create();
+
+    let StatelessRunner;
+    let SkippedRunner;
+    let RegularRunner;
+
+    let SuiteRunnerFactory;
+
+    const makeStatelessSuite = () => util.makeSuiteStub();
+    const makeSuite = () => util.makeSuiteStub({states: [util.makeStateStub()]});
+
+    const makeSuiteRunner = (suite) => {
+        const config = sinon.createStubInstance(Config);
+        config.forBrowser.returns({rootUrl: 'http://localhost/foo/default'});
+
+        return SuiteRunnerFactory.create(suite, {}, config);
+    };
+
+    beforeEach(() => {
+        const runnerStub = {on: () => {}};
+
+        StatelessRunner = sandbox.stub().returns(runnerStub);
+        SkippedRunner = sandbox.stub().returns(runnerStub);
+        RegularRunner = sandbox.stub().returns(runnerStub);
+
+        SuiteRunnerFactory = proxyquire('lib/runner/suite-runner', {
+            './stateless-suite-runner': StatelessRunner,
+            './skipped-suite-runner': SkippedRunner,
+            './regular-suite-runner': RegularRunner
+        });
     });
 
-    it('should create StatelessSuiteRunner for suite without states', function() {
-        var suite = util.makeSuiteStub();
+    afterEach(() => sandbox.restore());
 
-        var runner = suiteRunner.create(suite, {});
+    describe('StatelessSuiteRunner', () => {
+        it('should create StatelessSuiteRunner', () => {
+            makeSuiteRunner(makeStatelessSuite());
 
-        assert.instanceOf(runner, StatelessSuiteRunner);
-    });
-
-    it('should create RegularSuiteRunner for suite with states', function() {
-        var suite = util.makeSuiteStub({
-            states: [util.makeStateStub()]
+            assert.calledOnce(StatelessRunner);
+            assert.notCalled(SkippedRunner);
+            assert.notCalled(RegularRunner);
         });
 
-        var runner = suiteRunner.create(suite, {});
+        it('should return DecoratorSuiteRunner for StatelessSuiteRunner', () => {
+            const runner = makeSuiteRunner(makeStatelessSuite());
 
-        assert.instanceOf(runner, RegularSuiteRunner);
+            assert.instanceOf(runner, DecoratorSuiteRunner);
+        });
     });
 
-    it('should create SkippedSuiteRunner for skipped suite', function() {
-        var suite = util.makeSuiteStub({
-            states: [util.makeStateStub()]
+    describe('SkippedSuiteRunner', () => {
+        beforeEach(() => {
+            sandbox.stub(suiteUtil, 'shouldSkip').returns(true);
         });
-        sandbox.stub(suiteUtil, 'shouldSkip').returns(true);
 
-        var runner = suiteRunner.create(suite, {});
+        it('should create SkippedSuiteRunner', () => {
+            makeSuiteRunner(makeSuite());
 
-        assert.instanceOf(runner, SkippedSuiteRunner);
+            assert.calledOnce(SkippedRunner);
+            assert.notCalled(StatelessRunner);
+            assert.notCalled(RegularRunner);
+        });
+
+        it('should return DecoratorSuiteRunner for SkippedSuiteRunner', () => {
+            const runner = makeSuiteRunner(makeSuite());
+
+            assert.instanceOf(runner, DecoratorSuiteRunner);
+        });
+    });
+
+    describe('RegularSuiteRunner', () => {
+        it('should create RegularSuiteRunner', () => {
+            makeSuiteRunner(makeSuite());
+
+            assert.calledOnce(RegularRunner);
+            assert.notCalled(StatelessRunner);
+            assert.notCalled(SkippedRunner);
+        });
+
+        it('should return DecoratorSuiteRunner for RegularSuiteRunner', () => {
+            const runner = makeSuiteRunner(makeSuite());
+
+            assert.instanceOf(runner, DecoratorSuiteRunner);
+        });
     });
 });
