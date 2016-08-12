@@ -2,9 +2,6 @@
 
 const proxyquire = require('proxyquire');
 
-const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
-const StatelessSuiteRunner = require('lib/runner/suite-runner/stateless-suite-runner');
-const SkippedSuiteRunner = require('lib/runner/suite-runner/skipped-suite-runner');
 const DecoratorSuiteRunner = require('lib/runner/suite-runner/decorator-suite-runner');
 const Config = require('lib/config');
 const suiteUtil = require('lib/suite-util');
