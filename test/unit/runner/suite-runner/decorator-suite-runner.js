@@ -68,9 +68,10 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
             RunnerEvents.BEGIN_STATE,
             RunnerEvents.SKIP_STATE,
             RunnerEvents.END_STATE,
+            RunnerEvents.END_TEST,
+            RunnerEvents.CAPTURE,
             RunnerEvents.WARNING,
             RunnerEvents.ERROR,
-            PrivateEvents.STATE_RESULT,
             PrivateEvents.CRITICAL_ERROR
         ].forEach((event) => {
             it(`should pass ${event} event from an original to a decorated suite runner`, () => {
