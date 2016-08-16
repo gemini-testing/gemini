@@ -70,6 +70,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
             RunnerEvents.END_STATE,
             RunnerEvents.END_TEST,
             RunnerEvents.CAPTURE,
+            RunnerEvents.END_CAPTURE,
             RunnerEvents.WARNING,
             RunnerEvents.ERROR,
             PrivateEvents.CRITICAL_ERROR
