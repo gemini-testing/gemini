@@ -1,30 +1,31 @@
 'use strict';
 
-var EventEmitter = require('events').EventEmitter,
-    FlatVerboseReporter = require('lib/reporters/flat-factory/flat-verbose'),
-    RunnerEvents = require('lib/constants/runner-events'),
-    logger = require('lib/utils').logger,
-    chalk = require('chalk');
+const chalk = require('chalk');
 
-describe('Reporter#FlatVerbose', function() {
-    var sandbox = sinon.sandbox.create(),
-        emitter;
+const EventEmitter = require('events').EventEmitter;
+const FlatVerboseReporter = require('lib/reporters/flat-factory/flat-verbose');
+const RunnerEvents = require('lib/constants/runner-events');
+const logger = require('lib/utils').logger;
 
-    beforeEach(function() {
-        var reporter = new FlatVerboseReporter();
+describe('Reporter#FlatVerbose', () => {
+    const sandbox = sinon.sandbox.create();
+    let emitter;
+
+    beforeEach(() => {
+        const reporter = new FlatVerboseReporter();
 
         emitter = new EventEmitter();
         reporter.attachRunner(emitter);
         sandbox.stub(logger);
     });
 
-    afterEach(function() {
+    afterEach(() => {
         sandbox.restore();
         emitter.removeAllListeners();
     });
 
-    it('should correctly do the rendering', function() {
-        var test = {
+    it('should correctly do the rendering', () => {
+        const test = {
             suite: {path: ['block', 'size', 'big']},
             state: {name: 'hover'},
             browserId: 'chrome',
@@ -32,10 +33,10 @@ describe('Reporter#FlatVerbose', function() {
         };
 
         emitter.emit(RunnerEvents.BEGIN);
-        emitter.emit(RunnerEvents.CAPTURE, test);
+        emitter.emit(RunnerEvents.UPDATE_RESULT, test);
         emitter.emit(RunnerEvents.END);
 
-        var deserealizedResult = chalk
+        const deserealizedResult = chalk
             .stripColor(logger.log.firstCall.args[0])
             .substr(2); // remove first symbol (icon)
 

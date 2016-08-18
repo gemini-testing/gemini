@@ -1,30 +1,36 @@
 'use strict';
 
-var stateRunner = require('lib/runner/state-runner'),
-    StateRunner = require('lib/runner/state-runner/state-runner'),
-    DisabledStateRunner = require('lib/runner/state-runner/disabled-state-runner'),
-    util = require('../../../util');
+const proxyquire = require('proxyquire');
 
-describe('runner/state-runner', function() {
-    var sandbox = sinon.sandbox.create(),
-        sessionStub,
-        configStub;
+const StateRunner = require('lib/runner/state-runner/state-runner');
+const util = require('../../../util');
 
-    beforeEach(function() {
-        sandbox.stub(DisabledStateRunner.prototype, '__constructor');
+describe('runner/state-runner', () => {
+    const sandbox = sinon.sandbox.create();
 
+    let StateRunnerFactory;
+    let DisabledStateRunner;
+
+    let sessionStub;
+    let configStub;
+
+    beforeEach(() => {
         sessionStub = {browser: {}};
         configStub = {fake: 'value'};
+
+        DisabledStateRunner = sandbox.stub();
+
+        StateRunnerFactory = proxyquire('lib/runner/state-runner', {
+            './disabled-state-runner': DisabledStateRunner
+        });
     });
 
-    afterEach(function() {
-        sandbox.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    it('should create DisabledStateRunner for state with no browsers', function() {
-        var state = util.makeStateStub();
+    it('should create DisabledStateRunner for state with no browsers', () => {
+        const state = util.makeStateStub();
 
-        var runner = stateRunner.create(state, sessionStub);
+        const runner = StateRunnerFactory.create(state, sessionStub);
 
         assert.instanceOf(runner, DisabledStateRunner);
     });
@@ -32,18 +38,18 @@ describe('runner/state-runner', function() {
     it('should pass state, browser session and config to the constructor of DisabledStateRunner', () => {
         const state = util.makeStateStub();
 
-        stateRunner.create(state, sessionStub, configStub);
+        StateRunnerFactory.create(state, sessionStub, configStub);
 
-        assert.calledWith(DisabledStateRunner.prototype.__constructor, state, sessionStub, configStub);
+        assert.calledWith(DisabledStateRunner, state, sessionStub, configStub);
     });
 
-    it('should create StateRunner by default', function() {
-        var suite = util.makeSuiteStub({browsers: ['some-browser']}),
-            state = util.makeStateStub(suite);
+    it('should create StateRunner by default', () => {
+        const suite = util.makeSuiteStub({browsers: ['some-browser']});
+        const state = util.makeStateStub(suite);
 
         sessionStub.browser.id = 'some-browser';
 
-        var runner = stateRunner.create(state, sessionStub);
+        const runner = StateRunnerFactory.create(state, sessionStub);
 
         assert.instanceOf(runner, StateRunner);
     });
