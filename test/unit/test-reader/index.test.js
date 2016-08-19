@@ -5,7 +5,7 @@ const _ = require('lodash');
 const q = require('q');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('lib/utils');
-const pathUtils = require('lib/test-reader/path-utils');
+const globExtra = require('glob-extra');
 
 describe('test-reader', () => {
     const sandbox = sinon.sandbox.create();
@@ -33,7 +33,7 @@ describe('test-reader', () => {
 
     beforeEach(() => {
         sandbox.stub(utils, 'requireWithNoCache');
-        sandbox.stub(pathUtils, 'expandPaths').returns(q([]));
+        sandbox.stub(globExtra, 'expandPaths').returns(q([]));
 
         readTests = proxyquire('lib/test-reader', {
             '../tests-api': testsApi
@@ -68,7 +68,7 @@ describe('test-reader', () => {
             const api = {suite: 'api'};
 
             testsApi.returns(api);
-            pathUtils.expandPaths.returns(q(['some-test.js']));
+            globExtra.expandPaths.returns(q(['some-test.js']));
 
             return readTests_({config})
                 .then(() => assert.deepEqual(gemini, api));
@@ -77,7 +77,7 @@ describe('test-reader', () => {
         it('should rewrite global "gemini" variable for each file', () => {
             let globalGemini = [];
 
-            pathUtils.expandPaths.returns(q(['/some/path/file1.js', '/some/path/file2.js']));
+            globExtra.expandPaths.returns(q(['/some/path/file1.js', '/some/path/file2.js']));
 
             testsApi
                 .onFirstCall().returns({suite: 'apiInstance'})
@@ -93,7 +93,7 @@ describe('test-reader', () => {
 
         it('should delete global "gemini" variable after test reading', () => {
             testsApi.returns({suite: 'api'});
-            pathUtils.expandPaths.returns(q(['some-test.js']));
+            globExtra.expandPaths.returns(q(['some-test.js']));
             sandbox.stub(utils, 'requireWithNoCache');
 
             return readTests_({config}).then(() => assert.notProperty(global, 'gemini'));
@@ -109,7 +109,7 @@ describe('test-reader', () => {
             }
         };
 
-        pathUtils.expandPaths
+        globExtra.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']));
 
         return readTests_({config})
@@ -131,7 +131,7 @@ describe('test-reader', () => {
             }
         };
 
-        pathUtils.expandPaths.withArgs(['some/path']).returns(q(['/some/path/file1.js']));
+        globExtra.expandPaths.withArgs(['some/path']).returns(q(['/some/path/file1.js']));
 
         return readTests_({cliSets: ['set1'], config})
             .then(() => assert.alwaysCalledWithExactly(utils.requireWithNoCache, '/some/path/file1.js'));
@@ -149,7 +149,7 @@ describe('test-reader', () => {
             }
         };
 
-        pathUtils.expandPaths
+        globExtra.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js']));
 
         return readTests_({paths: ['some/path'], config})
@@ -167,7 +167,7 @@ describe('test-reader', () => {
             }
         };
 
-        pathUtils.expandPaths
+        globExtra.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js']))
             .withArgs(['some/path', 'other/path']).returns(q(['/some/path/file1.js', '/other/path/file2.js']));
 
@@ -178,7 +178,7 @@ describe('test-reader', () => {
             });
     });
 
-    it('should not load suites if sets do not constan paths from cli', () => {
+    it('should not load suites if sets do not contain paths from cli', () => {
         const config = {
             sets: {
                 set1: {
@@ -203,7 +203,7 @@ describe('test-reader', () => {
                 }
             };
 
-            pathUtils.expandPaths
+            globExtra.expandPaths
                 .withArgs(relativePath).returns(q([absolutePath]));
 
             return readTests_({
