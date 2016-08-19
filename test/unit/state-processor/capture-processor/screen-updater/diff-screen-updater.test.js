@@ -35,6 +35,7 @@ describe('diff-screen-updater', () => {
         imageStub.save.returns(q());
 
         fs.exists.returns(q(true));
+        fs.copy.returns(q());
     });
 
     afterEach(() => {
