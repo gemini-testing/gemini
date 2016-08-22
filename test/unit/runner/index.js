@@ -50,7 +50,8 @@ describe('runner', () => {
             const onBegin = sandbox.spy().named('onBegin');
             runner.on('begin', onBegin);
 
-            return run_().then(() => assert.calledOnce(onBegin));
+            return run_()
+                .then(() => assert.calledOnce(onBegin));
         });
 
         it('should pass total number of states when emitting `begin`', () => {
@@ -65,9 +66,8 @@ describe('runner', () => {
             const onBegin = sandbox.spy().named('onBegin');
             runner.on('begin', onBegin);
 
-            return run_(suiteCollectionStub).then(() => {
-                assert.calledWith(onBegin, sinon.match({totalStates: 3}));
-            });
+            return run_(suiteCollectionStub)
+                .then(() => assert.calledWith(onBegin, sinon.match({totalStates: 3})));
         });
 
         it('should pass all browser ids when emitting `begin`', () => {
@@ -110,18 +110,18 @@ describe('runner', () => {
             suiteCollectionStub.allSuites.returns(suites);
             sandbox.stub(testSessionRunner, 'run').returns(q());
 
-            return run_(suiteCollectionStub)
-                .then(() => {
-                    assert.calledOnce(testSessionRunner.run);
-                    assert.calledWith(testSessionRunner.run, suites, stateProcessor);
-                });
+            return run_(suiteCollectionStub).then(() => {
+                assert.calledOnce(testSessionRunner.run);
+                assert.calledWith(testSessionRunner.run, suites, stateProcessor);
+            });
         });
 
         it('should emit `end`', () => {
             const onEnd = sandbox.spy();
             runner.on('end', onEnd);
 
-            return run_().then(() => assert.calledOnce(onEnd));
+            return run_()
+                .then(() => assert.calledOnce(onEnd));
         });
 
         it('should emit events in correct order', () => {
@@ -131,7 +131,8 @@ describe('runner', () => {
             runner.on('begin', begin);
             runner.on('end', end);
 
-            return run_().then(() => assert.callOrder(begin, end));
+            return run_()
+                .then(() => assert.callOrder(begin, end));
         });
 
         describe('retries', () => {
@@ -145,7 +146,8 @@ describe('runner', () => {
             };
 
             const runAndEmit_ = (event, data) => {
-                return run_().then(() => testSessionRunner.emitAndWait(event, data));
+                return run_()
+                    .then(() => testSessionRunner.emitAndWait(event, data));
             };
 
             beforeEach(() => config.forBrowser.returns({retry: Infinity}));
@@ -159,14 +161,16 @@ describe('runner', () => {
                 const onEndTest = sandbox.spy();
                 runner.on('endTest', onEndTest);
 
-                return runAndEmit_('endTest').then(() => assert.calledOnce(onEndTest));
+                return runAndEmit_('endTest')
+                    .then(() => assert.calledOnce(onEndTest));
             });
 
-            it('should emit updateResult event above', () => {
+            it('should pass through updateResult event', () => {
                 const onUpdateResult = sandbox.spy();
                 runner.on('updateResult', onUpdateResult);
 
-                return runAndEmit_('updateResult').then(() => assert.calledOnce(onUpdateResult));
+                return runAndEmit_('updateResult')
+                    .then(() => assert.calledOnce(onUpdateResult));
             });
 
             it('should try to submit non-critical error for retry', () => {

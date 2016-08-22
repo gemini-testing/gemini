@@ -258,3 +258,7 @@ system:
 
 To use Gemini in your scripts or build tools you can use experimental
 [programmatic API](doc/programmatic-api.md).
+
+## Events
+
+To learn more about all events in Gemini use [events documentation](doc/events.md).

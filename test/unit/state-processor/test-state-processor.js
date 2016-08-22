@@ -6,13 +6,10 @@ const q = require('q');
 const CaptureSession = require('lib/capture-session');
 const StateProcessor = require('lib/state-processor/state-processor');
 const TestStateProcessor = require('lib/state-processor/test-state-processor');
-const Image = require('lib/image');
 const util = require('../../util');
 
 describe('state-processor/test-state-processor', () => {
     const sandbox = sinon.sandbox.create();
-
-    let BrowserSession;
 
     const mkTestStateProc_ = () => {
         const config = _.set({}, 'system.diffColor', '#ff00ff');
@@ -22,41 +19,48 @@ describe('state-processor/test-state-processor', () => {
     const exec_ = (opts) => {
         opts = _.defaultsDeep(opts || {}, {
             state: util.makeStateStub(),
+            browserSession: sinon.createStubInstance(CaptureSession),
             page: {},
             emit: sinon.spy()
         });
 
-        return mkTestStateProc_().exec(opts.state, BrowserSession, opts.page, opts.emit);
+        return mkTestStateProc_().exec(opts.state, opts.browserSession, opts.page, opts.emit);
     };
 
-    beforeEach(() => {
-        sandbox.stub(StateProcessor.prototype, 'exec');
-        BrowserSession = sinon.createStubInstance(CaptureSession);
-        _.set(BrowserSession, 'browser.config', {});
-    });
+    beforeEach(() => sandbox.stub(StateProcessor.prototype, 'exec'));
 
     afterEach(() => sandbox.restore());
 
     describe('exec', () => {
-        it('should call StateProcessor.exec with state, browserSession and page', () => {
+        it('should call base class exec method with correct args', () => {
             const state = util.makeStateStub();
             const page = {};
-
+            const browserSession = sinon.createStubInstance(CaptureSession);
 
             StateProcessor.prototype.exec.returns(q({}));
 
-            return exec_({state, page})
+            return mkTestStateProc_().exec(state, browserSession, page, sinon.spy())
                 .then(() => {
-                    assert.calledWithExactly(StateProcessor.prototype.exec, state, BrowserSession, page);
+                    assert.calledWithExactly(StateProcessor.prototype.exec, state, browserSession, page);
                 });
         });
 
-        it('should emit END_TEST event with atached diff info when images aren\'t equal', () => {
+        it('should return result from calling base class exec method', () => {
+            const result = {equal: true};
+
+            StateProcessor.prototype.exec.returns(q(result));
+
+            return exec_()
+                .then(() => {
+                    assert.eventually.equal(StateProcessor.prototype.exec.getCall(0).returnValue, result);
+                });
+        });
+
+        it('should emit END_TEST event with saveDiffTo func when images aren\'t equal', () => {
             const result = {equal: false};
             const emit = sandbox.stub();
 
             StateProcessor.prototype.exec.returns(q(result));
-            sandbox.stub(Image, 'buildDiff').returns({diff: 'default/path/diff.png'});
 
             return exec_({emit})
                 .then(() => {
@@ -64,7 +68,7 @@ describe('state-processor/test-state-processor', () => {
                 });
         });
 
-        it('should emit END_TEST event with diff results when images equal', () => {
+        it('should emit END_TEST event with diff results when images are equal', () => {
             const result = {equal: true};
             const emit = sandbox.stub();
 
@@ -72,6 +76,15 @@ describe('state-processor/test-state-processor', () => {
 
             return exec_({emit})
                 .then(() => assert.calledWithExactly(emit, 'endTest', result));
+        });
+
+        it('should emit END_TEST event without saveDiffTo func when images are equal', () => {
+            const emit = sandbox.stub();
+
+            StateProcessor.prototype.exec.returns(q({equal: true}));
+
+            return exec_({emit})
+                .then(() => assert.notProperty(emit.getCall(0).args[1], 'saveDiffTo'));
         });
     });
 });
