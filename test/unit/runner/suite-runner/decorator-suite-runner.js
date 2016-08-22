@@ -68,7 +68,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
             RunnerEvents.BEGIN_STATE,
             RunnerEvents.SKIP_STATE,
             RunnerEvents.END_STATE,
-            RunnerEvents.END_TEST,
+            RunnerEvents.TEST_RESULT,
             RunnerEvents.CAPTURE,
             RunnerEvents.UPDATE_RESULT,
             RunnerEvents.WARNING,

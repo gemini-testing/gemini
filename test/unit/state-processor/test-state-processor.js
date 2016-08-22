@@ -56,7 +56,7 @@ describe('state-processor/test-state-processor', () => {
                 });
         });
 
-        it('should emit END_TEST event with saveDiffTo func when images aren\'t equal', () => {
+        it('should emit TEST_RESULT event with saveDiffTo func when images aren\'t equal', () => {
             const result = {equal: false};
             const emit = sandbox.stub();
 
@@ -64,21 +64,21 @@ describe('state-processor/test-state-processor', () => {
 
             return exec_({emit})
                 .then(() => {
-                    assert.calledWithExactly(emit, 'endTest', _.extend(result, {saveDiffTo: () => {}}));
+                    assert.calledWithExactly(emit, 'testResult', _.extend(result, {saveDiffTo: () => {}}));
                 });
         });
 
-        it('should emit END_TEST event with diff results when images are equal', () => {
+        it('should emit TEST_RESULT event with diff results when images are equal', () => {
             const result = {equal: true};
             const emit = sandbox.stub();
 
             StateProcessor.prototype.exec.returns(q(result));
 
             return exec_({emit})
-                .then(() => assert.calledWithExactly(emit, 'endTest', result));
+                .then(() => assert.calledWithExactly(emit, 'testResult', result));
         });
 
-        it('should emit END_TEST event without saveDiffTo func when images are equal', () => {
+        it('should emit TEST_RESULT event without saveDiffTo func when images are equal', () => {
             const emit = sandbox.stub();
 
             StateProcessor.prototype.exec.returns(q({equal: true}));
