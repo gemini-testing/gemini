@@ -1,19 +1,26 @@
 'use strict';
-var q = require('q'),
-    CaptureSession = require('lib/capture-session'),
-    suiteRunner = require('lib/runner/suite-runner'),
-    StateRunner = require('lib/runner/state-runner/state-runner'),
-    BrowserAgent = require('lib/runner/browser-runner/browser-agent'),
-    Config = require('lib/config'),
-    util = require('../../../util'),
-    makeSuiteStub = util.makeSuiteStub;
 
-describe('runner/suite-runner/regular-suite-runner', function() {
-    var sandbox = sinon.sandbox.create(),
-        browser,
-        config;
+const q = require('q');
 
-    beforeEach(function() {
+const SuiteRunnerFactory = require('lib/runner/suite-runner');
+const StateRunnerFactory = require('lib/runner/state-runner');
+const StateRunner = require('lib/runner/state-runner/state-runner');
+const CaptureSession = require('lib/capture-session');
+const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
+const Config = require('lib/config');
+const util = require('../../../util');
+const makeSuiteStub = util.makeSuiteStub;
+
+describe('runner/suite-runner/regular-suite-runner', () => {
+    const sandbox = sinon.sandbox.create();
+
+    let stateRunner;
+    let stateRunnerFactory;
+
+    let browser;
+    let config;
+
+    beforeEach(() => {
         browser = util.browserWithId('default-browser');
         sandbox.stub(browser, 'openRelative');
         browser.openRelative.returns(q.resolve());
@@ -21,9 +28,6 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         sandbox.stub(BrowserAgent.prototype);
         BrowserAgent.prototype.getBrowser.returns(q.resolve(browser));
         BrowserAgent.prototype.freeBrowser.returns(q.resolve());
-
-        sandbox.stub(StateRunner.prototype);
-        StateRunner.prototype.run.returns(q.resolve());
 
         sandbox.stub(CaptureSession.prototype);
         CaptureSession.prototype.runActions.returns(q.resolve());
@@ -33,235 +37,198 @@ describe('runner/suite-runner/regular-suite-runner', function() {
         config.forBrowser.returns({
             rootUrl: 'http://localhost/foo/default'
         });
+
+        stateRunner = sinon.createStubInstance(StateRunner);
+        stateRunnerFactory = sandbox.stub(StateRunnerFactory);
+        stateRunnerFactory.create.returns(stateRunner);
     });
 
-    afterEach(function() {
-        sandbox.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    function mkRunner_(suite, browserId) {
-        var browserAgent = new BrowserAgent();
+    const mkRunner_ = (suite, browserId) => {
+        const browserAgent = new BrowserAgent();
         browserAgent.browserId = browserId || browser.id;
 
-        return suiteRunner.create(
+        return SuiteRunnerFactory.create(
             suite || makeSuiteStub(),
             browserAgent,
             config
         );
-    }
+    };
 
-    function run_(suite, stateProcessor) {
+    const run_ = (suite, stateProcessor) => {
         suite = suite || makeSuiteStub({
             states: [util.makeStateStub()]
         });
 
-        var runner = mkRunner_(suite);
+        const runner = mkRunner_(suite);
+
         return runner.run(stateProcessor);
-    }
+    };
 
-    describe('run', function() {
-        it('should emit `beginSuite` event', function() {
-            var onBeginSuite = sinon.spy().named('onBeginSuite'),
-                suite = makeSuiteStub(),
-                runner = mkRunner_(suite, 'browser');
+    describe('run', () => {
+        it('should emit `beginSuite` event', () => {
+            const onBeginSuite = sinon.spy().named('onBeginSuite');
+            const suite = makeSuiteStub();
+            const runner = mkRunner_(suite, 'browser');
 
             runner.on('beginSuite', onBeginSuite);
 
             return runner.run()
-                .then(function() {
-                    assert.calledWith(onBeginSuite, {
-                        suite: suite,
-                        browserId: 'browser'
-                    });
-                });
+                .then(() => assert.calledWith(onBeginSuite, {suite, browserId: 'browser'}));
         });
 
-        it('should emit `endSuite` event', function() {
-            var onEndSuite = sinon.spy().named('onEndSuite'),
-                suite = makeSuiteStub(),
-                runner = mkRunner_(suite, 'browser');
+        it('should emit `endSuite` event', () => {
+            const onEndSuite = sinon.spy().named('onEndSuite');
+            const suite = makeSuiteStub();
+            const runner = mkRunner_(suite, 'browser');
 
             runner.on('endSuite', onEndSuite);
 
             return runner.run()
-                .then(function() {
-                    assert.calledWith(onEndSuite, {
-                        suite: suite,
-                        browserId: 'browser'
-                    });
-                });
+                .then(() => assert.calledWith(onEndSuite, {suite, browserId: 'browser'}));
         });
 
-        it('should emit events in correct order', function() {
-            var onBeginSuite = sinon.spy().named('onBeginSuite'),
-                onEndSuite = sinon.spy().named('onEndSuite'),
-                runner = mkRunner_();
+        it('should emit events in correct order', () => {
+            const onBeginSuite = sinon.spy().named('onBeginSuite');
+            const onEndSuite = sinon.spy().named('onEndSuite');
+            const runner = mkRunner_();
 
             runner.on('beginSuite', onBeginSuite);
             runner.on('endSuite', onEndSuite);
 
             return runner.run()
-                .then(function() {
-                    assert.callOrder(
-                        onBeginSuite,
-                        onEndSuite
-                    );
-                });
+                .then(() => assert.callOrder(onBeginSuite, onEndSuite));
         });
 
-        it('should get new browser before open url', function() {
+        it('should get new browser before open url', () => {
             return run_()
-                .then(function() {
-                    assert.callOrder(
-                        BrowserAgent.prototype.getBrowser,
-                        browser.openRelative
-                    );
-                });
+                .then(() => assert.callOrder(
+                    BrowserAgent.prototype.getBrowser,
+                    browser.openRelative
+                ));
         });
 
-        it('should open suite url in browser', function() {
-            var suite = makeSuiteStub({
+        it('should open suite url in browser', () => {
+            const suite = makeSuiteStub({
                 states: [util.makeStateStub()],
                 url: '/path'
             });
 
             return run_(suite)
-                .then(function() {
-                    assert.calledWith(browser.openRelative, '/path');
-                });
+                .then(() => assert.calledWith(browser.openRelative, '/path'));
         });
 
-        it('should not call any actions if no states', function() {
-            var suite = makeSuiteStub();
+        it('should not call any actions if no states', () => {
+            const suite = makeSuiteStub();
 
             return run_(suite)
-                .then(function() {
-                    assert.notCalled(CaptureSession.prototype.runActions);
-                });
+                .then(() => assert.notCalled(CaptureSession.prototype.runActions));
         });
 
-        it('should run `before` actions if there are some states', function() {
-            var suite = makeSuiteStub({
+        it('should run `before` actions if there are some states', () => {
+            const suite = makeSuiteStub({
                 states: [util.makeStateStub()]
             });
 
             return run_(suite)
-                .then(function() {
-                    assert.calledWith(CaptureSession.prototype.runActions, suite.beforeActions);
-                });
+                .then(() => assert.calledWith(CaptureSession.prototype.runActions, suite.beforeActions));
         });
 
-        it('should run states', function() {
-            var state = util.makeStateStub(),
-                suite = makeSuiteStub({
-                    states: [state]
-                });
+        it('should run states', () => {
+            const state = util.makeStateStub();
+            const suite = makeSuiteStub({states: [state]});
+
+            stateRunnerFactory.create.withArgs(state).returns(stateRunner);
 
             return run_(suite)
-                .then(function() {
-                    assert.calledWith(StateRunner.prototype.__constructor, state);
-                    assert.calledOnce(StateRunner.prototype.run);
-                });
+                .then(() => assert.calledOnce(stateRunner.run));
         });
 
-        it('should passthrough capture processor to state runner', function() {
-            var suite = makeSuiteStub({
-                states: [util.makeStateStub()]
-            });
+        it('should passthrough capture processor to state runner', () => {
+            const suite = makeSuiteStub({states: [util.makeStateStub()]});
 
             return run_(suite, 'stateProcessor')
-                .then(function() {
-                    assert.calledWith(StateRunner.prototype.run, 'stateProcessor');
-                });
+                .then(() => assert.calledWith(stateRunner.run, 'stateProcessor'));
         });
 
-        describe('if can not get a browser', function() {
-            beforeEach(function() {
-                BrowserAgent.prototype.getBrowser.returns(q.reject(new Error()));
-            });
+        describe('if can not get a browser', () => {
+            beforeEach(() => BrowserAgent.prototype.getBrowser.returns(q.reject(new Error())));
 
-            it('should pass an error to all states', function() {
-                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
-                    runner = mkRunner_(suiteTree.suite),
-                    onErrorHandler = sinon.spy();
+            it('should pass an error to all states', () => {
+                const suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']});
+                const runner = mkRunner_(suiteTree.suite);
+                const onErrorHandler = sinon.spy();
 
                 runner.on('err', onErrorHandler);
 
                 return runner.run()
-                    .then(function() {
+                    .then(() => {
                         assert.calledTwice(onErrorHandler);
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
                     });
             });
 
-            it('should pass a browser id to an error', function() {
-                var state = util.makeStateStub(),
-                    runner = mkRunner_(state.suite, 'browser'),
-                    onErrorHandler = sinon.spy();
+            it('should pass a browser id to an error', () => {
+                const state = util.makeStateStub();
+                const runner = mkRunner_(state.suite, 'browser');
+                const onErrorHandler = sinon.spy();
 
                 runner.on('err', onErrorHandler);
 
                 return runner.run()
-                    .then(function() {
-                        assert.calledWithMatch(onErrorHandler, {browserId: 'browser'});
-                    });
+                    .then(() => assert.calledWithMatch(onErrorHandler, {browserId: 'browser'}));
             });
 
-            it('should not run states', function() {
+            it('should not run states', () => {
                 return run_()
-                    .then(function() {
-                        assert.notCalled(StateRunner.prototype.run);
-                    });
+                    .then(() => assert.notCalled(stateRunner.run));
             });
         });
 
-        describe('if can not open url in a browser', function() {
-            beforeEach(function() {
+        describe('if can not open url in a browser', () => {
+            beforeEach(() => {
                 browser.openRelative.returns(q.reject(new Error()));
             });
 
-            it('should pass an error to all states', function() {
-                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
-                    runner = mkRunner_(suiteTree.suite),
-                    onErrorHandler = sinon.spy();
+            it('should pass an error to all states', () => {
+                const suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']});
+                const runner = mkRunner_(suiteTree.suite);
+                const onErrorHandler = sinon.spy();
 
                 runner.on('err', onErrorHandler);
 
                 return runner.run()
-                    .then(function() {
+                    .then(() => {
                         assert.calledTwice(onErrorHandler);
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
                     });
             });
 
-            it('should pass a session id to an error', function() {
-                var state = util.makeStateStub(),
-                    runner = mkRunner_(state.suite),
-                    onErrorHandler = sinon.spy();
+            it('should pass a session id to an error', () => {
+                const state = util.makeStateStub();
+                const runner = mkRunner_(state.suite);
+                const onErrorHandler = sinon.spy();
 
                 runner.on('err', onErrorHandler);
                 browser.sessionId = 100500;
 
                 return runner.run()
-                    .then(function() {
-                        assert.calledWithMatch(onErrorHandler, {sessionId: 100500});
-                    });
+                    .then(() => assert.calledWithMatch(onErrorHandler, {sessionId: 100500}));
             });
 
-            it('should not run states', function() {
+            it('should not run states', () => {
                 return run_()
-                    .then(function() {
-                        assert.notCalled(StateRunner.prototype.run);
-                    });
+                    .then(() => assert.notCalled(stateRunner.run));
             });
         });
 
-        describe('if `beforeActions` failed', function() {
-            var suite;
+        describe('if `beforeActions` failed', () => {
+            let suite;
 
-            beforeEach(function() {
+            beforeEach(() => {
                 suite = makeSuiteStub({
                     states: [util.makeStateStub()]
                 });
@@ -269,133 +236,113 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                 CaptureSession.prototype.runActions.withArgs(suite.beforeActions).returns(q.reject(new Error()));
             });
 
-            it('should pass an error to all states', function() {
-                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
-                    runner = mkRunner_(suiteTree.suite),
-                    onErrorHandler = sinon.spy();
+            it('should pass an error to all states', () => {
+                const suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']});
+                const runner = mkRunner_(suiteTree.suite);
+                const onErrorHandler = sinon.spy();
 
                 runner.on('err', onErrorHandler);
 
                 return runner.run()
-                    .then(function() {
+                    .then(() => {
                         assert.calledTwice(onErrorHandler);
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
                     });
             });
 
-            it('should pass a session id to an error', function() {
-                var runner = mkRunner_(suite),
-                    onErrorHandler = sinon.spy();
+            it('should pass a session id to an error', () => {
+                const runner = mkRunner_(suite);
+                const onErrorHandler = sinon.spy();
 
                 runner.on('err', onErrorHandler);
                 browser.sessionId = 100500;
 
                 return runner.run()
-                    .then(function() {
-                        assert.calledWithMatch(onErrorHandler, {sessionId: 100500});
-                    });
+                    .then(() => assert.calledWithMatch(onErrorHandler, {sessionId: 100500}));
             });
 
-            it('should not run states', function() {
+            it('should not run states', () => {
                 return run_(suite)
-                    .fail(function() {
-                        assert.notCalled(StateRunner.prototype.run);
-                    });
+                    .fail(() => assert.notCalled(stateRunner.run));
             });
 
-            it('should not run `afterActions`', function() {
+            it('should not run `afterActions`', () => {
                 return run_(suite)
-                    .fail(function() {
+                    .fail(() => {
                         assert.neverCalledWith(CaptureSession.prototype.runActions, suite.afterActions);
                     });
             });
 
-            it('should not run post actions', function() {
+            it('should not run post actions', () => {
                 return run_(suite)
-                    .fail(function() {
-                        assert.notCalled(CaptureSession.prototype.runPostActions);
-                    });
+                    .fail(() => assert.notCalled(CaptureSession.prototype.runPostActions));
             });
         });
 
-        it('should run next state only after previous has been finished', function() {
-            var suite = makeSuiteStub(),
-                state1 = util.makeStateStub(suite),
-                state2 = util.makeStateStub(suite),
-                mediator = sinon.spy();
+        it('should run next state only after previous has been finished', () => {
+            const suite = makeSuiteStub();
+            const state1 = util.makeStateStub(suite);
+            const state2 = util.makeStateStub(suite);
+            const mediator = sinon.spy();
 
-            StateRunner.prototype.run.onFirstCall().returns(q.delay(1).then(mediator));
+            stateRunner.run.onFirstCall().returns(q.delay(1).then(mediator));
 
             return run_(suite)
-                .then(function() {
+                .then(() => {
                     assert.callOrder(
-                        StateRunner.prototype.__constructor.withArgs(state1).named('state1 runner'),
+                        stateRunnerFactory.create.withArgs(state1).returns(stateRunner).named('stateRunner1'),
                         mediator.named('middle function'),
-                        StateRunner.prototype.__constructor.withArgs(state2).named('state2 runner')
+                        stateRunnerFactory.create.withArgs(state2).returns(stateRunner).named('stateRunner2')
                     );
                 });
         });
 
-        it('should not run states after cancel', function() {
-            var state = util.makeStateStub(),
-                suite = makeSuiteStub({
-                    states: [state]
-                }),
-                runner = mkRunner_(suite);
+        it('should not run states after cancel', () => {
+            const state = util.makeStateStub();
+            const suite = makeSuiteStub({states: [state]});
+            const runner = mkRunner_(suite);
 
             runner.cancel();
 
             return runner.run()
-                .then(function() {
-                    assert.notCalled(StateRunner.prototype.run);
-                });
+                .then(() => assert.notCalled(stateRunner.run));
         });
 
-        it('should not run state after failed state', function() {
-            var state1 = util.makeStateStub(),
-                state2 = util.makeStateStub(),
-                suite = makeSuiteStub({
-                    states: [state1, state2]
-                });
+        it('should not run state after failed state', () => {
+            const state1 = util.makeStateStub();
+            const state2 = util.makeStateStub();
+            const suite = makeSuiteStub({states: [state1, state2]});
 
-            StateRunner.prototype.run.withArgs(state1).returns(q.reject());
+            stateRunner.run.withArgs(state1).returns(q.reject());
 
             return run_(suite)
-                .fail(function() {
-                    assert.neverCalledWith(StateRunner.prototype.run, state2);
-                });
+                .fail(() => assert.neverCalledWith(stateRunner.run, state2));
         });
 
-        describe('afterActions', function() {
-            it('should perform afterActions', function() {
-                var suite = makeSuiteStub({
-                    states: [util.makeStateStub()]
-                });
+        describe('afterActions', () => {
+            it('should perform afterActions', () => {
+                const suite = makeSuiteStub({states: [util.makeStateStub()]});
 
                 return run_(suite)
-                    .then(function() {
+                    .then(() => {
                         assert.calledWith(CaptureSession.prototype.runActions, suite.afterActions);
                     });
             });
 
-            it('should perform afterActions even if state failed', function() {
-                var suite = makeSuiteStub({
-                    states: [util.makeStateStub()]
-                });
+            it('should perform afterActions even if state failed', () => {
+                const suite = makeSuiteStub({states: [util.makeStateStub()]});
 
-                StateRunner.prototype.run.returns(q.reject());
+                stateRunner.run.returns(q.reject());
 
                 return run_(suite)
-                    .fail(function() {
-                        assert.calledWith(CaptureSession.prototype.runActions, suite.afterActions);
-                    });
+                    .fail(() => assert.calledWith(CaptureSession.prototype.runActions, suite.afterActions));
             });
 
-            it('should pass an error to all states if `afterActions` failed', function() {
-                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
-                    runner = mkRunner_(suiteTree.suite),
-                    onErrorHandler = sinon.spy();
+            it('should pass an error to all states if `afterActions` failed', () => {
+                const suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']});
+                const runner = mkRunner_(suiteTree.suite);
+                const onErrorHandler = sinon.spy();
 
                 CaptureSession.prototype.runActions.withArgs(suiteTree.suite.afterActions)
                     .returns(q.reject(new Error()));
@@ -403,7 +350,7 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                 runner.on('err', onErrorHandler);
 
                 return runner.run()
-                    .then(function() {
+                    .then(() => {
                         assert.calledWith(onErrorHandler);
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
@@ -411,57 +358,49 @@ describe('runner/suite-runner/regular-suite-runner', function() {
             });
         });
 
-        describe('postActions', function() {
-            it('should run post actions', function() {
+        describe('postActions', () => {
+            it('should run post actions', () => {
                 return run_()
-                    .then(function() {
-                        assert.calledOnce(CaptureSession.prototype.runPostActions);
-                    });
+                    .then(() => assert.calledOnce(CaptureSession.prototype.runPostActions));
             });
 
-            it('should pass an error to all states if post actions failed', function() {
-                var suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']}),
-                    runner = mkRunner_(suiteTree.suite),
-                    onErrorHandler = sinon.spy();
+            it('should pass an error to all states if post actions failed', () => {
+                const suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']});
+                const runner = mkRunner_(suiteTree.suite);
+                const onErrorHandler = sinon.spy();
 
                 CaptureSession.prototype.runPostActions.returns(q.reject(new Error()));
 
                 runner.on('err', onErrorHandler);
 
                 return runner.run()
-                    .then(function() {
+                    .then(() => {
                         assert.calledTwice(onErrorHandler);
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'first-state'}});
                         assert.calledWithMatch(onErrorHandler, {state: {name: 'second-state'}});
                     });
             });
 
-            it('should run post actions if state failed', function() {
-                StateRunner.prototype.run.returns(q.reject());
+            it('should run post actions if state failed', () => {
+                stateRunner.run.returns(q.reject());
 
                 return run_()
-                    .fail(function() {
-                        assert.calledOnce(CaptureSession.prototype.runPostActions);
-                    });
+                    .fail(() => assert.calledOnce(CaptureSession.prototype.runPostActions));
             });
 
-            it('should run post actions if `afterActions` failed', function() {
-                var suite = makeSuiteStub({
-                    states: [util.makeStateStub()]
-                });
+            it('should run post actions if `afterActions` failed', () => {
+                const suite = makeSuiteStub({states: [util.makeStateStub()]});
 
                 CaptureSession.prototype.runActions.withArgs(suite.afterActions).returns(q.reject());
 
                 return run_(suite)
-                    .fail(function() {
-                        assert.calledOnce(CaptureSession.prototype.runPostActions);
-                    });
+                    .fail(() => assert.calledOnce(CaptureSession.prototype.runPostActions));
             });
 
-            it('should pass an afterActions error to all states if afterActions and postActions failed', function() {
-                var suite = util.makeSuiteStub({states: [util.makeStateStub()]}),
-                    runner = mkRunner_(suite),
-                    onErrorHandler = sinon.spy();
+            it('should pass an afterActions error to all states if afterActions and postActions failed', () => {
+                const suite = util.makeSuiteStub({states: [util.makeStateStub()]});
+                const runner = mkRunner_(suite);
+                const onErrorHandler = sinon.spy();
 
                 CaptureSession.prototype.runActions.withArgs(suite.afterActions)
                     .returns(q.reject(new Error('after-actions-error')));
@@ -470,17 +409,17 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                 runner.on('err', onErrorHandler);
 
                 return runner.run()
-                    .then(function() {
+                    .then(() => {
                         assert.calledWithMatch(onErrorHandler, {message: 'after-actions-error'});
                         assert.neverCalledWithMatch(onErrorHandler, {message: 'post-actions-error'});
                     });
             });
         });
 
-        describe('freeBrowser', function() {
-            it('should free browser after all', function() {
+        describe('freeBrowser', () => {
+            it('should free browser after all', () => {
                 return run_()
-                    .then(function() {
+                    .then(() => {
                         assert.callOrder(
                             CaptureSession.prototype.runPostActions,
                             BrowserAgent.prototype.freeBrowser
@@ -488,27 +427,20 @@ describe('runner/suite-runner/regular-suite-runner', function() {
                     });
             });
 
-            it('should free browser if run states failed', function() {
-                StateRunner.prototype.run.returns(q.reject());
+            it('should free browser if run states failed', () => {
+                stateRunner.run.returns(q.reject());
 
                 return run_()
-                    .fail(function() {
-                        assert.calledOnce(BrowserAgent.prototype.freeBrowser);
-                    });
+                    .fail(() => assert.calledOnce(BrowserAgent.prototype.freeBrowser));
             });
         });
 
-        it('should add `browserId` and `sessionId` to error if something failed', function() {
+        it('should add `browserId` and `sessionId` to error if something failed', () => {
             browser.sessionId = 'test-session-id';
             CaptureSession.prototype.runActions.returns(q.reject(new Error('test_error')));
 
             return run_()
-                .fail(function(e) {
-                    assert.deepEqual(e, {
-                        browserId: 'default-browser',
-                        sessionId: 'test-session-id'
-                    });
-                });
+                .fail((e) => assert.deepEqual(e, {browserId: 'default-browser', sessionId: 'test-session-id'}));
         });
     });
 });

@@ -1,35 +1,34 @@
 'use strict';
 
-var EventEmitter = require('events').EventEmitter,
-    FlatReporter = require('lib/reporters/flat-factory/flat'),
-    RunnerEvents = require('lib/constants/runner-events'),
-    logger = require('lib/utils').logger,
-    chalk = require('chalk');
+const EventEmitter = require('events').EventEmitter;
+const FlatReporter = require('lib/reporters/flat-factory/flat');
+const RunnerEvents = require('lib/constants/runner-events');
+const logger = require('lib/utils').logger;
+const chalk = require('chalk');
 
-describe('Reporter#Flat', function() {
-    var sandbox = sinon.sandbox.create(),
-        test,
-        emitter;
+describe('Reporter#Flat', () => {
+    const sandbox = sinon.sandbox.create();
 
-    function getCounters(args) {
-        return {
-            total: chalk.stripColor(args[1]),
-            passed: chalk.stripColor(args[2]),
-            failed: chalk.stripColor(args[3]),
-            skipped: chalk.stripColor(args[4]),
-            retries: chalk.stripColor(args[5])
-        };
-    }
+    let test;
+    let emitter;
 
-    function emit(event, data) {
+    const getCounters = (args) => ({
+        total: chalk.stripColor(args[1]),
+        passed: chalk.stripColor(args[2]),
+        failed: chalk.stripColor(args[3]),
+        skipped: chalk.stripColor(args[4]),
+        retries: chalk.stripColor(args[5])
+    });
+
+    const emit = (event, data) => {
         emitter.emit(RunnerEvents.BEGIN);
         if (event) {
             emitter.emit(event, data);
         }
         emitter.emit(RunnerEvents.END);
-    }
+    };
 
-    beforeEach(function() {
+    beforeEach(() => {
         test = {
             suite: {path: []},
             state: {name: 'test'},
@@ -37,22 +36,22 @@ describe('Reporter#Flat', function() {
             retriesLeft: 1
         };
 
-        var reporter = new FlatReporter();
+        const reporter = new FlatReporter();
 
         emitter = new EventEmitter();
         reporter.attachRunner(emitter);
         sandbox.stub(logger);
     });
 
-    afterEach(function() {
+    afterEach(() => {
         sandbox.restore();
         emitter.removeAllListeners();
     });
 
-    it('should initialize counters with 0', function() {
+    it('should initialize counters with 0', () => {
         emit();
 
-        var counters = getCounters(logger.log.lastCall.args);
+        const counters = getCounters(logger.log.lastCall.args);
 
         assert.equal(counters.total, 0);
         assert.equal(counters.passed, 0);
@@ -61,11 +60,11 @@ describe('Reporter#Flat', function() {
         assert.equal(counters.retries, 0);
     });
 
-    describe('should correctly calculate counters for', function() {
-        it('successed', function() {
-            emit(RunnerEvents.CAPTURE, test);
+    describe('should correctly calculate counters for', () => {
+        it('successed', () => {
+            emit(RunnerEvents.UPDATE_RESULT, test);
 
-            var counters = getCounters(logger.log.lastCall.args);
+            const counters = getCounters(logger.log.lastCall.args);
 
             assert.equal(counters.total, 1);
             assert.equal(counters.passed, 1);
@@ -73,10 +72,10 @@ describe('Reporter#Flat', function() {
             assert.equal(counters.skipped, 0);
         });
 
-        it('failed', function() {
+        it('failed', () => {
             emit(RunnerEvents.ERROR, test);
 
-            var counters = getCounters(logger.log.lastCall.args);
+            const counters = getCounters(logger.log.lastCall.args);
 
             assert.equal(counters.total, 1);
             assert.equal(counters.passed, 0);
@@ -84,60 +83,60 @@ describe('Reporter#Flat', function() {
             assert.equal(counters.skipped, 0);
         });
 
-        describe('skipped', function() {
-            it('should increment skipped count on WARNING event', function() {
+        describe('skipped', () => {
+            it('should increment skipped count on WARNING event', () => {
                 emit(RunnerEvents.WARNING, test);
 
-                var counters = getCounters(logger.log.lastCall.args);
+                const counters = getCounters(logger.log.lastCall.args);
 
                 assert.equal(counters.total, 1);
                 assert.equal(counters.skipped, 1);
             });
 
-            it('should increment skipped count on SKIP_STATE event', function() {
+            it('should increment skipped count on SKIP_STATE event', () => {
                 emit(RunnerEvents.SKIP_STATE, test);
 
-                var counters = getCounters(logger.log.lastCall.args);
+                const counters = getCounters(logger.log.lastCall.args);
 
                 assert.equal(counters.total, 1);
                 assert.equal(counters.skipped, 1);
             });
         });
 
-        it('retry', function() {
+        it('retry', () => {
             emit(RunnerEvents.RETRY, test);
 
-            var counters = getCounters(logger.log.lastCall.args);
+            const counters = getCounters(logger.log.lastCall.args);
 
             assert.equal(counters.retries, 1);
         });
     });
 
-    describe('should correctly choose a handler if `equal` is', function() {
-        it('true', function() {
+    describe('should correctly choose a handler if `equal` is', () => {
+        it('true', () => {
             test.equal = true;
 
             emit(RunnerEvents.END_TEST, test);
 
-            var counters = getCounters(logger.log.lastCall.args);
+            const counters = getCounters(logger.log.lastCall.args);
 
             assert.equal(counters.passed, 1);
             assert.equal(counters.failed, 0);
         });
-        it('false', function() {
+        it('false', () => {
             test.equal = false;
 
             emit(RunnerEvents.END_TEST, test);
 
-            var counters = getCounters(logger.log.lastCall.args);
+            const counters = getCounters(logger.log.lastCall.args);
 
             assert.equal(counters.passed, 0);
             assert.equal(counters.failed, 1);
         });
     });
 
-    describe('should print an error if it there is in', function() {
-        it('result', function() {
+    describe('should print an error if it there is in', () => {
+        it('result', () => {
             test.message = 'Error from result';
 
             emit(RunnerEvents.ERROR, test);
@@ -145,7 +144,7 @@ describe('Reporter#Flat', function() {
             assert.calledWith(logger.error, test.message);
         });
 
-        it('originalError', function() {
+        it('originalError', () => {
             test.originalError = {stack: 'Error from originalError'};
 
             emit(RunnerEvents.ERROR, test);
@@ -154,16 +153,16 @@ describe('Reporter#Flat', function() {
         });
     });
 
-    it('should correctly do the rendering', function() {
+    it('should correctly do the rendering', () => {
         test = {
             suite: {path: ['block', 'size', 'big']},
             state: {name: 'hover'},
             browserId: 'chrome'
         };
 
-        emit(RunnerEvents.CAPTURE, test);
+        emit(RunnerEvents.UPDATE_RESULT, test);
 
-        var deserealizedResult = chalk
+        const deserealizedResult = chalk
             .stripColor(logger.log.firstCall.args[0])
             .substr(2); // remove first symbol (icon)
 

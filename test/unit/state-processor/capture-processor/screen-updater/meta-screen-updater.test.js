@@ -35,6 +35,7 @@ describe('meta-screen-updater', () => {
 
         fs.exists.returns(q(true));
         fs.makeTree.returns(q());
+        fs.copy.returns(q());
     });
 
     afterEach(() => {
