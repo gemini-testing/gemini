@@ -14,6 +14,7 @@ calibrate: false
 tolerance: 3.5
 httpTimeout: 5000
 sessionRequestTimeout: 60000
+sessionQuitTimeout: 5000
 screenshotsDir: './screens'
 windowSize: 1600x1080
 sessionsPerBrowser: 2
@@ -182,6 +183,8 @@ Settings list:
   default the server timeout is used.
 
 * `sessionRequestTimeout` - timeout for getting of browser sessions, milliseconds. By default the value of option `httpTimeout` is used.
+
+* `sessionQuitTimeout` - timeout for closing browser sessions, milliseconds. By default the value of option `httpTimeout` is used.
 
 * `screenshotsDir` – directory to save reference screenshots to.
   `<projectRoot>/gemini/screens` by default.

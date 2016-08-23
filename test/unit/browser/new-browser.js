@@ -29,7 +29,8 @@ describe('browser/new-browser', () => {
             elementByCssSelector: sinon.stub().returns(q()),
             on: sinon.stub(),
             currentContext: sinon.stub().returns(q()),
-            context: sinon.stub().returns(q())
+            context: sinon.stub().returns(q()),
+            quit: sinon.stub().returns(q())
         };
 
         sandbox.stub(wdAgent, 'promiseRemote').returns(wd);
@@ -459,6 +460,62 @@ describe('browser/new-browser', () => {
             return makeBrowser(null, {httpTimeout: 100500})
                 .initSession()
                 .then(() => assert.callOrder(wd.init, settingOfTimeout(100500)));
+        });
+    });
+
+    describe('quit', () => {
+        const settingOfTimeout = (timeout) =>
+            wd.configureHttp.withArgs({retries: 'never', timeout}).named('configureHttp');
+
+        const mkBrowser_ = (config, sessionId) => {
+            const browser = makeBrowser(null, config);
+            browser.sessionId = sessionId;
+
+            return browser;
+        };
+
+        it('should return empty promise if browser session id is not set', () => {
+            const browser = mkBrowser_();
+
+            sinon.spy(browser, 'quit');
+
+            return browser.quit()
+                .then(() => assert.eventually.isUndefined(browser.quit.getCall(0).returnValue));
+        });
+
+        it('should not close browser session without session id', () => {
+            const browser = mkBrowser_();
+
+            return browser.quit()
+                .then(() => assert.notCalled(wd.quit));
+        });
+
+        it('should close browser session with given session id', () => {
+            const browser = mkBrowser_(null, 'some-session-id');
+
+            return browser.quit()
+                .then(() => assert.called(wd.quit));
+        });
+
+        it('should set session quit timeout before closing session', () => {
+            const browser = mkBrowser_({sessionQuitTimeout: 100500}, 'some-session-id');
+
+            return browser.quit()
+                .then(() => assert.callOrder(settingOfTimeout(100500), wd.quit));
+        });
+
+        it('should fall back to "http timeout" value', () => {
+            const browser = mkBrowser_({httpTimeout: 100500, sessionQuitTimeout: null}, 'some-session-id');
+
+            return browser.quit()
+                .then(() => assert.callOrder(settingOfTimeout(100500), wd.quit));
+        });
+
+        it('should set http timeout for all other requests after closing a session', () => {
+            const browser = mkBrowser_({httpTimeout: 100500}, 'some-session-id');
+
+            return browser.quit()
+                .then(() => assert.callOrder(wd.quit, settingOfTimeout(100500)));
         });
     });
 });
