@@ -17,7 +17,7 @@ describe('path-utils', () => {
 
         glob = sandbox.stub();
 
-        pathUtils = proxyquire('../../lib/path-utils', {glob});
+        pathUtils = proxyquire('lib/test-reader/path-utils', {glob});
     });
 
     afterEach(() => sandbox.restore());

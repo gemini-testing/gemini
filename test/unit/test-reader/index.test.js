@@ -1,11 +1,11 @@
 'use strict';
 
-const utils = require('lib/utils');
-const pathUtils = require('lib/path-utils');
 const proxyquire = require('proxyquire');
 const _ = require('lodash');
 const q = require('q');
 const EventEmitter = require('events').EventEmitter;
+const utils = require('lib/utils');
+const pathUtils = require('lib/test-reader/path-utils');
 
 describe('test-reader', () => {
     const sandbox = sinon.sandbox.create();
@@ -13,26 +13,12 @@ describe('test-reader', () => {
 
     let readTests;
 
-    beforeEach(() => {
-        sandbox.stub(utils, 'requireWithNoCache');
-        sandbox.stub(pathUtils);
-        readTests = proxyquire('lib/test-reader', {
-            './tests-api': testsApi
-        });
-    });
-
-    afterEach(() => {
-        sandbox.restore();
-        testsApi.reset();
-    });
-
     const readTests_ = (opts) => {
         const REQUIRED_OPTS = {
             system: {
                 projectRoot: '/root'
             }
         };
-
 
         opts = _.defaults(opts || {}, {
             paths: [],
@@ -42,8 +28,22 @@ describe('test-reader', () => {
 
         opts.config = _.merge(opts.config, REQUIRED_OPTS);
 
-        return readTests(opts.paths, opts.config, opts.emitter);
+        return readTests({paths: opts.paths, sets: opts.cliSets}, opts.config, opts.emitter);
     };
+
+    beforeEach(() => {
+        sandbox.stub(utils, 'requireWithNoCache');
+        sandbox.stub(pathUtils, 'expandPaths').returns(q([]));
+
+        readTests = proxyquire('lib/test-reader', {
+            '../tests-api': testsApi
+        });
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+        testsApi.reset();
+    });
 
     describe('global "gemini" variable', () => {
         let gemini;
@@ -51,8 +51,14 @@ describe('test-reader', () => {
 
         beforeEach(() => {
             config = {
+                sets: {
+                    set: {
+                        files: ['some/files']
+                    }
+                },
                 getBrowserIds: () => []
             };
+
             utils.requireWithNoCache.restore();
         });
 
@@ -64,12 +70,12 @@ describe('test-reader', () => {
             testsApi.returns(api);
             pathUtils.expandPaths.returns(q(['some-test.js']));
 
-            return readTests_({config: config})
+            return readTests_({config})
                 .then(() => assert.deepEqual(gemini, api));
         });
 
         it('should rewrite global "gemini" variable for each file', () => {
-            let gemini = [];
+            let globalGemini = [];
 
             pathUtils.expandPaths.returns(q(['/some/path/file1.js', '/some/path/file2.js']));
 
@@ -78,11 +84,11 @@ describe('test-reader', () => {
                 .onSecondCall().returns({suite: 'anotherApiInstance'});
 
             sandbox.stub(utils, 'requireWithNoCache', () => {
-                gemini.push(global.gemini.suite);
+                globalGemini.push(global.gemini.suite);
             });
 
-            return readTests_({config: config})
-                .then(() => assert.deepEqual(gemini, ['apiInstance', 'anotherApiInstance']));
+            return readTests_({config})
+                .then(() => assert.deepEqual(globalGemini, ['apiInstance', 'anotherApiInstance']));
         });
 
         it('should delete global "gemini" variable after test reading', () => {
@@ -90,65 +96,48 @@ describe('test-reader', () => {
             pathUtils.expandPaths.returns(q(['some-test.js']));
             sandbox.stub(utils, 'requireWithNoCache');
 
-            return readTests_({config: config})
-                .then(() => assert.notProperty(global, 'gemini'));
+            return readTests_({config}).then(() => assert.notProperty(global, 'gemini'));
         });
     });
 
-    it('should not load any suites if no paths or sets specified', () => {
-        pathUtils.expandPaths.returns(q([]));
-
-        return readTests_()
-            .then(() => assert.notCalled(utils.requireWithNoCache));
-    });
-
-    it('should expand passed paths', () => {
-        pathUtils.expandPaths.returns(q([]));
-
-        return readTests_({paths: ['some/path/*']})
-            .then(() => assert.calledWithExactly(pathUtils.expandPaths, ['some/path/*']));
-    });
-
-    it('should expand paths from config.sets', () => {
-        pathUtils.expandPaths.returns(q([]));
-
+    it('should load suites related to sets from config', () => {
         const config = {
-            system: {
-                projectRoot: '/root'
-            },
             sets: {
-                set1: {
-                    files: ['some/files']
-                },
-                set2: {
-                    files: ['other/files']
+                set: {
+                    files: ['some/path']
                 }
             }
-        };
-
-        return readTests_({config: config})
-            .then(() => {
-                assert.calledWithExactly(pathUtils.expandPaths, ['some/files'], '/root');
-                assert.calledWithExactly(pathUtils.expandPaths, ['other/files'], '/root');
-            });
-    });
-
-    it('should load suites related to passed paths', () => {
-        const config = {
-            getBrowserIds: () => []
         };
 
         pathUtils.expandPaths
             .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']));
 
-        return readTests_({paths: ['some/path'], config: config})
+        return readTests_({config})
             .then(() => {
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file1.js');
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file2.js');
             });
     });
 
-    it('should load suites related to sets if no passed paths', () => {
+    it('should load suites related to sets from cli', () => {
+        const config = {
+            sets: {
+                set1: {
+                    files: ['some/path']
+                },
+                set2: {
+                    files: ['other/path']
+                }
+            }
+        };
+
+        pathUtils.expandPaths.withArgs(['some/path']).returns(q(['/some/path/file1.js']));
+
+        return readTests_({cliSets: ['set1'], config})
+            .then(() => assert.alwaysCalledWithExactly(utils.requireWithNoCache, '/some/path/file1.js'));
+    });
+
+    it('should load suites related to paths from cli', () => {
         const config = {
             sets: {
                 set1: {
@@ -161,80 +150,45 @@ describe('test-reader', () => {
         };
 
         pathUtils.expandPaths
-            .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']))
-            .withArgs(['other/path']).returns(q(['/other/path/file3.js']))
-            .withArgs([]).returns(q([]));
+            .withArgs(['some/path']).returns(q(['/some/path/file1.js']));
 
-        return readTests_({config: config})
+        return readTests_({paths: ['some/path'], config})
             .then(() => {
-                assert.calledThrice(utils.requireWithNoCache);
-                assert.calledWith(utils.requireWithNoCache, '/some/path/file1.js');
-                assert.calledWith(utils.requireWithNoCache, '/some/path/file2.js');
-                assert.calledWith(utils.requireWithNoCache, '/other/path/file3.js');
+                assert.alwaysCalledWithExactly(utils.requireWithNoCache, '/some/path/file1.js');
             });
     });
 
-    it('should load only passed paths', () => {
+    it('should load suites related to sets and paths from cli', () => {
         const config = {
             sets: {
-                all: {
-                    files: ['some/path', 'some/other/path']
+                set1: {
+                    files: ['some/path', 'other/path']
                 }
             }
         };
 
         pathUtils.expandPaths
-            .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']))
-            .withArgs(['some/path', 'some/other/path'])
-            .returns(q(['/some/path/file1.js', '/some/path/file2.js', '/some/other/path/file3.js']));
+            .withArgs(['some/path']).returns(q(['/some/path/file1.js']))
+            .withArgs(['some/path', 'other/path']).returns(q(['/some/path/file1.js', '/other/path/file2.js']));
 
-        return readTests_({paths: ['some/path'], config: config})
+        return readTests_({cliSets: ['set1'], paths: ['some/path'], config})
             .then(() => {
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file1.js');
-                assert.calledWith(utils.requireWithNoCache, '/some/path/file2.js');
-                assert.neverCalledWith(utils.requireWithNoCache, '/some/other/path/file3.js');
+                assert.neverCalledWith(utils.requireWithNoCache, '/other/path/file2.js');
             });
     });
 
-    it('should configure suite for certain browsers', () => {
+    it('should not load suites if sets do not constan paths from cli', () => {
         const config = {
             sets: {
-                all: {
-                    files: ['some/path'],
-                    browsers: ['b1']
+                set1: {
+                    files: ['some/path']
                 }
             }
         };
 
-        pathUtils.expandPaths.withArgs(['some/path']).returns(q(['/some/path/file.js']));
-
-        return readTests_({config: config})
-            .then(() => {
-                assert.calledWith(testsApi, sinon.match.any, ['b1']);
-                assert.callOrder(testsApi, utils.requireWithNoCache);
-            });
-    });
-
-    it('should configure suite for all browsers if file not configured in sets', () => {
-        const config = {
-            sets: {
-                all: {
-                    files: ['some/path'],
-                    browsers: ['b1']
-                }
-            },
-            getBrowserIds: () => ['b1', 'b2']
-        };
-
-        pathUtils.expandPaths
-            .withArgs(['some/path']).returns(q(['/some/path/file.js']))
-            .withArgs(['other/path']).returns(q(['/other/path/file2.js']));
-
-        return readTests_({paths: ['other/path'], config: config})
-            .then(() => {
-                assert.calledOnce(testsApi);
-                assert.calledWith(testsApi, sinon.match.any, ['b1', 'b2']);
-            });
+        return readTests_({paths: ['other/path'], config})
+            .then(() => assert.notCalled(utils.requireWithNoCache));
     });
 
     describe('events', () => {
@@ -272,7 +226,6 @@ describe('test-reader', () => {
                     assert.callOrder(beforeReadSpy, utils.requireWithNoCache);
                 });
         });
-
 
         it('should emit "afterFileRead" after reading each file', () => {
             const filePath = '/some/path/file.js';
