@@ -56,7 +56,7 @@ describe('LimitedPool', function() {
         it('for release if there are no more requests', function() {
             return pool.getBrowser('first')
                 .then(() => pool.freeBrowser(browser))
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: true}));
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: true}));
         });
 
         it('for caching if there is at least one pending request', function() {
@@ -65,7 +65,7 @@ describe('LimitedPool', function() {
                     pool.getBrowser('second');
                     return pool.freeBrowser(browser);
                 })
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: false}));
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: false}));
         });
 
         it('for caching if there are pending requests', function() {
@@ -75,7 +75,7 @@ describe('LimitedPool', function() {
                     pool.getBrowser('third');
                     return pool.freeBrowser(browser);
                 })
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: false}));
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: false}));
         });
 
         it('taking into account number of failed browser requests', function() {
@@ -91,7 +91,7 @@ describe('LimitedPool', function() {
                 pool.getBrowser('second')
             ])
                 .then(() => pool.freeBrowser(browser))
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {noMoreRequests: true}));
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: true}));
         });
     });
 

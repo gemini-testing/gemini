@@ -79,7 +79,7 @@ describe('CachingPool', () => {
         this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
 
         return pool.getBrowser('id')
-            .then((browser) => pool.freeBrowser(browser, {noMoreRequests: false}))
+            .then((browser) => pool.freeBrowser(browser, {force: false}))
             .then(() => assert.notCalled(this.underlyingPool.freeBrowser));
     });
 
@@ -88,7 +88,7 @@ describe('CachingPool', () => {
         this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
 
         return pool.getBrowser('id')
-            .then((browser) => pool.freeBrowser(browser, {noMoreRequests: true}))
+            .then((browser) => pool.freeBrowser(browser, {force: true}))
             .then(() => assert.calledOnce(this.underlyingPool.freeBrowser));
     });
 
