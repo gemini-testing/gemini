@@ -38,6 +38,7 @@
     "sizzle": "^2.2.0",
     "source-map": "^0.5.3",
     "temp": "~0.8.0",
+    "uglify-js": "^2.7.3",
     "uglifyify": "^3.0.1",
     "wd": "^0.4.0",
     "worker-farm": "^1.3.1"
@@ -52,8 +53,7 @@
     "istanbul": "^0.4.2",
     "mocha": "^2.1.0",
     "proxyquire": "^1.7.3",
-    "sinon": "^1.17.3",
-    "uglify-js": "^2.7.0"
+    "sinon": "^1.17.3"
   },
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
