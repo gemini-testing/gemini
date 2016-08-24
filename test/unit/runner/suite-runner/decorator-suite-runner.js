@@ -6,7 +6,6 @@ const QEmitter = require('qemitter');
 const SuiteRunner = require('lib/runner/suite-runner/suite-runner');
 const DecoratorSuiteRunner = require('lib/runner/suite-runner/decorator-suite-runner');
 const RunnerEvents = require('lib/constants/runner-events');
-const PrivateEvents = require('lib/runner/private-events');
 const Config = require('lib/config');
 
 describe('runner/suite-runner/decorator-suite-runner', () => {
@@ -72,8 +71,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
             RunnerEvents.CAPTURE,
             RunnerEvents.UPDATE_RESULT,
             RunnerEvents.WARNING,
-            RunnerEvents.ERROR,
-            PrivateEvents.CRITICAL_ERROR
+            RunnerEvents.ERROR
         ].forEach((event) => {
             it(`should pass ${event} event from an original to a decorated suite runner`, () => {
                 const suiteRunner = new QEmitter();
