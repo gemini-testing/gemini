@@ -371,7 +371,7 @@ describe('tests-api/suite-builder', function() {
 
         beforeEach(function() {
             rootSuite = Suite.create('');
-            suite = Suite.create('', rootSuite);
+            suite = Suite.create('some-suite', rootSuite);
             suiteBuilder = new SuiteBuilder(suite);
         });
 
