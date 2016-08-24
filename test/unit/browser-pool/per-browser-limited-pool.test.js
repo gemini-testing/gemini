@@ -1,125 +1,108 @@
 'use strict';
-var q = require('q'),
-    PerBrowserLimitedPool = require('lib/browser-pool/per-browser-limited-pool'),
-    browserWithId = require('../../util').makeBrowser;
 
-describe('PerBrowserLimitedPool', function() {
-    beforeEach(function() {
-        this.underlyingPool = {
-            getBrowser: sinon.stub(),
-            freeBrowser: sinon.stub().returns(q())
+const _ = require('lodash');
+const PerBrowserLimitedPool = require('lib/browser-pool/per-browser-limited-pool');
+const LimitedPool = require('lib/browser-pool/limited-pool');
+const BasicPool = require('lib/browser-pool/basic-pool');
+const browserWithId = require('../../util').browserWithId;
+
+describe('PerBrowserLimitedPool', () => {
+    const sandbox = sinon.sandbox.create();
+
+    beforeEach(() => {
+        sandbox.stub(LimitedPool, 'create').returns(sinon.createStubInstance(LimitedPool));
+    });
+
+    afterEach(() => sandbox.restore());
+
+    const mkConfigStub_ = (browsers) => {
+        return {
+            getBrowserIds: () => _.keys(browsers),
+            forBrowser: (id) => browsers[id]
         };
+    };
 
-        this.poolWithLimits = function(limits) {
-            var config = {
-                getBrowserIds: sinon.stub().returns(Object.keys(limits)),
-                forBrowser: function(id) {
-                    return {
-                        id: id,
-                        sessionsPerBrowser: limits[id],
-                        desiredCapabilities: {}
-                    };
-                }
-            };
-            return new PerBrowserLimitedPool(config, this.underlyingPool);
-        };
-    });
+    describe('constructor', () => {
+        it('should create LimitedPool for each browser', () => {
+            const config = mkConfigStub_({
+                bro1: {sessionsPerBrowser: 1},
+                bro2: {sessionsPerBrowser: 2}
+            });
+            const underlyingPool = sinon.createStubInstance(BasicPool);
 
-    it('should request browser from underlying pool', function() {
-        var browser = browserWithId('id');
-        this.underlyingPool.getBrowser.returns(q(browser));
-        var pool = this.poolWithLimits({id: 1});
-        return assert.eventually.equal(pool.getBrowser('id'), browser);
-    });
+            new PerBrowserLimitedPool(config, underlyingPool); // eslint-disable-line no-new
 
-    it('should return browser to underlying pool when freed', function() {
-        var _this = this,
-            browser = browserWithId('id'),
-            pool = this.poolWithLimits({id: 1});
-        return pool.freeBrowser(browser).then(function() {
-            assert.calledWith(_this.underlyingPool.freeBrowser, browser);
+            assert.calledTwice(LimitedPool.create);
+            assert.calledWith(LimitedPool.create, 1, underlyingPool);
+            assert.calledWith(LimitedPool.create, 2, underlyingPool);
         });
     });
 
-    describe('limit', function() {
-        it('should launch all browser in limit', function() {
-            var _this = this;
-            this.underlyingPool.getBrowser
-                .onFirstCall().returns(q(browserWithId('id')))
-                .onSecondCall().returns(q(browserWithId('id')));
-            var pool = this.poolWithLimits({id: 2});
-            return pool.getBrowser('id')
-                .then(function() {
-                    return pool.getBrowser('id');
-                })
-                .then(function() {
-                    assert.calledTwice(_this.underlyingPool.getBrowser);
-                });
+    describe('getBrowser', () => {
+        it('should redirect request to corresponding pool', () => {
+            const config = mkConfigStub_({
+                bro1: {sessionsPerBrowser: 1},
+                bro2: {sessionsPerBrowser: 2}
+            });
+
+            const bro1Pool = sinon.createStubInstance(BasicPool);
+            const bro2Pool = sinon.createStubInstance(BasicPool);
+
+            LimitedPool.create.withArgs(1).returns(bro1Pool);
+            LimitedPool.create.withArgs(2).returns(bro2Pool);
+
+            const perBrowserLimitedPool = new PerBrowserLimitedPool(config);
+
+            perBrowserLimitedPool.getBrowser('bro1');
+
+            assert.called(bro1Pool.getBrowser);
+            assert.notCalled(bro2Pool.getBrowser);
         });
+    });
 
-        it('should not launch browsers out of limit', function() {
-            this.underlyingPool.getBrowser.returns(q(browserWithId('id')));
-            var pool = this.poolWithLimits({id: 1}),
-                result = pool.getBrowser('id')
-                    .then(function() {
-                        return pool.getBrowser('id').timeout(100, 'timeout');
-                    });
-            return assert.isRejected(result, /timeout$/);
+    describe('freeBrowser', () => {
+        it('should redirect request to corresponding pool', () => {
+            const config = mkConfigStub_({
+                bro1: {sessionsPerBrowser: 1},
+                bro2: {sessionsPerBrowser: 2}
+            });
+
+            const bro1Pool = sinon.createStubInstance(BasicPool);
+            const bro2Pool = sinon.createStubInstance(BasicPool);
+
+            LimitedPool.create.withArgs(1).returns(bro1Pool);
+            LimitedPool.create.withArgs(2).returns(bro2Pool);
+
+            const perBrowserLimitedPool = new PerBrowserLimitedPool(config);
+
+            const browser = browserWithId('bro1');
+
+            perBrowserLimitedPool.freeBrowser(browser);
+
+            assert.calledWith(bro1Pool.freeBrowser, browser);
+            assert.notCalled(bro2Pool.freeBrowser);
         });
+    });
 
-        it('should allow to launch different browser when first is over limit', function() {
-            var expectedBrowser = browserWithId('second');
-            this.underlyingPool.getBrowser
-                .withArgs('first').returns(q(browserWithId('first')))
-                .withArgs('second').returns(q(expectedBrowser));
+    describe('cancel', () => {
+        it('should cancel all limited pools', () => {
+            const config = mkConfigStub_({
+                bro1: {sessionsPerBrowser: 1},
+                bro2: {sessionsPerBrowser: 2}
+            });
 
-            var pool = this.poolWithLimits({first: 1, second: 1}),
-                result = pool.getBrowser('first')
-                    .then(function() {
-                        return pool.getBrowser('second');
-                    });
-            return assert.eventually.equal(result, expectedBrowser);
-        });
+            const bro1Pool = sinon.createStubInstance(BasicPool);
+            const bro2Pool = sinon.createStubInstance(BasicPool);
 
-        it('should launch next browsers after previous are released', function() {
-            var expectedBrowser = browserWithId('id'),
-                pool = this.poolWithLimits({id: 1});
+            LimitedPool.create.withArgs(1).returns(bro1Pool);
+            LimitedPool.create.withArgs(2).returns(bro2Pool);
 
-            this.underlyingPool.getBrowser
-                .onFirstCall().returns(q(browserWithId('id')))
-                .onSecondCall().returns(q(expectedBrowser));
+            const perBrowserLimitedPool = new PerBrowserLimitedPool(config);
 
-            var result = pool.getBrowser('id')
-                .then(function(browser) {
-                    return pool.freeBrowser(browser);
-                })
-                .then(function() {
-                    return pool.getBrowser('id');
-                });
+            perBrowserLimitedPool.cancel();
 
-            return assert.eventually.equal(result, expectedBrowser);
-        });
-
-        it('should launch queued browser when previous are released', function() {
-            var expectedBrowser = browserWithId('id'),
-                pool = this.poolWithLimits({id: 1});
-
-            this.underlyingPool.getBrowser
-                .onFirstCall().returns(q(browserWithId('id')))
-                .onSecondCall().returns(q(expectedBrowser));
-
-            var result = pool.getBrowser('id')
-                .then(function(browser) {
-                    var secondPromise = pool.getBrowser('id');
-                    return q.delay(100)
-                        .then(function() {
-                            return pool.freeBrowser(browser);
-                        })
-                        .then(function() {
-                            return secondPromise;
-                        });
-                });
-            return assert.eventually.equal(result, expectedBrowser);
+            assert.calledOnce(bro1Pool.cancel);
+            assert.calledOnce(bro2Pool.cancel);
         });
     });
 });
