@@ -116,7 +116,7 @@ describe('Reporter#Flat', () => {
         it('true', () => {
             test.equal = true;
 
-            emit(RunnerEvents.END_TEST, test);
+            emit(RunnerEvents.TEST_RESULT, test);
 
             const counters = getCounters(logger.log.lastCall.args);
 
@@ -126,7 +126,7 @@ describe('Reporter#Flat', () => {
         it('false', () => {
             test.equal = false;
 
-            emit(RunnerEvents.END_TEST, test);
+            emit(RunnerEvents.TEST_RESULT, test);
 
             const counters = getCounters(logger.log.lastCall.args);
 

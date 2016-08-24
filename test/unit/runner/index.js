@@ -153,16 +153,16 @@ describe('runner', () => {
             beforeEach(() => config.forBrowser.returns({retry: Infinity}));
 
             it('should try to submit state result for retry', () => {
-                return runAndEmit_('endTest')
+                return runAndEmit_('testResult')
                     .then(() => assert.called(FailCollector.prototype.tryToSubmitStateResult));
             });
 
-            it('should emit endTest event if it was not submitted for retry', () => {
-                const onEndTest = sandbox.spy();
-                runner.on('endTest', onEndTest);
+            it('should emit testResult event if it was not submitted for retry', () => {
+                const ontestResult = sandbox.spy();
+                runner.on('testResult', ontestResult);
 
-                return runAndEmit_('endTest')
-                    .then(() => assert.calledOnce(onEndTest));
+                return runAndEmit_('testResult')
+                    .then(() => assert.calledOnce(ontestResult));
             });
 
             it('should pass through updateResult event', () => {
@@ -215,7 +215,7 @@ describe('runner', () => {
                     const onRetry = sandbox.spy();
                     runner.on('retry', onRetry);
 
-                    return runAndEmit_('endTest', mkRetryCandidate_())
+                    return runAndEmit_('testResult', mkRetryCandidate_())
                         .then(() => assert.called(onRetry));
                 });
 
@@ -223,7 +223,7 @@ describe('runner', () => {
                     const onRetry = sandbox.spy();
                     runner.on('retry', onRetry);
 
-                    return runAndEmit_('endTest', mkRetryCandidate_())
+                    return runAndEmit_('testResult', mkRetryCandidate_())
                         .then(() => {
                             const retryArgs = onRetry.lastCall.args[0];
 

@@ -83,12 +83,12 @@ describe('stats listener', function() {
     });
 
     it('should count test passed', function() {
-        runner.emit(RunnerEvents.END_TEST, {equal: true});
+        runner.emit(RunnerEvents.TEST_RESULT, {equal: true});
         assert.equal(stats.get('passed'), 1);
     });
 
     it('should count test failed', function() {
-        runner.emit(RunnerEvents.END_TEST, {equal: false});
+        runner.emit(RunnerEvents.TEST_RESULT, {equal: false});
         assert.equal(stats.get('failed'), 1);
     });
 });
