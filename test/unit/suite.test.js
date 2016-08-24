@@ -61,6 +61,12 @@ describe('suite', function() {
 
             assert.deepEqual(parent.context, {some: 'data'});
         });
+
+        it('should not allow to create suite with empty name', () => {
+            const parent = createSuite('parent');
+
+            assert.throws(() => createSuite('', parent), /Empty suite name/);
+        });
     });
 
     describe('states', function() {

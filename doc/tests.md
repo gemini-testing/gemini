@@ -35,7 +35,7 @@ gemini.suite('button', function(suite) {
 Arguments of a `gemini.suite`:
 
 * `name` – the name of the new test suite. Name is displayed in reports and
-  affects screenshots filenames.
+  affects screenshots filenames. **Important** Name of test suite can not be empty.
 
 * `callback(suite)` – callback, used to set up the suite. Receives a suite
   builder instance (described below).
