@@ -69,6 +69,15 @@ describe('LimitedPool', function() {
                 .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: false}));
         });
 
+        it('for release if there are pending requests but forced to free', function() {
+            return pool.getBrowser('first')
+                .then(() => {
+                    pool.getBrowser('second');
+                    return pool.freeBrowser(browser, {force: true});
+                })
+                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: true}));
+        });
+
         it('for caching if there are pending requests', function() {
             return pool.getBrowser('first')
                 .then(() => {

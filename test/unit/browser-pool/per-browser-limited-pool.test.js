@@ -77,9 +77,9 @@ describe('PerBrowserLimitedPool', () => {
 
             const browser = browserWithId('bro1');
 
-            perBrowserLimitedPool.freeBrowser(browser);
+            perBrowserLimitedPool.freeBrowser(browser, {foo: 'bar'});
 
-            assert.calledWith(bro1Pool.freeBrowser, browser);
+            assert.calledWith(bro1Pool.freeBrowser, browser, {foo: 'bar'});
             assert.notCalled(bro2Pool.freeBrowser);
         });
     });
