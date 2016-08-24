@@ -4,7 +4,7 @@ var q = require('q'),
     BrowserAgent = require('lib/runner/browser-runner/browser-agent'),
     SuiteRunner = require('lib/runner/suite-runner/suite-runner'),
     suiteRunnerFabric = require('lib/runner/suite-runner'),
-    pool = require('lib/browser-pool'),
+    CancelledError = require('lib/errors/cancelled-error'),
     BasicPool = require('lib/browser-pool/basic-pool'),
     Config = require('lib/config'),
 
@@ -185,7 +185,7 @@ describe('runner/BrowserRunner', function() {
                 runner = mkRunner_();
 
             runner.on('criticalError', onCriticalError);
-            suiteRunner.run.onFirstCall().returns(q.reject(new pool.CancelledError()));
+            suiteRunner.run.onFirstCall().returns(q.reject(new CancelledError()));
 
             return runner.run(suites)
                 .then(function() {

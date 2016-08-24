@@ -1,7 +1,8 @@
 'use strict';
 var Browser = require('lib/browser'),
     q = require('q'),
-    LimitedPool = require('lib/browser-pool/limited-pool');
+    LimitedPool = require('lib/browser-pool/limited-pool'),
+    CancelledError = require('lib/errors/cancelled-error');
 
 describe('LimitedPool', function() {
     beforeEach(function() {
@@ -228,7 +229,7 @@ describe('LimitedPool', function() {
                 .then(function() {
                     var secondRequest = pool.getBrowser('id');
                     pool.cancel();
-                    return assert.isRejected(secondRequest, LimitedPool.CancelledError);
+                    return assert.isRejected(secondRequest, CancelledError);
                 });
         });
 
