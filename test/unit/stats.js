@@ -1,33 +1,34 @@
 'use strict';
-var EventEmitter = require('events').EventEmitter,
-    inherit = require('inherit'),
 
-    Stats = require('lib/stats'),
-    RunnerEvents = require('lib/constants/runner-events');
+const EventEmitter = require('events').EventEmitter;
+const inherit = require('inherit');
 
-describe('stats', function() {
-    var stats;
+const Stats = require('lib/stats');
+const RunnerEvents = require('lib/constants/runner-events');
 
-    beforeEach(function() {
+describe('stats', () => {
+    let stats;
+
+    beforeEach(() => {
         stats = new Stats();
     });
 
-    it('should return \'undefined\' before adding keys', function() {
+    it('should return \'undefined\' before adding keys', () => {
         assert.isUndefined(stats.get('counter'));
     });
 
-    it('should allow to add new key', function() {
+    it('should allow to add new key', () => {
         stats.add('counter');
         assert.equal(stats.get('counter'), 1);
     });
 
-    it('should increment existing keys', function() {
+    it('should increment existing keys', () => {
         stats.add('counter');
         stats.add('counter');
         assert.equal(stats.get('counter'), 2);
     });
 
-    it('should return all full stat', function() {
+    it('should return all full stat', () => {
         stats.add('counter');
         stats.add('counter');
         stats.add('counter');
@@ -42,52 +43,57 @@ describe('stats', function() {
     });
 });
 
-describe('stats listener', function() {
-    var stats,
-        Runner = inherit(EventEmitter, {}),
-        runner;
+describe('stats listener', () => {
+    let stats;
+    let Runner = inherit(EventEmitter, {});
+    let runner;
 
-    beforeEach(function() {
+    beforeEach(() => {
         runner = new Runner();
         stats = new Stats(runner);
     });
 
-    it('should return undefined before triggering any events', function() {
+    it('should return undefined before triggering any events', () => {
         assert.isUndefined(stats.get('total'));
     });
 
-    it('should count on beginState event', function() {
+    it('should count on beginState event', () => {
         runner.emit(RunnerEvents.BEGIN_STATE);
         assert.equal(stats.get('total'), 1);
     });
 
-    it('should count on skipState event', function() {
+    it('should count on skipState event', () => {
         runner.emit(RunnerEvents.SKIP_STATE);
         assert.equal(stats.get('total'), 1);
         assert.equal(stats.get('skipped'), 1);
     });
 
-    it('should count on warning event', function() {
+    it('should count on warning event', () => {
         runner.emit(RunnerEvents.WARNING);
         assert.equal(stats.get('warned'), 1);
     });
 
-    it('should count on error event', function() {
+    it('should count on error event', () => {
         runner.emit(RunnerEvents.ERROR);
         assert.equal(stats.get('errored'), 1);
     });
 
-    it('should count on capture event', function() {
-        runner.emit(RunnerEvents.CAPTURE);
-        assert.equal(stats.get('gathered'), 1);
+    it('should count on updated images', () => {
+        runner.emit(RunnerEvents.UPDATE_RESULT, {updated: true});
+        assert.equal(stats.get('updated'), 1);
     });
 
-    it('should count test passed', function() {
+    it('should count on passed images', () => {
+        runner.emit(RunnerEvents.UPDATE_RESULT, {updated: false});
+        assert.equal(stats.get('passed'), 1);
+    });
+
+    it('should count test passed', () => {
         runner.emit(RunnerEvents.TEST_RESULT, {equal: true});
         assert.equal(stats.get('passed'), 1);
     });
 
-    it('should count test failed', function() {
+    it('should count test failed', () => {
         runner.emit(RunnerEvents.TEST_RESULT, {equal: false});
         assert.equal(stats.get('failed'), 1);
     });
