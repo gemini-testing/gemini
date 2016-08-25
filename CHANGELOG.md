@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.7.0 - 2016-08-25
+
+* `beforeFileRead` and `afterFileRead` API events were added. This allows plugins to be notified
+   when gemini is about to read a test file and when it was read
+*  `CAPTURE` and `END_TEST` events were declared as deprecated. `UPDATE_RESULT` and `TEST_RESULT` events       should be used instead of them respectively
+*  Added the ability to see in flat reporter which states were really updated via gemini update command
+*  Added `sessionQuitTimeout` option which allows to change timeout for session termination
+*  Disallowed usage of empty names for suites
+*  Added nodejs@6.x support
+
 ## 4.6.0 - 2016-08-11
 
 * Added `GEMINI_SKIP_BROWSERS` environment variable support
