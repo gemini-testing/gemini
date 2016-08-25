@@ -3,11 +3,11 @@
 const EventEmitter = require('events').EventEmitter;
 const HtmlReporter = require('lib/reporters/html/index.js');
 const RunnerEvents = require('lib/constants/runner-events');
+const Handlebars = require('handlebars');
 const logger = require('lib/utils').logger;
 const chalk = require('chalk');
 const path = require('path');
 const view = require('lib/reporters/html/view');
-const lib = require('lib/reporters/html/lib');
 
 describe('HTML Reporter', () => {
     const sandbox = sinon.sandbox.create();
@@ -33,17 +33,13 @@ describe('HTML Reporter', () => {
         assert.calledWith(logger.log, `Your HTML report is here: ${chalk.yellow(reportPath)}`);
     });
 
-    it('should escape special chars in paths', () => {
+    it('should escape special chars in urls', () => {
         const data = {
-            suite: {
-                path: 'fake/long+path'
-            },
-            state: {
-                name: 'fakeName'
-            },
-            browserId: 'fakeId'
+            actualPath: 'images/fake/long+path/fakeName/fakeId~current.png'
         };
 
-        assert.equal(lib.currentPath(data), 'images/fake/long%2Bpath/fakeName/fakeId~current.png');
+        const render = Handlebars.compile('{{image "actual"}}');
+
+        assert.equal(render(data), '<img data-src="images/fake/long%2Bpath/fakeName/fakeId~current.png">');
     });
 });
