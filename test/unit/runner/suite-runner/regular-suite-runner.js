@@ -8,6 +8,7 @@ const StateRunner = require('lib/runner/state-runner/state-runner');
 const CaptureSession = require('lib/capture-session');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const Config = require('lib/config');
+const NoRefImageError = require('lib/errors/no-ref-image-error');
 const util = require('../../../util');
 const makeSuiteStub = util.makeSuiteStub;
 
@@ -432,6 +433,24 @@ describe('runner/suite-runner/regular-suite-runner', () => {
 
                 return run_()
                     .fail(() => assert.calledOnce(BrowserAgent.prototype.freeBrowser));
+            });
+
+            it('should invalidate session after error in test', () => {
+                CaptureSession.prototype.runActions.returns(q.reject());
+
+                return run_()
+                    .catch(() => {
+                        assert.called(BrowserAgent.prototype.invalidateSession);
+                    });
+            });
+
+            it('should not invalidate session after `NoRefImageError`', () => {
+                CaptureSession.prototype.runActions.returns(q.reject(new NoRefImageError()));
+
+                return run_()
+                    .then(() => {
+                        assert.notCalled(BrowserAgent.prototype.invalidateSession);
+                    });
             });
         });
 
