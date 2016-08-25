@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.7.1 - 2016-08-25
+
+* Fixed critical bug which causes failing of browser requests
+
 ## 4.7.0 - 2016-08-25
 
 * `beforeFileRead` and `afterFileRead` API events were added. This allows plugins to be notified
