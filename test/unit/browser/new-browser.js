@@ -54,9 +54,13 @@ describe('browser/new-browser', () => {
 
     describe('should expose wd API', () => {
         const testExposedWdMethod = (method) => {
-            wd[method] = sinon.stub().withArgs('firstArg', 'secondArg').returns(q('awesome-res'));
+            wd[method] = sinon.stub().returns(q('awesome-res'));
 
-            return assert.eventually.equal(makeBrowser()[method]('firstArg', 'secondArg'), 'awesome-res');
+            return makeBrowser()[method]('firstArg', 'secondArg')
+                .then((res) => {
+                    assert.calledWith(wd[method], 'firstArg', 'secondArg');
+                    assert.equal(res, 'awesome-res');
+                });
         };
 
         [
