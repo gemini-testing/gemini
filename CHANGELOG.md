@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.7.2 - 2016-08-26
+
+* Correctly display the images in the html report in case suite names contain non-urlsafe characters.
+
 ## 4.7.1 - 2016-08-25
 
 * Fixed critical bug which causes failing of browser requests
