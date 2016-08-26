@@ -4,7 +4,7 @@ const _ = require('lodash');
 const q = require('q');
 const globExtra = require('glob-extra');
 const SetCollection = require('lib/test-reader/set-collection');
-const Set = require('lib/test-reader/set');
+const TestSet = require('lib/test-reader/test-set');
 
 describe('set-collection', () => {
     const sandbox = sinon.sandbox.create();
@@ -20,6 +20,7 @@ describe('set-collection', () => {
     const mkConfigStub = (opts) => {
         return _.defaults(opts || {}, {
             sets: opts.sets || {},
+            getBrowserIds: opts.getBrowserIds,
             system: {
                 projectRoot: '/root'
             }
@@ -32,6 +33,21 @@ describe('set-collection', () => {
 
     afterEach(() => sandbox.restore());
 
+    describe('sets are not specified in config', () => {
+        it('should throw an error if an unknown set was passed', () => {
+            assert.throws(() => SetCollection.create(mkConfigStub(), ['unknown-set'], /unknown-set/));
+        });
+
+        it('should create new set with empty files and browsers from config', () => {
+            sandbox.stub(TestSet, 'create').returns(mkSetStub());
+
+            const getBrowserIds = sandbox.stub().returns(['b1', 'b2']);
+
+            return SetCollection.create(mkConfigStub({getBrowserIds}))
+                .then(() => assert.calledWith(TestSet.create, {files: [], browsers: ['b1', 'b2']}));
+        });
+    });
+
     it('should create collection for specified sets', () => {
         const config = mkConfigStub({
             sets: {
@@ -40,14 +56,14 @@ describe('set-collection', () => {
             }
         });
 
-        sandbox.stub(Set, 'create').returns(mkSetStub());
+        sandbox.stub(TestSet, 'create').returns(mkSetStub());
 
         globExtra.expandPaths.withArgs(['some/files']).returns(q(['some/files/file.js']));
 
         return SetCollection.create(config, ['set1'])
             .then(() => {
-                assert.calledOnce(Set.create);
-                assert.calledWith(Set.create, {files: ['some/files/file.js']});
+                assert.calledOnce(TestSet.create);
+                assert.calledWith(TestSet.create, {files: ['some/files/file.js']});
             });
     });
 
@@ -77,12 +93,12 @@ describe('set-collection', () => {
             .withArgs(['some/files']).returns(q(['some/files/file1.js']))
             .withArgs(['other/files']).returns(q(['other/files/file2.js']));
 
-        sandbox.stub(Set, 'create').returns(mkSetStub());
+        sandbox.stub(TestSet, 'create').returns(mkSetStub());
 
         return SetCollection.create(config)
             .then(() => {
-                assert.calledWith(Set.create, {files: ['some/files/file1.js']});
-                assert.calledWith(Set.create, {files: ['other/files/file2.js']});
+                assert.calledWith(TestSet.create, {files: ['some/files/file1.js']});
+                assert.calledWith(TestSet.create, {files: ['other/files/file2.js']});
             });
     });
 
@@ -94,16 +110,16 @@ describe('set-collection', () => {
             }
         });
 
-        assert.throws(() => SetCollection.create(config, ['set3']), /set3(.+) set1, set2/);
+        assert.throws(() => SetCollection.create(config, ['unknown-set']), /unknown-set(.+) set1, set2/);
     });
 
-    it('should filter sets files by passed files', () => {
+    it('should filter passed files if sets are specified in config', () => {
         const sets = {
             set1: mkSetStub(),
             set2: mkSetStub()
         };
 
-        sandbox.stub(Set, 'create')
+        sandbox.stub(TestSet, 'create')
             .onFirstCall().returns(sets.set1)
             .onSecondCall().returns(sets.set2);
 
