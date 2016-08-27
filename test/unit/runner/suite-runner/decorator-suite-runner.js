@@ -58,12 +58,39 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
         });
     });
 
+    describe('pass events through', () => {
+        beforeEach(() => sandbox.spy(DecoratorSuiteRunner.prototype, 'emit'));
+
+        [RunnerEvents.BEGIN_SUITE, RunnerEvents.END_SUITE].forEach((event) => {
+            it(`should pass ${event} event through without changing`, () => {
+                const suiteRunner = new QEmitter();
+                const decorator = makeDecoratorRunner(suiteRunner);
+
+                const eventSpy = sinon.spy().named(event);
+                const suiteData = makeSuiteData();
+                const suiteDataClone = _.cloneDeep(suiteData);
+
+                decorator.on(event, eventSpy);
+                suiteRunner.emit(event, suiteData);
+
+                assert.deepEqual(eventSpy.firstCall.args[0], suiteDataClone);
+            });
+
+            it(`should emit ${event} event`, () => {
+                const suiteRunner = new QEmitter();
+                const decorator = makeDecoratorRunner(suiteRunner);
+
+                suiteRunner.emit(event, makeSuiteData());
+
+                assert.calledWith(decorator.emit, event);
+            });
+        });
+    });
+
     describe('event decorator', () => {
         beforeEach(() => sandbox.spy(DecoratorSuiteRunner.prototype, 'emitAndWait'));
 
         [
-            RunnerEvents.BEGIN_SUITE,
-            RunnerEvents.END_SUITE,
             RunnerEvents.BEGIN_STATE,
             RunnerEvents.SKIP_STATE,
             RunnerEvents.END_STATE,
@@ -82,7 +109,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
                 const suiteDataClone = _.cloneDeep(suiteData);
 
                 decorator.on(event, eventSpy);
-                suiteRunner.emit(event, suiteDataClone);
+                suiteRunner.emit(event, suiteData);
 
                 assert.calledWithMatch(eventSpy, suiteDataClone);
                 assert.notDeepEqual(suiteData, suiteDataClone);
@@ -100,13 +127,25 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
     });
 
     describe('add metaInfo url to suite field', () => {
+        it('should not modify a data suite multiple times', () => {
+            const suiteRunner = new QEmitter();
+            makeDecoratorRunner(suiteRunner, {rootUrl: 'http://localhost/foo/bar/'});
+
+            const suiteData = makeSuiteData({url: 'testUrl'});
+            suiteData.suite.metaInfo = {url: 'testUrl'};
+
+            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
+
+            assert.equal(suiteData.suite.metaInfo.url, 'testUrl');
+        });
+
         it('should concatenate rootUrl and suiteUrl', () => {
             const suiteRunner = new QEmitter();
             makeDecoratorRunner(suiteRunner, {rootUrl: 'http://localhost/foo/bar/'});
 
             const suiteData = makeSuiteData({url: 'testUrl'});
 
-            suiteRunner.emit(RunnerEvents.BEGIN_SUITE, suiteData);
+            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, '/foo/bar/testUrl');
         });
@@ -117,7 +156,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
 
             const suiteData = makeSuiteData({url: 'testUrl//'});
 
-            suiteRunner.emit(RunnerEvents.BEGIN_SUITE, suiteData);
+            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, '/foo/baz/testUrl');
         });
@@ -128,7 +167,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
 
             const suiteData = makeSuiteData({url: '/testUrl'});
 
-            suiteRunner.emit(RunnerEvents.BEGIN_SUITE, suiteData);
+            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, '/foo/qux/testUrl');
         });
@@ -139,7 +178,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
 
             const suiteData = makeSuiteData({url: 'testUrl'});
 
-            suiteRunner.emit(RunnerEvents.BEGIN_SUITE, suiteData);
+            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, '/foo/bar/testUrl');
         });
