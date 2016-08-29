@@ -1,37 +1,51 @@
 'use strict';
 
-var TestCounter = require('lib/reporters/utils/test-counter');
+const TestCounter = require('lib/reporters/utils/test-counter');
 
-describe('TestCounter', function() {
-    var counter;
+const mkCompleted_ = (opts) => {
+    opts = opts || {};
 
-    beforeEach(function() {
+    return {
+        suite: {fullName: 'default_suite'},
+        browserId: opts.browserId || 'default_browser',
+        state: opts.state && {name: opts.state}
+    };
+};
+
+describe('TestCounter', () => {
+    let counter;
+
+    beforeEach(() => {
         counter = new TestCounter();
     });
 
-    describe('onPassed', function() {
+    describe('onUpdated', () => {
+        testCounter_('Updated');
+    });
+
+    describe('onPassed', () => {
         testCounter_('Passed');
     });
 
-    describe('onFailed', function() {
+    describe('onFailed', () => {
         testCounter_('Failed');
     });
 
-    describe('onSkipped', function() {
+    describe('onSkipped', () => {
         testCounter_('Skipped');
     });
 
-    describe('onRetry', function() {
-        it('should increase `retries` count', function() {
-            var completed = mkCompleted_({state: 'defaultState'});
+    describe('onRetry', () => {
+        it('should increase `retries` count', () => {
+            const completed = mkCompleted_({state: 'defaultState'});
 
             counter.onRetry(completed);
 
             assert.equal(counter.getResult().retries, 1);
         });
 
-        it('should clear stats for retried suite', function() {
-            var completed = mkCompleted_({state: 'defaultState'});
+        it('should clear stats for retried suite', () => {
+            const completed = mkCompleted_({state: 'defaultState'});
 
             counter.onPassed(completed);
             counter.onRetry(completed);
@@ -40,33 +54,35 @@ describe('TestCounter', function() {
         });
     });
 
-    describe('getResult', function() {
-        it('should return object with collected results', function() {
-            var result = counter.getResult();
+    describe('getResult', () => {
+        it('should return object with collected results', () => {
+            const result = counter.getResult();
 
-            ['passed', 'failed', 'skipped', 'retries', 'total'].forEach(function(key) {
+            ['updated', 'passed', 'failed', 'skipped', 'retries', 'total'].forEach((key) => {
                 assert.property(result, key);
             });
         });
 
-        it('should calculate total from `passed`, `failed` and `skipped`', function() {
-            var passed = mkCompleted_({state: 'passed'}),
-                failed = mkCompleted_({state: 'failed'}),
-                skipped = mkCompleted_({state: 'skipped'});
+        it('should calculate total from `updated`, `passed`, `failed` and `skipped`', () => {
+            const updated = mkCompleted_({state: 'updated'});
+            const passed = mkCompleted_({state: 'passed'});
+            const failed = mkCompleted_({state: 'failed'});
+            const skipped = mkCompleted_({state: 'skipped'});
 
+            counter.onUpdated(updated);
             counter.onPassed(passed);
             counter.onFailed(failed);
             counter.onSkipped(skipped);
 
-            assert.equal(counter.getResult().total, 3);
+            assert.equal(counter.getResult().total, 4);
         });
 
-        it('should not add retries to total', function() {
-            var passed = mkCompleted_({state: 'some_state'}),
-                retried = mkCompleted_({
-                    state: 'some_other_state',
-                    browserId: 'some_browser'
-                });
+        it('should not add retries to total', () => {
+            const passed = mkCompleted_({state: 'some_state'});
+            const retried = mkCompleted_({
+                state: 'some_other_state',
+                browserId: 'some_browser'
+            });
 
             counter.onPassed(passed);
             counter.onRetry(retried);
@@ -77,39 +93,39 @@ describe('TestCounter', function() {
 });
 
 function testCounter_(name) {
-    it('should count test result if it has state', function() {
-        var completed = mkCompleted_({state: 'defaultState'}),
-            counter = new TestCounter();
+    it('should count test result if it has state', () => {
+        const completed = mkCompleted_({state: 'defaultState'});
+        const counter = new TestCounter();
 
         counter['on' + name](completed);
 
         assert.equal(counter.getResult()[name.toLowerCase()], 1);
     });
 
-    it('should count test result if it does not have state', function() {
-        var completed = mkCompleted_({state: undefined}),
-            counter = new TestCounter();
+    it('should count test result if it does not have state', () => {
+        const completed = mkCompleted_({state: undefined});
+        const counter = new TestCounter();
 
         counter['on' + name](completed);
 
         assert.equal(counter.getResult()[name.toLowerCase()], 1);
     });
 
-    it('should not count test result if it does not have state or suite', function() {
-        var completed = {browserId: 'some_browser'},
-            counter = new TestCounter();
+    it('should not count test result if it does not have state or suite', () => {
+        const completed = {browserId: 'some_browser'};
+        const counter = new TestCounter();
 
         counter['on' + name](completed);
 
         assert.equal(counter.getResult()[name.toLowerCase()], 0);
     });
 
-    it('should not count test result twice for same suite and browser', function() {
-        var counter = new TestCounter(),
-            completed = mkCompleted_({
-                browserId: 'test_browser',
-                state: 'test_state'
-            });
+    it('should not count test result twice for same suite and browser', () => {
+        const counter = new TestCounter();
+        const completed = mkCompleted_({
+            browserId: 'test_browser',
+            state: 'test_state'
+        });
 
         counter['on' + name](completed);
         counter['on' + name](completed);
@@ -118,12 +134,4 @@ function testCounter_(name) {
     });
 }
 
-function mkCompleted_(opts) {
-    opts = opts || {};
 
-    return {
-        suite: {fullName: 'default_suite'},
-        browserId: opts.browserId || 'default_browser',
-        state: opts.state && {name: opts.state}
-    };
-}
