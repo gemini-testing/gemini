@@ -26,7 +26,10 @@ describe('runner/suite-runner/regular-suite-runner', () => {
         sandbox.stub(browser, 'openRelative');
         browser.openRelative.returns(q.resolve());
 
-        sandbox.stub(BrowserAgent.prototype);
+        sandbox.stub(BrowserAgent.prototype, 'getBrowser');
+        sandbox.stub(BrowserAgent.prototype, 'freeBrowser');
+        sandbox.stub(BrowserAgent.prototype, 'invalidateSession');
+
         BrowserAgent.prototype.getBrowser.returns(q.resolve(browser));
         BrowserAgent.prototype.freeBrowser.returns(q.resolve());
 
