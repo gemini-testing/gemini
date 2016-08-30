@@ -8,8 +8,8 @@ const StateRunner = require('lib/runner/state-runner/state-runner');
 const CaptureSession = require('lib/capture-session');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const Config = require('lib/config');
-const util = require('../../../util');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
+const util = require('../../../util');
 const makeSuiteStub = util.makeSuiteStub;
 
 describe('runner/suite-runner/regular-suite-runner', () => {
@@ -435,21 +435,21 @@ describe('runner/suite-runner/regular-suite-runner', () => {
                     .fail(() => assert.calledOnce(BrowserAgent.prototype.freeBrowser));
             });
 
-            it('should free browser with force after error in test', () => {
+            it('should invalidate session after error in test', () => {
                 CaptureSession.prototype.runActions.returns(q.reject());
 
                 return run_()
                     .catch(() => {
-                        assert.calledWith(BrowserAgent.prototype.freeBrowser, sinon.match.any, {force: true});
+                        assert.called(BrowserAgent.prototype.invalidateSession);
                     });
             });
 
-            it('should free browser without force after `NoRefImageError` in test', () => {
+            it('should not invalidate session after `NoRefImageError`', () => {
                 CaptureSession.prototype.runActions.returns(q.reject(new NoRefImageError()));
 
                 return run_()
                     .then(() => {
-                        assert.calledWith(BrowserAgent.prototype.freeBrowser, sinon.match.any, {force: false});
+                        assert.notCalled(BrowserAgent.prototype.invalidateSession);
                     });
             });
         });

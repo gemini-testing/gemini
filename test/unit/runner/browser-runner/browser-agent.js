@@ -31,4 +31,21 @@ describe('runner/browser-runner/browser-agent', function() {
 
         assert.calledWith(browserPool.freeBrowser, browser);
     });
+
+    it('should free browser unconditionally if session was invalidated', () => {
+        const browserAgent = BrowserAgent.create('browser', browserPool);
+
+        browserAgent.invalidateSession();
+        browserAgent.freeBrowser();
+
+        assert.calledWith(browserPool.freeBrowser, sinon.match.any, {force: true});
+    });
+
+    it('should free browser conditionally if session was not invalidated', () => {
+        const browserAgent = BrowserAgent.create('browser', browserPool);
+
+        browserAgent.freeBrowser();
+
+        assert.calledWith(browserPool.freeBrowser, sinon.match.any, {force: false});
+    });
 });
