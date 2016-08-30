@@ -9,13 +9,16 @@ describe('tests-api/actions-builder', () => {
     const sandbox = sinon.sandbox.create();
     const browser = util.makeBrowser();
 
-    const createActionsBuilder = (actions) => new ActionsBuilder(actions || []);
+    const mkActionsBuilder = (actions) => new ActionsBuilder(actions || []);
 
-    const runAction = (method, browser, postActions) => {
-        const actions = [];
+    const mkAction = (actionName, browser, postActions) => {
+        return function() {
+            const actions = [];
+            const actionsBuilder = mkActionsBuilder(actions);
 
-        createActionsBuilder(actions)[method]();
-        return actions[0](browser, postActions);
+            actionsBuilder[actionName].apply(actionsBuilder, arguments);
+            return actions[0](browser, postActions);
+        };
     };
 
     afterEach(() => sandbox.restore());
@@ -27,46 +30,51 @@ describe('tests-api/actions-builder', () => {
         });
 
         it('should throw in case of passed arguments', () => {
-            const fn = () => createActionsBuilder().changeOrientation('awesome argument');
+            const fn = () => mkActionsBuilder().changeOrientation('awesome argument');
 
             assert.throws(fn, TypeError, /\.changeOrientation\(\) does not accept any arguments/);
         });
 
         it('should return ActionsBuilder instance', () => {
-            assert.instanceOf(createActionsBuilder().changeOrientation(), ActionsBuilder);
+            assert.instanceOf(mkActionsBuilder().changeOrientation(), ActionsBuilder);
         });
 
         it('should change orientation from PORTRAIT to LANDSCAPE', () => {
             browser.getOrientation.returns(q('PORTRAIT'));
+            const changeOrientation = mkAction('changeOrientation', browser);
 
-            return runAction('changeOrientation', browser)
+            return changeOrientation()
                 .then(() => assert.calledWith(browser.setOrientation, 'LANDSCAPE'));
         });
 
         it('should change orientation from LANDSCAPE to PORTRAIT', () => {
             browser.getOrientation.returns(q('LANDSCAPE'));
+            const changeOrientation = mkAction('changeOrientation', browser);
 
-            return runAction('changeOrientation', browser)
+            return changeOrientation()
                 .then(() => assert.calledWith(browser.setOrientation, 'PORTRAIT'));
         });
 
         it('should restore orientation in post actions', () => {
             const postActions = sinon.createStubInstance(ActionsBuilder);
+            const changeOrientation = mkAction('changeOrientation', browser, postActions);
 
-            return runAction('changeOrientation', browser, postActions)
+            return changeOrientation()
                 .then(() => assert.called(postActions.changeOrientation));
         });
 
         it('should be rejected if getting of orientation fails', () => {
             browser.getOrientation.returns(q.reject('awesome error'));
+            const changeOrientation = mkAction('changeOrientation', browser);
 
-            return assert.isRejected(runAction('changeOrientation', browser), /awesome error/);
+            return assert.isRejected(changeOrientation(), /awesome error/);
         });
 
         it('should be rejected if setting of orientation fails', () => {
             browser.setOrientation.returns(q.reject('awesome error'));
+            const changeOrientation = mkAction('changeOrientation', browser);
 
-            return assert.isRejected(runAction('changeOrientation', browser), /awesome error/);
+            return assert.isRejected(changeOrientation(), /awesome error/);
         });
     });
 });
