@@ -77,4 +77,115 @@ describe('tests-api/actions-builder', () => {
             return assert.isRejected(changeOrientation(), /awesome error/);
         });
     });
+
+    describe('mouse actions', () => {
+        beforeEach(() => {
+            sandbox.stub(browser, 'moveTo').returns(q());
+            sandbox.stub(browser, 'findElement').returns(q({}));
+        });
+
+        describe('click', () => {
+            beforeEach(() => {
+                sandbox.stub(browser, 'click').returns(q());
+            });
+
+            it('should use left button if not specified', () => {
+                const click = mkAction('click', browser);
+
+                return click('.some-selector')
+                    .then(() => assert.calledWith(browser.click, 0));
+            });
+
+            it('should use passed button', () => {
+                const click = mkAction('click', browser);
+
+                return click('.some-selector', 1)
+                    .then(() => assert.calledWith(browser.click, 1));
+            });
+
+            it('should throw on bad button (not 0, 1 or 2)', () => {
+                const click = mkAction('click', browser);
+
+                assert.throws(() => click('.some-selector', 3), /Mouse button should be/);
+            });
+        });
+
+        describe('doubleClick', () => {
+            beforeEach(() => {
+                sandbox.stub(browser, 'doubleClick').returns(q());
+            });
+
+            it('should use left button if not specified', () => {
+                const doubleClick = mkAction('doubleClick', browser);
+
+                return doubleClick('.some-selector')
+                    .then(() => assert.calledWith(browser.doubleClick, '.some-selector', 0));
+            });
+
+            it('should use passed button', () => {
+                const doubleClick = mkAction('doubleClick', browser);
+
+                return doubleClick('.some-selector', 1)
+                    .then(() => assert.calledWith(browser.doubleClick, '.some-selector', 1));
+            });
+
+            it('should throw on bad button (not 0, 1 or 2)', () => {
+                const doubleClick = mkAction('doubleClick', browser);
+
+                assert.throws(() => doubleClick('.some-selector', 3), /Mouse button should be/);
+            });
+        });
+
+        describe('mouseDown', () => {
+            beforeEach(() => {
+                sandbox.stub(browser, 'buttonDown').returns(q());
+            });
+
+            it('should use left button if not specified', () => {
+                const mouseDown = mkAction('mouseDown', browser);
+
+                return mouseDown('.some-selector')
+                    .then(() => assert.calledWith(browser.buttonDown, 0));
+            });
+
+            it('should use passed button', () => {
+                const mouseDown = mkAction('mouseDown', browser);
+
+                return mouseDown('.some-selector', 1)
+                    .then(() => assert.calledWith(browser.buttonDown, 1));
+            });
+
+            it('should throw on bad button (not 0, 1 or 2)', () => {
+                const mouseDown = mkAction('mouseDown', browser);
+
+                assert.throws(() => mouseDown('.some-selector', 3), /Mouse button should be/);
+            });
+        });
+
+        describe('mouseUp', () => {
+            beforeEach(() => {
+                sandbox.stub(browser, 'buttonUp').returns(q());
+            });
+
+            it('should use left button if not specified', () => {
+                const mouseUp = mkAction('mouseUp', browser);
+
+                return mouseUp('.some-selector')
+                    .then(() => assert.calledWith(browser.buttonUp, 0));
+            });
+
+            it('should use passed button', () => {
+                const mouseUp = mkAction('mouseUp', browser);
+
+                return mouseUp('.some-selector', 1)
+                    .then(() => assert.calledWith(browser.buttonUp, 1));
+            });
+
+            it('should throw on bad button (not 0, 1 or 2)', () => {
+                const mouseUp = mkAction('mouseUp', browser);
+
+                assert.throws(() => mouseUp('.some-selector', 3), /Mouse button should be/);
+            });
+        });
+    });
 });
