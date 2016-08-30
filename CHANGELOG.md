@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.7.3 - 2016-08-30
+## 4.8.0 - 2016-08-30
 
 * Fixed bug which causes `Cannot find files by mask gemini` error if sets in config are not specified (see [#569])
 * Fixed bug which causes `/null` url in meta-info
