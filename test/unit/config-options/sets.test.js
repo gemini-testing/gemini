@@ -1,12 +1,14 @@
 'use strict';
-var parser = require('lib/config/options'),
-    GeminiError = require('lib/errors/gemini-error'),
-    _ = require('lodash');
 
-describe('config.sets', function() {
-    ///
-    function createConfig(opts) {
-        var REQUIRED_OPTIONS = {
+const MissingOptionError = require('gemini-configparser').MissingOptionError;
+const _ = require('lodash');
+
+const parser = require('lib/config/options');
+const GeminiError = require('lib/errors/gemini-error');
+
+describe('config.sets', () => {
+    const createConfig = (opts) => {
+        const REQUIRED_OPTIONS = {
             system: {
                 projectRoot: '/some/path'
             },
@@ -14,28 +16,28 @@ describe('config.sets', function() {
             desiredCapabilities: {}
         };
 
-        var options = _.extend({}, REQUIRED_OPTIONS, opts);
+        const options = _.extend({}, REQUIRED_OPTIONS, opts);
 
         return parser({
             options: options,
             env: {},
             argv: []
         });
-    }
+    };
 
-    describe('files', function() {
-        it('should be `gemini` by default', function() {
-            var config = createConfig({
-                sets: {
-                    someSet: {}
-                }
-            });
-
-            assert.deepEqual(config.sets.someSet.files, ['gemini']);
+    describe('files', () => {
+        it('should throw an error if files are not specified', () => {
+            assert.throws(() => {
+                createConfig({
+                    sets: {
+                        someSet: {}
+                    }
+                });
+            }, MissingOptionError);
         });
 
-        it('should convert string to array of strings', function() {
-            var config = createConfig({
+        it('should convert string to array of strings', () => {
+            const config = createConfig({
                 sets: {
                     someSet: {
                         files: 'some/path'
@@ -46,8 +48,8 @@ describe('config.sets', function() {
             assert.deepEqual(config.sets.someSet.files, ['some/path']);
         });
 
-        it('should not accept non-string arrays', function() {
-            assert.throws(function() {
+        it('should not accept non-string arrays', () => {
+            assert.throws(() => {
                 createConfig({
                     sets: {
                         someSet: {
@@ -58,8 +60,8 @@ describe('config.sets', function() {
             }, GeminiError);
         });
 
-        it('should accept array with strings', function() {
-            var config = createConfig({
+        it('should accept array with strings', () => {
+            const config = createConfig({
                 sets: {
                     someSet: {
                         files: [
@@ -77,26 +79,29 @@ describe('config.sets', function() {
         });
     });
 
-    describe('browsers', function() {
-        it('should contain all browsers by default', function() {
+    describe('browsers', () => {
+        it('should contain all browsers by default', () => {
             var config = createConfig({
                 browsers: {
                     b1: {},
                     b2: {}
                 },
                 sets: {
-                    someSet: {}
+                    someSet: {
+                        files: ['some/path']
+                    }
                 }
             });
 
             assert.deepEqual(config.sets.someSet.browsers, ['b1', 'b2']);
         });
 
-        it('should not accept non-arrays', function() {
-            assert.throws(function() {
+        it('should not accept non-arrays', () => {
+            assert.throws(() => {
                 createConfig({
                     sets: {
                         someSet: {
+                            files: ['some/path'],
                             browsers: 'something'
                         }
                     }
@@ -104,8 +109,8 @@ describe('config.sets', function() {
             }, GeminiError);
         });
 
-        it('should not accept unknown browsers', function() {
-            assert.throws(function() {
+        it('should not accept unknown browsers', () => {
+            assert.throws(() => {
                 createConfig({
                     browsers: {
                         b1: {},
@@ -113,6 +118,7 @@ describe('config.sets', function() {
                     },
                     sets: {
                         someSet: {
+                            files: ['some/path'],
                             browsers: ['b3']
                         }
                     }
@@ -120,17 +126,19 @@ describe('config.sets', function() {
             }, GeminiError);
         });
 
-        it('should accept configured browsers', function() {
-            var config = createConfig({
+        it('should accept configured browsers', () => {
+            const config = createConfig({
                 browsers: {
                     b1: {},
                     b2: {}
                 },
                 sets: {
                     set1: {
+                        files: ['some/path'],
                         browsers: ['b1']
                     },
                     set2: {
+                        files: ['other/path'],
                         browsers: ['b2']
                     }
                 }
@@ -141,15 +149,14 @@ describe('config.sets', function() {
         });
     });
 
-    it('should have `all` set with default values if no set specified', function() {
-        var config = createConfig({
+    it('should not have default set if sets are not specified', () => {
+        const config = createConfig({
             browsers: {
                 b1: {},
                 b2: {}
             }
         });
 
-        assert.deepEqual(config.sets.all.files, ['gemini']);
-        assert.deepEqual(config.sets.all.browsers, ['b1', 'b2']);
+        assert.deepEqual(config.sets, {});
     });
 });

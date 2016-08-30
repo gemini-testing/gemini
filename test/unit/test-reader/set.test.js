@@ -1,12 +1,12 @@
 'use strict';
 
-const Set = require('lib/test-reader/set');
+const TestSet = require('lib/test-reader/test-set');
 
-describe('Set', () => {
+describe('TestSet', () => {
     let set;
 
     beforeEach(() => {
-        set = new Set({
+        set = new TestSet({
             files: ['some/path/file.js'],
             browsers: ['bro1', 'bro2']
         });
@@ -41,6 +41,15 @@ describe('Set', () => {
 
         it('should return set files if files are not passed', () =>{
             set.filterFiles([]);
+
+            const files = set.getFiles();
+
+            assert.deepEqual(files, ['some/path/file.js']);
+        });
+
+        it('should return passed files if set files are empty', () => {
+            set = new TestSet({files: []});
+            set.filterFiles(['some/path/file.js']);
 
             const files = set.getFiles();
 

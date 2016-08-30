@@ -100,6 +100,17 @@ describe('test-reader', () => {
         });
     });
 
+    it('should use gemini folder if sets are not specified in config and paths are not passed', () => {
+        const config = {
+            getBrowserIds: () => []
+        };
+
+        globExtra.expandPaths.withArgs(['/root/gemini']).returns(q(['/root/gemini/file.js']));
+
+        return readTests_({config})
+            .then(() => assert.calledWith(utils.requireWithNoCache, '/root/gemini/file.js'));
+    });
+
     it('should load suites related to sets from config', () => {
         const config = {
             sets: {
