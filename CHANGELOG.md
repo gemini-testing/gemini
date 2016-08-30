@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.3 - 2016-08-30
+
+* Fixed bug which causes `Cannot find files by mask gemini` error if sets in config are not specified (see [#569])
+* Fixed bug which causes `/null` url in meta-info
+* Displaying the number of updated images via command `gemini update` in flat reporter
+
 ## 4.7.2 - 2016-08-26
 
 * Correctly display the images in the html report in case suite names contain non-urlsafe characters.
@@ -1114,3 +1120,5 @@ Was republished as 0.7.0 due to a breaking change.
 ## 0.1.0 - 2014-03-27
 
 * Initial release
+
+[#569]: https://github.com/gemini-testing/gemini/issues/569
