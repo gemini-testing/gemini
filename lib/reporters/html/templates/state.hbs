@@ -25,13 +25,15 @@
     </div>
 {{/if}}
 {{#if fail}}
-    <div class="image-box__image">
-        <div class="image-box__title">Expected</div>
-        {{image "expected"}}
-    </div>
-    <div class="image-box__image">
-        <div class="image-box__title">Actual</div>
-        {{image "actual"}}
+    <div class="image-box__exp-with-act">
+        <div class="image-box__image">
+            <div class="image-box__title">Expected</div>
+            {{image "expected"}}
+        </div>
+        <div class="image-box__image">
+            <div class="image-box__title">Actual</div>
+            {{image "actual"}}
+        </div>
     </div>
     <div class="image-box__image">
         <div class="image-box__title">Diff</div>
