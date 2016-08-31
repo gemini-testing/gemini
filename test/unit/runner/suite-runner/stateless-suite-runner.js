@@ -1,43 +1,48 @@
 'use strict';
 
-const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
-const StatelessSuiteRunner = require('lib/runner/suite-runner/stateless-suite-runner');
-const util = require('../../../util');
+var BrowserAgent = require('lib/runner/browser-runner/browser-agent'),
+    StatelessSuiteRunner = require('lib/runner/suite-runner/stateless-suite-runner'),
+    util = require('../../../util');
 
-describe('runner/suite-runner/stateless-suite-runner', () => {
-    const sandbox = sinon.sandbox.create();
-    const suite = util.makeSuiteStub();
-    const browserAgent = new BrowserAgent('default-browser');
-    const runner = new StatelessSuiteRunner(suite, browserAgent);
+describe('runner/suite-runner/stateless-suite-runner', function() {
+    var sandbox = sinon.sandbox.create(),
+        suite = util.makeSuiteStub(),
+        browserAgent = new BrowserAgent('default-browser'),
+        runner = new StatelessSuiteRunner(suite, browserAgent);
 
-    beforeEach(() => {
-        sandbox.stub(BrowserAgent.prototype, 'getBrowser');
-        sandbox.stub(BrowserAgent.prototype, 'freeBrowser');
+    beforeEach(function() {
+        sandbox.stub(BrowserAgent.prototype);
     });
 
-    afterEach(() => sandbox.restore());
+    afterEach(function() {
+        sandbox.restore();
+    });
 
-    it('should emit `beginSuite` event', () => {
-        const onBeginSuite = sinon.spy().named('onBeginSuite');
+    it('should emit `beginSuite` event', function() {
+        var onBeginSuite = sinon.spy().named('onBeginSuite');
 
         runner.on('beginSuite', onBeginSuite);
 
         return runner.run()
-            .then(() => assert.calledOnce(onBeginSuite));
+            .then(function() {
+                assert.calledOnce(onBeginSuite);
+            });
     });
 
-    it('should emit `endSuite` event', () => {
-        const onEndSuite = sinon.spy().named('onEndSuite');
+    it('should emit `endSuite` event', function() {
+        var onEndSuite = sinon.spy().named('onEndSuite');
 
         runner.on('endSuite', onEndSuite);
 
         return runner.run()
-            .then(() => assert.calledOnce(onEndSuite));
+            .then(function() {
+                assert.calledOnce(onEndSuite);
+            });
     });
 
-    it('should not get/free browser on run', () => {
+    it('should not get/free browser on run', function() {
         return runner.run()
-            .then(() => {
+            .then(function() {
                 assert.notCalled(BrowserAgent.prototype.getBrowser);
                 assert.notCalled(BrowserAgent.prototype.freeBrowser);
             });
