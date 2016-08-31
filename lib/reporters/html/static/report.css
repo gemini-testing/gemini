@@ -37,10 +37,23 @@
     background: #eee;
 }
 
+.button_checked {
+    background: #ffeba0;
+    border-color: #cebe7d;
+}
+
 .image-box {
     padding: 5px;
     border: 1px solid #ccc;
     background: #c9c9c9;
+}
+
+.image-box__exp-with-act {
+    display: inline-block;
+}
+
+.report_show-only-diff .image-box__exp-with-act {
+    display: none;
 }
 
 .image-box__image {
