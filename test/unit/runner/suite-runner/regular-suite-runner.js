@@ -447,7 +447,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
                     });
             });
 
-            it('should not invalidate session after `NoRefImageError`', () => {
+            it('should not invalidate session if reference image does not exist', () => {
                 CaptureSession.prototype.runActions.returns(q.reject(new NoRefImageError()));
 
                 return run_()
