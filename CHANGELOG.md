@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.9.0 - 2016-09-01
+
+* Close browser session after error in a test
+* Set left button as default for mouse button actions
+* Fixed wrong validation of `grep` option from cli
+
 ## 4.8.0 - 2016-08-30
 
 * Fixed bug which causes `Cannot find files by mask gemini` error if sets in config are not specified (see [#569])
