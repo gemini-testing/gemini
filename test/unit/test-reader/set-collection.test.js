@@ -44,7 +44,10 @@ describe('set-collection', () => {
             const getBrowserIds = sandbox.stub().returns(['b1', 'b2']);
 
             return SetCollection.create(mkConfigStub({getBrowserIds}))
-                .then(() => assert.calledWith(TestSet.create, {files: [], browsers: ['b1', 'b2']}));
+                .then(() => {
+                    assert.calledWith(globExtra.expandPaths, []);
+                    assert.calledWith(TestSet.create, {files: [], browsers: ['b1', 'b2']});
+                });
         });
     });
 
