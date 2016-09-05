@@ -8,7 +8,6 @@ const TestSessionRunner = require('lib/runner/test-session-runner');
 const StateProcessor = require('lib/state-processor/state-processor');
 const Config = require('lib/config');
 const FailCollector = require('lib/fail-collector');
-const util = require('../../util');
 
 describe('runner', () => {
     const sandbox = sinon.sandbox.create();
@@ -105,14 +104,11 @@ describe('runner', () => {
         });
 
         it('should run suites in test session runner', () => {
-            const suites = [util.makeSuiteStub()];
-
-            suiteCollectionStub.allSuites.returns(suites);
             sandbox.stub(testSessionRunner, 'run').returns(q());
 
             return run_(suiteCollectionStub).then(() => {
                 assert.calledOnce(testSessionRunner.run);
-                assert.calledWith(testSessionRunner.run, suites, stateProcessor);
+                assert.calledWith(testSessionRunner.run, suiteCollectionStub, stateProcessor);
             });
         });
 

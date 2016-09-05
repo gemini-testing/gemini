@@ -1,6 +1,8 @@
 'use strict';
 
-var createSuite = require('lib/suite').create;
+const createSuite = require('lib/suite').create;
+const State = require('lib/state');
+const mkTree = require('../util').makeSuiteTree;
 
 describe('suite', function() {
     describe('create', function() {
@@ -33,13 +35,6 @@ describe('suite', function() {
                 child = createSuite('child', parent);
 
             assert.equal(child.parent, parent);
-        });
-
-        it('should add new suite to the parent\'s children', function() {
-            var parent = createSuite('parent'),
-                child = createSuite('child', parent);
-
-            assert.include(parent.children, child);
         });
 
         it('child suite should have same data in context as parent', function() {
@@ -93,6 +88,29 @@ describe('suite', function() {
         });
     });
 
+    describe('addChild', () => {
+        it('should add child for parent suite', () => {
+            const suite = createSuite('suite');
+            const child = createSuite('child', suite);
+            suite.addChild(child);
+            assert.equal(suite.children[0], child);
+        });
+
+        it('should set himself as a parent for child suite', function() {
+            const suite = createSuite('suite');
+            const anotherSuite = createSuite('another-suite');
+            suite.addChild(anotherSuite);
+            assert.equal(anotherSuite.parent, suite);
+        });
+
+        it('child suite should inherit properties from the parent', function() {
+            const suite = createSuite('suite');
+            const anotherSuite = createSuite('another-suite');
+            suite.addChild(anotherSuite);
+            assert.equal(Object.getPrototypeOf(anotherSuite), suite);
+        });
+    });
+
     describe('addState', function() {
         beforeEach(function() {
             this.suite = createSuite('suite');
@@ -102,6 +120,12 @@ describe('suite', function() {
             var state = {name: 'some state'};
             this.suite.addState(state);
             assert.equal(this.suite.states[0], state);
+        });
+
+        it('should redefine parent suite for state', function() {
+            var state = {name: 'some state'};
+            this.suite.addState(state);
+            assert.equal(state.suite, this.suite);
         });
     });
 
@@ -199,14 +223,15 @@ describe('suite', function() {
     describe('hasChildNamed', function() {
         beforeEach(function() {
             this.suite = createSuite('parent');
-            createSuite('has', this.suite);
+            this.child = createSuite('has', this.suite);
+            this.suite.addChild(this.child);
         });
 
         it('should return true when suite has child of a given name', function() {
             assert.isTrue(this.suite.hasChildNamed('has'));
         });
 
-        it('should return fals when suite has no child of a given name', function() {
+        it('should return false when suite has no child of a given name', function() {
             assert.isFalse(this.suite.hasChildNamed('has no'));
         });
     });
@@ -238,6 +263,91 @@ describe('suite', function() {
 
         it('should concat own name with parents', function() {
             assert.equal(this.child.fullName, 'parent child');
+        });
+    });
+
+    describe('suite clone', () => {
+        let sandbox;
+
+        beforeEach(() => {
+            sandbox = sinon.sandbox.create();
+        });
+
+        afterEach(() => sandbox.restore());
+
+        it('should return cloned suite', () => {
+            const suite = createSuite('origin');
+            const clonedSuite = suite.clone();
+
+            assert.notEqual(clonedSuite, suite);
+        });
+
+        it('should clone nested suites', () => {
+            const tree = mkTree({
+                suite: {
+                    child: []
+                }
+            });
+            const childSuite = tree.child;
+            sandbox.stub(childSuite, 'clone').returns({});
+
+            tree.suite.clone();
+
+            assert.calledOnce(childSuite.clone);
+        });
+
+        it('should not change child suite count while cloning', () => {
+            const tree = mkTree({
+                suite: {
+                    child: []
+                }
+            });
+            const clonedSuite = tree.suite.clone();
+
+            assert.lengthOf(clonedSuite.children, 1);
+        });
+
+        it('should redefine parent for nested suites', () => {
+            const suite = createSuite('origin');
+            const childSuite = createSuite('child suite');
+            suite.addChild(childSuite);
+
+            const clonedSuite = suite.clone();
+
+            assert.deepEqual(clonedSuite.children[0].parent, clonedSuite);
+        });
+
+        it('should clone nested states', () => {
+            const suite = createSuite('origin');
+            const state = new State(suite);
+            sandbox.stub(state, 'clone').returns({});
+            suite.addState(state);
+
+            suite.clone();
+
+            assert.calledOnce(state.clone);
+        });
+
+        it('should redefine parent suite for state', () => {
+            const suite = createSuite('origin');
+            const state = new State(suite);
+            suite.addState(state);
+
+            const clonedSuite = suite.clone();
+
+            assert.equal(clonedSuite.states[0].suite, clonedSuite);
+        });
+
+        it('should not change state count while cloning', () => {
+            const suite = createSuite('origin');
+            const state1 = new State(suite);
+            const state2 = new State(suite);
+            suite.addState(state1);
+            suite.addState(state2);
+
+            const clonedSuite = suite.clone();
+
+            assert.lengthOf(clonedSuite.states, 2);
         });
     });
 });

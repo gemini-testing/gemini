@@ -91,6 +91,7 @@ function makeSuiteTree(sceleton, rootOpts) {
                 pushToTree_(val, makeStateStub(parent, {name: val}));
             } else {
                 var suite = makeSuiteStub({parent: parent, name: name});
+                parent.addChild(suite);
                 pushToTree_(name, suite);
                 mkTree_(val, suite);
             }

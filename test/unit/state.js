@@ -54,4 +54,32 @@ describe('state methods', () => {
             assert.equal(state[method], suite[method]);
         });
     });
+
+    describe('clone method', () => {
+        it('should return cloned state', () => {
+            const state = new State({});
+            const clonedState = state.clone();
+
+            assert.notEqual(state, clonedState);
+        });
+
+        it('should clone actions from the origin state', () => {
+            const state = new State({});
+            state.actions.push('actions');
+
+            const clonedState = state.clone();
+            state.actions.push('anotherAction');
+
+            assert.deepEqual(clonedState.actions, ['actions']);
+        });
+
+        it('should clone tolerance from the origin state', () => {
+            const state = new State({});
+            state.tolerance = 100;
+
+            const clonedState = state.clone();
+
+            assert.equal(clonedState.tolerance, 100);
+        });
+    });
 });

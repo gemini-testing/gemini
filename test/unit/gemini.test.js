@@ -9,6 +9,7 @@ const Runner = require('lib/runner');
 const temp = require('lib/temp');
 
 const mkSuiteStub = require('../util').makeSuiteStub;
+const mkStateStub = require('../util').makeStateStub;
 
 describe('gemini', () => {
     const sandbox = sinon.sandbox.create();
@@ -94,6 +95,9 @@ describe('gemini', () => {
             const child = mkSuiteStub({parent: parent});
             const anotherChild = mkSuiteStub({parent: parent});
 
+            parent.addChild(child);
+            parent.addChild(anotherChild);
+
             return readTests_(parent)
                 .then((collection) => {
                     const allSuites = collection.allSuites();
@@ -107,16 +111,19 @@ describe('gemini', () => {
         it('should grep leaf suites by fullname', () => {
             const grandParent = mkSuiteStub();
             const parent = mkSuiteStub({parent: grandParent});
+            grandParent.addChild(parent);
             const matchingChild = mkSuiteStub({
-                states: [1],
+                states: [mkStateStub()],
                 name: 'ok',
                 parent: parent
             });
             const nonMatchingChild = mkSuiteStub({
-                states: [1],
+                states: [mkStateStub()],
                 name: 'fail',
                 parent: parent
             });
+            parent.addChild(matchingChild);
+            parent.addChild(nonMatchingChild);
 
             return readTests_(parent, {grep: /ok/})
                 .then((collection) => {
@@ -135,7 +142,7 @@ describe('gemini', () => {
                 parent: parent
             });
             const nonMatchingBranchLeaf = mkSuiteStub({
-                states: [1],
+                states: [mkStateStub()],
                 name: 'nonMatchingBranchLeaf',
                 parent: nonMatchingBranchRoot
             });
@@ -152,15 +159,18 @@ describe('gemini', () => {
         it('should keep in tree branch that have matching leaf suites', () => {
             const grandParent = mkSuiteStub();
             const parent = mkSuiteStub({parent: grandParent});
+            grandParent.addChild(parent);
             const matchingBranchRoot = mkSuiteStub({
                 name: 'matchingBranchRoot',
                 parent: parent
             });
+            parent.addChild(matchingBranchRoot);
             const matchingBranchLeaf = mkSuiteStub({
-                states: [1],
+                states: [mkStateStub()],
                 name: 'matchingBranchLeaf',
                 parent: matchingBranchRoot
             });
+            matchingBranchRoot.addChild(matchingBranchLeaf);
 
             return readTests_(grandParent, {grep: /matchingBranchLeaf/})
                 .then((collection) => {

@@ -8,6 +8,7 @@ describe('suite-monitor', function() {
 
         this.root = createSuite('root');
         this.suite = createSuite('suite', this.root);
+        this.root.addChild(this.suite);
 
         this.monitor = new SuiteMonitor();
     });
@@ -34,6 +35,7 @@ describe('suite-monitor', function() {
         it('should emit `endSuite` event when passed suite has complete nested suits', function() {
             var spy = this.sinon.spy().named('onEndSuite');
             this.child = createSuite('child', this.suite);
+            this.suite.addChild(this.child);
             this.monitor.on('endSuite', spy);
             this.monitor.suiteFinished(this.root, 'browser');
             this.monitor.suiteFinished(this.suite, 'browser');

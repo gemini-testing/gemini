@@ -53,6 +53,51 @@ describe('suite-collection', () => {
         });
     });
 
+    describe('clone method', () => {
+        it('should leave top level parent for each tl suite', () => {
+            const tree = mkTree({
+                parent: {
+                    child: []
+                }
+            });
+
+            const collection = new SuiteCollection([tree.child]);
+            const clonedCollection = collection.clone();
+            const clonedChild = clonedCollection.topLevelSuites()[0];
+
+            assert.equal(clonedChild.parent, tree.child.parent);
+        });
+
+        it('should not add new children to top level parent', () => {
+            const tree = mkTree({
+                parent: {
+                    child: []
+                }
+            });
+
+            const collection = new SuiteCollection([tree.child]);
+            const clonedCollection = collection.clone();
+
+            assert.lengthOf(clonedCollection.topLevelSuites()[0].parent.children, 1);
+        });
+
+        it('should return new suite collection', () => {
+            const collection = new SuiteCollection();
+            const clonedCollection = collection.clone();
+
+            assert.notEqual(clonedCollection, collection);
+        });
+
+        it('should clone all suites from the collection', () => {
+            const tree = mkTree({suite: []});
+            const collection = new SuiteCollection([tree.suite]);
+            sandbox.stub(tree.suite, 'clone');
+            collection.clone();
+
+            assert.calledOnce(collection.topLevelSuites()[0].clone);
+        });
+    });
+
     describe('allSuites', () => {
         it('should return empty list on empty collection', () => {
             const collection = new SuiteCollection();
