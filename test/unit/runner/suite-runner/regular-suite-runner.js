@@ -28,7 +28,6 @@ describe('runner/suite-runner/regular-suite-runner', () => {
 
         sandbox.stub(BrowserAgent.prototype, 'getBrowser');
         sandbox.stub(BrowserAgent.prototype, 'freeBrowser');
-        sandbox.stub(BrowserAgent.prototype, 'invalidateSession');
 
         BrowserAgent.prototype.getBrowser.returns(q.resolve(browser));
         BrowserAgent.prototype.freeBrowser.returns(q.resolve());
@@ -443,7 +442,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
 
                 return run_()
                     .catch(() => {
-                        assert.called(BrowserAgent.prototype.invalidateSession);
+                        assert.calledWith(BrowserAgent.prototype.freeBrowser, sinon.match.any, {force: true});
                     });
             });
 
@@ -452,7 +451,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
 
                 return run_()
                     .then(() => {
-                        assert.notCalled(BrowserAgent.prototype.invalidateSession);
+                        assert.calledWith(BrowserAgent.prototype.freeBrowser, sinon.match.any, {force: false});
                     });
             });
         });
