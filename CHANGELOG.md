@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.9.1 - 2016-09-05
+
+* Fixed abort of the broken session on test error
+* Fixed incorrect creation of set with empty files
+* Updated version of glob-extra
+
 ## 4.9.0 - 2016-09-01
 
 * Close browser session after error in a test
