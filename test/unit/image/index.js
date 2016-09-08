@@ -8,8 +8,9 @@ const looksSameStub = sinon.stub();
 const Image = proxyquire('lib/image', {
     'looks-same': looksSameStub
 });
+const SafeRect = require('lib/image/safe-rect');
 
-describe('unit-image', () => {
+describe('Image', () => {
     const sandbox = sinon.sandbox.create();
     let image;
 
@@ -26,20 +27,47 @@ describe('unit-image', () => {
         sandbox.stub(PngImg.prototype, 'size').returns({width: 100500, height: 500100});
     });
 
-    afterEach(() => {
-        sandbox.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    it('should crop image', () => {
-        sandbox.stub(PngImg.prototype, 'crop');
+    describe('crop', () => {
+        beforeEach(() => {
+            sandbox.stub(SafeRect, 'create').returns({});
 
-        const rect = {top: 1, left: 2, width: 3, height: 4};
+            sandbox.stub(PngImg.prototype, 'crop');
+        });
 
-        return image.crop(rect)
-            .then(() => {
-                assert.calledOnce(PngImg.prototype.crop);
-                assert.calledWith(PngImg.prototype.crop, 2, 1, 3, 4);
-            });
+        it('should create instance of "SafeRect"', () => {
+            const rect = {left: 1, top: 2, width: 3, height: 4};
+
+            return image.crop(rect)
+                .then(() => {
+                    assert.calledOnce(SafeRect.create);
+                    assert.calledWith(SafeRect.create, rect, image.getSize());
+                });
+        });
+
+        it('should consider scale factor before creating of instance of "SafeRect"', () => {
+            const rect = {left: 1, top: 2, width: 3, height: 4};
+            const scaledRect = {left: 2, top: 4, width: 6, height: 8};
+
+            return image.crop(rect, {scaleFactor: 2})
+                .then(() => assert.calledWith(SafeRect.create, scaledRect));
+        });
+
+        it('should crop an image', () => {
+            SafeRect.create.returns({left: 1, top: 2, width: 3, height: 4});
+
+            return image.crop({})
+                .then(() => {
+                    assert.calledOnce(PngImg.prototype.crop);
+                    assert.calledWith(PngImg.prototype.crop, 1, 2, 3, 4);
+                });
+        });
+
+        it('should be resolved with the same instance of "Image" after crop', () => {
+            return image.crop({})
+                .then((res) => assert.deepEqual(res, image));
+        });
     });
 
     it('should return correct size', () => {
