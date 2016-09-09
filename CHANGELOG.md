@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.9.2 - 2016-09-09
+
+* Updated third party libraries, so Array.prototype methods won't be overwritten
+  anymore
+
 ## 4.9.1 - 2016-09-05
 
 * Fixed abort of the broken session on test error
