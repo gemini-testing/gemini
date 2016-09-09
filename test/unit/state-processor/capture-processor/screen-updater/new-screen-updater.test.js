@@ -22,7 +22,9 @@ describe('new-screen-updater', () => {
     });
 
     function exec_(opts) {
-        opts = opts || {};
+        opts = opts || {
+            refPath: '/non/relevant.png'
+        };
         const updater = new NewScreenUpdater(),
             capture = {
                 image: imageStub
