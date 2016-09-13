@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.9.3 - 2016-09-13
+## 4.9.4 - 2016-09-13
 
 * Fixed `Out of the bounds` error (see [#543])
 
