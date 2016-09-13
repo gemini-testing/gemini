@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.9.3 - 2016-09-13
+
+* Fixed `Out of the bounds` error (see [#543])
+
+[#543]: https://github.com/gemini-testing/gemini/issues/543
+
 ## 4.9.2 - 2016-09-09
 
 * Updated third party libraries, so Array.prototype methods won't be overwritten
