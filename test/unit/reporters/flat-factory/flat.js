@@ -20,7 +20,7 @@ describe('Reporter#Flat', () => {
 
         return _(chunks)
             .map((val) => val.toLowerCase().split(/:\s/))
-            .zipObject()
+            .fromPairs()
             .value();
     };
 
