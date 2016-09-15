@@ -1,49 +1,57 @@
 'use strict';
-var createSuite = require('lib/suite').create,
-    SuiteMonitor = require('lib/suite-monitor');
 
-describe('suite-monitor', function() {
-    beforeEach(function() {
-        this.sinon = sinon.sandbox.create();
+const createSuite = require('lib/suite').create;
+const SuiteMonitor = require('lib/suite-monitor');
 
-        this.root = createSuite('root');
-        this.suite = createSuite('suite', this.root);
-        this.root.addChild(this.suite);
+describe('suite-monitor', () => {
+    const sandbox = sinon.sandbox.create();
+    let monitor;
+    let root;
+    let suite;
 
-        this.monitor = new SuiteMonitor();
+    beforeEach(() => {
+        root = createSuite('root');
+        suite = createSuite('suite', root);
+        root.addChild(suite);
+
+        monitor = new SuiteMonitor();
     });
 
-    afterEach(function() {
-        this.sinon.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    describe('suiteFinished', function() {
-        it('should emit `endSuite` event when passed suite does not have nested suits', function() {
-            var spy = this.sinon.spy().named('onEndSuite');
-            this.monitor.on('endSuite', spy);
-            this.monitor.suiteFinished(this.suite, 'browser');
+    describe('suiteFinished', () => {
+        it('should emit `endSuite` event when passed suite does not have nested suits', () => {
+            const spy = sandbox.spy().named('onEndSuite');
+            monitor.on('endSuite', spy);
+
+            monitor.suiteFinished(suite, 'browser');
+
             assert.calledOnce(spy);
         });
 
-        it('should not emit `endSuite` event when passed suite has incomplete nested suits', function() {
-            var spy = this.sinon.spy().named('onEndSuite');
-            this.monitor.on('endSuite', spy);
-            this.monitor.suiteFinished(this.root, 'browser');
+        it('should not emit `endSuite` event when passed suite has incomplete nested suits', () => {
+            const spy = sandbox.spy().named('onEndSuite');
+            monitor.on('endSuite', spy);
+
+            monitor.suiteFinished(root, 'browser');
+
             assert.neverCalledWith(spy);
         });
 
-        it('should emit `endSuite` event when passed suite has complete nested suits', function() {
-            var spy = this.sinon.spy().named('onEndSuite');
-            this.child = createSuite('child', this.suite);
-            this.suite.addChild(this.child);
-            this.monitor.on('endSuite', spy);
-            this.monitor.suiteFinished(this.root, 'browser');
-            this.monitor.suiteFinished(this.suite, 'browser');
-            this.monitor.suiteFinished(this.child, 'browser');
+        it('should emit `endSuite` event when passed suite has complete nested suits', () => {
+            const spy = sandbox.spy().named('onEndSuite');
+            const child = createSuite('child', suite);
+            suite.addChild(child);
+            monitor.on('endSuite', spy);
+
+            monitor.suiteFinished(root, 'browser');
+            monitor.suiteFinished(suite, 'browser');
+            monitor.suiteFinished(child, 'browser');
+
             assert.callOrder(
-                spy.withArgs(sinon.match({suite: this.child, browserId: 'browser'})),
-                spy.withArgs(sinon.match({suite: this.suite, browserId: 'browser'})),
-                spy.withArgs(sinon.match({suite: this.root, browserId: 'browser'}))
+                spy.withArgs(sinon.match({suite: child, browserId: 'browser'})),
+                spy.withArgs(sinon.match({suite: suite, browserId: 'browser'})),
+                spy.withArgs(sinon.match({suite: root, browserId: 'browser'}))
             );
         });
     });
