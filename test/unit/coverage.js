@@ -36,5 +36,17 @@ describe('coverage', () => {
 
             assert.calledWith(path.resolve, 'source/root', 'rel/path');
         });
+
+        it('should correctly merge a coverage level', () => {
+            const config = createConfig();
+            const coverage = new Coverage(config);
+
+            coverage.byURL['http://some/url'] = {
+                coverage: {'.some-selector': 'full'}
+            };
+            coverage.addStatsForBrowser({'http://some/url': {'.some-selector': 'none'}});
+
+            assert.deepEqual(coverage.byURL['http://some/url'].coverage, {'.some-selector': 'full'});
+        });
     });
 });
