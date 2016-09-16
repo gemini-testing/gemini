@@ -1,8 +1,9 @@
 'use strict';
-var Browser = require('lib/browser'),
-    State = require('lib/state'),
-    Suite = require('lib/suite'),
-    _ = require('lodash');
+
+const Browser = require('lib/browser');
+const State = require('lib/state');
+const Suite = require('lib/suite');
+const _ = require('lodash');
 
 function makeBrowser(capabilities, config) {
     config = _.merge({}, {
@@ -17,7 +18,7 @@ function makeBrowser(capabilities, config) {
 
 function browserWithId(id) {
     return Browser.create({
-        id: id,
+        id,
         desiredCapabilities: {
             browserName: id
         }
@@ -26,12 +27,12 @@ function browserWithId(id) {
 
 function makeSuiteStub(opts) {
     opts = _.defaults(opts || {}, {
-        name: 'some-default-name_' + new Date().getTime(),
+        name: `some-default-name_${new Date().getTime()}`,
         url: 'some-default-url',
         states: []
     });
 
-    var suite = Suite.create(opts.name, opts.parent);
+    const suite = Suite.create(opts.name, opts.parent);
     suite.beforeActions = ['before', 'actions'];
     suite.afterActions = ['after', 'actions'];
 
@@ -50,7 +51,7 @@ function makeStateStub(suite, opts) {
     suite = suite || makeSuiteStub();
     opts = opts || {};
 
-    var state = new State(suite, opts.name || 'default-state-name');
+    const state = new State(suite, opts.name || 'default-state-name');
     state.shouldSkip = sinon.stub();
 
     suite.states.push(state);
@@ -81,16 +82,17 @@ function makeSuiteTree(sceleton, rootOpts) {
         browsers: ['default-browser1', 'default-browser2']
     });
 
-    var tree = {};
+    const tree = {};
     mkTree_(sceleton, makeSuiteStub(rootOpts));
     return tree;
 
     function mkTree_(sceleton, parent) {
-        _.forEach(sceleton, function(val, name) {
+        _.forEach(sceleton, (val, name) => {
             if (_.isString(val)) {
                 pushToTree_(val, makeStateStub(parent, {name: val}));
             } else {
-                var suite = makeSuiteStub({parent: parent, name: name});
+                const suite = makeSuiteStub({parent: parent, name: name});
+                parent.addChild(suite);
                 pushToTree_(name, suite);
                 mkTree_(val, suite);
             }
@@ -105,8 +107,10 @@ function makeSuiteTree(sceleton, rootOpts) {
     }
 }
 
-exports.makeBrowser = makeBrowser;
-exports.browserWithId = browserWithId;
-exports.makeStateStub = makeStateStub;
-exports.makeSuiteStub = makeSuiteStub;
-exports.makeSuiteTree = makeSuiteTree;
+module.exports = {
+    makeBrowser,
+    browserWithId,
+    makeStateStub,
+    makeSuiteStub,
+    makeSuiteTree
+};

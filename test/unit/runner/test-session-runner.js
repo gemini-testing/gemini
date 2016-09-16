@@ -1,33 +1,31 @@
 'use strict';
-var q = require('q'),
-    TestSessionRunner = require('lib/runner/test-session-runner'),
-    BrowserRunner = require('lib/runner/browser-runner'),
-    pool = require('lib/browser-pool'),
-    BasicPool = require('lib/browser-pool/basic-pool'),
-    Config = require('lib/config');
 
-describe('runner/TestSessionRunner', function() {
-    var sandbox = sinon.sandbox.create(),
-        config;
+const q = require('q');
+const TestSessionRunner = require('lib/runner/test-session-runner');
+const BrowserRunner = require('lib/runner/browser-runner');
+const pool = require('lib/browser-pool');
+const BasicPool = require('lib/browser-pool/basic-pool');
+const Config = require('lib/config');
 
-    beforeEach(function() {
+describe('runner/TestSessionRunner', () => {
+    const sandbox = sinon.sandbox.create();
+    let config;
+
+    beforeEach(() => {
         sandbox.stub(pool, 'create');
         config = sinon.createStubInstance(Config);
     });
 
-    afterEach(function() {
-        sandbox.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    describe('create', function() {
-        beforeEach(function() {
+    describe('create', () => {
+        beforeEach(() => {
             sandbox.stub(BrowserRunner, 'create');
             BrowserRunner.create.returns(sinon.createStubInstance(BrowserRunner));
         });
 
-        it('should create runner for each browser in config if testBrowsers are not set', function() {
-            config.getBrowserIds
-                .returns(['browser1', 'browser2']);
+        it('should create runner for each browser in config if testBrowsers are not set', () => {
+            config.getBrowserIds.returns(['browser1', 'browser2']);
 
             TestSessionRunner.create(config);
 
@@ -36,9 +34,8 @@ describe('runner/TestSessionRunner', function() {
             assert.calledWith(BrowserRunner.create, 'browser2');
         });
 
-        it('should launch only browsers specified in testBrowsers', function() {
-            config.getBrowserIds
-                .returns(['browser1', 'browser2']);
+        it('should launch only browsers specified in testBrowsers', () => {
+            config.getBrowserIds.returns(['browser1', 'browser2']);
 
             TestSessionRunner.create(config, ['browser1']);
 
@@ -47,34 +44,32 @@ describe('runner/TestSessionRunner', function() {
         });
     });
 
-    describe('run', function() {
-        beforeEach(function() {
-            sandbox.stub(BrowserRunner.prototype);
-            BrowserRunner.prototype.run.returns(q.resolve());
+    describe('run', () => {
+        beforeEach(() => {
+            sandbox.stub(BrowserRunner.prototype, 'run');
+            BrowserRunner.prototype.run.returns(q());
         });
 
         function run_(suites, stateProcessor) {
             return TestSessionRunner.create(config).run(suites || [], stateProcessor);
         }
 
-        it('should emit `beginSession` event on start runner', function() {
-            config.getBrowserIds
-                .returns(['browser1']);
+        it('should emit `beginSession` event on start runner', () => {
+            config.getBrowserIds.returns(['browser1']);
 
-            var onBeginSession = sandbox.spy().named('onBeginSession'),
-                runner = TestSessionRunner.create(config);
+            const onBeginSession = sandbox.spy().named('onBeginSession');
+            const runner = TestSessionRunner.create(config);
 
             runner.on('beginSession', onBeginSession);
 
             runner.run()
-                .then(function() {
+                .then(() => {
                     assert.called(onBeginSession);
                 });
         });
 
-        it('shoud run all created runners', function() {
-            config.getBrowserIds
-                .returns(['browser1', 'browser2']);
+        it('shoud run all created runners', () => {
+            config.getBrowserIds.returns(['browser1', 'browser2']);
 
             run_();
 
@@ -85,18 +80,17 @@ describe('runner/TestSessionRunner', function() {
             );
         });
 
-        it('should run all suites in browser runner', function() {
-            config.getBrowserIds
-                .returns(['browser1']);
-            var suites = [];
+        it('should run all suites in browser runner', () => {
+            config.getBrowserIds.returns(['browser1']);
+            const suites = [];
 
             run_(suites);
 
             assert.calledWith(BrowserRunner.prototype.run, suites);
         });
 
-        it('should pass through stateProcessor to browserRunner', function() {
-            var stateProcessor = 'stateProcessor';
+        it('should pass through stateProcessor to browserRunner', () => {
+            const stateProcessor = 'stateProcessor';
 
             config.getBrowserIds.returns(['browser']);
             run_([], stateProcessor);
@@ -104,66 +98,63 @@ describe('runner/TestSessionRunner', function() {
             assert.calledWith(BrowserRunner.prototype.run, sinon.match.any, stateProcessor);
         });
 
-        it('should emit `endSession` event after test session finished', function() {
-            config.getBrowserIds
-                .returns(['browser1']);
+        it('should emit `endSession` event after test session finished', () => {
+            config.getBrowserIds.returns(['browser1']);
 
-            var onEndSession = sandbox.spy().named('onEndSession'),
-                runner = TestSessionRunner.create(config);
+            const onEndSession = sandbox.spy().named('onEndSession');
+            const runner = TestSessionRunner.create(config);
 
             runner.on('endSession', onEndSession);
 
             return runner.run()
-                .then(function() {
+                .then(() => {
                     assert.called(onEndSession);
                 });
         });
 
-        it('should emit `beginSession` and `endSession` events in correct order', function() {
-            config.getBrowserIds
-                .returns(['browser1']);
+        it('should emit `beginSession` and `endSession` events in correct order', () => {
+            config.getBrowserIds.returns(['browser1']);
 
-            var onBeginSession = sandbox.spy().named('onBeginSession'),
-                onEndSession = sandbox.spy().named('onEndSession'),
-                runner = TestSessionRunner.create(config);
+            const onBeginSession = sandbox.spy().named('onBeginSession');
+            const onEndSession = sandbox.spy().named('onEndSession');
+            const runner = TestSessionRunner.create(config);
 
             runner.on('beginSession', onBeginSession);
             runner.on('endSession', onEndSession);
 
             return runner.run()
-                .then(function() {
+                .then(() => {
                     assert.callOrder(onBeginSession, onEndSession);
                 });
         });
 
-        describe('on error', function() {
-            beforeEach(function() {
-                config.getBrowserIds
-                    .returns(['browser1', 'browser2']);
+        describe('on error', () => {
+            beforeEach(() => {
+                config.getBrowserIds.returns(['browser1', 'browser2']);
 
-                BrowserRunner.prototype.run
-                    .onFirstCall().returns(q.reject());
+                BrowserRunner.prototype.run.onFirstCall().returns(q.reject());
 
                 pool.create.returns(sinon.createStubInstance(BasicPool));
             });
 
-            it('should be rejected', function() {
+            it('should be rejected', () => {
                 return assert.isRejected(run_());
             });
 
-            it('should cancel all runners', function() {
+            it('should cancel all runners', () => {
+                sandbox.stub(BrowserRunner.prototype, 'cancel');
                 return run_()
-                    .fail(function() {
+                    .fail(() => {
                         assert.calledTwice(BrowserRunner.prototype.cancel);
                     });
             });
 
-            it('should cancel browser pool', function() {
-                var browserPool = sinon.createStubInstance(BasicPool);
+            it('should cancel browser pool', () => {
+                const browserPool = sinon.createStubInstance(BasicPool);
                 pool.create.returns(browserPool);
 
                 return run_()
-                    .fail(function() {
+                    .fail(() => {
                         assert.calledOnce(browserPool.cancel);
                     });
             });
