@@ -250,6 +250,8 @@ sets:
 
 If no sets specified then default set named `all` with all defaults will be created.
 
+You can specify sets to run using CLI option [`--set`](./commands.md#common-cli-options).
+
 ## Overriding settings
 
 All options can also be overridden via command-line flags or environment
