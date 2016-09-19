@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.10.0 - 2016-09-19
+
+* Lodash updated to v4.x
+* Clone suite tree for each browser runner
+* Use `catch` method instead of `fail` in q
+
 ## 4.9.4 - 2016-09-13
 
 * Fixed `Out of the bounds` error (see [#543])
