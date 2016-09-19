@@ -1,5 +1,6 @@
 'use strict';
 
+const q = require('q');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const BasicPool = require('lib/browser-pool/basic-pool');
 
@@ -9,6 +10,8 @@ describe('runner/browser-runner/browser-agent', () => {
 
     beforeEach(() => {
         browserPool = sinon.createStubInstance(BasicPool);
+        browserPool.freeBrowser.returns(q());
+        browserPool.getBrowser.returns(q());
     });
 
     afterEach(() => {
@@ -21,6 +24,32 @@ describe('runner/browser-runner/browser-agent', () => {
         browserAgent.getBrowser();
 
         assert.calledWith(browserPool.getBrowser, 'browser');
+    });
+
+    it('should rerequest browser if got same session', () => {
+        const someBro = {sessionId: 'some-id'};
+        const otherBro = {sessionId: 'other-id'};
+
+        browserPool.getBrowser.returns(q(someBro));
+
+        const browserAgent = BrowserAgent.create('bro', browserPool);
+
+        return browserAgent.getBrowser()
+            .then((bro) => browserAgent.freeBrowser(bro))
+            .then(() => {
+                // reset stubs
+                browserPool.getBrowser = sandbox.stub();
+                browserPool.getBrowser.onFirstCall().returns(q(someBro));
+                browserPool.getBrowser.onSecondCall().returns(q(otherBro));
+
+                browserPool.freeBrowser = sandbox.stub().returns(q());
+            })
+            .then(() => browserAgent.getBrowser())
+            .then((bro) => {
+                assert.equal(bro, otherBro);
+                assert.calledTwice(browserPool.getBrowser);
+                assert.calledWith(browserPool.freeBrowser, someBro);
+            });
     });
 
     it('should free passed browser', () => {
