@@ -2,7 +2,7 @@
 
 const q = require('q');
 
-const SuiteRunnerFactory = require('lib/runner/suite-runner');
+const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
 const StateRunnerFactory = require('lib/runner/state-runner');
 const StateRunner = require('lib/runner/state-runner/state-runner');
 const CaptureSession = require('lib/capture-session');
@@ -52,7 +52,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
         const browserAgent = new BrowserAgent();
         browserAgent.browserId = browserId || browser.id;
 
-        return SuiteRunnerFactory.create(
+        return RegularSuiteRunner.create(
             suite || makeSuiteStub(),
             browserAgent,
             config
@@ -122,14 +122,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
                 .then(() => assert.calledWith(browser.openRelative, '/path'));
         });
 
-        it('should not call any actions if no states', () => {
-            const suite = makeSuiteStub();
-
-            return run_(suite)
-                .then(() => assert.notCalled(CaptureSession.prototype.runActions));
-        });
-
-        it('should run `before` actions if there are some states', () => {
+        it('should run `before` actions', () => {
             const suite = makeSuiteStub({
                 states: [util.makeStateStub()]
             });

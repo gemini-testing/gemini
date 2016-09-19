@@ -12,7 +12,7 @@ describe('runner/suite-runner/create', () => {
 
     let StatelessRunner;
     let SkippedRunner;
-    let RegularRunner;
+    let InsistentRunner;
 
     let SuiteRunnerFactory;
 
@@ -31,12 +31,12 @@ describe('runner/suite-runner/create', () => {
 
         StatelessRunner = sandbox.stub().returns(runnerStub);
         SkippedRunner = sandbox.stub().returns(runnerStub);
-        RegularRunner = sandbox.stub().returns(runnerStub);
+        InsistentRunner = sandbox.stub().returns(runnerStub);
 
         SuiteRunnerFactory = proxyquire('lib/runner/suite-runner', {
             './stateless-suite-runner': StatelessRunner,
             './skipped-suite-runner': SkippedRunner,
-            './regular-suite-runner': RegularRunner
+            './insistent-suite-runner': InsistentRunner
         });
     });
 
@@ -48,7 +48,7 @@ describe('runner/suite-runner/create', () => {
 
             assert.calledOnce(StatelessRunner);
             assert.notCalled(SkippedRunner);
-            assert.notCalled(RegularRunner);
+            assert.notCalled(InsistentRunner);
         });
 
         it('should return DecoratorSuiteRunner for StatelessSuiteRunner', () => {
@@ -68,7 +68,7 @@ describe('runner/suite-runner/create', () => {
 
             assert.calledOnce(SkippedRunner);
             assert.notCalled(StatelessRunner);
-            assert.notCalled(RegularRunner);
+            assert.notCalled(InsistentRunner);
         });
 
         it('should return DecoratorSuiteRunner for SkippedSuiteRunner', () => {
@@ -78,16 +78,16 @@ describe('runner/suite-runner/create', () => {
         });
     });
 
-    describe('RegularSuiteRunner', () => {
-        it('should create RegularSuiteRunner', () => {
+    describe('InsistentSuiteRunner', () => {
+        it('should create InsistentSuiteRunner', () => {
             makeSuiteRunner(makeSuite());
 
-            assert.calledOnce(RegularRunner);
+            assert.calledOnce(InsistentRunner);
             assert.notCalled(StatelessRunner);
             assert.notCalled(SkippedRunner);
         });
 
-        it('should return DecoratorSuiteRunner for RegularSuiteRunner', () => {
+        it('should return DecoratorSuiteRunner for InsistentSuiteRunner', () => {
             const runner = makeSuiteRunner(makeSuite());
 
             assert.instanceOf(runner, DecoratorSuiteRunner);

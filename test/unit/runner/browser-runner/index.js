@@ -5,7 +5,6 @@ const BrowserRunner = require('lib/runner/browser-runner');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const SuiteRunner = require('lib/runner/suite-runner/suite-runner');
 const suiteRunnerFabric = require('lib/runner/suite-runner');
-const CancelledError = require('lib/errors/cancelled-error');
 const BasicPool = require('lib/browser-pool/basic-pool');
 const Config = require('lib/config');
 const SuiteCollection = require('lib/suite-collection');
@@ -153,50 +152,6 @@ describe('runner/BrowserRunner', () => {
                         suiteRunner.run,
                         stopBrowser
                     );
-                });
-        });
-    });
-
-    describe('critical error', () => {
-        it('should emit `criticalError` event on error', () => {
-            const onCriticalError = sinon.spy().named('onCriticalError');
-            const suiteCollection = new SuiteCollection([makeSuiteStub({browsers: ['browser']})]);
-            const runner = mkRunner_('browser');
-
-            runner.on('criticalError', onCriticalError);
-            suiteRunner.run.onFirstCall().returns(q.reject(new Error('error')));
-
-            return runner.run(suiteCollection)
-                .then(() => assert.calledOnce(onCriticalError));
-        });
-
-        it('should not emit `criticalError` if it was manually stopped', () => {
-            const onCriticalError = sinon.spy().named('onCriticalError');
-            const suiteCollection = new SuiteCollection([makeSuiteStub()]);
-            const runner = mkRunner_();
-
-            runner.on('criticalError', onCriticalError);
-            suiteRunner.run.onFirstCall().returns(q.reject(new CancelledError()));
-
-            return runner.run(suiteCollection)
-                .then(() => assert.notCalled(onCriticalError));
-        });
-
-        it('should pass suite and browser id as critical error event data', () => {
-            const onCriticalError = sinon.spy().named('onCriticalError');
-            const suite = makeSuiteStub({name: 'some suite', browsers: ['browser']});
-            const suiteCollection = new SuiteCollection([suite]);
-            const runner = mkRunner_('browser');
-
-            runner.on('criticalError', onCriticalError);
-            suiteRunner.run.onFirstCall().returns(q.reject(new Error('error')));
-
-            return runner.run(suiteCollection)
-                .then(() => {
-                    const err = onCriticalError.firstCall.args[0];
-
-                    assert.equal(err.suite.name, suite.name);
-                    assert.equal(err.browserId, 'browser');
                 });
         });
     });
