@@ -1,31 +1,31 @@
 'use strict';
 
-var BrowserAgent = require('lib/runner/browser-runner/browser-agent'),
-    BasicPool = require('lib/browser-pool/basic-pool');
+const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
+const BasicPool = require('lib/browser-pool/basic-pool');
 
-describe('runner/browser-runner/browser-agent', function() {
-    var sandbox = sinon.sandbox.create(),
-        browserPool;
+describe('runner/browser-runner/browser-agent', () => {
+    const sandbox = sinon.sandbox.create();
+    let browserPool;
 
-    beforeEach(function() {
+    beforeEach(() => {
         browserPool = sinon.createStubInstance(BasicPool);
     });
 
-    afterEach(function() {
+    afterEach(() => {
         sandbox.restore();
     });
 
-    it('should return browser associated with agent', function() {
-        var browserAgent = BrowserAgent.create('browser', browserPool);
+    it('should return browser associated with agent', () => {
+        const browserAgent = BrowserAgent.create('browser', browserPool);
 
         browserAgent.getBrowser();
 
         assert.calledWith(browserPool.getBrowser, 'browser');
     });
 
-    it('should free passed browser', function() {
-        var browserAgent = BrowserAgent.create(undefined, browserPool),
-            browser = sinon.spy().named('browser');
+    it('should free passed browser', () => {
+        const browserAgent = BrowserAgent.create(undefined, browserPool);
+        const browser = sinon.spy().named('browser');
 
         browserAgent.freeBrowser(browser);
 
