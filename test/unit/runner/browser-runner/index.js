@@ -34,17 +34,6 @@ describe('runner/BrowserRunner', () => {
         );
     };
 
-    describe('constructor', () => {
-        it('should create browser agent associated with passed browser id', () => {
-            sandbox.stub(BrowserAgent, 'create');
-            const browserPool = sinon.createStubInstance(BasicPool);
-
-            mkRunner_('browser', browserPool);
-
-            assert.calledWith(BrowserAgent.create, 'browser', browserPool);
-        });
-    });
-
     describe('run', () => {
         let suiteCollection;
 
@@ -91,6 +80,24 @@ describe('runner/BrowserRunner', () => {
 
             return runner.run(suiteCollection)
                 .then(() => assert.calledWith(suiteRunnerFabric.create, sinon.match.any, browserAgent));
+        });
+
+        it('should create browser agent instance for each suite', () => {
+            const suiteCollection = new SuiteCollection([
+                makeSuiteStub({browsers: ['bro']}),
+                makeSuiteStub({browsers: ['bro']})
+            ]);
+            sandbox.spy(BrowserAgent, 'create');
+
+            return mkRunner_('bro')
+                .run(suiteCollection)
+                .then(() => {
+                    assert.calledTwice(BrowserAgent.create);
+                    assert.notEqual(
+                        suiteRunnerFabric.create.firstCall.args[1],
+                        suiteRunnerFabric.create.secondCall.args[1]
+                    );
+                });
         });
 
         it('should passthrough stateProcessor to suite runner', () => {
