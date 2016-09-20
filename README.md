@@ -1,4 +1,4 @@
-# Gemini quick start
+# Gemini
 
 [![Join the chat at
 https://gitter.im/gemini-testing/gemini](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gemini-testing/gemini?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -34,8 +34,57 @@ Its key features are:
 **Gemini** is created at [Yandex](http://www.yandex.com/) and will be especially
 useful to UI libraries developers.
 
-Current document is a quick step-by-step guide that describes installation,
-configuration and usage of **Gemini**.
+## Quick start
+
+### Installation
+
+```
+npm install -g gemini
+npm install -g selenium-standalone
+selenium-standalone install
+```
+
+### Configuration
+
+Put the `.gemini.js` file in the root of your project:
+
+```javascript
+module.exports = {
+    rootUrl: 'http://yandex.ru',
+    gridUrl: 'http://127.0.0.1:4444/wd/hub',
+
+    browsers: {
+        chrome: {
+            desiredCapabilities: {
+                browserName: 'chrome'
+            }
+        }
+    }
+};
+```
+
+### Writing tests
+
+Write a test and put it into the `gemini` folder in the root of your project:
+
+```javascript
+gemini.suite('yandex-search', (suite) => {
+    suite.setUrl('/')
+        .setCaptureElements('.home-logo')
+        .capture('plain');
+});
+```
+
+### Running tests
+Start `selenium-standalone` in a separate tab before running the tests:
+```
+selenium-standalone start
+```
+
+Run gemini tests with flat and html reporters:
+```
+gemini test --reporter flat --reporter html
+```
 
 ## Dependencies
 
@@ -61,23 +110,12 @@ Required software:
 
 ## Installation
 
-### Global installation
-
 To install the utility use [npm](https://www.npmjs.org/) command `install`:
 
 ```sh
 npm install -g gemini
 ```
 Global installation is used for commands launch.
-
-### Local installation
-
-To write the tests you will also need local installation of `Gemini`. Run the
-following command in project directory:
-
-```sh
-npm install gemini
-```
 
 ## Configuration
 
