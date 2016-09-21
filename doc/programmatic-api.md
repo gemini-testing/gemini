@@ -210,15 +210,28 @@ Rejects promise if critical error occurred.
 `gemini` instance emits some events, which can be used by external scripts or
 plugins:
 
-* `startRunner` - emitted before the start of `test` or `update` command. If
+* `START_RUNNER` - emitted before the start of `test` or `update` command. If
   you return a promise from the event handler, the start of the command will
   be delayed until the promise resolves.
 
-* `endRunner` - emitted after the end of the `test` or `update` command.
+* `END_RUNNER` - emitted after the end of the `test` or `update` command.
 
-* `beforeFileRead` – emitted before each test file is read. The event is emitted
+* `BEFORE_FILE_READ` – emitted before each test file is read. The event is emitted
   with 1 argument `filePath` which is the absolute path to the file to be read.
 
-* `afterFileRead` – emitted after each test file have been read. The event is
+* `AFTER_FILE_READ` – emitted after each test file have been read. The event is
   emitted with 1 argument `filePath` which is the absolute path to the file that
   was read.
+
+Plugin example with the listening on the events:
+```javascript
+module.exports = (gemini, options) => {
+    gemini.on(gemini.events.START_RUNNER, () => {
+        return setUp(gemini.config, options.param); // config can be mutated
+    });
+
+    gemini.on(gemini.events.END_RUNNER, () => {
+        return tearDown();
+    });
+};
+```

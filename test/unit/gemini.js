@@ -1,11 +1,15 @@
 'use strict';
 
-const q = require('q');
+const EventEmitter = require('events').EventEmitter;
 const _ = require('lodash');
 const proxyquire = require('proxyquire');
-const SuiteCollection = require('lib/suite-collection');
+const q = require('q');
+
 const Config = require('lib/config');
+const plugins = require('lib/plugins');
 const Runner = require('lib/runner');
+const RunnerEvents = require('lib/constants/runner-events');
+const SuiteCollection = require('lib/suite-collection');
 const temp = require('lib/temp');
 
 const mkSuiteStub = require('../util').makeSuiteStub;
@@ -56,9 +60,33 @@ describe('gemini', () => {
         sandbox.stub(Runner.prototype, 'on').returnsThis();
         sandbox.stub(Runner.prototype, 'run').returns(q());
         sandbox.stub(console, 'warn');
+        sandbox.stub(plugins, 'load');
     });
 
     afterEach(() => sandbox.restore());
+
+    it('should passthrough "START_RUNNER" and "END_RUNNER" events', () => {
+        sandbox.stub(temp, 'init');
+
+        const runner = new EventEmitter();
+        sandbox.stub(Runner, 'create').returns(runner);
+
+        const gemini = initGemini({});
+        gemini.test();
+
+        [
+            RunnerEvents.START_RUNNER,
+            RunnerEvents.END_RUNNER
+        ].forEach((event, name) => {
+            const spy = sinon.spy().named(`${name} handler`);
+            gemini.on(event, spy);
+
+            runner.emit(event, 'value');
+
+            assert.calledOnce(spy);
+            assert.calledWith(spy, 'value');
+        });
+    });
 
     describe('readTests', () => {
         const readTests_ = (rootSuite, options) => {
