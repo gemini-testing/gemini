@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.11.0 - 2016-09-23
+
+* Do not delay retry failed tests until all tests finish. Retry ASAP
+* Added `events` field for `gemini` instance in plugins, see [documentation](https://github.com/gemini-testing/gemini/blob/master/doc/plugins.md) for more details.
+* Updated `Quick start` section in documentation
+
 ## 4.10.0 - 2016-09-19
 
 * Lodash updated to v4.x
