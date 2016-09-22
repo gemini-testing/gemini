@@ -211,13 +211,7 @@ Settings list:
 * `retry` – maximum amount of relaunch fallen tests with a critical error. If not
   specified, the fallen tests will not be relaunched (by default it's 0).
 
-  Note that fallen test will not be retried immediately, it will be delayed until
-  all tests finish and then restarted in new browser session. So the tests will be
-  performed in waves:
-  - run all tests
-  - first retry: run tests failed during all tests run
-  - second retry: run tests failed during first retry
-  - ...
+  Note that the same test never be performed in the same browser session.
 
 * `screenshotMode` - image capture mode. There are 3 allowed values for this option:
     * `auto` (default). Mode will be obtained automatically.

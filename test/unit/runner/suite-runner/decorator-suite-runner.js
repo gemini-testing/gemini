@@ -98,7 +98,8 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
             RunnerEvents.CAPTURE,
             RunnerEvents.UPDATE_RESULT,
             RunnerEvents.WARNING,
-            RunnerEvents.ERROR
+            RunnerEvents.ERROR,
+            RunnerEvents.RETRY
         ].forEach((event) => {
             it(`should pass ${event} event from an original to a decorated suite runner`, () => {
                 const suiteRunner = new QEmitter();
