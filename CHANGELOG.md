@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.11.1 - 2016-09-26
+
+* Fixed bug which causes emitting `beforeFileRead` after the file has already been read in GeminiFacade
+
 ## 4.11.0 - 2016-09-23
 
 * Do not delay retry failed tests until all tests finish. Retry ASAP
