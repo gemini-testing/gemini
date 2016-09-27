@@ -1,8 +1,13 @@
 # Changelog
 
-## 4.11.1 - 2016-09-26
+
+## 4.11.2 - 2016-09-27
 
 * Fixed bug which causes emitting `beforeFileRead` after the file has already been read in GeminiFacade
+
+## 4.11.1 - 2016-09-26
+
+Identical to 4.11, published by mistake
 
 ## 4.11.0 - 2016-09-23
 
