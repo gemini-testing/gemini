@@ -13,11 +13,23 @@ describe('set-collection', () => {
         const set = sandbox.stub();
 
         set.filterFiles = sandbox.stub();
+        set.getFiles = sandbox.stub();
 
         return set;
     };
 
+    const mkOptsStub = (opts) => {
+        opts = opts || {};
+
+        return _.defaults(opts, {
+            sets: opts.sets || {},
+            paths: opts.paths || []
+        });
+    };
+
     const mkConfigStub = (opts) => {
+        opts = opts || {};
+
         return _.defaults(opts || {}, {
             sets: opts.sets || {},
             getBrowserIds: opts.getBrowserIds,
@@ -35,7 +47,9 @@ describe('set-collection', () => {
 
     describe('sets are not specified in config', () => {
         it('should throw an error if an unknown set was passed', () => {
-            assert.throws(() => SetCollection.create(mkConfigStub(), ['unknown-set'], /unknown-set/));
+            assert.throws(() => {
+                return SetCollection.create(mkConfigStub(), mkOptsStub({sets: ['unknown-set']}));
+            }, /unknown-set/);
         });
 
         it('should create new set with empty files and browsers from config', () => {
@@ -43,7 +57,7 @@ describe('set-collection', () => {
 
             const getBrowserIds = sandbox.stub().returns(['b1', 'b2']);
 
-            return SetCollection.create(mkConfigStub({getBrowserIds}))
+            return SetCollection.create(mkConfigStub({getBrowserIds}), mkOptsStub())
                 .then(() => {
                     assert.calledWith(globExtra.expandPaths, []);
                     assert.calledWith(TestSet.create, {files: [], browsers: ['b1', 'b2']});
@@ -63,7 +77,7 @@ describe('set-collection', () => {
 
         globExtra.expandPaths.withArgs(['some/files']).returns(q(['some/files/file.js']));
 
-        return SetCollection.create(config, ['set1'])
+        return SetCollection.create(config, mkOptsStub({sets: ['set1']}))
             .then(() => {
                 assert.calledOnce(TestSet.create);
                 assert.calledWith(TestSet.create, {files: ['some/files/file.js']});
@@ -78,7 +92,7 @@ describe('set-collection', () => {
             system: {
                 projectRoot: '/root'
             }
-        }))
+        }), mkOptsStub())
         .then(() => {
             assert.calledWithMatch(globExtra.expandPaths, sinon.match.any, {root: '/root'});
         });
@@ -98,7 +112,7 @@ describe('set-collection', () => {
 
         sandbox.stub(TestSet, 'create').returns(mkSetStub());
 
-        return SetCollection.create(config)
+        return SetCollection.create(config, mkOptsStub())
             .then(() => {
                 assert.calledWith(TestSet.create, {files: ['some/files/file1.js']});
                 assert.calledWith(TestSet.create, {files: ['other/files/file2.js']});
@@ -112,8 +126,11 @@ describe('set-collection', () => {
                 set2: {files: ['other/files']}
             }
         });
+        const opts = mkOptsStub({
+            sets: ['unknown-set']
+        });
 
-        assert.throws(() => SetCollection.create(config, ['unknown-set']), /unknown-set(.+) set1, set2/);
+        assert.throws(() => SetCollection.create(config, opts), /unknown-set(.+) set1, set2/);
     });
 
     it('should filter passed files if sets are specified in config', () => {
@@ -126,7 +143,7 @@ describe('set-collection', () => {
             .onFirstCall().returns(sets.set1)
             .onSecondCall().returns(sets.set2);
 
-        return SetCollection.create(mkConfigStub({sets}))
+        return SetCollection.create(mkConfigStub({sets}), mkOptsStub())
             .then((setCollection) => {
                 setCollection.filterFiles(['some/files/file.js']);
 
@@ -153,7 +170,7 @@ describe('set-collection', () => {
             .withArgs(['some/files']).returns(q(['some/files/file1.js']))
             .withArgs(['other/files']).returns(q(['other/files/file2.js']));
 
-        return SetCollection.create(config)
+        return SetCollection.create(config, mkOptsStub())
             .then((setCollection) => {
                 const callback = sandbox.stub();
 
@@ -162,5 +179,39 @@ describe('set-collection', () => {
                 assert.calledWith(callback, 'some/files/file1.js', ['bro1']);
                 assert.calledWith(callback, 'other/files/file2.js', ['bro2']);
             });
+    });
+
+    describe('files of sets are specified as masks and "opts.paths" are not empty', () => {
+        it('should create collection with "files" field resolved to project root', () => {
+            const config = mkConfigStub({
+                sets: {
+                    set1: {files: ['some/**']},
+                    set2: {files: ['other/**']}
+                }
+            });
+
+            sandbox.stub(TestSet, 'create').returns(mkSetStub());
+
+            return SetCollection.create(config, mkOptsStub({paths: ['some/files']}))
+                .then(() => {
+                    assert.calledWith(TestSet.create, {files: ['/root/some/**']});
+                    assert.calledWith(TestSet.create, {files: ['/root/other/**']});
+                });
+        });
+
+        it('should create collection with "opts.allFilesMasks" as "true"', () => {
+            const config = mkConfigStub({
+                sets: {
+                    set1: {files: ['some/**']}
+                }
+            });
+
+            sandbox.stub(TestSet, 'create').returns(mkSetStub());
+
+            return SetCollection.create(config, mkOptsStub({paths: ['some/files']}))
+                .then(() => {
+                    assert.calledWith(TestSet.create, sinon.match.any, {allFilesMasks: true});
+                });
+        });
     });
 });
