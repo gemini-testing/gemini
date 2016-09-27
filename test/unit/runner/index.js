@@ -4,7 +4,7 @@ const q = require('q');
 const QEmitter = require('qemitter');
 
 const Runner = require('lib/runner');
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 const TestSessionRunner = require('lib/runner/test-session-runner');
 const StateProcessor = require('lib/state-processor/state-processor');
 const Config = require('lib/config');
@@ -44,7 +44,7 @@ describe('runner', () => {
     describe('run', () => {
         it('should emit `BEGIN` event when tests start', () => {
             const onBegin = sandbox.spy().named('onBegin');
-            runner.on(RunnerEvents.BEGIN, onBegin);
+            runner.on(Events.BEGIN, onBegin);
 
             return run_()
                 .then(() => assert.calledOnce(onBegin));
@@ -60,7 +60,7 @@ describe('runner', () => {
             suiteCollectionStub.allSuites.returns(suites);
 
             const onBegin = sandbox.spy().named('onBegin');
-            runner.on(RunnerEvents.BEGIN, onBegin);
+            runner.on(Events.BEGIN, onBegin);
 
             return run_(suiteCollectionStub)
                 .then(() => assert.calledWith(onBegin, sinon.match({totalStates: 3})));
@@ -71,7 +71,7 @@ describe('runner', () => {
                 .returns(['browser1', 'browser2']);
 
             const onBegin = sandbox.spy().named('onBegin');
-            runner.on(RunnerEvents.BEGIN, onBegin);
+            runner.on(Events.BEGIN, onBegin);
 
             return run_().then(() => {
                 assert.calledWith(onBegin, sinon.match({
@@ -82,7 +82,7 @@ describe('runner', () => {
 
         it('should pass config when emitting `BEGIN`', () => {
             const onBegin = sandbox.spy().named('onBegin');
-            runner.on(RunnerEvents.BEGIN, onBegin);
+            runner.on(Events.BEGIN, onBegin);
 
             return run_().then(() => {
                 assert.calledWith(onBegin, sinon.match({
@@ -93,7 +93,7 @@ describe('runner', () => {
 
         it('should emit `START_RUNNER` event when tests start', () => {
             const onStartRunner = sandbox.spy().named('onStartRunner');
-            runner.on(RunnerEvents.START_RUNNER, onStartRunner);
+            runner.on(Events.START_RUNNER, onStartRunner);
 
             return run_()
                 .then(() => assert.calledOnce(onStartRunner));
@@ -101,7 +101,7 @@ describe('runner', () => {
 
         it('should pass runner when emitting `START_RUNNER`', () => {
             const onStartRunner = sandbox.spy().named('onStartRunner');
-            runner.on(RunnerEvents.START_RUNNER, onStartRunner);
+            runner.on(Events.START_RUNNER, onStartRunner);
 
             return run_()
                 .then(() => assert.calledWith(onStartRunner, runner));
@@ -127,7 +127,7 @@ describe('runner', () => {
 
         it('should emit `END`', () => {
             const onEnd = sandbox.spy();
-            runner.on(RunnerEvents.END, onEnd);
+            runner.on(Events.END, onEnd);
 
             return run_()
                 .then(() => assert.calledOnce(onEnd));
@@ -135,7 +135,7 @@ describe('runner', () => {
 
         it('should emit `END_RUNNER` event when tests end', () => {
             const onEndRunner = sandbox.spy().named('onEndRunner');
-            runner.on(RunnerEvents.END_RUNNER, onEndRunner);
+            runner.on(Events.END_RUNNER, onEndRunner);
 
             return run_()
                 .then(() => assert.calledOnce(onEndRunner));
@@ -143,7 +143,7 @@ describe('runner', () => {
 
         it('should pass runner when emitting `END_RUNNER`', () => {
             const onEndRunner = sandbox.spy().named('onEndRunner');
-            runner.on(RunnerEvents.END_RUNNER, onEndRunner);
+            runner.on(Events.END_RUNNER, onEndRunner);
 
             return run_()
                 .then(() => assert.calledWith(onEndRunner, runner));
@@ -155,10 +155,10 @@ describe('runner', () => {
             const startRunner = sandbox.spy().named('onStartRunner');
             const endRunner = sandbox.spy().named('onEndRunner');
 
-            runner.on(RunnerEvents.BEGIN, begin);
-            runner.on(RunnerEvents.END, end);
-            runner.on(RunnerEvents.START_RUNNER, startRunner);
-            runner.on(RunnerEvents.END_RUNNER, endRunner);
+            runner.on(Events.BEGIN, begin);
+            runner.on(Events.END, end);
+            runner.on(Events.START_RUNNER, startRunner);
+            runner.on(Events.END_RUNNER, endRunner);
 
             return run_()
                 .then(() => assert.callOrder(startRunner, begin, end, endRunner));

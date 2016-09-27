@@ -6,7 +6,7 @@ const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 const FlatReporter = require('lib/reporters/flat-factory/flat');
 const logger = require('lib/utils').logger;
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 
 describe('Reporter#Flat', () => {
     const sandbox = sinon.sandbox.create();
@@ -25,13 +25,13 @@ describe('Reporter#Flat', () => {
     };
 
     const emit = (event, data) => {
-        emitter.emit(RunnerEvents.BEGIN);
+        emitter.emit(Events.BEGIN);
 
         if (event) {
             emitter.emit(event, data);
         }
 
-        emitter.emit(RunnerEvents.END);
+        emitter.emit(Events.END);
     };
 
     beforeEach(() => {
@@ -75,7 +75,7 @@ describe('Reporter#Flat', () => {
             it('should increment "total" and "updated" counters', () => {
                 test.updated = true;
 
-                emit(RunnerEvents.UPDATE_RESULT, test);
+                emit(Events.UPDATE_RESULT, test);
 
                 const counters = getLoggedCounters();
 
@@ -86,7 +86,7 @@ describe('Reporter#Flat', () => {
             it('should initialize all remaining counters with 0', () => {
                 test.updated = true;
 
-                emit(RunnerEvents.UPDATE_RESULT, test);
+                emit(Events.UPDATE_RESULT, test);
 
                 const counters = getLoggedCounters();
 
@@ -98,7 +98,7 @@ describe('Reporter#Flat', () => {
         });
 
         it('failed', () => {
-            emit(RunnerEvents.ERROR, test);
+            emit(Events.ERROR, test);
 
             const counters = getLoggedCounters();
 
@@ -110,7 +110,7 @@ describe('Reporter#Flat', () => {
 
         describe('skipped', () => {
             it('should increment skipped count on WARNING event', () => {
-                emit(RunnerEvents.WARNING, test);
+                emit(Events.WARNING, test);
 
                 const counters = getLoggedCounters();
 
@@ -119,7 +119,7 @@ describe('Reporter#Flat', () => {
             });
 
             it('should increment skipped count on SKIP_STATE event', () => {
-                emit(RunnerEvents.SKIP_STATE, test);
+                emit(Events.SKIP_STATE, test);
 
                 const counters = getLoggedCounters();
 
@@ -129,7 +129,7 @@ describe('Reporter#Flat', () => {
         });
 
         it('retry', () => {
-            emit(RunnerEvents.RETRY, test);
+            emit(Events.RETRY, test);
 
             const counters = getLoggedCounters();
 
@@ -141,7 +141,7 @@ describe('Reporter#Flat', () => {
         it('true', () => {
             test.equal = true;
 
-            emit(RunnerEvents.TEST_RESULT, test);
+            emit(Events.TEST_RESULT, test);
 
             const counters = getLoggedCounters();
 
@@ -152,7 +152,7 @@ describe('Reporter#Flat', () => {
         it('false', () => {
             test.equal = false;
 
-            emit(RunnerEvents.TEST_RESULT, test);
+            emit(Events.TEST_RESULT, test);
 
             const counters = getLoggedCounters();
 
@@ -165,7 +165,7 @@ describe('Reporter#Flat', () => {
         it('true', () => {
             test.updated = true;
 
-            emit(RunnerEvents.UPDATE_RESULT, test);
+            emit(Events.UPDATE_RESULT, test);
 
             const counters = getLoggedCounters();
 
@@ -176,7 +176,7 @@ describe('Reporter#Flat', () => {
         it('false', () => {
             test.updated = false;
 
-            emit(RunnerEvents.UPDATE_RESULT, test);
+            emit(Events.UPDATE_RESULT, test);
 
             const counters = getLoggedCounters();
 
@@ -189,7 +189,7 @@ describe('Reporter#Flat', () => {
         it('result', () => {
             test.message = 'Error from result';
 
-            emit(RunnerEvents.ERROR, test);
+            emit(Events.ERROR, test);
 
             assert.calledWith(logger.error, test.message);
         });
@@ -197,7 +197,7 @@ describe('Reporter#Flat', () => {
         it('originalError', () => {
             test.originalError = {stack: 'Error from originalError'};
 
-            emit(RunnerEvents.ERROR, test);
+            emit(Events.ERROR, test);
 
             assert.calledWith(logger.error, test.originalError.stack);
         });
@@ -210,7 +210,7 @@ describe('Reporter#Flat', () => {
             browserId: 'chrome'
         };
 
-        emit(RunnerEvents.UPDATE_RESULT, test);
+        emit(Events.UPDATE_RESULT, test);
 
         const deserealizedResult = chalk
             .stripColor(logger.log.firstCall.args[0])

@@ -1,6 +1,6 @@
 'use strict';
 
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 const InsistentSuiteRunner = require('lib/runner/suite-runner/insistent-suite-runner');
 const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
@@ -65,13 +65,13 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
     });
 
     [
-        RunnerEvents.BEGIN_STATE,
-        RunnerEvents.SKIP_STATE,
-        RunnerEvents.END_STATE,
-        RunnerEvents.TEST_RESULT,
-        RunnerEvents.CAPTURE,
-        RunnerEvents.UPDATE_RESULT,
-        RunnerEvents.WARNING
+        Events.BEGIN_STATE,
+        Events.SKIP_STATE,
+        Events.END_STATE,
+        Events.TEST_RESULT,
+        Events.CAPTURE,
+        Events.UPDATE_RESULT,
+        Events.WARNING
     ].forEach((stateEvent) => it(`should passthrough ${stateEvent} state`, () => {
         stubWrappedRun_((runner) => runner.emit(stateEvent, {foo: 'bar'}));
         const handler = sinon.spy().named(stateEvent + 'Handler');
@@ -86,8 +86,8 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
     }));
 
     [
-        RunnerEvents.BEGIN_SUITE,
-        RunnerEvents.END_SUITE
+        Events.BEGIN_SUITE,
+        Events.END_SUITE
     ].forEach((suiteEvent) => it(`should not passthrough ${suiteEvent}`, () => {
         stubWrappedRun_((runner) => runner.emit(suiteEvent, {foo: 'bar'}));
         const handler = sinon.spy().named(suiteEvent + 'Handler');
@@ -103,8 +103,8 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
         const onEndSuite = sinon.spy().named('onEndSuite');
 
         return mkInsistentRunner_()
-            .on(RunnerEvents.BEGIN_SUITE, onBeginSuite)
-            .on(RunnerEvents.END_SUITE, onEndSuite)
+            .on(Events.BEGIN_SUITE, onBeginSuite)
+            .on(Events.END_SUITE, onEndSuite)
             .run()
             .then(() => assert.callOrder(onBeginSuite, onEndSuite));
     });
@@ -139,7 +139,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 const onError = sinon.spy().named('onError');
 
                 return mkInsistentRunner_({suite, browserAgent})
-                    .on(RunnerEvents.ERROR, onError)
+                    .on(Events.ERROR, onError)
                     .run()
                     .catch(() => {
                         assert.calledOnce(onError);
@@ -164,7 +164,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 const onError = sinon.spy().named('onError');
 
                 return mkInsistentRunner_()
-                    .on(RunnerEvents.ERROR, onError)
+                    .on(Events.ERROR, onError)
                     .run()
                     .then(() => assert.notCalled(onError));
             });
@@ -174,10 +174,10 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             it('should emit ERROR', () => {
                 const onError = sinon.spy().named('onError');
 
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.ERROR, {foo: 'bar'}));
+                stubWrappedRun_((runner) => runner.emit(Events.ERROR, {foo: 'bar'}));
 
                 return mkInsistentRunner_()
-                    .on(RunnerEvents.ERROR, onError)
+                    .on(Events.ERROR, onError)
                     .run()
                     .then(() => {
                         assert.calledOnce(onError);
@@ -186,7 +186,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should not retry', () => {
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.ERROR, {}));
+                stubWrappedRun_((runner) => runner.emit(Events.ERROR, {}));
 
                 return mkInsistentRunner_()
                     .run()
@@ -198,10 +198,10 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             it('should emit same TEST_RESULT', () => {
                 const onTestResult = sinon.spy().named('onTestResult');
 
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.TEST_RESULT, {equal: false}));
+                stubWrappedRun_((runner) => runner.emit(Events.TEST_RESULT, {equal: false}));
 
                 return mkInsistentRunner_()
-                    .on(RunnerEvents.TEST_RESULT, onTestResult)
+                    .on(Events.TEST_RESULT, onTestResult)
                     .run()
                     .then(() => {
                         assert.calledOnce(onTestResult);
@@ -210,7 +210,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should not retry', () => {
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.TEST_RESULT, {equal: false}));
+                stubWrappedRun_((runner) => runner.emit(Events.TEST_RESULT, {equal: false}));
 
                 return mkInsistentRunner_()
                     .run()
@@ -261,7 +261,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 const onRetry = sinon.spy().named('onRetry');
 
                 return mkInsistentRunner_({suite, browserAgent, config})
-                    .on(RunnerEvents.RETRY, onRetry)
+                    .on(Events.RETRY, onRetry)
                     .run()
                     .catch(() => {
                         assert.calledOnce(onRetry);
@@ -280,7 +280,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 const onError = sinon.spy().named('onError');
 
                 return mkRunnerWithRetries_()
-                    .on(RunnerEvents.ERROR, onError)
+                    .on(Events.ERROR, onError)
                     .run()
                     .then(() => assert.notCalled(onError));
             });
@@ -291,7 +291,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 let count = 0;
                 stubWrappedRun_((runner) => {
                     if (count++ === 0) { // only first time
-                        runner.emit(RunnerEvents.ERROR, {foo: 'bar'});
+                        runner.emit(Events.ERROR, {foo: 'bar'});
                     }
                 });
 
@@ -302,8 +302,8 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 const onRetry = sinon.spy().named('onRetry');
 
                 return mkInsistentRunner_({suite, browserAgent, config})
-                    .on(RunnerEvents.ERROR, onError)
-                    .on(RunnerEvents.RETRY, onRetry)
+                    .on(Events.ERROR, onError)
+                    .on(Events.RETRY, onRetry)
                     .run()
                     .then(() => {
                         assert.notCalled(onError);
@@ -320,7 +320,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should retry as much times as specified in config', () => {
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.ERROR, {}));
+                stubWrappedRun_((runner) => runner.emit(Events.ERROR, {}));
                 const config = mkConfigStub_({retry: 2});
 
                 return mkInsistentRunner_({config})
@@ -330,8 +330,8 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
 
             it('should count few errors during run for one', () => {
                 stubWrappedRun_((runner) => {
-                    runner.emit(RunnerEvents.ERROR, {});
-                    runner.emit(RunnerEvents.ERROR, {});
+                    runner.emit(Events.ERROR, {});
+                    runner.emit(Events.ERROR, {});
                 });
                 const config = mkConfigStub_({retry: 2});
 
@@ -344,11 +344,11 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 const onError = sinon.spy().named('onError');
                 const onRetry = sinon.spy().named('onRetry');
 
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.ERROR, new NoRefImageError()));
+                stubWrappedRun_((runner) => runner.emit(Events.ERROR, new NoRefImageError()));
 
                 return mkRunnerWithRetries_()
-                    .on(RunnerEvents.ERROR, onError)
-                    .on(RunnerEvents.RETRY, onRetry)
+                    .on(Events.ERROR, onError)
+                    .on(Events.RETRY, onRetry)
                     .run()
                     .then(() => {
                         assert.notCalled(onRetry);
@@ -362,10 +362,10 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             it('should emit same TEST_RESULT', () => {
                 const onTestResult = sinon.spy().named('onTestResult');
 
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.TEST_RESULT, {equal: true}));
+                stubWrappedRun_((runner) => runner.emit(Events.TEST_RESULT, {equal: true}));
 
                 return mkRunnerWithRetries_()
-                    .on(RunnerEvents.TEST_RESULT, onTestResult)
+                    .on(Events.TEST_RESULT, onTestResult)
                     .run()
                     .then(() => {
                         assert.calledOnce(onTestResult);
@@ -374,7 +374,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should not retry', () => {
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.TEST_RESULT, {equal: true}));
+                stubWrappedRun_((runner) => runner.emit(Events.TEST_RESULT, {equal: true}));
 
                 return mkRunnerWithRetries_()
                     .run()
@@ -387,7 +387,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 let count = 0;
                 stubWrappedRun_((runner) => {
                     if (count++ === 0) { // only first time
-                        runner.emit(RunnerEvents.TEST_RESULT, {equal: false});
+                        runner.emit(Events.TEST_RESULT, {equal: false});
                     }
                 });
 
@@ -398,8 +398,8 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 const onRetry = sinon.spy().named('onRetry');
 
                 return mkInsistentRunner_({suite, browserAgent, config})
-                    .on(RunnerEvents.TEST_RESULT, onTestResult)
-                    .on(RunnerEvents.RETRY, onRetry)
+                    .on(Events.TEST_RESULT, onTestResult)
+                    .on(Events.RETRY, onRetry)
                     .run()
                     .then(() => {
                         assert.notCalled(onTestResult);
@@ -416,7 +416,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should retry as much times as specified in config', () => {
-                stubWrappedRun_((runner) => runner.emit(RunnerEvents.TEST_RESULT, {equal: false}));
+                stubWrappedRun_((runner) => runner.emit(Events.TEST_RESULT, {equal: false}));
                 const config = mkConfigStub_({retry: 2});
 
                 return mkInsistentRunner_({config})
@@ -426,8 +426,8 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
 
             it('should count few diffs during run for one', () => {
                 stubWrappedRun_((runner) => {
-                    runner.emit(RunnerEvents.TEST_RESULT, {equal: false});
-                    runner.emit(RunnerEvents.TEST_RESULT, {equal: false});
+                    runner.emit(Events.TEST_RESULT, {equal: false});
+                    runner.emit(Events.TEST_RESULT, {equal: false});
                 });
                 const config = mkConfigStub_({retry: 2});
 
@@ -438,7 +438,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
 
             it('should not retry on cancel after diff', () => {
                 stubWrappedRun_((runner) => {
-                    runner.emit(RunnerEvents.TEST_RESULT, {equal: false});
+                    runner.emit(Events.TEST_RESULT, {equal: false});
                     return q.reject(new CancelledError());
                 });
 
@@ -452,9 +452,9 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             const tree = makeSuiteTree({suite: ['1st', '2nd', '3rd']}, {browsers: ['bro']});
 
             stubWrappedRun_((runner) => {
-                runner.emit(RunnerEvents.TEST_RESULT, {state: {name: '1st'}, equal: true});
-                runner.emit(RunnerEvents.ERROR, {state: {name: '2nd'}});
-                runner.emit(RunnerEvents.TEST_RESULT, {state: {name: '3rd'}, equal: false});
+                runner.emit(Events.TEST_RESULT, {state: {name: '1st'}, equal: true});
+                runner.emit(Events.ERROR, {state: {name: '2nd'}});
+                runner.emit(Events.TEST_RESULT, {state: {name: '3rd'}, equal: false});
             });
 
             sandbox.spy(RegularSuiteRunner, 'create');

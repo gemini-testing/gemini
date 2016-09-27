@@ -4,7 +4,7 @@ const EventEmitter = require('events').EventEmitter;
 const inherit = require('inherit');
 
 const Stats = require('lib/stats');
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 
 describe('stats', () => {
     let stats;
@@ -58,43 +58,43 @@ describe('stats listener', () => {
     });
 
     it('should count on beginState event', () => {
-        runner.emit(RunnerEvents.BEGIN_STATE);
+        runner.emit(Events.BEGIN_STATE);
         assert.equal(stats.get('total'), 1);
     });
 
     it('should count on skipState event', () => {
-        runner.emit(RunnerEvents.SKIP_STATE);
+        runner.emit(Events.SKIP_STATE);
         assert.equal(stats.get('total'), 1);
         assert.equal(stats.get('skipped'), 1);
     });
 
     it('should count on warning event', () => {
-        runner.emit(RunnerEvents.WARNING);
+        runner.emit(Events.WARNING);
         assert.equal(stats.get('warned'), 1);
     });
 
     it('should count on error event', () => {
-        runner.emit(RunnerEvents.ERROR);
+        runner.emit(Events.ERROR);
         assert.equal(stats.get('errored'), 1);
     });
 
     it('should count on updated images', () => {
-        runner.emit(RunnerEvents.UPDATE_RESULT, {updated: true});
+        runner.emit(Events.UPDATE_RESULT, {updated: true});
         assert.equal(stats.get('updated'), 1);
     });
 
     it('should count on passed images', () => {
-        runner.emit(RunnerEvents.UPDATE_RESULT, {updated: false});
+        runner.emit(Events.UPDATE_RESULT, {updated: false});
         assert.equal(stats.get('passed'), 1);
     });
 
     it('should count test passed', () => {
-        runner.emit(RunnerEvents.TEST_RESULT, {equal: true});
+        runner.emit(Events.TEST_RESULT, {equal: true});
         assert.equal(stats.get('passed'), 1);
     });
 
     it('should count test failed', () => {
-        runner.emit(RunnerEvents.TEST_RESULT, {equal: false});
+        runner.emit(Events.TEST_RESULT, {equal: false});
         assert.equal(stats.get('failed'), 1);
     });
 });

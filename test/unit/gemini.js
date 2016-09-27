@@ -8,7 +8,7 @@ const q = require('q');
 const Config = require('lib/config');
 const plugins = require('lib/plugins');
 const Runner = require('lib/runner');
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 const SuiteCollection = require('lib/suite-collection');
 const temp = require('lib/temp');
 
@@ -75,8 +75,8 @@ describe('gemini', () => {
         gemini.test();
 
         [
-            RunnerEvents.START_RUNNER,
-            RunnerEvents.END_RUNNER
+            Events.START_RUNNER,
+            Events.END_RUNNER
         ].forEach((event, name) => {
             const spy = sinon.spy().named(`${name} handler`);
             gemini.on(event, spy);

@@ -2,7 +2,7 @@
 
 const EventEmitter = require('events').EventEmitter;
 const HtmlReporter = require('lib/reporters/html/index.js');
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 const Handlebars = require('handlebars');
 const logger = require('lib/utils').logger;
 const chalk = require('chalk');
@@ -27,7 +27,7 @@ describe('HTML Reporter', () => {
     it('should log correct path to html report', () => {
         sandbox.stub(logger, 'log');
 
-        emitter.emit(RunnerEvents.END);
+        emitter.emit(Events.END);
 
         const reportPath = `file://${path.resolve('gemini-report/index.html')}`;
         assert.calledWith(logger.log, `Your HTML report is here: ${chalk.yellow(reportPath)}`);

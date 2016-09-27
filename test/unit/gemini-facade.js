@@ -3,7 +3,7 @@
 const EventEmitter = require('events').EventEmitter;
 const _ = require('lodash');
 const GeminiFacade = require('lib/gemini-facade');
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 
 describe('gemini-facade', () => {
     const sandbox = sinon.sandbox.create();
@@ -28,14 +28,14 @@ describe('gemini-facade', () => {
     it('should provide access to events', () => {
         const facade = new GeminiFacade(new EventEmitter());
 
-        assert.deepEqual(facade.events, RunnerEvents);
+        assert.deepEqual(facade.events, Events);
     });
 
     it('should passthrough all runner events', () => {
         const runner = new EventEmitter();
         const facade = new GeminiFacade(runner);
 
-        _.forEach(RunnerEvents, (event, name) => {
+        _.forEach(Events, (event, name) => {
             const spy = sinon.spy().named(name + ' handler');
             facade.on(event, spy);
 
