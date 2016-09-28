@@ -1,0 +1,15 @@
+{
+  "gitbook": "3.2.0",
+  "title": "Gemini",
+  "description": "Visual regression testing tool",
+  "plugins": ["edit-link", "github"],
+  "pluginsConfig": {
+    "edit-link": {
+      "base": "https://github.com/gemini-testing/gemini/edit/master",
+      "label": "Edit on github"
+    },
+    "github": {
+      "url": "https://github.com/gemini-testing/gemini"
+    }
+  }
+}

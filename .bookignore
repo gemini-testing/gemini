@@ -1,0 +1,10 @@
+lib
+test
+bin
+.bookignore
+.eslintignore
+.eslintrc.js
+.gitignore
+.npmignore
+.travis.yml
+ISSUE_TEMPLATE.md
