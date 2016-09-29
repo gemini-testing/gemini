@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.11.3 - 2016-09-29
+
+* Second attempt of fixing order of file read events
+
 
 ## 4.11.2 - 2016-09-27
 
