@@ -3,7 +3,7 @@
 const EventEmitter = require('events').EventEmitter;
 const _ = require('lodash');
 const proxyquire = require('proxyquire');
-const q = require('q');
+const q = require('bluebird-q');
 
 const Config = require('lib/config');
 const plugins = require('lib/plugins');

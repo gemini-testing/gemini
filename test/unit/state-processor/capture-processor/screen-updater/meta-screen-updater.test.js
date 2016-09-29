@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 const MetaScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/meta-screen-updater');
 const temp = require('lib/temp');
 const fs = require('q-io/fs');

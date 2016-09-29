@@ -1,7 +1,7 @@
 'use strict';
 
 const NewScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/new-screen-updater');
-const q = require('q');
+const q = require('bluebird-q');
 const fs = require('q-io/fs');
 const Image = require('lib/image');
 
@@ -41,7 +41,7 @@ describe('new-screen-updater', () => {
     it('should make directory before saving the image', () => {
         const mediator = sinon.spy().named('mediator');
         fs.exists.returns(q(false));
-        fs.makeTree.returns(q.delay(1).then(mediator));
+        fs.makeTree.returns(q.delay(100).then(mediator));
 
         return exec_()
             .then(() => {

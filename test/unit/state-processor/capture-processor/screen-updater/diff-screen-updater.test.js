@@ -2,7 +2,7 @@
 
 const DiffScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/diff-screen-updater');
 const temp = require('lib/temp');
-const q = require('q');
+const q = require('bluebird-q');
 const fs = require('q-io/fs');
 const Image = require('lib/image');
 

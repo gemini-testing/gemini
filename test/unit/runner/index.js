@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 const QEmitter = require('qemitter');
 
 const Runner = require('lib/runner');

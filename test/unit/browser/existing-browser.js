@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const wd = require('wd');
-const q = require('q');
+const q = require('bluebird-q');
 
 const ExistingBrowser = require('lib/browser/existing-browser');
 

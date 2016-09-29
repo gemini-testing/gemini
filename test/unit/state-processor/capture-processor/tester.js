@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('q-io/fs');
-const q = require('q');
+const q = require('bluebird-q');
 const temp = require('lib/temp');
 const Image = require('lib/image');
 const NoRefImageError = require('lib/errors/no-ref-image-error');

@@ -1,5 +1,5 @@
 'use strict';
-var q = require('q'),
+var q = require('bluebird-q'),
     DisabledStateRunner = require('lib/runner/state-runner/disabled-state-runner'),
     CaptureSession = require('lib/capture-session'),
     Config = require('lib/config'),

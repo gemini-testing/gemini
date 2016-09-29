@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 const Camera = require('lib/browser/camera');
 const Image = require('lib/image');
 const util = require('lib/browser/util');

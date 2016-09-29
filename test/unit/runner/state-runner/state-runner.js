@@ -1,5 +1,5 @@
 'use strict';
-var q = require('q'),
+var q = require('bluebird-q'),
     StateRunner = require('lib/runner/state-runner/state-runner'),
     CaptureSession = require('lib/capture-session'),
     StateError = require('lib/errors/state-error'),
@@ -104,7 +104,7 @@ describe('runner/state-runner/state-runner', function() {
                 mediator = sinon.spy().named('mediator'),
                 stateProcessor = mkStateProcessor_();
 
-            browserSession.runActions.returns(q.delay(1).then(mediator));
+            browserSession.runActions.returns(q.delay(100).then(mediator));
 
             return run_(runner, stateProcessor)
                 .then(function() {
@@ -138,7 +138,7 @@ describe('runner/state-runner/state-runner', function() {
                 mediator = sinon.spy().named('mediator'),
                 stateProcessor = mkStateProcessor_();
 
-            browserSession.prepareScreenshot.returns(q.delay(1).then(mediator));
+            browserSession.prepareScreenshot.returns(q.delay(100).then(mediator));
 
             return run_(runner, stateProcessor)
                 .then(function() {

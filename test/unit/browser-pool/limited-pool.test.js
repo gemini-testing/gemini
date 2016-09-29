@@ -1,6 +1,6 @@
 'use strict';
 var Browser = require('lib/browser'),
-    q = require('q'),
+    q = require('bluebird-q'),
     LimitedPool = require('lib/browser-pool/limited-pool'),
     CancelledError = require('lib/errors/cancelled-error');
 

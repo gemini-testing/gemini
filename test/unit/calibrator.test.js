@@ -1,5 +1,5 @@
 'use strict';
-var q = require('q'),
+var q = require('bluebird-q'),
     path = require('path'),
     fs = require('fs'),
     Calibrator = require('lib/calibrator'),

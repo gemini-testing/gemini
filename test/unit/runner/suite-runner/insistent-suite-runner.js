@@ -8,7 +8,7 @@ const CancelledError = require('lib/errors/cancelled-error');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
 const makeSuiteStub = require('../../../util').makeSuiteStub;
 const makeSuiteTree = require('../../../util').makeSuiteTree;
-const q = require('q');
+const q = require('bluebird-q');
 const _ = require('lodash');
 
 describe('runner/suite-runner/insistent-suite-runner', () => {

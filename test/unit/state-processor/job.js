@@ -4,7 +4,7 @@ var CaptureSession = require('lib/capture-session'),
     CaptureProcessor = require('lib/state-processor/capture-processor/capture-processor'),
     temp = require('lib/temp'),
     proxyquire = require('proxyquire').noCallThru(),
-    q = require('q'),
+    q = require('bluebird-q'),
     _ = require('lodash');
 
 describe('state-processor/job', () => {

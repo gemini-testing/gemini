@@ -1,5 +1,5 @@
 'use strict';
-const q = require('q');
+const q = require('bluebird-q');
 const Pool = require('lib/browser-pool/caching-pool');
 const browserWithId = require('../../util').browserWithId;
 

@@ -1,5 +1,5 @@
 'use strict';
-var q = require('q'),
+var q = require('bluebird-q'),
     ClientBridge = require('lib/browser/client-bridge'),
     StateError = require('lib/errors/state-error'),
 
@@ -45,8 +45,9 @@ describe('ClientBridge', function() {
 
         it('should reject if evalScript returns unexpected error', function() {
             var message = 'Something happened';
-            this.browser.evalScript.returns(q({error: message}));
+            this.browser.evalScript.returns(q.resolve({error: message}));
             var result = this.bridge.call('fail');
+            console.log(result);
             return assert.isRejected(result, StateError, message);
         });
 

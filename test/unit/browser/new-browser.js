@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 const wdAgent = require('wd');
 const polyfillService = require('polyfill-service');
 
@@ -19,7 +19,7 @@ describe('browser/new-browser', () => {
     beforeEach(() => {
         wd = {
             configureHttp: sinon.stub().returns(q()),
-            init: sinon.stub().returns(q({})),
+            init: sinon.stub().returns(q([])),
             get: sinon.stub().returns(q({})),
             eval: sinon.stub().returns(q('')),
             setWindowSize: sinon.stub().returns(q({})),

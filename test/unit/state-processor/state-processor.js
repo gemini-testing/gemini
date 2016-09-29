@@ -8,7 +8,7 @@ var CaptureSession = require('lib/capture-session'),
     proxyquire = require('proxyquire').noCallThru(),
     _ = require('lodash'),
     QEmitter = require('qemitter'),
-    q = require('q');
+    q = require('bluebird-q');
 
 describe('state-processor/state-processor', () => {
     var sandbox = sinon.sandbox.create(),

@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 
 const ActionsBuilder = require('lib/tests-api/actions-builder');
 const util = require('../../util');

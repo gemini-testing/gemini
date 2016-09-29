@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const q = require('q');
+const q = require('bluebird-q');
 
 const CoordValidator = require('lib/capture-session/coord-validator');
 const Image = require('lib/image');

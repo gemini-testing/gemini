@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 const TestSessionRunner = require('lib/runner/test-session-runner');
 const BrowserRunner = require('lib/runner/browser-runner');
 const pool = require('lib/browser-pool');

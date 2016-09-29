@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 const Browser = require('lib/browser');
 const BasicPool = require('lib/browser-pool/basic-pool');
 const signalHandler = require('lib/signal-handler');

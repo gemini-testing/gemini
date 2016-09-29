@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 
 const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
 const StateRunnerFactory = require('lib/runner/state-runner');
@@ -282,7 +282,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
             const state2 = util.makeStateStub(suite);
             const mediator = sinon.spy();
 
-            stateRunner.run.onFirstCall().returns(q.delay(1).then(mediator));
+            stateRunner.run.onFirstCall().returns(q.delay(100).then(mediator));
 
             return run_(suite)
                 .then(() => {

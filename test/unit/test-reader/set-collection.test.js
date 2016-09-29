@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const q = require('q');
+const q = require('bluebird-q');
 const globExtra = require('glob-extra');
 const SetCollection = require('lib/test-reader/set-collection');
 const TestSet = require('lib/test-reader/test-set');

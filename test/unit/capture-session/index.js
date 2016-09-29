@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const q = require('bluebird-q');
 const _ = require('lodash');
 const promiseUtils = require('q-promise-utils');
 

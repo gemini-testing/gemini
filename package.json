@@ -12,6 +12,7 @@
   "dependencies": {
     "aliasify": "^1.7.2",
     "app-module-path": "^1.1.0",
+    "bluebird-q": "^2.1.1",
     "browserify": "^13.0.0",
     "chalk": "^1.1.3",
     "commander": "^2.8.1",
@@ -29,8 +30,6 @@
     "minimatch": "^3.0.0",
     "png-img": "^2.1.0",
     "polyfill-service": "~1.4.0",
-    "q": "^1.1.2",
-    "q-debug-mode": "0.0.1",
     "q-io": "^2.0.6",
     "q-promise-utils": "^1.1.0",
     "qemitter": "^1.0.0",

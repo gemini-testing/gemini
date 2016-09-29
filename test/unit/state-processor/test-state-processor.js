@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const q = require('q');
+const q = require('bluebird-q');
 
 const CaptureSession = require('lib/capture-session');
 const StateProcessor = require('lib/state-processor/state-processor');
