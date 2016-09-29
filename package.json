@@ -49,6 +49,7 @@
     "coveralls": "^2.11.2",
     "eslint": "^3.1.1",
     "eslint-config-gemini-testing": "^2.0.0",
+    "gitbook-cli": "^2.3.0",
     "husky": "^0.11.4",
     "istanbul": "^0.4.5",
     "mocha": "^2.1.0",
@@ -58,12 +59,16 @@
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
     "prepublish": "uglifyjs ./lib/browser/client-scripts/gemini.calibrate.js -m > ./lib/browser/client-scripts/gemini.calibrate.min.js --support-ie8",
+    "postpublish": "npm run publish-site",
     "test-func": "istanbul test _mocha test/functional",
     "test-browser": "istanbul test _mocha test/browser",
     "test": "istanbul test _mocha -- --recursive test/unit test/functional test/browser",
     "lint": "eslint .",
     "precommit": "npm run lint",
-    "preversion": "npm run lint && npm test"
+    "preversion": "npm run lint && npm test",
+    "prepare-site": "gitbook install",
+    "build-site": "npm run prepare-site && gitbook build",
+    "publish-site": "npm run build-site && cd _book && git init && git add -A && git commit -m 'Update site' && git push --force git@github.com:gemini-testing/gemini-testing.github.io.git master"
   },
   "author": "Sergey Tatarintsev <tatarincev.serg@yandex.ua> (https://github.com/SevInf)",
   "license": "MIT",
