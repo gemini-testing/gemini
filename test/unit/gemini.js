@@ -8,7 +8,7 @@ const q = require('q');
 const Config = require('lib/config');
 const plugins = require('lib/plugins');
 const Runner = require('lib/runner');
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 const SuiteCollection = require('lib/suite-collection');
 const temp = require('lib/temp');
 
@@ -65,7 +65,7 @@ describe('gemini', () => {
 
     afterEach(() => sandbox.restore());
 
-    it('should passthrough "START_RUNNER" and "END_RUNNER" events', () => {
+    it('should passthrough runner events', () => {
         sandbox.stub(temp, 'init');
 
         const runner = new EventEmitter();
@@ -75,8 +75,35 @@ describe('gemini', () => {
         gemini.test();
 
         [
-            RunnerEvents.START_RUNNER,
-            RunnerEvents.END_RUNNER
+            Events.START_RUNNER,
+            Events.END_RUNNER,
+            Events.BEGIN,
+            Events.END,
+
+            Events.BEGIN_SESSION,
+            Events.END_SESSION,
+
+            Events.RETRY,
+
+            Events.START_BROWSER,
+            Events.STOP_BROWSER,
+
+            Events.BEGIN_SUITE,
+            Events.END_SUITE,
+
+            Events.SKIP_STATE,
+            Events.BEGIN_STATE,
+            Events.END_STATE,
+
+            Events.INFO,
+            Events.WARNING,
+            Events.ERROR,
+
+            Events.END_TEST,
+            Events.CAPTURE,
+
+            Events.TEST_RESULT,
+            Events.UPDATE_RESULT
         ].forEach((event, name) => {
             const spy = sinon.spy().named(`${name} handler`);
             gemini.on(event, spy);

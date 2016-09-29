@@ -5,7 +5,7 @@ const QEmitter = require('qemitter');
 
 const SuiteRunner = require('lib/runner/suite-runner/suite-runner');
 const DecoratorSuiteRunner = require('lib/runner/suite-runner/decorator-suite-runner');
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 const Config = require('lib/config');
 
 describe('runner/suite-runner/decorator-suite-runner', () => {
@@ -61,7 +61,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
     describe('pass events through', () => {
         beforeEach(() => sandbox.spy(DecoratorSuiteRunner.prototype, 'emit'));
 
-        [RunnerEvents.BEGIN_SUITE, RunnerEvents.END_SUITE].forEach((event) => {
+        [Events.BEGIN_SUITE, Events.END_SUITE].forEach((event) => {
             it(`should pass ${event} event through without changing`, () => {
                 const suiteRunner = new QEmitter();
                 const decorator = makeDecoratorRunner(suiteRunner);
@@ -91,15 +91,15 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
         beforeEach(() => sandbox.spy(DecoratorSuiteRunner.prototype, 'emitAndWait'));
 
         [
-            RunnerEvents.BEGIN_STATE,
-            RunnerEvents.SKIP_STATE,
-            RunnerEvents.END_STATE,
-            RunnerEvents.TEST_RESULT,
-            RunnerEvents.CAPTURE,
-            RunnerEvents.UPDATE_RESULT,
-            RunnerEvents.WARNING,
-            RunnerEvents.ERROR,
-            RunnerEvents.RETRY
+            Events.BEGIN_STATE,
+            Events.SKIP_STATE,
+            Events.END_STATE,
+            Events.TEST_RESULT,
+            Events.CAPTURE,
+            Events.UPDATE_RESULT,
+            Events.WARNING,
+            Events.ERROR,
+            Events.RETRY
         ].forEach((event) => {
             it(`should pass ${event} event from an original to a decorated suite runner`, () => {
                 const suiteRunner = new QEmitter();
@@ -135,7 +135,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
             const suiteData = makeSuiteData({url: 'testUrl'});
             suiteData.suite.metaInfo = {url: 'testUrl'};
 
-            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
+            suiteRunner.emit(Events.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, 'testUrl');
         });
@@ -146,7 +146,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
 
             const suiteData = makeSuiteData({url: 'testUrl'});
 
-            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
+            suiteRunner.emit(Events.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, '/foo/bar/testUrl');
         });
@@ -157,7 +157,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
 
             const suiteData = makeSuiteData({url: 'testUrl//'});
 
-            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
+            suiteRunner.emit(Events.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, '/foo/baz/testUrl');
         });
@@ -168,7 +168,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
 
             const suiteData = makeSuiteData({url: '/testUrl'});
 
-            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
+            suiteRunner.emit(Events.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, '/foo/qux/testUrl');
         });
@@ -179,7 +179,7 @@ describe('runner/suite-runner/decorator-suite-runner', () => {
 
             const suiteData = makeSuiteData({url: 'testUrl'});
 
-            suiteRunner.emit(RunnerEvents.BEGIN_STATE, suiteData);
+            suiteRunner.emit(Events.BEGIN_STATE, suiteData);
 
             assert.equal(suiteData.suite.metaInfo.url, '/foo/bar/testUrl');
         });

@@ -4,7 +4,7 @@ const chalk = require('chalk');
 
 const EventEmitter = require('events').EventEmitter;
 const FlatVerboseReporter = require('lib/reporters/flat-factory/flat-verbose');
-const RunnerEvents = require('lib/constants/runner-events');
+const Events = require('lib/constants/events');
 const logger = require('lib/utils').logger;
 
 describe('Reporter#FlatVerbose', () => {
@@ -32,9 +32,9 @@ describe('Reporter#FlatVerbose', () => {
             sessionId: '0fc23des'
         };
 
-        emitter.emit(RunnerEvents.BEGIN);
-        emitter.emit(RunnerEvents.UPDATE_RESULT, test);
-        emitter.emit(RunnerEvents.END);
+        emitter.emit(Events.BEGIN);
+        emitter.emit(Events.UPDATE_RESULT, test);
+        emitter.emit(Events.END);
 
         const deserealizedResult = chalk
             .stripColor(logger.log.firstCall.args[0])
