@@ -1,6 +1,7 @@
 'use strict';
 
 const Browser = require('lib/browser');
+const Promise = require('bluebird');
 const State = require('lib/state');
 const Suite = require('lib/suite');
 const _ = require('lodash');
@@ -107,10 +108,22 @@ function makeSuiteTree(sceleton, rootOpts) {
     }
 }
 
+function rejectedPromise(error) {
+    if (!error) {
+        error = new Error('Rejected');
+    } else if (typeof error === 'string') {
+        error = new Error(error);
+    }
+    const promise = Promise.reject(error);
+    promise.catch(() => {});
+    return promise;
+}
+
 module.exports = {
     makeBrowser,
     browserWithId,
     makeStateStub,
     makeSuiteStub,
-    makeSuiteTree
+    makeSuiteTree,
+    rejectedPromise
 };

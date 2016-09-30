@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const _ = require('lodash');
 const promiseUtils = require('q-promise-utils');
 
@@ -18,7 +18,7 @@ describe('capture session', () => {
     beforeEach(() => {
         imageStub = sinon.createStubInstance(Image);
         sandbox.stub(promiseUtils);
-        promiseUtils.sequence.returns(q());
+        promiseUtils.sequence.returns(Promise.resolve());
 
         sandbox.stub(temp);
     });
@@ -102,7 +102,7 @@ describe('capture session', () => {
         it('should prepare screenshot', () => {
             const browser = {
                 config: {},
-                prepareScreenshot: sinon.stub().returns(q())
+                prepareScreenshot: sinon.stub().returns(Promise.resolve())
             };
             const session = new CaptureSession(browser);
             const state = {
@@ -129,7 +129,7 @@ describe('capture session', () => {
         beforeEach(() => {
             browser = {
                 config: {},
-                captureViewportImage: sinon.stub().returns(q({
+                captureViewportImage: sinon.stub().returns(Promise.resolve({
                     save: sinon.stub()
                 }))
             };
@@ -150,7 +150,7 @@ describe('capture session', () => {
         });
 
         it('should not add an image to error if can not captureViewportImage', () => {
-            browser.captureViewportImage = sinon.stub().returns(q.reject({}));
+            browser.captureViewportImage = sinon.stub().returns(Promise.reject({}));
 
             error = new StateError('some error');
 
@@ -182,16 +182,16 @@ describe('capture session', () => {
         let captureSession;
 
         beforeEach(() => {
-            imageStub.crop.returns(q({}));
+            imageStub.crop.returns(Promise.resolve({}));
             imageStub.getSize.returns({});
-            imageStub.save.returns(q());
+            imageStub.save.returns(Promise.resolve());
 
             temp.path.returns('/path/to/img');
 
             browserStub = {
                 config: {},
-                captureViewportImage: sinon.stub().returns(q(imageStub)),
-                scrollBy: sinon.stub().returns(q())
+                captureViewportImage: sinon.stub().returns(Promise.resolve(imageStub)),
+                scrollBy: sinon.stub().returns(Promise.resolve())
             };
 
             page = {
@@ -206,7 +206,7 @@ describe('capture session', () => {
                 canHaveCaret: true
             };
 
-            sandbox.stub(Viewport.prototype, 'crop').returns(q());
+            sandbox.stub(Viewport.prototype, 'crop').returns(Promise.resolve());
             sandbox.stub(Viewport.prototype, 'ignoreAreas');
 
             sandbox.spy(Viewport, 'create');
@@ -221,7 +221,7 @@ describe('capture session', () => {
         });
 
         it('should create viewport instance', () => {
-            browserStub.captureViewportImage.withArgs(page).returns(q('image'));
+            browserStub.captureViewportImage.withArgs(page).returns(Promise.resolve('image'));
 
             return captureSession.capture(page)
                 .then(() => {
@@ -236,9 +236,9 @@ describe('capture session', () => {
         });
 
         it('should return object with cropped image and `canHaveCaret` property', () => {
-            Viewport.prototype.crop.returns(q('image'));
+            Viewport.prototype.crop.returns(Promise.resolve('image'));
 
-            assert.eventually.equal(captureSession.capture(page), {
+            return assert.eventually.deepEqual(captureSession.capture(page), {
                 image: 'image',
                 canHaveCaret: page.canHaveCaret
             });
@@ -339,7 +339,7 @@ describe('capture session', () => {
                         const scrolledViewportScreenshot = imageStub;
 
                         browserStub.captureViewportImage
-                            .withArgs(scrolledPage).returns(q(scrolledViewportScreenshot));
+                            .withArgs(scrolledPage).returns(Promise.resolve(scrolledViewportScreenshot));
 
                         return captureSession.capture(page)
                             .then(() => assert.calledWith(Viewport.prototype.extendBy, 2, scrolledViewportScreenshot));
@@ -353,9 +353,9 @@ describe('capture session', () => {
                     });
 
                     it('should return object with cropped image and `canHaveCaret` property', () => {
-                        Viewport.prototype.crop.returns(q('image'));
+                        Viewport.prototype.crop.returns(Promise.resolve('image'));
 
-                        assert.eventually.equal(captureSession.capture(page), {
+                        return assert.eventually.deepEqual(captureSession.capture(page), {
                             image: 'image',
                             canHaveCaret: page.canHaveCaret
                         });

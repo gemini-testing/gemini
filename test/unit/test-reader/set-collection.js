@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const q = require('q');
+const Promise = require('bluebird');
 const globExtra = require('glob-extra');
 const SetCollection = require('lib/test-reader/set-collection');
 const TestSet = require('lib/test-reader/test-set');
@@ -40,7 +40,7 @@ describe('set-collection', () => {
     };
 
     beforeEach(() => {
-        sandbox.stub(globExtra, 'expandPaths').returns(q([]));
+        sandbox.stub(globExtra, 'expandPaths').returns(Promise.resolve([]));
     });
 
     afterEach(() => sandbox.restore());
@@ -75,7 +75,7 @@ describe('set-collection', () => {
 
         sandbox.stub(TestSet, 'create').returns(mkSetStub());
 
-        globExtra.expandPaths.withArgs(['some/files']).returns(q(['some/files/file.js']));
+        globExtra.expandPaths.withArgs(['some/files']).returns(Promise.resolve(['some/files/file.js']));
 
         return SetCollection.create(config, mkOptsStub({sets: ['set1']}))
             .then(() => {
@@ -107,8 +107,8 @@ describe('set-collection', () => {
         });
 
         globExtra.expandPaths
-            .withArgs(['some/files']).returns(q(['some/files/file1.js']))
-            .withArgs(['other/files']).returns(q(['other/files/file2.js']));
+            .withArgs(['some/files']).returns(Promise.resolve(['some/files/file1.js']))
+            .withArgs(['other/files']).returns(Promise.resolve(['other/files/file2.js']));
 
         sandbox.stub(TestSet, 'create').returns(mkSetStub());
 
@@ -167,8 +167,8 @@ describe('set-collection', () => {
         });
 
         globExtra.expandPaths
-            .withArgs(['some/files']).returns(q(['some/files/file1.js']))
-            .withArgs(['other/files']).returns(q(['other/files/file2.js']));
+            .withArgs(['some/files']).returns(Promise.resolve(['some/files/file1.js']))
+            .withArgs(['other/files']).returns(Promise.resolve(['other/files/file2.js']));
 
         return SetCollection.create(config, mkOptsStub())
             .then((setCollection) => {

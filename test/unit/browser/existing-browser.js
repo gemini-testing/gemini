@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const wd = require('wd');
-const q = require('q');
+const Promise = require('bluebird');
 
 const ExistingBrowser = require('lib/browser/existing-browser');
 
@@ -23,8 +23,8 @@ describe('browser/existing-browser', () => {
 
     beforeEach(() => {
         wdRemote = {
-            configureHttp: sinon.stub().returns(q()),
-            attach: sinon.stub().returns(q())
+            configureHttp: sinon.stub().returns(Promise.resolve()),
+            attach: sinon.stub().returns(Promise.resolve())
         };
 
         sandbox.stub(wd, 'promiseRemote');

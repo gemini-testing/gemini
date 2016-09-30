@@ -4,7 +4,7 @@ var CaptureSession = require('lib/capture-session'),
     CaptureProcessor = require('lib/state-processor/capture-processor/capture-processor'),
     temp = require('lib/temp'),
     proxyquire = require('proxyquire').noCallThru(),
-    q = require('q'),
+    Promise = require('bluebird'),
     _ = require('lodash');
 
 describe('state-processor/job', () => {
@@ -15,7 +15,7 @@ describe('state-processor/job', () => {
 
     beforeEach(() => {
         captureProcessor = sinon.createStubInstance(CaptureProcessor);
-        captureProcessor.exec.returns(q({}));
+        captureProcessor.exec.returns(Promise.resolve({}));
 
         CaptureProcessorStub = {
             create: sinon.stub().returns(captureProcessor)
@@ -24,7 +24,7 @@ describe('state-processor/job', () => {
         browserSession = sinon.createStubInstance(CaptureSession);
         browserSession.capture.returns({});
 
-        sandbox.stub(CaptureSession, 'fromObject').returns(q(browserSession));
+        sandbox.stub(CaptureSession, 'fromObject').returns(Promise.resolve(browserSession));
 
         sandbox.stub(temp);
     });
@@ -72,7 +72,7 @@ describe('state-processor/job', () => {
 
     it('should process captured screenshot', () => {
         var capture = {some: 'capture'};
-        browserSession.capture.returns(q(capture));
+        browserSession.capture.returns(Promise.resolve(capture));
 
         return execJob_()
             .then(() => {

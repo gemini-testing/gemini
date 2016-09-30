@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const wdAgent = require('wd');
 const polyfillService = require('polyfill-service');
 
@@ -18,19 +18,19 @@ describe('browser/new-browser', () => {
 
     beforeEach(() => {
         wd = {
-            configureHttp: sinon.stub().returns(q()),
-            init: sinon.stub().returns(q({})),
-            get: sinon.stub().returns(q({})),
-            eval: sinon.stub().returns(q('')),
-            setWindowSize: sinon.stub().returns(q({})),
-            maximize: sinon.stub().returns(q()),
-            windowHandle: sinon.stub().returns(q({})),
-            moveTo: sinon.stub().returns(q()),
-            elementByCssSelector: sinon.stub().returns(q()),
+            configureHttp: sinon.stub().returns(Promise.resolve()),
+            init: sinon.stub().returns(Promise.resolve([])),
+            get: sinon.stub().returns(Promise.resolve({})),
+            eval: sinon.stub().returns(Promise.resolve('')),
+            setWindowSize: sinon.stub().returns(Promise.resolve({})),
+            maximize: sinon.stub().returns(Promise.resolve()),
+            windowHandle: sinon.stub().returns(Promise.resolve({})),
+            moveTo: sinon.stub().returns(Promise.resolve()),
+            elementByCssSelector: sinon.stub().returns(Promise.resolve()),
             on: sinon.stub(),
-            currentContext: sinon.stub().returns(q()),
-            context: sinon.stub().returns(q()),
-            quit: sinon.stub().returns(q())
+            currentContext: sinon.stub().returns(Promise.resolve()),
+            context: sinon.stub().returns(Promise.resolve()),
+            quit: sinon.stub().returns(Promise.resolve())
         };
 
         sandbox.stub(wdAgent, 'promiseRemote').returns(wd);
@@ -54,7 +54,7 @@ describe('browser/new-browser', () => {
 
     describe('should expose wd API', () => {
         const testExposedWdMethod = (method) => {
-            wd[method] = sinon.stub().returns(q('awesome-res'));
+            wd[method] = sinon.stub().returns(Promise.resolve('awesome-res'));
 
             return makeBrowser()[method]('firstArg', 'secondArg')
                 .then((res) => {
@@ -80,7 +80,7 @@ describe('browser/new-browser', () => {
             });
 
             it('should restore original context after applying', () => {
-                wd.currentContext.returns(q('ORIGINAL_CONTEXT'));
+                wd.currentContext.returns(Promise.resolve('ORIGINAL_CONTEXT'));
 
                 const context = wd.context.withArgs('ORIGINAL_CONTEXT').named('context');
 
@@ -100,7 +100,7 @@ describe('browser/new-browser', () => {
             });
 
             it('should restore original context after applying', () => {
-                wd.currentContext.returns(q('ORIGINAL_CONTEXT'));
+                wd.currentContext.returns(Promise.resolve('ORIGINAL_CONTEXT'));
 
                 const context = wd.context.withArgs('ORIGINAL_CONTEXT').named('context');
 
@@ -141,7 +141,7 @@ describe('browser/new-browser', () => {
             beforeEach(() => browser.config.calibrate = true);
 
             it('should calibrate', () => {
-                calibrator.calibrate.returns(q());
+                calibrator.calibrate.returns(Promise.resolve());
 
                 return browser.launch(calibrator)
                     .then(() => assert.calledOnce(calibrator.calibrate));
@@ -150,7 +150,7 @@ describe('browser/new-browser', () => {
             it('should calibrate camera object', () => {
                 const calibration = {some: 'data'};
 
-                calibrator.calibrate.returns(q(calibration));
+                calibrator.calibrate.returns(Promise.resolve(calibration));
 
                 return browser.launch(calibrator)
                     .then(() => {
@@ -192,13 +192,13 @@ describe('browser/new-browser', () => {
             });
 
             it('should not fail if not supported in legacy Opera', () => {
-                wd.setWindowSize.returns(q.reject({cause: {value: {message: 'Not supported in OperaDriver yet'}}}));
+                wd.setWindowSize.returns(Promise.reject({cause: {value: {message: 'Not supported in OperaDriver yet'}}}));
 
                 return assert.isFulfilled(launchBrowser());
             });
 
             it('should fail if setWindowSize fails with other error', () => {
-                wd.setWindowSize.returns(q.reject(new Error('other')));
+                wd.setWindowSize.returns(Promise.reject(new Error('other')));
 
                 return assert.isRejected(launchBrowser());
             });
@@ -209,7 +209,7 @@ describe('browser/new-browser', () => {
         let browser;
 
         beforeEach(() => {
-            sandbox.stub(ClientBridge.prototype, 'call').returns(q({}));
+            sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
             sandbox.stub(polyfillService, 'getPolyfillString').returns('function() {}');
         });
 
@@ -268,17 +268,17 @@ describe('browser/new-browser', () => {
         it('should reset mouse position', () => {
             const elem = {};
 
-            wd.eval.returns(q(elem));
+            wd.eval.returns(Promise.resolve(elem));
 
             return browser.reset().then(() => assert.calledWith(wd.moveTo, elem, 0, 0));
         });
 
         it('should reject promise with browserId and sessionId if error happened', () => {
             browser.sessionId = 'test_session_id';
-            wd.eval.returns(q.reject());
+            wd.eval.returns(Promise.reject());
 
             return browser.reset()
-                .fail((e) => assert.deepEqual(e, {browserId: 'id', sessionId: 'test_session_id'}));
+                .catch((e) => assert.deepEqual(e, {browserId: 'id', sessionId: 'test_session_id'}));
         });
     });
 
@@ -294,7 +294,7 @@ describe('browser/new-browser', () => {
         it('should delegate actual capturing to camera object', () => {
             browser = makeBrowser({browserName: 'browser', version: '1.0'}, {calibrate: false});
 
-            Camera.prototype.captureViewportImage.returns(q({some: 'image'}));
+            Camera.prototype.captureViewportImage.returns(Promise.resolve({some: 'image'}));
 
             return browser.launch()
                 .then(() => browser.captureViewportImage())
@@ -334,7 +334,7 @@ describe('browser/new-browser', () => {
 
         describe('when browser supports CSS3 selectors', () => {
             beforeEach(() => {
-                calibrator.calibrate.returns(q({hasCSS3Selectors: true}));
+                calibrator.calibrate.returns(Promise.resolve({hasCSS3Selectors: true}));
 
                 return browser.launch(calibrator);
             });
@@ -342,7 +342,7 @@ describe('browser/new-browser', () => {
             it('should return what wd.elementByCssSelector returns', () => {
                 const element = {element: 'elem'};
 
-                wd.elementByCssSelector.withArgs('.class').returns(q(element));
+                wd.elementByCssSelector.withArgs('.class').returns(Promise.resolve(element));
 
                 return assert.eventually.equal(browser.findElement('.class'), element);
             });
@@ -351,7 +351,7 @@ describe('browser/new-browser', () => {
                 const error = new Error('Element not found');
                 error.status = WdErrors.ELEMENT_NOT_FOUND;
 
-                wd.elementByCssSelector.returns(q.reject(error));
+                wd.elementByCssSelector.returns(Promise.reject(error));
 
                 return assert.isRejected(browser.findElement('.class'))
                     .then((error) => assert.equal(error.selector, '.class'));
@@ -360,9 +360,9 @@ describe('browser/new-browser', () => {
 
         describe('when browser does not support CSS3 selectors', () => {
             beforeEach(() => {
-                sandbox.stub(ClientBridge.prototype, 'call').returns(q({}));
+                sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
 
-                calibrator.calibrate.returns(q({hasCSS3Selectors: false}));
+                calibrator.calibrate.returns(Promise.resolve({hasCSS3Selectors: false}));
 
                 return browser.launch(calibrator);
             });
@@ -370,13 +370,13 @@ describe('browser/new-browser', () => {
             it('should return what client method returns', () => {
                 const element = {element: 'elem'};
 
-                ClientBridge.prototype.call.withArgs('query.first', ['.class']).returns(q(element));
+                ClientBridge.prototype.call.withArgs('query.first', ['.class']).returns(Promise.resolve(element));
 
                 return assert.eventually.equal(browser.findElement('.class'), element);
             });
 
             it('should reject with element not found error if client method returns null', () => {
-                ClientBridge.prototype.call.returns(q(null));
+                ClientBridge.prototype.call.returns(Promise.resolve(null));
 
                 return assert.isRejected(browser.findElement('.class'))
                     .then((error) => {
@@ -418,7 +418,7 @@ describe('browser/new-browser', () => {
 
         it('should add calibration results to object', () => {
             const calibrator = sinon.createStubInstance(Calibrator);
-            calibrator.calibrate.returns(q({some: 'data'}));
+            calibrator.calibrate.returns(Promise.resolve({some: 'data'}));
 
             const browser = makeBrowser({}, {calibrate: true});
             return browser.launch(calibrator)
@@ -441,7 +441,7 @@ describe('browser/new-browser', () => {
         });
 
         it('should set session id after getting of a session', () => {
-            wd.init.returns(q(['100500']));
+            wd.init.returns(Promise.resolve(['100500']));
 
             const browser = makeBrowser();
             return browser.initSession()

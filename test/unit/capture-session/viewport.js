@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const q = require('q');
+const Promise = require('bluebird');
 
 const CoordValidator = require('lib/capture-session/coord-validator');
 const Image = require('lib/image');
@@ -76,7 +76,7 @@ describe('Viewport', () => {
         beforeEach(() => {
             image = sinon.createStubInstance(Image);
 
-            image.crop.returns(q());
+            image.crop.returns(Promise.resolve());
         });
 
         it('should crop an image', () => {
@@ -116,7 +116,7 @@ describe('Viewport', () => {
             image = sinon.createStubInstance(Image);
             newImage = sinon.createStubInstance(Image);
 
-            newImage.crop.returns(q());
+            newImage.crop.returns(Promise.resolve());
             newImage.getSize.returns({});
         });
 
@@ -139,7 +139,7 @@ describe('Viewport', () => {
         it('should join original image with cropped image', () => {
             const viewport = createViewport({image});
 
-            newImage.crop.returns(q('cropped-image'));
+            newImage.crop.returns(Promise.resolve('cropped-image'));
 
             return viewport.extendBy(null, newImage)
                 .then(() => assert.calledWith(image.join, 'cropped-image'));

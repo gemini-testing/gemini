@@ -1,14 +1,15 @@
 'use strict';
 var Browser = require('lib/browser'),
-    q = require('q'),
+    Promise = require('bluebird'),
     LimitedPool = require('lib/browser-pool/limited-pool'),
+    rejectedPromise = require('test/util').rejectedPromise,
     CancelledError = require('lib/errors/cancelled-error');
 
 describe('LimitedPool', function() {
     beforeEach(function() {
         this.underlyingPool = {
             getBrowser: sinon.stub(),
-            freeBrowser: sinon.stub().returns(q()),
+            freeBrowser: sinon.stub().returns(Promise.resolve()),
             cancel: sinon.stub()
         };
 
@@ -34,7 +35,7 @@ describe('LimitedPool', function() {
 
     it('should request browser from underlying pool', function() {
         var browser = this.makeBrowser();
-        this.underlyingPool.getBrowser.returns(q(browser));
+        this.underlyingPool.getBrowser.returns(Promise.resolve(browser));
         var pool = this.makePool();
         return assert.eventually.equal(pool.getBrowser('id'), browser);
     });
@@ -46,7 +47,7 @@ describe('LimitedPool', function() {
         beforeEach(function() {
             browser = this.makeBrowser();
             pool = this.makePool();
-            this.underlyingPool.getBrowser.returns(q(browser));
+            this.underlyingPool.getBrowser.returns(Promise.resolve(browser));
         });
 
         it('when freed', function() {
@@ -93,12 +94,12 @@ describe('LimitedPool', function() {
             const pool = this.makePool(2);
 
             this.underlyingPool.getBrowser
-                .withArgs('first').returns(q(browser))
-                .withArgs('second').returns(q.reject());
+                .withArgs('first').returns(Promise.resolve(browser))
+                .withArgs('second').returns(rejectedPromise());
 
-            return q.allSettled([
+            return Promise.all([
                 pool.getBrowser('first'),
-                pool.getBrowser('second')
+                pool.getBrowser('second').reflect()
             ])
                 .then(() => pool.freeBrowser(browser))
                 .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: true}));
@@ -109,10 +110,10 @@ describe('LimitedPool', function() {
         var browser = this.makeBrowser(),
             pool = this.makePool();
 
-        this.underlyingPool.getBrowser.onFirstCall().returns(q.reject());
-        this.underlyingPool.getBrowser.onSecondCall().returns(browser);
+        this.underlyingPool.getBrowser.onFirstCall().returns(rejectedPromise());
+        this.underlyingPool.getBrowser.onSecondCall().returns(Promise.resolve(browser));
 
-        pool.getBrowser('id');
+        pool.getBrowser('id').catch(() => {});
 
         assert.eventually.equal(pool.getBrowser('id'), browser);
     });
@@ -121,10 +122,10 @@ describe('LimitedPool', function() {
         it('should launch all browser in limit', function() {
             var _this = this;
             this.underlyingPool.getBrowser
-                .withArgs('first').returns(q(this.makeBrowser()))
-                .withArgs('second').returns(q(this.makeBrowser()));
+                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
+                .withArgs('second').returns(Promise.resolve(this.makeBrowser()));
             var pool = this.makePool(2);
-            return q.all([pool.getBrowser('first'), pool.getBrowser('second')])
+            return Promise.all([pool.getBrowser('first'), pool.getBrowser('second')])
                 .then(function() {
                     assert.calledTwice(_this.underlyingPool.getBrowser);
                     assert.calledWith(_this.underlyingPool.getBrowser, 'first');
@@ -133,7 +134,7 @@ describe('LimitedPool', function() {
         });
 
         it('should not launch browsers out of limit', function() {
-            this.underlyingPool.getBrowser.returns(q(this.makeBrowser()));
+            this.underlyingPool.getBrowser.returns(Promise.resolve(this.makeBrowser()));
             var pool = this.makePool(1);
             var result = pool.getBrowser('first')
                 .then(function() {
@@ -147,8 +148,8 @@ describe('LimitedPool', function() {
                 pool = this.makePool(1);
 
             this.underlyingPool.getBrowser
-                .withArgs('first').returns(q(this.makeBrowser()))
-                .withArgs('second').returns(q(expectedBrowser));
+                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
+                .withArgs('second').returns(Promise.resolve(expectedBrowser));
 
             var result = pool.getBrowser('first')
                 .then(function(browser) {
@@ -166,13 +167,13 @@ describe('LimitedPool', function() {
                 pool = this.makePool(1);
 
             this.underlyingPool.getBrowser
-                .withArgs('first').returns(q(this.makeBrowser()))
-                .withArgs('second').returns(q(expectedBrowser));
+                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
+                .withArgs('second').returns(Promise.resolve(expectedBrowser));
 
             var result = pool.getBrowser('first')
                 .then(function(browser) {
                     var secondPromise = pool.getBrowser('second');
-                    return q.delay(100)
+                    return Promise.delay(100)
                         .then(function() {
                             return pool.freeBrowser(browser);
                         })
@@ -188,19 +189,20 @@ describe('LimitedPool', function() {
                 pool = this.makePool(1);
 
             this.underlyingPool.getBrowser
-                .withArgs('first').returns(q(this.makeBrowser()))
-                .withArgs('second').returns(q(expectedBrowser));
+                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
+                .withArgs('second').returns(Promise.resolve(expectedBrowser));
 
-            this.underlyingPool.freeBrowser.returns(q.reject('error'));
+            this.underlyingPool.freeBrowser.returns(rejectedPromise());
 
             var result = pool.getBrowser('first')
                 .then(function(browser) {
                     var secondPromise = pool.getBrowser('second');
-                    return q.delay(100)
+                    return Promise.delay(100)
                         .then(function() {
                             return pool.freeBrowser(browser);
                         })
-                        .fail(function() {
+                        .catch(function() {
+                            console.log('caught');
                             return secondPromise;
                         });
                 });
@@ -214,26 +216,26 @@ describe('LimitedPool', function() {
             const afterSecondGet = sinon.spy().named('afterSecondGet');
 
             this.underlyingPool.getBrowser
-                .withArgs('first').returns(q(this.makeBrowser()))
-                .withArgs('second').returns(q.resolve());
+                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
+                .withArgs('second').returns(Promise.resolve());
 
             return pool.getBrowser('first')
                 .then((browser) => {
-                    const freeFirstBrowser = q.delay(100)
+                    const freeFirstBrowser = Promise.delay(100)
                         .then(() => pool.freeBrowser(browser))
                         .then(afterFree);
 
                     const getSecondBrowser = pool.getBrowser('second')
                         .then(afterSecondGet);
 
-                    return q.all([getSecondBrowser, freeFirstBrowser])
+                    return Promise.all([getSecondBrowser, freeFirstBrowser])
                         .then(() => assert.callOrder(afterFree, afterSecondGet));
                 });
         });
 
         it('should cancel queued browsers when cancel is called', function() {
             var pool = this.makePool(1);
-            this.underlyingPool.getBrowser.returns(q(this.makeBrowser()));
+            this.underlyingPool.getBrowser.returns(Promise.resolve(this.makeBrowser()));
             return pool.getBrowser('id')
                 .then(function() {
                     var secondRequest = pool.getBrowser('id');
@@ -246,8 +248,8 @@ describe('LimitedPool', function() {
             var pool = this.makePool(1),
                 error = new Error('You shall not pass');
             this.underlyingPool.getBrowser
-                .onFirstCall().returns(q(this.makeBrowser()))
-                .onSecondCall().returns(q.reject(error));
+                .onFirstCall().returns(Promise.resolve(this.makeBrowser()))
+                .onSecondCall().returns(rejectedPromise(error));
 
             return pool.getBrowser('id')
                 .then(function(browser) {

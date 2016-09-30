@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const Browser = require('lib/browser');
 const BasicPool = require('lib/browser-pool/basic-pool');
 const signalHandler = require('lib/signal-handler');
@@ -20,8 +20,8 @@ describe('UnlimitedPool', function() {
             forBrowser: sinon.stub().returns(browserConfig)
         };
         browser = sandbox.stub(browserWithId('id'));
-        browser.launch.returns(q());
-        browser.quit.returns(q());
+        browser.launch.returns(Promise.resolve());
+        browser.quit.returns(Promise.resolve());
 
         sandbox.stub(Browser, 'create').returns(browser);
         pool = new BasicPool(config);
@@ -44,7 +44,7 @@ describe('UnlimitedPool', function() {
         const freeBrowser = sinon.spy(pool, 'freeBrowser');
         const assertCalled = () => assert.called(freeBrowser);
 
-        browser.reset.returns(q.reject());
+        browser.reset.returns(Promise.reject());
 
         return requestBrowser()
             .then(assertCalled, assertCalled);

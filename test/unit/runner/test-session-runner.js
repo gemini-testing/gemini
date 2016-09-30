@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const TestSessionRunner = require('lib/runner/test-session-runner');
 const BrowserRunner = require('lib/runner/browser-runner');
 const pool = require('lib/browser-pool');
@@ -47,7 +47,7 @@ describe('runner/TestSessionRunner', () => {
     describe('run', () => {
         beforeEach(() => {
             sandbox.stub(BrowserRunner.prototype, 'run');
-            BrowserRunner.prototype.run.returns(q());
+            BrowserRunner.prototype.run.returns(Promise.resolve());
         });
 
         function run_(suites, stateProcessor) {
@@ -132,7 +132,7 @@ describe('runner/TestSessionRunner', () => {
             beforeEach(() => {
                 config.getBrowserIds.returns(['browser1', 'browser2']);
 
-                BrowserRunner.prototype.run.onFirstCall().returns(q.reject());
+                BrowserRunner.prototype.run.onFirstCall().returns(Promise.reject());
 
                 pool.create.returns(sinon.createStubInstance(BasicPool));
             });

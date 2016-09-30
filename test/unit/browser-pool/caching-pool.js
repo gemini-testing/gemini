@@ -1,21 +1,21 @@
 'use strict';
-const q = require('q');
+const Promise = require('bluebird');
 const Pool = require('lib/browser-pool/caching-pool');
 const browserWithId = require('../../util').browserWithId;
 
 describe('CachingPool', () => {
     const makeStubBrowser = (id) => {
         const browser = sinon.stub(browserWithId(id));
-        browser.launch.returns(q());
-        browser.reset.returns(q());
+        browser.launch.returns(Promise.resolve());
+        browser.reset.returns(Promise.resolve());
         return browser;
     };
 
     beforeEach(() => {
         this.underlyingPool = {
             getBrowser: sinon.stub(),
-            freeBrowser: sinon.stub().returns(q()),
-            finalizeBrowsers: sinon.stub().returns(q())
+            freeBrowser: sinon.stub().returns(Promise.resolve()),
+            finalizeBrowsers: sinon.stub().returns(Promise.resolve())
         };
 
         this.poolWithReuseLimits = (limits) => {
@@ -40,7 +40,7 @@ describe('CachingPool', () => {
     afterEach(() => this.sinon.restore());
 
     it('should create new browser when requested first time', () => {
-        this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
+        this.underlyingPool.getBrowser.returns(Promise.resolve(makeStubBrowser('id')));
         const pool = this.makePool();
         return pool.getBrowser('id')
             .then(() => assert.calledWith(this.underlyingPool.getBrowser, 'id'));
@@ -48,22 +48,22 @@ describe('CachingPool', () => {
 
     it('should return same browser as returned by underlying pool', () => {
         const browser = makeStubBrowser('id');
-        this.underlyingPool.getBrowser.returns(q(browser));
+        this.underlyingPool.getBrowser.returns(Promise.resolve(browser));
         const pool = this.makePool();
         return assert.eventually.equal(pool.getBrowser('id'), browser);
     });
 
     it('should not reset the new browser', () => {
         const browser = makeStubBrowser('id');
-        this.underlyingPool.getBrowser.returns(q(browser));
+        this.underlyingPool.getBrowser.returns(Promise.resolve(browser));
         return this.makePool().getBrowser('id')
             .then(() => assert.notCalled(browser.reset));
     });
 
     it('should create and launch new browser if there is free browser with different id', () => {
         this.underlyingPool.getBrowser
-            .withArgs('first').returns(q(makeStubBrowser('first')))
-            .withArgs('second').returns(q(makeStubBrowser('second')));
+            .withArgs('first').returns(Promise.resolve(makeStubBrowser('first')))
+            .withArgs('second').returns(Promise.resolve(makeStubBrowser('second')));
         const pool = this.poolWithReuseLimits({
             first: 1,
             second: 1
@@ -76,7 +76,7 @@ describe('CachingPool', () => {
 
     it('should not quit browser when freed', () => {
         const pool = this.makePool();
-        this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
+        this.underlyingPool.getBrowser.returns(Promise.resolve(makeStubBrowser('id')));
 
         return pool.getBrowser('id')
             .then((browser) => pool.freeBrowser(browser, {force: false}))
@@ -85,7 +85,7 @@ describe('CachingPool', () => {
 
     it('should quit browser when there are no more requests', () => {
         const pool = this.makePool();
-        this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
+        this.underlyingPool.getBrowser.returns(Promise.resolve(makeStubBrowser('id')));
 
         return pool.getBrowser('id')
             .then((browser) => pool.freeBrowser(browser, {force: true}))
@@ -111,23 +111,23 @@ describe('CachingPool', () => {
 
         describe('when reset failed', () => {
             it('should fail to get browser', () => {
-                this.browser.reset.returns(q.reject('some-error'));
+                this.browser.reset.returns(Promise.reject('some-error'));
                 return assert.isRejected(this.pool.getBrowser('id'), /some-error/);
             });
 
             it('should put browser back', () => {
-                this.browser.reset.returns(q.reject());
+                this.browser.reset.returns(Promise.reject());
 
                 return this.pool.getBrowser('id')
-                    .fail(() => {
+                    .catch(() => {
                         assert.calledOnce(this.underlyingPool.freeBrowser);
                         assert.calledWith(this.underlyingPool.freeBrowser, this.browser);
                     });
             });
 
             it('should keep original error if failed to put browser back', () => {
-                this.browser.reset.returns(q.reject('reset-error'));
-                this.underlyingPool.freeBrowser.returns(q.reject('free-error'));
+                this.browser.reset.returns(Promise.reject('reset-error'));
+                this.underlyingPool.freeBrowser.returns(Promise.reject('free-error'));
 
                 return assert.isRejected(this.pool.getBrowser('id'), /reset-error/);
             });
@@ -139,7 +139,7 @@ describe('CachingPool', () => {
             this.firstBrowser = makeStubBrowser('id');
             this.secondBrowser = makeStubBrowser('id');
             this.pool = this.makePool();
-            return q.all([
+            return Promise.all([
                 this.pool.freeBrowser(this.firstBrowser),
                 this.pool.freeBrowser(this.secondBrowser)
             ]);
@@ -171,7 +171,7 @@ describe('CachingPool', () => {
         });
 
         it('should launch only one session within the reuse limit', () => {
-            this.underlyingPool.getBrowser.returns(q(makeStubBrowser('id')));
+            this.underlyingPool.getBrowser.returns(Promise.resolve(makeStubBrowser('id')));
             const pool = this.poolWithReuseLimits({id: 2});
             return this.launchAndFree(pool, 'id')
                 .then(() => pool.getBrowser('id'))
@@ -180,8 +180,8 @@ describe('CachingPool', () => {
 
         it('should launch next session when over reuse limit', () => {
             this.underlyingPool.getBrowser
-                .onFirstCall().returns(q(makeStubBrowser('id')))
-                .onSecondCall().returns(q(makeStubBrowser('id')));
+                .onFirstCall().returns(Promise.resolve(makeStubBrowser('id')))
+                .onSecondCall().returns(Promise.resolve(makeStubBrowser('id')));
             const pool = this.poolWithReuseLimits({id: 2});
             return this.launchAndFree(pool, 'id')
                 .then(() => this.launchAndFree(pool, 'id'))
@@ -191,8 +191,8 @@ describe('CachingPool', () => {
 
         it('should get new session for each suite if reuse limit equal 1', () => {
             this.underlyingPool.getBrowser
-                .onFirstCall().returns(q(makeStubBrowser('browserId')))
-                .onSecondCall().returns(q(makeStubBrowser('browserId')));
+                .onFirstCall().returns(Promise.resolve(makeStubBrowser('browserId')))
+                .onSecondCall().returns(Promise.resolve(makeStubBrowser('browserId')));
             const pool = this.poolWithReuseLimits({browserId: 1});
             return this.launchAndFree(pool, 'browserId')
                 .then(() => pool.getBrowser('browserId'))
@@ -201,7 +201,7 @@ describe('CachingPool', () => {
 
         it('should close old session when reached reuse limit', () => {
             const browser = makeStubBrowser('id');
-            this.underlyingPool.getBrowser.returns(q(browser));
+            this.underlyingPool.getBrowser.returns(Promise.resolve(browser));
             const pool = this.poolWithReuseLimits({id: 2});
             return this.launchAndFree(pool, 'id')
                 .then(() => this.launchAndFree(pool, 'id'))
@@ -210,10 +210,10 @@ describe('CachingPool', () => {
 
         it('should cache browser with different id even if the first one is over limit', () => {
             this.underlyingPool.getBrowser
-                .withArgs('first').returns(q(makeStubBrowser('first')));
+                .withArgs('first').returns(Promise.resolve(makeStubBrowser('first')));
 
             const createSecondBrowser = this.underlyingPool.getBrowser.withArgs('second');
-            createSecondBrowser.returns(q(makeStubBrowser('second')));
+            createSecondBrowser.returns(Promise.resolve(makeStubBrowser('second')));
 
             const pool = this.poolWithReuseLimits({
                 first: 2,

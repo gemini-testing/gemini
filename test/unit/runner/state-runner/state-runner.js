@@ -1,5 +1,5 @@
 'use strict';
-var q = require('q'),
+var Promise = require('bluebird'),
     StateRunner = require('lib/runner/state-runner/state-runner'),
     CaptureSession = require('lib/capture-session'),
     StateError = require('lib/errors/state-error'),
@@ -14,9 +14,9 @@ describe('runner/state-runner/state-runner', function() {
         session.browser = util.browserWithId(opts.browserId || 'default-browser-id');
         session.browser.sessionId = opts.sessionId || 'default-session-id';
 
-        session.runActions.returns(q.resolve());
-        session.capture.returns(q.resolve({}));
-        session.extendWithPageScreenshot.returns(q.resolve());
+        session.runActions.returns(Promise.resolve());
+        session.capture.returns(Promise.resolve({}));
+        session.extendWithPageScreenshot.returns(Promise.resolve());
 
         return session;
     }
@@ -31,7 +31,7 @@ describe('runner/state-runner/state-runner', function() {
 
     function mkStateProcessor_() {
         var stateProcessor = sinon.createStubInstance(StateProcessor);
-        stateProcessor.exec.returns(q());
+        stateProcessor.exec.returns(Promise.resolve());
         return stateProcessor;
     }
 
@@ -104,7 +104,7 @@ describe('runner/state-runner/state-runner', function() {
                 mediator = sinon.spy().named('mediator'),
                 stateProcessor = mkStateProcessor_();
 
-            browserSession.runActions.returns(q.delay(1).then(mediator));
+            browserSession.runActions.returns(Promise.delay(50).then(mediator));
 
             return run_(runner, stateProcessor)
                 .then(function() {
@@ -122,7 +122,7 @@ describe('runner/state-runner/state-runner', function() {
                 runner = mkRunner_(state, browserSession);
 
             var error = new StateError('some error');
-            browserSession.runActions.returns(q.reject(error));
+            browserSession.runActions.returns(Promise.reject(error));
 
             return run_(runner)
                 .then(function() {
@@ -138,7 +138,7 @@ describe('runner/state-runner/state-runner', function() {
                 mediator = sinon.spy().named('mediator'),
                 stateProcessor = mkStateProcessor_();
 
-            browserSession.prepareScreenshot.returns(q.delay(1).then(mediator));
+            browserSession.prepareScreenshot.returns(Promise.delay(500).then(mediator));
 
             return run_(runner, stateProcessor)
                 .then(function() {
@@ -156,7 +156,7 @@ describe('runner/state-runner/state-runner', function() {
                 runner = mkRunner_(state, browserSession);
 
             var error = new StateError('some error');
-            browserSession.prepareScreenshot.returns(q.reject(error));
+            browserSession.prepareScreenshot.returns(Promise.reject(error));
 
             return run_(runner)
                 .then(function() {
@@ -171,7 +171,7 @@ describe('runner/state-runner/state-runner', function() {
                 runner = mkRunner_(state, browserSession),
                 stateProcessor = mkStateProcessor_();
 
-            stateProcessor.exec.returns(q());
+            stateProcessor.exec.returns(Promise.resolve());
 
             return runner.run(stateProcessor)
                 .then(function() {
@@ -188,7 +188,7 @@ describe('runner/state-runner/state-runner', function() {
 
             runner.on('err', onStateError);
 
-            stateProcessor.exec.returns(q.reject(new StateError()));
+            stateProcessor.exec.returns(Promise.reject(new StateError()));
 
             return run_(runner, stateProcessor)
                 .then(function() {

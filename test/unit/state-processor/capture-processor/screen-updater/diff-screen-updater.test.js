@@ -2,7 +2,7 @@
 
 const DiffScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/diff-screen-updater');
 const temp = require('lib/temp');
-const q = require('q');
+const Promise = require('bluebird');
 const fs = require('q-io/fs');
 const Image = require('lib/image');
 
@@ -21,7 +21,7 @@ describe('diff-screen-updater', () => {
                 refPath: opts.refPath
             };
 
-        capture.image.save.returns(q());
+        capture.image.save.returns(Promise.resolve());
 
         return updater.exec(capture, env);
     }
@@ -32,10 +32,10 @@ describe('diff-screen-updater', () => {
 
         imageStub = sinon.createStubInstance(Image);
         imageCompareStub = sandbox.stub(Image, 'compare');
-        imageStub.save.returns(q());
+        imageStub.save.returns(Promise.resolve());
 
-        fs.exists.returns(q(true));
-        fs.copy.returns(q());
+        fs.exists.returns(Promise.resolve(true));
+        fs.copy.returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -43,7 +43,7 @@ describe('diff-screen-updater', () => {
     });
 
     it('should save image to the temp directory before comparing', () => {
-        imageCompareStub.returns(q());
+        imageCompareStub.returns(Promise.resolve());
         temp.path.returns('/temp/path');
 
         return exec_()
@@ -54,8 +54,8 @@ describe('diff-screen-updater', () => {
     });
 
     it('should not compare images if reference image does not exist', () => {
-        fs.exists.returns(q(false));
-        imageCompareStub.returns(q());
+        fs.exists.returns(Promise.resolve(false));
+        imageCompareStub.returns(Promise.resolve());
 
         return exec_()
             .then(() => {
@@ -64,7 +64,7 @@ describe('diff-screen-updater', () => {
     });
 
     it('should not save image if images are the same', () => {
-        imageCompareStub.returns(q(true));
+        imageCompareStub.returns(Promise.resolve(true));
 
         return exec_()
             .then(() => {
@@ -73,7 +73,7 @@ describe('diff-screen-updater', () => {
     });
 
     it('should save image if images are different', () => {
-        imageCompareStub.returns(q(false));
+        imageCompareStub.returns(Promise.resolve(false));
         temp.path.returns('/temp/path');
 
         return exec_({refPath: '/ref/path'})
@@ -83,7 +83,7 @@ describe('diff-screen-updater', () => {
     });
 
     it('should save image with correct suffix', () => {
-        imageCompareStub.returns(q(false));
+        imageCompareStub.returns(Promise.resolve(false));
 
         return exec_()
             .then(() => {

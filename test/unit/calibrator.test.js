@@ -1,5 +1,5 @@
 'use strict';
-var q = require('q'),
+var Promise = require('bluebird'),
     path = require('path'),
     fs = require('fs'),
     Calibrator = require('lib/calibrator'),
@@ -14,21 +14,21 @@ describe('calibrator', function() {
         var imgPath = path.join(__dirname, '..', 'functional', 'data', 'image', imageName),
             imgData = fs.readFileSync(imgPath);
 
-        browser.captureViewportImage.returns(q(new Image(imgData)));
+        browser.captureViewportImage.returns(Promise.resolve(new Image(imgData)));
     }
 
     beforeEach(function() {
         browser = browserWithId('id');
         sinon.stub(browser);
-        browser.evalScript.returns(q({innerWidth: 984})); //width of viewport in test image
-        browser.open.returns(q());
+        browser.evalScript.returns(Promise.resolve({innerWidth: 984})); //width of viewport in test image
+        browser.open.returns(Promise.resolve());
         calibrator = new Calibrator();
     });
 
     it('should calculate correct crop area', function() {
         setScreenshot('calibrate.png');
         var result = calibrator.calibrate(browser);
-        return q.all([
+        return Promise.all([
             assert.eventually.propertyVal(result, 'top', 2),
             assert.eventually.propertyVal(result, 'left', 2)
         ]);
@@ -36,7 +36,7 @@ describe('calibrator', function() {
 
     it('should return also features detected by script', function() {
         setScreenshot('calibrate.png');
-        browser.evalScript.returns(q({feature: 'value', innerWidth: 984}));
+        browser.evalScript.returns(Promise.resolve({feature: 'value', innerWidth: 984}));
         var result = calibrator.calibrate(browser);
         return assert.eventually.propertyVal(result, 'feature', 'value');
     });
@@ -60,7 +60,7 @@ describe('calibrator', function() {
                         .then(function() {
                             return calibrator.calibrate(browser);
                         });
-        return q.all([
+        return Promise.all([
             assert.eventually.propertyVal(result, 'top', 2),
             assert.eventually.propertyVal(result, 'left', 2)
         ]);

@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 
 const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
 const StateRunnerFactory = require('lib/runner/state-runner');
@@ -11,6 +11,7 @@ const Config = require('lib/config');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
 const util = require('../../../util');
 const makeSuiteStub = util.makeSuiteStub;
+const rejectedPromise = util.rejectedPromise;
 
 describe('runner/suite-runner/regular-suite-runner', () => {
     const sandbox = sinon.sandbox.create();
@@ -24,16 +25,16 @@ describe('runner/suite-runner/regular-suite-runner', () => {
     beforeEach(() => {
         browser = util.browserWithId('default-browser');
         sandbox.stub(browser, 'openRelative');
-        browser.openRelative.returns(q.resolve());
+        browser.openRelative.returns(Promise.resolve());
 
         sandbox.stub(BrowserAgent.prototype, 'getBrowser');
         sandbox.stub(BrowserAgent.prototype, 'freeBrowser');
 
-        BrowserAgent.prototype.getBrowser.returns(q.resolve(browser));
-        BrowserAgent.prototype.freeBrowser.returns(q.resolve());
+        BrowserAgent.prototype.getBrowser.returns(Promise.resolve(browser));
+        BrowserAgent.prototype.freeBrowser.returns(Promise.resolve());
 
         sandbox.stub(CaptureSession.prototype);
-        CaptureSession.prototype.runActions.returns(q.resolve());
+        CaptureSession.prototype.runActions.returns(Promise.resolve());
         CaptureSession.prototype.browser = browser;
 
         config = sinon.createStubInstance(Config);
@@ -149,7 +150,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
         });
 
         describe('if can not get a browser', () => {
-            beforeEach(() => BrowserAgent.prototype.getBrowser.returns(q.reject(new Error())));
+            beforeEach(() => BrowserAgent.prototype.getBrowser.returns(rejectedPromise()));
 
             it('should pass an error to all states', () => {
                 const suiteTree = util.makeSuiteTree({suite: ['first-state', 'second-state']});
@@ -185,7 +186,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
 
         describe('if can not open url in a browser', () => {
             beforeEach(() => {
-                browser.openRelative.returns(q.reject(new Error()));
+                browser.openRelative.returns(rejectedPromise());
             });
 
             it('should pass an error to all states', () => {
@@ -229,7 +230,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
                     states: [util.makeStateStub()]
                 });
 
-                CaptureSession.prototype.runActions.withArgs(suite.beforeActions).returns(q.reject(new Error()));
+                CaptureSession.prototype.runActions.withArgs(suite.beforeActions).returns(rejectedPromise());
             });
 
             it('should pass an error to all states', () => {
@@ -260,19 +261,19 @@ describe('runner/suite-runner/regular-suite-runner', () => {
 
             it('should not run states', () => {
                 return run_(suite)
-                    .fail(() => assert.notCalled(stateRunner.run));
+                    .catch(() => assert.notCalled(stateRunner.run));
             });
 
             it('should not run `afterActions`', () => {
                 return run_(suite)
-                    .fail(() => {
+                    .catch(() => {
                         assert.neverCalledWith(CaptureSession.prototype.runActions, suite.afterActions);
                     });
             });
 
             it('should not run post actions', () => {
                 return run_(suite)
-                    .fail(() => assert.notCalled(CaptureSession.prototype.runPostActions));
+                    .catch(() => assert.notCalled(CaptureSession.prototype.runPostActions));
             });
         });
 
@@ -282,7 +283,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
             const state2 = util.makeStateStub(suite);
             const mediator = sinon.spy();
 
-            stateRunner.run.onFirstCall().returns(q.delay(1).then(mediator));
+            stateRunner.run.onFirstCall().returns(Promise.delay(50).then(mediator));
 
             return run_(suite)
                 .then(() => {
@@ -310,10 +311,10 @@ describe('runner/suite-runner/regular-suite-runner', () => {
             const state2 = util.makeStateStub();
             const suite = makeSuiteStub({states: [state1, state2]});
 
-            stateRunner.run.withArgs(state1).returns(q.reject());
+            stateRunner.run.withArgs(state1).returns(rejectedPromise());
 
             return run_(suite)
-                .fail(() => assert.neverCalledWith(stateRunner.run, state2));
+                .catch(() => assert.neverCalledWith(stateRunner.run, state2));
         });
 
         describe('afterActions', () => {
@@ -329,10 +330,10 @@ describe('runner/suite-runner/regular-suite-runner', () => {
             it('should perform afterActions even if state failed', () => {
                 const suite = makeSuiteStub({states: [util.makeStateStub()]});
 
-                stateRunner.run.returns(q.reject());
+                stateRunner.run.returns(rejectedPromise());
 
                 return run_(suite)
-                    .fail(() => assert.calledWith(CaptureSession.prototype.runActions, suite.afterActions));
+                    .catch(() => assert.calledWith(CaptureSession.prototype.runActions, suite.afterActions));
             });
 
             it('should pass an error to all states if `afterActions` failed', () => {
@@ -341,7 +342,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
                 const onErrorHandler = sinon.spy();
 
                 CaptureSession.prototype.runActions.withArgs(suiteTree.suite.afterActions)
-                    .returns(q.reject(new Error()));
+                    .returns(rejectedPromise());
 
                 runner.on('err', onErrorHandler);
 
@@ -365,7 +366,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
                 const runner = mkRunner_(suiteTree.suite);
                 const onErrorHandler = sinon.spy();
 
-                CaptureSession.prototype.runPostActions.returns(q.reject(new Error()));
+                CaptureSession.prototype.runPostActions.returns(rejectedPromise());
 
                 runner.on('err', onErrorHandler);
 
@@ -378,19 +379,19 @@ describe('runner/suite-runner/regular-suite-runner', () => {
             });
 
             it('should run post actions if state failed', () => {
-                stateRunner.run.returns(q.reject());
+                stateRunner.run.returns(rejectedPromise());
 
                 return run_()
-                    .fail(() => assert.calledOnce(CaptureSession.prototype.runPostActions));
+                    .catch(() => assert.calledOnce(CaptureSession.prototype.runPostActions));
             });
 
             it('should run post actions if `afterActions` failed', () => {
                 const suite = makeSuiteStub({states: [util.makeStateStub()]});
 
-                CaptureSession.prototype.runActions.withArgs(suite.afterActions).returns(q.reject());
+                CaptureSession.prototype.runActions.withArgs(suite.afterActions).returns(rejectedPromise());
 
                 return run_(suite)
-                    .fail(() => assert.calledOnce(CaptureSession.prototype.runPostActions));
+                    .catch(() => assert.calledOnce(CaptureSession.prototype.runPostActions));
             });
 
             it('should pass an afterActions error to all states if afterActions and postActions failed', () => {
@@ -399,8 +400,8 @@ describe('runner/suite-runner/regular-suite-runner', () => {
                 const onErrorHandler = sinon.spy();
 
                 CaptureSession.prototype.runActions.withArgs(suite.afterActions)
-                    .returns(q.reject(new Error('after-actions-error')));
-                CaptureSession.prototype.runPostActions.returns(q.reject(new Error('post-actions-error')));
+                    .returns(rejectedPromise('after-actions-error'));
+                CaptureSession.prototype.runPostActions.returns(rejectedPromise('post-actions-error'));
 
                 runner.on('err', onErrorHandler);
 
@@ -424,14 +425,14 @@ describe('runner/suite-runner/regular-suite-runner', () => {
             });
 
             it('should free browser if run states failed', () => {
-                stateRunner.run.returns(q.reject());
+                stateRunner.run.returns(rejectedPromise());
 
                 return run_()
-                    .fail(() => assert.calledOnce(BrowserAgent.prototype.freeBrowser));
+                    .catch(() => assert.calledOnce(BrowserAgent.prototype.freeBrowser));
             });
 
             it('should invalidate session after error in test', () => {
-                CaptureSession.prototype.runActions.returns(q.reject());
+                CaptureSession.prototype.runActions.returns(rejectedPromise());
 
                 return run_()
                     .catch(() => {
@@ -440,7 +441,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
             });
 
             it('should not invalidate session if reference image does not exist', () => {
-                CaptureSession.prototype.runActions.returns(q.reject(new NoRefImageError()));
+                CaptureSession.prototype.runActions.returns(rejectedPromise(new NoRefImageError()));
 
                 return run_()
                     .then(() => {
@@ -451,10 +452,10 @@ describe('runner/suite-runner/regular-suite-runner', () => {
 
         it('should add `browserId` and `sessionId` to error if something failed', () => {
             browser.sessionId = 'test-session-id';
-            CaptureSession.prototype.runActions.returns(q.reject(new Error('test_error')));
+            CaptureSession.prototype.runActions.returns(rejectedPromise('test_error'));
 
             return run_()
-                .fail((e) => assert.deepEqual(e, {browserId: 'default-browser', sessionId: 'test-session-id'}));
+                .catch((e) => assert.deepEqual(e, {browserId: 'default-browser', sessionId: 'test-session-id'}));
         });
     });
 });

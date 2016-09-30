@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 
 const ActionsBuilder = require('lib/tests-api/actions-builder');
 const util = require('../../util');
@@ -25,8 +25,8 @@ describe('tests-api/actions-builder', () => {
 
     describe('changeOrientation', () => {
         beforeEach(() => {
-            sandbox.stub(browser, 'getOrientation').returns(q());
-            sandbox.stub(browser, 'setOrientation').returns(q());
+            sandbox.stub(browser, 'getOrientation').returns(Promise.resolve());
+            sandbox.stub(browser, 'setOrientation').returns(Promise.resolve());
         });
 
         it('should throw in case of passed arguments', () => {
@@ -40,7 +40,7 @@ describe('tests-api/actions-builder', () => {
         });
 
         it('should change orientation from PORTRAIT to LANDSCAPE', () => {
-            browser.getOrientation.returns(q('PORTRAIT'));
+            browser.getOrientation.returns(Promise.resolve('PORTRAIT'));
             const changeOrientation = mkAction('changeOrientation', browser);
 
             return changeOrientation()
@@ -48,7 +48,7 @@ describe('tests-api/actions-builder', () => {
         });
 
         it('should change orientation from LANDSCAPE to PORTRAIT', () => {
-            browser.getOrientation.returns(q('LANDSCAPE'));
+            browser.getOrientation.returns(Promise.resolve('LANDSCAPE'));
             const changeOrientation = mkAction('changeOrientation', browser);
 
             return changeOrientation()
@@ -64,14 +64,14 @@ describe('tests-api/actions-builder', () => {
         });
 
         it('should be rejected if getting of orientation fails', () => {
-            browser.getOrientation.returns(q.reject('awesome error'));
+            browser.getOrientation.returns(Promise.reject('awesome error'));
             const changeOrientation = mkAction('changeOrientation', browser);
 
             return assert.isRejected(changeOrientation(), /awesome error/);
         });
 
         it('should be rejected if setting of orientation fails', () => {
-            browser.setOrientation.returns(q.reject('awesome error'));
+            browser.setOrientation.returns(Promise.reject('awesome error'));
             const changeOrientation = mkAction('changeOrientation', browser);
 
             return assert.isRejected(changeOrientation(), /awesome error/);
@@ -80,13 +80,13 @@ describe('tests-api/actions-builder', () => {
 
     describe('mouse actions', () => {
         beforeEach(() => {
-            sandbox.stub(browser, 'moveTo').returns(q());
-            sandbox.stub(browser, 'findElement').returns(q({}));
+            sandbox.stub(browser, 'moveTo').returns(Promise.resolve());
+            sandbox.stub(browser, 'findElement').returns(Promise.resolve({}));
         });
 
         describe('click', () => {
             beforeEach(() => {
-                sandbox.stub(browser, 'click').returns(q());
+                sandbox.stub(browser, 'click').returns(Promise.resolve());
             });
 
             it('should use left button if not specified', () => {
@@ -112,7 +112,7 @@ describe('tests-api/actions-builder', () => {
 
         describe('doubleClick', () => {
             beforeEach(() => {
-                sandbox.stub(browser, 'doubleClick').returns(q());
+                sandbox.stub(browser, 'doubleClick').returns(Promise.resolve());
             });
 
             it('should use left button if not specified', () => {
@@ -138,7 +138,7 @@ describe('tests-api/actions-builder', () => {
 
         describe('mouseDown', () => {
             beforeEach(() => {
-                sandbox.stub(browser, 'buttonDown').returns(q());
+                sandbox.stub(browser, 'buttonDown').returns(Promise.resolve());
             });
 
             it('should use left button if not specified', () => {
@@ -164,7 +164,7 @@ describe('tests-api/actions-builder', () => {
 
         describe('mouseUp', () => {
             beforeEach(() => {
-                sandbox.stub(browser, 'buttonUp').returns(q());
+                sandbox.stub(browser, 'buttonUp').returns(Promise.resolve());
             });
 
             it('should use left button if not specified', () => {

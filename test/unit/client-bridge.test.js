@@ -1,5 +1,5 @@
 'use strict';
-var q = require('q'),
+var Promise = require('bluebird'),
     ClientBridge = require('lib/browser/client-bridge'),
     StateError = require('lib/errors/state-error'),
 
@@ -9,8 +9,8 @@ var q = require('q'),
 describe('ClientBridge', function() {
     beforeEach(function() {
         this.browser = sinon.stub(browserWithId('id'));
-        this.browser.evalScript.returns(q({}));
-        this.browser.injectScript.returns(q({}));
+        this.browser.evalScript.returns(Promise.resolve({}));
+        this.browser.injectScript.returns(Promise.resolve({}));
         this.script = 'exampleScript()';
         this.bridge = new ClientBridge(this.browser, this.script);
     });
@@ -39,20 +39,20 @@ describe('ClientBridge', function() {
         });
 
         it('should return what evalScript returns if succeeded', function() {
-            this.browser.evalScript.returns(q('result'));
+            this.browser.evalScript.returns(Promise.resolve('result'));
             return assert.becomes(this.bridge.call('example'), 'result');
         });
 
         it('should reject if evalScript returns unexpected error', function() {
             var message = 'Something happened';
-            this.browser.evalScript.returns(q({error: message}));
+            this.browser.evalScript.returns(Promise.resolve({error: message}));
             var result = this.bridge.call('fail');
             return assert.isRejected(result, StateError, message);
         });
 
         it('should not attempt to call eval second if it return with unexpected error', function() {
             var _this = this;
-            this.browser.evalScript.returns(q({error: 'unexpected'}));
+            this.browser.evalScript.returns(Promise.resolve({error: 'unexpected'}));
             return assert.isRejected(this.bridge.call('fail'))
                 .then(function() {
                     assert.calledOnce(_this.browser.evalScript);
@@ -63,12 +63,12 @@ describe('ClientBridge', function() {
             beforeEach(function() {
                 this.setupAsNonInjected = function(finalResult) {
                     this.browser.evalScript
-                        .onFirstCall().returns(q({error: 'ERRNOFUNC'}))
-                        .onSecondCall().returns(q(finalResult));
+                        .onFirstCall().returns(Promise.resolve({error: 'ERRNOFUNC'}))
+                        .onSecondCall().returns(Promise.resolve(finalResult));
 
                     this.browser.injectScript
                         .withArgs(this.script)
-                        .returns(q());
+                        .returns(Promise.resolve());
                 };
 
                 this.performCall = function() {

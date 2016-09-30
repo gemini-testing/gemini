@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const BrowserRunner = require('lib/runner/browser-runner');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const SuiteRunner = require('lib/runner/suite-runner/suite-runner');
@@ -18,7 +18,7 @@ describe('runner/BrowserRunner', () => {
 
     beforeEach(() => {
         suiteRunner = sinon.createStubInstance(SuiteRunner);
-        suiteRunner.run.returns(q.resolve());
+        suiteRunner.run.returns(Promise.resolve());
 
         sandbox.stub(suiteRunnerFabric, 'create');
         suiteRunnerFabric.create.returns(suiteRunner);
