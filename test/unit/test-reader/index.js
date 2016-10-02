@@ -28,7 +28,7 @@ describe('test-reader', () => {
 
         opts.config = _.merge(opts.config, REQUIRED_OPTS);
 
-        return readTests({paths: opts.paths, sets: opts.cliSets}, opts.config, opts.emitter);
+        return readTests({paths: opts.paths, sets: opts.sets}, opts.config, opts.emitter);
     };
 
     beforeEach(() => {
@@ -130,7 +130,7 @@ describe('test-reader', () => {
             });
     });
 
-    it('should load suites related to sets from cli', () => {
+    it('should load suites related to sets from opts', () => {
         const config = {
             sets: {
                 set1: {
@@ -144,11 +144,11 @@ describe('test-reader', () => {
 
         globExtra.expandPaths.withArgs(['some/path']).returns(q(['/some/path/file1.js']));
 
-        return readTests_({cliSets: ['set1'], config})
+        return readTests_({sets: ['set1'], config})
             .then(() => assert.alwaysCalledWithExactly(utils.requireWithNoCache, '/some/path/file1.js'));
     });
 
-    it('should load suites related to paths from cli', () => {
+    it('should load suites related to paths from opts', () => {
         const config = {
             sets: {
                 set1: {
@@ -169,7 +169,7 @@ describe('test-reader', () => {
             });
     });
 
-    it('should load suites related to sets and paths from cli', () => {
+    it('should load suites related to sets and paths from opts', () => {
         const config = {
             sets: {
                 set1: {
@@ -182,14 +182,14 @@ describe('test-reader', () => {
             .withArgs(['some/path']).returns(q(['/some/path/file1.js']))
             .withArgs(['some/path', 'other/path']).returns(q(['/some/path/file1.js', '/other/path/file2.js']));
 
-        return readTests_({cliSets: ['set1'], paths: ['some/path'], config})
+        return readTests_({sets: ['set1'], paths: ['some/path'], config})
             .then(() => {
                 assert.calledWith(utils.requireWithNoCache, '/some/path/file1.js');
                 assert.neverCalledWith(utils.requireWithNoCache, '/other/path/file2.js');
             });
     });
 
-    it('should not load suites if sets do not contain paths from cli', () => {
+    it('should throw error if sets do not contain paths from opts', () => {
         const config = {
             sets: {
                 set1: {
@@ -198,8 +198,59 @@ describe('test-reader', () => {
             }
         };
 
-        return readTests_({paths: ['other/path'], config})
-            .then(() => assert.notCalled(utils.requireWithNoCache));
+        return assert.isRejected(readTests_({paths: ['other/path'], config}), /Cannot find files/);
+    });
+
+    describe('files of sets are specified as masks', () => {
+        it('should load suites related to paths from opts', () => {
+            const config = {
+                sets: {
+                    set1: {
+                        files: ['some/**']
+                    },
+                    set2: {
+                        files: ['other/**']
+                    }
+                }
+            };
+
+            globExtra.expandPaths
+                .withArgs(['some/path/*.js']).returns(q(['/root/some/path/file1.js']));
+
+            return readTests_({paths: ['some/path/*.js'], config})
+                .then(() => {
+                    assert.alwaysCalledWithExactly(utils.requireWithNoCache, '/root/some/path/file1.js');
+                });
+        });
+
+        it('should load suites related to sets and paths from opts', () => {
+            const config = {
+                sets: {
+                    set1: {
+                        files: ['{*,other}/path/*.js', 'another/**']
+                    }
+                }
+            };
+
+            globExtra.expandPaths.withArgs(['some/path/*']).returns(q(['/root/some/path/file1.js']));
+
+            return readTests_({sets: ['set1'], paths: ['some/path/*'], config})
+                .then(() => assert.calledWith(utils.requireWithNoCache, '/root/some/path/file1.js'));
+        });
+
+        it('should throw error if sets do not contain paths from opts', () => {
+            const config = {
+                sets: {
+                    set1: {
+                        files: ['some/*']
+                    }
+                }
+            };
+
+            globExtra.expandPaths.withArgs(['other/path']).returns(q(['/root/other/path/file1.js']));
+
+            return assert.isRejected(readTests_({paths: ['other/path'], config}), /Cannot find files/);
+        });
     });
 
     describe('events', () => {
