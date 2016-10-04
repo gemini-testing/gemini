@@ -107,6 +107,16 @@ describe('runner', () => {
                 .then(() => assert.calledWith(onStartRunner, runner));
         });
 
+        it('should wait for resolving a listener when `START_RUNNER` event was emitted', () => {
+            const onStartRunner = sandbox.spy().named('onStartRunner');
+            runner.on(Events.START_RUNNER, onStartRunner);
+
+            sandbox.spy(Runner.prototype, 'emitAndWait');
+
+            return run_()
+                .then(() => assert.calledWith(runner.emitAndWait, Events.START_RUNNER));
+        });
+
         it('should launch only browsers specified in testBrowsers', () => {
             runner.config.getBrowserIds.returns(['browser1', 'browser2']);
             runner.setTestBrowsers(['browser1']);
@@ -147,6 +157,16 @@ describe('runner', () => {
 
             return run_()
                 .then(() => assert.calledWith(onEndRunner, runner));
+        });
+
+        it('should wait for resolving a listener when `END_RUNNER` event was emitted', () => {
+            const onStartRunner = sandbox.spy().named('onStartRunner');
+            runner.on(Events.END_RUNNER, onStartRunner);
+
+            sandbox.spy(Runner.prototype, 'emitAndWait');
+
+            return run_()
+                .then(() => assert.calledWith(runner.emitAndWait, Events.END_RUNNER));
         });
 
         it('should emit events in correct order', () => {
