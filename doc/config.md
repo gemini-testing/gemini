@@ -51,6 +51,8 @@ sets:
 system:
   projectRoot: ../project
   sourceRoot: ../project/src
+  exclude:
+    - node_modules/**
   plugins:
     teamcity: true
   debug: true
@@ -84,6 +86,15 @@ settings. These settings can not be set per-browser.
   starting with `.gemini.tmp.` where all temporary images will be saved.
   After run created directory will be removed. If not set system temp
   directory will be used.
+
+* `exclude` - array of glob patterns to exclude paths from the test search. For example:
+
+```yaml
+exclude:
+  - node_modules/**
+  - gemini/helpers/**
+  - foo/{bar,baz}/*.js
+```
 
 * `plugins` - list of plugins to enable. Should have form of `pluginName:
   settings`.  For example:
@@ -132,7 +143,6 @@ settings. These settings can not be set per-browser.
           exclude:
             - libs/**
             - path/to/some.css
-            -
       ```
 
   - `html` - set to false to disable html report and save only JSON.
