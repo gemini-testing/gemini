@@ -1,9 +1,13 @@
 # Changelog
 
+## 4.12.0 - 2016-10-03
+
+* Added the ability to specify exclude paths in which the gemini tests will not be searched, see [documentation](https://github.com/gemini-testing/gemini/blob/master/doc/config.md#system-settings)
+* Fixed bug which causes skip errors which might be occur in listeners of `START_RUNNER` and `END_RUNNER` events
+
 ## 4.11.3 - 2016-09-29
 
 * Second attempt of fixing order of file read events
-
 
 ## 4.11.2 - 2016-09-27
 
