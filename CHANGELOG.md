@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.12.1 - 2016-10-06
+
+* Restore 4.10 plugin loading order — plugins now loaded before any tests files
+  are read.
+* Internal promises library changed `bluebird`. This should make gemini a little
+  bit faster.
+
 ## 4.12.0 - 2016-10-03
 
 * Added the ability to specify exclude paths in which the gemini tests will not be searched, see [documentation](https://github.com/gemini-testing/gemini/blob/master/doc/config.md#system-settings)
