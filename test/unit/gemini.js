@@ -3,7 +3,7 @@
 const EventEmitter = require('events').EventEmitter;
 const _ = require('lodash');
 const proxyquire = require('proxyquire');
-const q = require('q');
+const Promise = require('bluebird');
 
 const Config = require('lib/config');
 const plugins = require('lib/plugins');
@@ -31,7 +31,7 @@ describe('gemini', () => {
     const initGemini = (opts) => {
         opts.rootSuite = opts.rootSuite || mkSuiteStub();
 
-        testReaderStub = sandbox.stub().named('TestReader').returns(q(opts.rootSuite));
+        testReaderStub = sandbox.stub().named('TestReader').returns(Promise.resolve(opts.rootSuite));
 
         Gemini = proxyquire('lib/gemini', {'./test-reader': testReaderStub});
 
@@ -58,7 +58,7 @@ describe('gemini', () => {
 
     beforeEach(() => {
         sandbox.stub(Runner.prototype, 'on').returnsThis();
-        sandbox.stub(Runner.prototype, 'run').returns(q());
+        sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
         sandbox.stub(console, 'warn');
         sandbox.stub(plugins, 'load');
     });

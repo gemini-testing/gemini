@@ -2,7 +2,7 @@
 
 const proxyquire = require('proxyquire');
 const _ = require('lodash');
-const q = require('q');
+const Promise = require('bluebird');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('lib/utils');
 const globExtra = require('glob-extra');
@@ -33,7 +33,7 @@ describe('test-reader', () => {
 
     beforeEach(() => {
         sandbox.stub(utils, 'requireWithNoCache');
-        sandbox.stub(globExtra, 'expandPaths').returns(q([]));
+        sandbox.stub(globExtra, 'expandPaths').returns(Promise.resolve([]));
 
         readTests = proxyquire('lib/test-reader', {
             '../tests-api': testsApi
@@ -68,7 +68,7 @@ describe('test-reader', () => {
             const api = {suite: 'api'};
 
             testsApi.returns(api);
-            globExtra.expandPaths.returns(q(['some-test.js']));
+            globExtra.expandPaths.returns(Promise.resolve(['some-test.js']));
 
             return readTests_({config})
                 .then(() => assert.deepEqual(gemini, api));
@@ -77,7 +77,7 @@ describe('test-reader', () => {
         it('should rewrite global "gemini" variable for each file', () => {
             let globalGemini = [];
 
-            globExtra.expandPaths.returns(q(['/some/path/file1.js', '/some/path/file2.js']));
+            globExtra.expandPaths.returns(Promise.resolve(['/some/path/file1.js', '/some/path/file2.js']));
 
             testsApi
                 .onFirstCall().returns({suite: 'apiInstance'})
@@ -93,7 +93,7 @@ describe('test-reader', () => {
 
         it('should delete global "gemini" variable after test reading', () => {
             testsApi.returns({suite: 'api'});
-            globExtra.expandPaths.returns(q(['some-test.js']));
+            globExtra.expandPaths.returns(Promise.resolve(['some-test.js']));
             sandbox.stub(utils, 'requireWithNoCache');
 
             return readTests_({config}).then(() => assert.notProperty(global, 'gemini'));
@@ -105,7 +105,7 @@ describe('test-reader', () => {
             getBrowserIds: () => []
         };
 
-        globExtra.expandPaths.withArgs(['/root/gemini']).returns(q(['/root/gemini/file.js']));
+        globExtra.expandPaths.withArgs(['/root/gemini']).returns(Promise.resolve(['/root/gemini/file.js']));
 
         return readTests_({config})
             .then(() => assert.calledWith(utils.requireWithNoCache, '/root/gemini/file.js'));
@@ -121,7 +121,7 @@ describe('test-reader', () => {
         };
 
         globExtra.expandPaths
-            .withArgs(['some/path']).returns(q(['/some/path/file1.js', '/some/path/file2.js']));
+            .withArgs(['some/path']).returns(Promise.resolve(['/some/path/file1.js', '/some/path/file2.js']));
 
         return readTests_({config})
             .then(() => {
@@ -142,7 +142,7 @@ describe('test-reader', () => {
             }
         };
 
-        globExtra.expandPaths.withArgs(['some/path']).returns(q(['/some/path/file1.js']));
+        globExtra.expandPaths.withArgs(['some/path']).returns(Promise.resolve(['/some/path/file1.js']));
 
         return readTests_({sets: ['set1'], config})
             .then(() => assert.alwaysCalledWithExactly(utils.requireWithNoCache, '/some/path/file1.js'));
@@ -161,7 +161,7 @@ describe('test-reader', () => {
         };
 
         globExtra.expandPaths
-            .withArgs(['some/path']).returns(q(['/some/path/file1.js']));
+            .withArgs(['some/path']).returns(Promise.resolve(['/some/path/file1.js']));
 
         return readTests_({paths: ['some/path'], config})
             .then(() => {
@@ -179,8 +179,8 @@ describe('test-reader', () => {
         };
 
         globExtra.expandPaths
-            .withArgs(['some/path']).returns(q(['/some/path/file1.js']))
-            .withArgs(['some/path', 'other/path']).returns(q(['/some/path/file1.js', '/other/path/file2.js']));
+            .withArgs(['some/path']).returns(Promise.resolve(['/some/path/file1.js']))
+            .withArgs(['some/path', 'other/path']).returns(Promise.resolve(['/some/path/file1.js', '/other/path/file2.js']));
 
         return readTests_({sets: ['set1'], paths: ['some/path'], config})
             .then(() => {
@@ -215,7 +215,7 @@ describe('test-reader', () => {
             };
 
             globExtra.expandPaths
-                .withArgs(['some/path/*.js']).returns(q(['/root/some/path/file1.js']));
+                .withArgs(['some/path/*.js']).returns(Promise.resolve(['/root/some/path/file1.js']));
 
             return readTests_({paths: ['some/path/*.js'], config})
                 .then(() => {
@@ -232,7 +232,7 @@ describe('test-reader', () => {
                 }
             };
 
-            globExtra.expandPaths.withArgs(['some/path/*']).returns(q(['/root/some/path/file1.js']));
+            globExtra.expandPaths.withArgs(['some/path/*']).returns(Promise.resolve(['/root/some/path/file1.js']));
 
             return readTests_({sets: ['set1'], paths: ['some/path/*'], config})
                 .then(() => assert.calledWith(utils.requireWithNoCache, '/root/some/path/file1.js'));
@@ -247,7 +247,7 @@ describe('test-reader', () => {
                 }
             };
 
-            globExtra.expandPaths.withArgs(['other/path']).returns(q(['/root/other/path/file1.js']));
+            globExtra.expandPaths.withArgs(['other/path']).returns(Promise.resolve(['/root/other/path/file1.js']));
 
             return assert.isRejected(readTests_({paths: ['other/path'], config}), /Cannot find files/);
         });
@@ -266,7 +266,7 @@ describe('test-reader', () => {
             };
 
             globExtra.expandPaths
-                .withArgs(relativePath).returns(q([absolutePath]));
+                .withArgs(relativePath).returns(Promise.resolve([absolutePath]));
 
             return readTests_({
                 paths: [relativePath],

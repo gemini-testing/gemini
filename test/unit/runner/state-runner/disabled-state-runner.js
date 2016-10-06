@@ -1,5 +1,5 @@
 'use strict';
-var q = require('q'),
+var Promise = require('bluebird'),
     DisabledStateRunner = require('lib/runner/state-runner/disabled-state-runner'),
     CaptureSession = require('lib/capture-session'),
     Config = require('lib/config'),
@@ -12,8 +12,8 @@ describe('runner/state-runner/disabled-state-runner', function() {
         session.browser = util.browserWithId(opts.browserId || 'default-browser-id');
         session.browser.sessionId = opts.sessionId || 'default-session-id';
 
-        session.runActions.returns(q.resolve());
-        session.capture.returns(q.resolve());
+        session.runActions.returns(Promise.resolve());
+        session.capture.returns(Promise.resolve());
 
         return session;
     }

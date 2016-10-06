@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const q = require('q');
+const Promise = require('bluebird');
 
 const CaptureSession = require('lib/capture-session');
 const StateProcessor = require('lib/state-processor/state-processor');
@@ -37,7 +37,7 @@ describe('state-processor/test-state-processor', () => {
             const page = {};
             const browserSession = sinon.createStubInstance(CaptureSession);
 
-            StateProcessor.prototype.exec.returns(q({}));
+            StateProcessor.prototype.exec.returns(Promise.resolve({}));
 
             return mkTestStateProc_().exec(state, browserSession, page, sinon.spy())
                 .then(() => {
@@ -48,7 +48,7 @@ describe('state-processor/test-state-processor', () => {
         it('should return result from calling base class exec method', () => {
             const result = {equal: true};
 
-            StateProcessor.prototype.exec.returns(q(result));
+            StateProcessor.prototype.exec.returns(Promise.resolve(result));
 
             return exec_()
                 .then(() => {
@@ -60,7 +60,7 @@ describe('state-processor/test-state-processor', () => {
             const result = {equal: false};
             const emit = sandbox.stub();
 
-            StateProcessor.prototype.exec.returns(q(result));
+            StateProcessor.prototype.exec.returns(Promise.resolve(result));
 
             return exec_({emit})
                 .then(() => {
@@ -72,7 +72,7 @@ describe('state-processor/test-state-processor', () => {
             const result = {equal: true};
             const emit = sandbox.stub();
 
-            StateProcessor.prototype.exec.returns(q(result));
+            StateProcessor.prototype.exec.returns(Promise.resolve(result));
 
             return exec_({emit})
                 .then(() => assert.calledWithExactly(emit, 'testResult', result));
@@ -81,7 +81,7 @@ describe('state-processor/test-state-processor', () => {
         it('should emit TEST_RESULT event without saveDiffTo func when images are equal', () => {
             const emit = sandbox.stub();
 
-            StateProcessor.prototype.exec.returns(q({equal: true}));
+            StateProcessor.prototype.exec.returns(Promise.resolve({equal: true}));
 
             return exec_({emit})
                 .then(() => assert.notProperty(emit.getCall(0).args[1], 'saveDiffTo'));

@@ -8,7 +8,7 @@ var CaptureSession = require('lib/capture-session'),
     proxyquire = require('proxyquire').noCallThru(),
     _ = require('lodash'),
     QEmitter = require('qemitter'),
-    q = require('q');
+    Promise = require('bluebird');
 
 describe('state-processor/state-processor', () => {
     var sandbox = sinon.sandbox.create(),
@@ -173,13 +173,13 @@ describe('state-processor/state-processor', () => {
         });
 
         it('should restore error object inheritance', () => {
-            sandbox.stub(q, 'nfcall').returns(q.reject({name: 'NoRefImageError'}));
+            sandbox.stub(Promise, 'fromCallback').returns(Promise.reject({name: 'NoRefImageError'}));
             sandbox.stub(errorUtils, 'fromPlainObject')
                 .withArgs({name: 'NoRefImageError'})
                 .returns({restored: 'object'});
 
             return exec_()
-                .fail((err) => {
+                .catch((err) => {
                     assert.calledOnce(errorUtils.fromPlainObject);
                     assert.deepEqual(err, {restored: 'object'});
                 });

@@ -1,6 +1,11 @@
 'use strict';
 
-var chai = require('chai');
+const chai = require('chai');
+const Promise = require('bluebird');
+
+Promise.config({
+    longStackTraces: true
+});
 
 global.sinon = require('sinon');
 global.assert = chai.assert;

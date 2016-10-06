@@ -1,7 +1,7 @@
 'use strict';
 
 const NewScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/new-screen-updater');
-const q = require('q');
+const Promise = require('bluebird');
 const fs = require('q-io/fs');
 const Image = require('lib/image');
 
@@ -11,10 +11,10 @@ describe('new-screen-updater', () => {
 
     beforeEach(() => {
         sandbox.stub(fs);
-        fs.makeTree.returns(q());
+        fs.makeTree.returns(Promise.resolve());
 
         imageStub = sinon.createStubInstance(Image);
-        imageStub.save.returns(q());
+        imageStub.save.returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -33,15 +33,15 @@ describe('new-screen-updater', () => {
                 refPath: opts.refPath
             };
 
-        capture.image.save.returns(q());
+        capture.image.save.returns(Promise.resolve());
 
         return updater.exec(capture, env);
     }
 
     it('should make directory before saving the image', () => {
         const mediator = sinon.spy().named('mediator');
-        fs.exists.returns(q(false));
-        fs.makeTree.returns(q.delay(1).then(mediator));
+        fs.exists.returns(Promise.resolve(false));
+        fs.makeTree.returns(Promise.delay(50).then(mediator));
 
         return exec_()
             .then(() => {
@@ -54,7 +54,7 @@ describe('new-screen-updater', () => {
     });
 
     it('should save new image if it does not exists', () => {
-        fs.exists.returns(q(false));
+        fs.exists.returns(Promise.resolve(false));
 
         return exec_({refPath: '/some/path'})
             .then(() => {
@@ -63,7 +63,7 @@ describe('new-screen-updater', () => {
     });
 
     it('should not save image if it already exists', () => {
-        fs.exists.returns(q(true));
+        fs.exists.returns(Promise.resolve(true));
 
         return exec_()
             .then(() => {
@@ -72,7 +72,7 @@ describe('new-screen-updater', () => {
     });
 
     it('should save image with correct path', () => {
-        fs.exists.returns(q(false));
+        fs.exists.returns(Promise.resolve(false));
 
         return exec_({refPath: '/ref/path'})
             .then(() => {

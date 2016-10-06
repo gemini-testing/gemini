@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const MetaScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/meta-screen-updater');
 const temp = require('lib/temp');
 const fs = require('q-io/fs');
@@ -20,7 +20,7 @@ describe('meta-screen-updater', () => {
                 refPath: opts.refPath
             };
 
-        capture.image.save.returns(q());
+        capture.image.save.returns(Promise.resolve());
 
         return updater.exec(capture, env);
     }
@@ -28,14 +28,14 @@ describe('meta-screen-updater', () => {
     beforeEach(() => {
         sandbox.stub(fs);
         sandbox.stub(temp);
-        sandbox.stub(Image, 'compare').returns(q());
+        sandbox.stub(Image, 'compare').returns(Promise.resolve());
 
         imageStub = sinon.createStubInstance(Image);
-        imageStub.save.returns(q());
+        imageStub.save.returns(Promise.resolve());
 
-        fs.exists.returns(q(true));
-        fs.makeTree.returns(q());
-        fs.copy.returns(q());
+        fs.exists.returns(Promise.resolve(true));
+        fs.makeTree.returns(Promise.resolve());
+        fs.copy.returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -50,7 +50,7 @@ describe('meta-screen-updater', () => {
     });
 
     it('should save temp image if reference image exists', () => {
-        fs.exists.returns(q(true));
+        fs.exists.returns(Promise.resolve(true));
         temp.path.returns('/temp/path');
 
         return exec_()
@@ -61,7 +61,7 @@ describe('meta-screen-updater', () => {
     });
 
     it('should save new reference if it does not exist', () => {
-        fs.exists.returns(q(false));
+        fs.exists.returns(Promise.resolve(false));
 
         return exec_({refPath: '/ref/path'})
             .then(() => {

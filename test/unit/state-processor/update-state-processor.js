@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const q = require('q');
+const Promise = require('bluebird');
 
 const CaptureSession = require('lib/capture-session');
 const StateProcessor = require('lib/state-processor/state-processor');
@@ -32,7 +32,7 @@ describe('state-processor/update-state-processor', () => {
             const page = {};
             const browserSession = sinon.createStubInstance(CaptureSession);
 
-            StateProcessor.prototype.exec.returns(q({}));
+            StateProcessor.prototype.exec.returns(Promise.resolve({}));
 
             return new UpdateStateProcessor().exec(state, browserSession, page, sinon.spy())
                 .then(() => {
@@ -44,7 +44,7 @@ describe('state-processor/update-state-processor', () => {
             const result = {updated: true};
             const emit = sandbox.stub();
 
-            StateProcessor.prototype.exec.returns(q(result));
+            StateProcessor.prototype.exec.returns(Promise.resolve(result));
 
             return exec_({emit})
                 .then(() => assert.calledWithExactly(emit, 'updateResult', result));
@@ -54,7 +54,7 @@ describe('state-processor/update-state-processor', () => {
             const result = {updated: false};
             const emit = sandbox.stub();
 
-            StateProcessor.prototype.exec.returns(q(result));
+            StateProcessor.prototype.exec.returns(Promise.resolve(result));
 
             return exec_({emit})
                 .then(() => assert.calledWithExactly(emit, 'updateResult', result));

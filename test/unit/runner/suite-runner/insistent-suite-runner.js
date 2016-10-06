@@ -8,7 +8,7 @@ const CancelledError = require('lib/errors/cancelled-error');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
 const makeSuiteStub = require('../../../util').makeSuiteStub;
 const makeSuiteTree = require('../../../util').makeSuiteTree;
-const q = require('q');
+const Promise = require('bluebird');
 const _ = require('lodash');
 
 describe('runner/suite-runner/insistent-suite-runner', () => {
@@ -39,12 +39,12 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
     const stubWrappedRun_ = (scenario) => {
         RegularSuiteRunner.prototype.run.restore();
         sandbox.stub(RegularSuiteRunner.prototype, 'run', function() {
-            return q(scenario(this));
+            return Promise.resolve(scenario(this));
         });
     };
 
     beforeEach(() => {
-        sandbox.stub(RegularSuiteRunner.prototype, 'run').returns(q());
+        sandbox.stub(RegularSuiteRunner.prototype, 'run').returns(Promise.resolve());
     });
 
     afterEach(() => sandbox.restore());
@@ -123,7 +123,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
     describe('run without retries', () => {
         describe('on reject', () => {
             it('should reject after first run', () => {
-                RegularSuiteRunner.prototype.run.returns(q.reject('some-error'));
+                RegularSuiteRunner.prototype.run.returns(Promise.reject('some-error'));
 
                 const runner = mkInsistentRunner_();
 
@@ -132,7 +132,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should emit ERROR event', () => {
-                RegularSuiteRunner.prototype.run.returns(q.reject(new Error()));
+                RegularSuiteRunner.prototype.run.returns(Promise.reject(new Error()));
 
                 const suite = makeSuiteStub();
                 const browserAgent = mkBrowserAgentStub_('bro');
@@ -151,7 +151,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should not reject on cancel', () => {
-                RegularSuiteRunner.prototype.run.returns(q.reject(new CancelledError()));
+                RegularSuiteRunner.prototype.run.returns(Promise.reject(new CancelledError()));
 
                 const runner = mkInsistentRunner_();
 
@@ -159,7 +159,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should not retry on cancel', () => {
-                RegularSuiteRunner.prototype.run.returns(q.reject(new CancelledError()));
+                RegularSuiteRunner.prototype.run.returns(Promise.reject(new CancelledError()));
 
                 const onError = sinon.spy().named('onError');
 
@@ -228,7 +228,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
 
         describe('on reject', () => {
             it('should try to run regular suite runner again', () => {
-                RegularSuiteRunner.prototype.run.onFirstCall().returns(q.reject('some-error'));
+                RegularSuiteRunner.prototype.run.onFirstCall().returns(Promise.reject('some-error'));
 
                 return mkRunnerWithRetries_()
                     .run()
@@ -237,14 +237,14 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should be rejected retry failed', () => {
-                RegularSuiteRunner.prototype.run.returns(q.reject('some-error'));
+                RegularSuiteRunner.prototype.run.returns(Promise.reject('some-error'));
 
                 const result = mkRunnerWithRetries_().run();
                 return assert.isRejected(result, /some-error/);
             });
 
             it('should retry as much times as specified in config', () => {
-                RegularSuiteRunner.prototype.run.returns(q.reject('some-error'));
+                RegularSuiteRunner.prototype.run.returns(Promise.reject('some-error'));
                 const config = mkConfigStub_({retry: 2});
 
                 return mkInsistentRunner_({config})
@@ -253,7 +253,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should emit RETRY event', () => {
-                RegularSuiteRunner.prototype.run.onFirstCall().returns(q.reject(new Error()));
+                RegularSuiteRunner.prototype.run.onFirstCall().returns(Promise.reject(new Error()));
 
                 const suite = makeSuiteStub();
                 const browserAgent = mkBrowserAgentStub_('bro');
@@ -275,7 +275,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
 
             it('should not retry on cancel', () => {
-                RegularSuiteRunner.prototype.run.returns(q.reject(new CancelledError()));
+                RegularSuiteRunner.prototype.run.returns(Promise.reject(new CancelledError()));
 
                 const onError = sinon.spy().named('onError');
 
@@ -439,7 +439,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             it('should not retry on cancel after diff', () => {
                 stubWrappedRun_((runner) => {
                     runner.emit(Events.TEST_RESULT, {equal: false});
-                    return q.reject(new CancelledError());
+                    return Promise.reject(new CancelledError());
                 });
 
                 return mkRunnerWithRetries_()

@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const QEmitter = require('qemitter');
 
 const Runner = require('lib/runner');
@@ -24,7 +24,7 @@ describe('runner', () => {
 
     const createTestSessionRunner_ = () => {
         const runner = new QEmitter();
-        runner.run = () => q();
+        runner.run = () => Promise.resolve();
         return runner;
     };
 
@@ -127,7 +127,7 @@ describe('runner', () => {
         });
 
         it('should run suites in test session runner', () => {
-            sandbox.stub(testSessionRunner, 'run').returns(q());
+            sandbox.stub(testSessionRunner, 'run').returns(Promise.resolve());
 
             return run_(suiteCollectionStub).then(() => {
                 assert.calledOnce(testSessionRunner.run);

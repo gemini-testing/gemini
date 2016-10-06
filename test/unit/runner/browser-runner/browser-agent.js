@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const BasicPool = require('lib/browser-pool/basic-pool');
 
@@ -10,8 +10,8 @@ describe('runner/browser-runner/browser-agent', () => {
 
     beforeEach(() => {
         browserPool = sinon.createStubInstance(BasicPool);
-        browserPool.freeBrowser.returns(q());
-        browserPool.getBrowser.returns(q());
+        browserPool.freeBrowser.returns(Promise.resolve());
+        browserPool.getBrowser.returns(Promise.resolve({}));
     });
 
     afterEach(() => {
@@ -30,7 +30,7 @@ describe('runner/browser-runner/browser-agent', () => {
         const someBro = {sessionId: 'some-id'};
         const otherBro = {sessionId: 'other-id'};
 
-        browserPool.getBrowser.returns(q(someBro));
+        browserPool.getBrowser.returns(Promise.resolve(someBro));
 
         const browserAgent = BrowserAgent.create('bro', browserPool);
 
@@ -39,10 +39,10 @@ describe('runner/browser-runner/browser-agent', () => {
             .then(() => {
                 // reset stubs
                 browserPool.getBrowser = sandbox.stub();
-                browserPool.getBrowser.onFirstCall().returns(q(someBro));
-                browserPool.getBrowser.onSecondCall().returns(q(otherBro));
+                browserPool.getBrowser.onFirstCall().returns(Promise.resolve(someBro));
+                browserPool.getBrowser.onSecondCall().returns(Promise.resolve(otherBro));
 
-                browserPool.freeBrowser = sandbox.stub().returns(q());
+                browserPool.freeBrowser = sandbox.stub().returns(Promise.resolve());
             })
             .then(() => browserAgent.getBrowser())
             .then((bro) => {

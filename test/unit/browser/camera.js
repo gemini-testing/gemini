@@ -1,6 +1,6 @@
 'use strict';
 
-const q = require('q');
+const Promise = require('bluebird');
 const Camera = require('lib/browser/camera');
 const Image = require('lib/image');
 const util = require('lib/browser/util');
@@ -18,9 +18,9 @@ describe('browser/camera', function() {
 
     function mkWdStub_() {
         return {
-            takeScreenshot: sinon.stub().returns(q({})),
-            currentContext: sinon.stub().returns(q()),
-            context: sinon.stub().returns(q()),
+            takeScreenshot: sinon.stub().returns(Promise.resolve({})),
+            currentContext: sinon.stub().returns(Promise.resolve()),
+            context: sinon.stub().returns(Promise.resolve()),
             on: sinon.stub()
         };
     }
@@ -51,7 +51,7 @@ describe('browser/camera', function() {
                 error = new Error('not today');
 
             wd.takeScreenshot
-                .onSecondCall().returns(q.reject(error));
+                .onSecondCall().returns(Promise.reject(error));
 
             var camera = new Camera(wd),
                 result = camera.captureViewportImage()
@@ -69,7 +69,7 @@ describe('browser/camera', function() {
             var wd = mkWdStub_();
 
             wd.takeScreenshot
-                .onFirstCall().returns(q.reject(new Error('not today')));
+                .onFirstCall().returns(Promise.reject(new Error('not today')));
 
             var camera = new Camera(wd);
             return camera.captureViewportImage()
@@ -82,7 +82,7 @@ describe('browser/camera', function() {
             var wd = mkWdStub_();
 
             wd.takeScreenshot
-                .onFirstCall().returns(q.reject(new Error('not today')));
+                .onFirstCall().returns(Promise.reject(new Error('not today')));
 
             var camera = new Camera(wd);
             return camera.captureViewportImage()
@@ -94,9 +94,9 @@ describe('browser/camera', function() {
         it('should restore original context after taking screenshot', function() {
             var wd = mkWdStub_();
 
-            wd.currentContext.returns(q('Original'));
+            wd.currentContext.returns(Promise.resolve('Original'));
             wd.takeScreenshot
-                .onFirstCall().returns(q.reject(new Error('not today')));
+                .onFirstCall().returns(Promise.reject(new Error('not today')));
 
             var camera = new Camera(wd);
             return camera.captureViewportImage()
@@ -110,8 +110,8 @@ describe('browser/camera', function() {
                 originalError = new Error('Original');
 
             wd.takeScreenshot
-                .onFirstCall().returns(q.reject(originalError))
-                .onSecondCall().returns(q.reject(new Error('still does not work')));
+                .onFirstCall().returns(Promise.reject(originalError))
+                .onSecondCall().returns(Promise.reject(new Error('still does not work')));
 
             var camera = new Camera(wd);
             return assert.isRejected(camera.captureViewportImage(), originalError);
@@ -122,8 +122,8 @@ describe('browser/camera', function() {
                 error = new Error('not today');
 
             wd.takeScreenshot
-                .onFirstCall().returns(q.reject(error))
-                .onThirdCall().returns(q.reject(error));
+                .onFirstCall().returns(Promise.reject(error))
+                .onThirdCall().returns(Promise.reject(error));
 
             var camera = new Camera(wd);
             return assert.isRejected(camera.captureViewportImage()
