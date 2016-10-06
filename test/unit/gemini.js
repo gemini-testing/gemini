@@ -115,6 +115,14 @@ describe('gemini', () => {
         });
     });
 
+    it('should load plugins before reading tests', () => {
+        sandbox.stub(temp, 'init');
+        return runGeminiTest()
+            .then(() => {
+                assert.callOrder(plugins.load, testReaderStub);
+            });
+    });
+
     describe('readTests', () => {
         const readTests_ = (rootSuite, options) => {
             gemini = initGemini({rootSuite});
