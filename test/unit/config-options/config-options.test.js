@@ -725,8 +725,6 @@ describe('config', function() {
                 var config = createBrowserConfig({});
                 assert.equal(config.screenshotsDir, '/some/path/gemini/screens');
             });
-
-            //TODO: toplevel
         });
 
         describe('calibrate', function() {

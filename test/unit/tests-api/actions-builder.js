@@ -11,14 +11,12 @@ describe('tests-api/actions-builder', () => {
 
     const mkActionsBuilder = (actions) => new ActionsBuilder(actions || []);
 
-    const mkAction = (actionName, browser, postActions) => {
-        return function() {
-            const actions = [];
-            const actionsBuilder = mkActionsBuilder(actions);
+    const mkAction = (actionName, browser, postActions) => () => {
+        const actions = [];
+        const actionsBuilder = mkActionsBuilder(actions);
 
-            actionsBuilder[actionName].apply(actionsBuilder, arguments);
-            return actions[0](browser, postActions);
-        };
+        actionsBuilder[actionName].apply(actionsBuilder, arguments);
+        return actions[0](browser, postActions);
     };
 
     afterEach(() => sandbox.restore());
@@ -50,7 +48,6 @@ describe('tests-api/actions-builder', () => {
         it('should change orientation from LANDSCAPE to PORTRAIT', () => {
             browser.getOrientation.returns(Promise.resolve('LANDSCAPE'));
             const changeOrientation = mkAction('changeOrientation', browser);
-
             return changeOrientation()
                 .then(() => assert.calledWith(browser.setOrientation, 'PORTRAIT'));
         });
@@ -66,14 +63,12 @@ describe('tests-api/actions-builder', () => {
         it('should be rejected if getting of orientation fails', () => {
             browser.getOrientation.returns(Promise.reject('awesome error'));
             const changeOrientation = mkAction('changeOrientation', browser);
-
             return assert.isRejected(changeOrientation(), /awesome error/);
         });
 
         it('should be rejected if setting of orientation fails', () => {
             browser.setOrientation.returns(Promise.reject('awesome error'));
             const changeOrientation = mkAction('changeOrientation', browser);
-
             return assert.isRejected(changeOrientation(), /awesome error/);
         });
     });

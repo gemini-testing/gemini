@@ -1,5 +1,5 @@
 'use strict';
-var Config = require('lib/config'),
+let Config = require('lib/config'),
     Browser = require('lib/browser'),
     _ = require('lodash'),
 
@@ -63,9 +63,9 @@ var Config = require('lib/config'),
     testsConfig = new Config({
         gridUrl: 'http://ondemand.saucelabs.com/wd/hub',
         rootUrl: 'http://example.com',
-        browsers: _.mapValues(supportedBrowsers, function(capabilities) {
-            return {desiredCapabilities: capabilities};
-        }),
+        browsers: _.mapValues(supportedBrowsers, (capabilities) => ({
+            desiredCapabilities: capabilities
+        })),
         system: {
             projectRoot: process.cwd()
         }
@@ -83,14 +83,14 @@ if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
     console.warn('2. Set SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables');
 }
 
-exports.eachSupportedBrowser = function(cb) {
+exports.eachSupportedBrowser = (cb) => {
     if (process.env.BROWSER) {
         runTestsInBrowser(process.env.BROWSER, cb);
         return;
     }
 
     // run tests in all supported browsers
-    Object.keys(supportedBrowsers).forEach(function(browserId) {
+    Object.keys(supportedBrowsers).forEach((browserId) => {
         runTestsInBrowser(browserId, cb);
     });
 };
@@ -99,9 +99,9 @@ function runTestsInBrowser(browserId, callback) {
     if (!supportedBrowsers.hasOwnProperty(browserId)) {
         throw new Error('Unknown browser: ' + browserId);
     }
-    browserDescribe('in ' + browserId, function() {
-        beforeEach(function() {
-            var browserConfig = testsConfig.forBrowser(browserId);
+    browserDescribe('in ' + browserId, () => {
+        beforeEach(() => {
+            const browserConfig = testsConfig.forBrowser(browserId);
             this.browser = Browser.create(browserConfig);
         });
 
