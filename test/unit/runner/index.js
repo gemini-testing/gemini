@@ -50,6 +50,20 @@ describe('runner', () => {
                 .then(() => assert.calledOnce(onBegin));
         });
 
+        it('should wait until all `START_RUNNER` handlers have finished', () => {
+            const onStartRunner = sandbox.spy().named('onStartRunner');
+            const onStartRannerWithDelay = () => Promise.delay(50).then(onStartRunner);
+            const onBegin = sandbox.spy().named('onBegin');
+
+            runner.on(Events.START_RUNNER, onStartRannerWithDelay);
+            runner.on(Events.BEGIN, onBegin);
+
+            return run_()
+                .then(() => {
+                    assert.callOrder(onStartRunner, onBegin);
+                });
+        });
+
         it('should pass total number of states when emitting `BEGIN`', () => {
             const suites = [
                 {states: []},
