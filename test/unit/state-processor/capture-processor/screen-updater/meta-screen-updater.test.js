@@ -3,7 +3,7 @@
 const Promise = require('bluebird');
 const MetaScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/meta-screen-updater');
 const temp = require('lib/temp');
-const fs = require('q-io/fs');
+const fs = require('fs-extra');
 const Image = require('lib/image');
 
 describe('meta-screen-updater', () => {
@@ -33,9 +33,9 @@ describe('meta-screen-updater', () => {
         imageStub = sinon.createStubInstance(Image);
         imageStub.save.returns(Promise.resolve());
 
-        fs.exists.returns(Promise.resolve(true));
-        fs.makeTree.returns(Promise.resolve());
-        fs.copy.returns(Promise.resolve());
+        fs.accessAsync.returns(Promise.resolve());
+        fs.mkdirsAsync.returns(Promise.resolve());
+        fs.copyAsync.returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -45,12 +45,12 @@ describe('meta-screen-updater', () => {
     it('should check file to exist once', () => {
         return exec_()
             .then(() => {
-                assert.calledOnce(fs.exists);
+                assert.calledOnce(fs.accessAsync);
             });
     });
 
     it('should save temp image if reference image exists', () => {
-        fs.exists.returns(Promise.resolve(true));
+        fs.accessAsync.returns(Promise.resolve());
         temp.path.returns('/temp/path');
 
         return exec_()
@@ -61,7 +61,7 @@ describe('meta-screen-updater', () => {
     });
 
     it('should save new reference if it does not exist', () => {
-        fs.exists.returns(Promise.resolve(false));
+        fs.accessAsync.returns(Promise.reject());
 
         return exec_({refPath: '/ref/path'})
             .then(() => {

@@ -3,7 +3,7 @@
 const DiffScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/diff-screen-updater');
 const temp = require('lib/temp');
 const Promise = require('bluebird');
-const fs = require('q-io/fs');
+const fs = require('fs-extra');
 const Image = require('lib/image');
 
 describe('diff-screen-updater', () => {
@@ -34,8 +34,8 @@ describe('diff-screen-updater', () => {
         imageCompareStub = sandbox.stub(Image, 'compare');
         imageStub.save.returns(Promise.resolve());
 
-        fs.exists.returns(Promise.resolve(true));
-        fs.copy.returns(Promise.resolve());
+        fs.accessAsync.returns(Promise.resolve());
+        fs.copyAsync.returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -54,7 +54,7 @@ describe('diff-screen-updater', () => {
     });
 
     it('should not compare images if reference image does not exist', () => {
-        fs.exists.returns(Promise.resolve(false));
+        fs.accessAsync.returns(Promise.reject());
         imageCompareStub.returns(Promise.resolve());
 
         return exec_()
@@ -68,7 +68,7 @@ describe('diff-screen-updater', () => {
 
         return exec_()
             .then(() => {
-                assert.notCalled(fs.copy);
+                assert.notCalled(fs.copyAsync);
             });
     });
 
@@ -78,7 +78,7 @@ describe('diff-screen-updater', () => {
 
         return exec_({refPath: '/ref/path'})
             .then(() => {
-                assert.calledWith(fs.copy, '/temp/path', '/ref/path');
+                assert.calledWith(fs.copyAsync, '/temp/path', '/ref/path');
             });
     });
 
