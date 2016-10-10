@@ -52,9 +52,7 @@ describe('runner', () => {
 
         it('should wait until all `START_RUNNER` handlers have finished', () => {
             const onStartRunner = sandbox.spy().named('onStartRunner');
-            const onStartRannerWithDelay = () => {
-                return Promise.delay(50).then(onStartRunner);
-            };
+            const onStartRannerWithDelay = () => Promise.delay(50).then(onStartRunner);
             const onBegin = sandbox.spy().named('onBegin');
 
             runner.on(Events.START_RUNNER, onStartRannerWithDelay);
