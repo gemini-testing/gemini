@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.12.2 - 20160-10-11
+
+* Fix `startRunner` and `endRunner` to correctly wait for promises, returned
+  from plugins.
+* Various fixes related to `bluebird` migration. All "is not a function" errors
+  now should be gone.
+* Fix assignment to const error in html report.
+
 ## 4.12.1 - 2016-10-06
 
 * Restore 4.10 plugin loading order — plugins now loaded before any tests files
