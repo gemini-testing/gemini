@@ -7,6 +7,8 @@ Promise.config({
     longStackTraces: true
 });
 
+Promise.promisifyAll(require('fs-extra'));
+
 global.sinon = require('sinon');
 global.assert = chai.assert;
 

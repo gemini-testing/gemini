@@ -2,7 +2,7 @@
 
 const NewScreenUpdater = require('lib/state-processor/capture-processor/screen-updater/new-screen-updater');
 const Promise = require('bluebird');
-const fs = require('q-io/fs');
+const fs = require('fs-extra');
 const Image = require('lib/image');
 
 describe('new-screen-updater', () => {
@@ -11,7 +11,7 @@ describe('new-screen-updater', () => {
 
     beforeEach(() => {
         sandbox.stub(fs);
-        fs.makeTree.returns(Promise.resolve());
+        fs.mkdirsAsync.returns(Promise.resolve());
 
         imageStub = sinon.createStubInstance(Image);
         imageStub.save.returns(Promise.resolve());
@@ -40,13 +40,13 @@ describe('new-screen-updater', () => {
 
     it('should make directory before saving the image', () => {
         const mediator = sinon.spy().named('mediator');
-        fs.exists.returns(Promise.resolve(false));
-        fs.makeTree.returns(Promise.delay(50).then(mediator));
+        fs.accessAsync.returns(Promise.reject());
+        fs.mkdirsAsync.returns(Promise.delay(50).then(mediator));
 
         return exec_()
             .then(() => {
                 assert.callOrder(
-                    fs.makeTree,
+                    fs.mkdirsAsync,
                     mediator,
                     imageStub.save
                 );
@@ -54,7 +54,7 @@ describe('new-screen-updater', () => {
     });
 
     it('should save new image if it does not exists', () => {
-        fs.exists.returns(Promise.resolve(false));
+        fs.accessAsync.returns(Promise.reject());
 
         return exec_({refPath: '/some/path'})
             .then(() => {
@@ -63,7 +63,7 @@ describe('new-screen-updater', () => {
     });
 
     it('should not save image if it already exists', () => {
-        fs.exists.returns(Promise.resolve(true));
+        fs.accessAsync.returns(Promise.resolve());
 
         return exec_()
             .then(() => {
@@ -72,7 +72,7 @@ describe('new-screen-updater', () => {
     });
 
     it('should save image with correct path', () => {
-        fs.exists.returns(Promise.resolve(false));
+        fs.accessAsync.returns(Promise.reject());
 
         return exec_({refPath: '/ref/path'})
             .then(() => {

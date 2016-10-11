@@ -1,6 +1,6 @@
 'use strict';
 
-const fs = require('q-io/fs');
+const fs = require('fs-extra');
 const Promise = require('bluebird');
 const temp = require('lib/temp');
 const Image = require('lib/image');
@@ -23,7 +23,7 @@ describe('state-processor/capture-processor/tester', () => {
         beforeEach(() => {
             sandbox.stub(temp, 'path').returns('tmp/path');
             sandbox.stub(Image, 'compare').returns(true);
-            sandbox.stub(fs, 'exists').returns(Promise.resolve(true));
+            sandbox.stub(fs, 'accessAsync').returns(Promise.resolve());
 
             capture = {
                 canHaveCaret: true,
@@ -43,7 +43,7 @@ describe('state-processor/capture-processor/tester', () => {
         });
 
         it('should reject with error if reference image does not exist', () => {
-            fs.exists.returns(Promise.resolve(false));
+            fs.accessAsync.returns(Promise.reject());
             return assert.isRejected(tester.exec(capture, {}), NoRefImageError);
         });
 
