@@ -16,6 +16,7 @@ exports.withTempFile = function(func) {
         try {
             fs.unlinkSync(filePath);
         } catch (e) {
+            // continue regardless of error
         }
     });
 };
