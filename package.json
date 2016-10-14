@@ -47,6 +47,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
+    "conventional-changelog-lint": "^1.0.1",
     "coveralls": "^2.11.2",
     "eslint": "^3.1.1",
     "eslint-config-gemini-testing": "^2.0.0",
@@ -55,7 +56,8 @@
     "istanbul": "^0.4.5",
     "mocha": "^2.1.0",
     "proxyquire": "^1.7.3",
-    "sinon": "^1.17.3"
+    "sinon": "^1.17.3",
+    "standard-version": "^3.0.0"
   },
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
@@ -65,7 +67,9 @@
     "test-browser": "istanbul test _mocha test/browser",
     "test": "istanbul test _mocha -- --recursive test/unit test/functional test/browser",
     "lint": "eslint .",
+    "release": "standard-version",
     "precommit": "npm run lint",
+    "commitmsg": "conventional-changelog-lint -e",
     "preversion": "npm run lint && npm test",
     "prepare-site": "gitbook install",
     "build-site": "npm run prepare-site && gitbook build",
