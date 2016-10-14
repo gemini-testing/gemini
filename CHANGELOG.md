@@ -1,5 +1,6 @@
-# Changelog
+# Change Log
 
+<a name="4.12.2">
 ## 4.12.2 - 20160-10-11
 
 * Fix `startRunner` and `endRunner` to correctly wait for promises, returned
@@ -8,6 +9,7 @@
   now should be gone.
 * Fix assignment to const error in html report.
 
+<a name="4.12.1">
 ## 4.12.1 - 2016-10-06
 
 * Restore 4.10 plugin loading order — plugins now loaded before any tests files
@@ -15,72 +17,86 @@
 * Internal promises library changed `bluebird`. This should make gemini a little
   bit faster.
 
+<a name="4.12.0">
 ## 4.12.0 - 2016-10-03
 
 * Added the ability to specify exclude paths in which the gemini tests will not be searched, see [documentation](https://github.com/gemini-testing/gemini/blob/master/doc/config.md#system-settings)
 * Fixed bug which causes skip errors which might be occur in listeners of `START_RUNNER` and `END_RUNNER` events
 
+<a name="4.11.3">
 ## 4.11.3 - 2016-09-29
 
 * Second attempt of fixing order of file read events
 
+<a name="4.11.2">
 ## 4.11.2 - 2016-09-27
 
 * Fixed bug which causes emitting `beforeFileRead` after the file has already been read in GeminiFacade
 
+<a name="4.11.1">
 ## 4.11.1 - 2016-09-26
 
 Identical to 4.11, published by mistake
 
+<a name="4.11.0">
 ## 4.11.0 - 2016-09-23
 
 * Do not delay retry failed tests until all tests finish. Retry ASAP
 * Added `events` field for `gemini` instance in plugins, see [documentation](https://github.com/gemini-testing/gemini/blob/master/doc/plugins.md) for more details.
 * Updated `Quick start` section in documentation
 
+<a name="4.10.0">
 ## 4.10.0 - 2016-09-19
 
 * Lodash updated to v4.x
 * Clone suite tree for each browser runner
 * Use `catch` method instead of `fail` in q
 
+<a name="4.9.4">
 ## 4.9.4 - 2016-09-13
 
 * Fixed `Out of the bounds` error (see [#543])
 
 [#543]: https://github.com/gemini-testing/gemini/issues/543
 
+<a name="4.9.2">
 ## 4.9.2 - 2016-09-09
 
 * Updated third party libraries, so Array.prototype methods won't be overwritten
   anymore
 
+<a name="4.9.1">
 ## 4.9.1 - 2016-09-05
 
 * Fixed abort of the broken session on test error
 * Fixed incorrect creation of set with empty files
 * Updated version of glob-extra
 
+<a name="4.9.0">
 ## 4.9.0 - 2016-09-01
 
 * Close browser session after error in a test
 * Set left button as default for mouse button actions
 * Fixed wrong validation of `grep` option from cli
 
+<a name="4.8.0">
 ## 4.8.0 - 2016-08-30
 
 * Fixed bug which causes `Cannot find files by mask gemini` error if sets in config are not specified (see [#569])
 * Fixed bug which causes `/null` url in meta-info
 * Displaying the number of updated images via command `gemini update` in flat reporter
 
+<a name="4.7.2">
 ## 4.7.2 - 2016-08-26
 
 * Correctly display the images in the html report in case suite names contain non-urlsafe characters.
 
+<a name="4.7.1">
 ## 4.7.1 - 2016-08-25
 
 * Fixed critical bug which causes failing of browser requests
 
+<a name="4.7.0">
 ## 4.7.0 - 2016-08-25
 
 * `beforeFileRead` and `afterFileRead` API events were added. This allows plugins to be notified
@@ -91,6 +107,7 @@ Identical to 4.11, published by mistake
 *  Disallowed usage of empty names for suites
 *  Added nodejs@6.x support
 
+<a name="4.6.0">
 ## 4.6.0 - 2016-08-11
 
 * Added `GEMINI_SKIP_BROWSERS` environment variable support
@@ -98,6 +115,7 @@ Identical to 4.11, published by mistake
 * Fix: escape special symbols in HTML report
 * Fix: correct displaying of test url in meta-info of an HTML report
 
+<a name="4.5.0">
 ## 4.5.0 - 2016-08-05
 
 * Retry only failed states on fail instead of all states of the suite
@@ -105,20 +123,24 @@ Identical to 4.11, published by mistake
 * Add ability to implement custom source path resolving for CSS files in coverage
 * Fix: keep original stack when cloning error
 
+<a name="4.4.4">
 ## 4.4.4 - 2016-07-27
 
 * Revert code changes made for version 4.4.3
 
+<a name="4.4.3">
 ## 4.4.3 - 2016-07-26
 
 * Fix bug with resolving source paths in gemini coverage module
 
+<a name="4.4.2">
 ## 4.4.2 - 2016-07-20
 
 * Fixed retry of individual states (error with 'isCoverageEnabled on undefined')
 * Support `changeOrientation` for `appium` below 1.5.x
 * Back to upstream of `uglify-js`
 
+<a name="4.4.1">
 ## 4.4.1 - 2016-07-18
 
 * Froze uglify-js version at v2.6.4
@@ -127,6 +149,7 @@ Identical to 4.11, published by mistake
 * Output path to html report to a console
 * Updated version of looks-same dependency to 3.0.0
 
+<a name="4.4.0">
 ## 4.4.0 - 2016-06-17
 
 * Added option `compositeImage` which allows to test areas with height larger than viewport one,
@@ -138,6 +161,7 @@ Identical to 4.11, published by mistake
 * Fix: do not fail test if a hidden element was added to method `ignoreElements`.
 * Fix displaying of retries in HTML report after adding of `sessionId` in meta-info of HTML reporter.
 
+<a name="4.3.0">
 ## 4.3.0 - 2016-06-02
 
 * Added new browser option `screenshotMode` which allows to set an image capture mode, see the [documentation](https://github.com/gemini-testing/gemini/blob/v4.3.0/doc/config.md#browsers-settings) for more details.
@@ -146,10 +170,12 @@ Identical to 4.11, published by mistake
 * Fix: do not emit an error if `browser.quit` fails, warning will be logged.
 * Fix: support passing of `sessionId` to an error if launching of a browser fails.
 
+<a name="4.2.0">
 ## 4.2.0 - 2016-05-26
 
 * Added option `sessionRequestTimeout` which sets a timeout for getting of browser sessions
 
+<a name="4.1.0">
 ## 4.1.0 - 2016-05-20
 
 * Supported displaying of meta-info in HTML reporter which contains suite/state url
@@ -158,26 +184,31 @@ Identical to 4.11, published by mistake
 * Dropped throwing of critical errors in states, this means that a state failure always emits an `err` event
 * Fix: browser sessions will be freed immediately if there are no states to run instead of waiting for the end of all remaining running states in other browser sessions
 
+<a name="4.0.4">
 ## 4.0.4 - 2016-04-29
 
 * Fix: use top level windowSize
 * Fix error object instance after serializing
 
+<a name="4.0.3">
 ## 4.0.3 - 2016-04-26
 
 * Fix image processing: use pixel ratio in subprocesses
 
+<a name="4.0.2">
 ## 4.0.2 - 2016-04-25
 
 * Fix failed suites count in summary line
 * Throw error on image validation fail
 * Show page screenshot on image validation error
 
+<a name="4.0.1">
 ## 4.0.1 - 2016-04-20
 
 * Fix documentation
 * Fix: require default config by absolute path
 
+<a name="4.0.0">
 ## 4.0.0 - 2016-04-20
 
 * Fixed hang in browser pool queue when using `parallelLimit` option
@@ -192,14 +223,17 @@ Identical to 4.11, published by mistake
 * Removed `gather command`. Use `update` command instead
 * Now error data will be extended with path to image instead of image itself: `error.image` => `error.imagePath`
 
+<a name="3.0.2">
 ## 3.0.2 - 2016-03-30
 
 * Fix: Child suite context should have same data as parent has (@j0tunn)
 
+<a name="3.0.1">
 ## 3.0.1 - 2016-03-24
 
 * Fixed element find caching (@j0tunn)
 
+<a name="3.0.0">
 ## 3.0.0 - 2016-03-23
 
 * Fixed `CLIENT_STOPPED_SESSION` bug when performing setWindowSize in post actions (@j0tunn)
@@ -219,10 +253,12 @@ Identical to 4.11, published by mistake
 * Removed skip method for actions (@j0tunn)
 * Accumulate "before" and "after" actions for nested suites (@j0tunn)
 
+<a name="2.1.1">
 ## 2.1.1 - 2016-01-27
 
 * Fix: specified name for NoRefImageError (@SwinX)
 
+<a name="2.1.0">
 ## 2.1.0 - 2016-01-25
 
 * Fixed bug in enable/disable logic in suite collection - may not work properly when disabling
@@ -230,12 +266,14 @@ Identical to 4.11, published by mistake
 * Added possibility to enable/disable suites by full name (@j0tunn)
 * Added possibility to specify `grep` condition for `readTests` API method (@SwinX)
 
+<a name="2.0.3">
 ## 2.0.3 - 2015-12-23
 
 * Fix update command called without any options (@sipayRT)
 * Limited pool fix: push defer queue if failed to free browser (@j0tunn)
 * Add editor files to the .npmignore (@j0tunn)
 
+<a name="2.0.0">
 ## 2.0.0 - 2015-12-19
 
 * `gemini update` command: ability to update only new and changed references (@sipayRT)
@@ -258,34 +296,41 @@ Identical to 4.11, published by mistake
 * `gemini.readTests` now returns `SuiteCollection` instance instead of `rootSuite` object (@j0tunn)
 * `gemini gather` deprecated in favor of `gemini update` (@sipayRT)
 
+<a name="1.1.6">
 ## 1.1.6 - 2015-12-04
 
 * Remove restirction for maximum open concurrent sockets (@j0tunn)
 
+<a name="1.1.5">
 ## 1.1.5 - 2015-12-03
 
 * Show reference image if test failed due to lack of it (@sipayrt)
 * Fixed result in HTML report for sibling states appear several times on retry (@SwinX)
 
+<a name="1.1.4">
 ## 1.1.4 - 2015-11-27
 
 * Fix: in LimitedPool next browser request will be triggered if failed to receive browser from underlying pool (@SwinX)
 
+<a name="1.1.3">
 ## 1.1.3 - 2015-11-25
 
 * Implemented TestCounter class for reporters (@SwinX)
 * Fixed undefined session id in vflat reporter (@SwinX)
 * Immediately quit browser if failed to create it (@SwinX)
 
+<a name="1.1.2">
 ## 1.1.2 - 2015-11-20
 
 * Fix: wrong initial-scale meta data (@sipayrt)
 * Fix: build crashed on 'gather' command (@SwinX)
 
+<a name="1.1.1">
 ## 1.1.1 - 2015-11-18
 
 * Fix: html reporter correctly handles `error` event if no data about state passed
 
+<a name="1.1.0">
 ## 1.1.0 - 2015-11-18
 
 * Implemented suite retry on compare diff and critical errors (@SwinX)
@@ -297,35 +342,42 @@ Identical to 4.11, published by mistake
 * Fix: free browser after cancel (@j0tunn)
 * Fix: keep original error if 'afterHook' or 'postActions' failed (@j0tunn)
 
+<a name="1.0.6">
 ## 1.0.6 - 2015-11-06
 
 * Show error message + whole page screenshot on test fail (@sipayrt)
 * Fix: clean browsers pool after finalization (@SwinX)
 * Fix: check for global window variable on client-side (@eroshinev)
 
+<a name="1.0.5">
 ## 1.0.5 - 2015-11-03
 
 * Do not fail tests if browsers specified from env does not exists in config (@sipayrt)
 
+<a name="1.0.4">
 ## 1.0.4 - 2015-10-13
 
 * Fix counting of skipped test by flat reporter (@sipayrt)
 * Pass sessionId on events for correctly TC work (@sipayrt)
 
+<a name="1.0.3">
 ## 1.0.3 - 2015-10-12
 
 * Fix: return correct exit code on test failing (@sipayrt)
 
+<a name="1.0.2">
 ## 1.0.2 - 2015-10-12
 
 * Fix handling of END_RUNNER event (@sipayrt)
 
+<a name="1.0.1">
 ## 1.0.1 - 2015-10-08
 
 * Fix: END_RUNNER event delivered to plugins in case of critical error (@SwinX)
 * Fix: make screenshot after prepareScreenshot() has been executed (@sipayrt)
 * Remove spaces from env GEMINI_BROWSERS (@sipayrt)
 
+<a name="1.0.0">
 ## 1.0.0 - 2015-10-05
 
 * Add Android support (@SevInf)
@@ -342,16 +394,19 @@ Identical to 4.11, published by mistake
 
 * Fix: fire END_SUITE event when nested suites are done (@scf2k)
 
+<a name="0.13.5">
 ## 0.13.5 - 2015-09-09
 
 * Added the `vflat` reporter (@unlok)
 
+<a name="0.13.4">
 ## 0.13.4 - 2015-08-30
 
 * Path to the plugin configuration fixed (@SevInf)
 
 * Sets support (@j0tunn)
 
+<a name="0.13.3">
 ## 0.13.3 - 2015-08-27
 
 * mouseUp action: make element argument optional (@just-boris).
@@ -360,10 +415,12 @@ Identical to 4.11, published by mistake
 
 * html report: load report images in lazy mode (@scf2k).
 
+<a name="0.13.2">
 ## 0.13.2 - 2015-08-17
 
 * Fix: correct handling of no-ref-image error (@j0tunn).
 
+<a name="0.13.1">
 ## 0.13.1 - 2015-08-15
 
 * Inline sourcemaps support in coverage calculation (@j0tunn).
@@ -372,6 +429,7 @@ Identical to 4.11, published by mistake
 
 * API: do not override options with CLI flags and env vars by default (@SevInf).
 
+<a name="0.13.0">
 ## 0.13.0 - 2015-08-10
 
 * Fail when removed option is detected and warn if removed env var is detected
@@ -389,10 +447,12 @@ Identical to 4.11, published by mistake
 
 * Corrected updates (@maximerassi).
 
+<a name="0.13.0">
 ## 0.13.0-beta.1 — 2015-07-31
 
 Previous version was published without a tarball once again. Republishing.
 
+<a name="0.13.0">
 ## 0.13.0-beta — 2015-07-29
 
 * BREAKING CHANGE: new config format. See [docs](doc/config.md).
@@ -504,26 +564,31 @@ Previous version was published without a tarball once again. Republishing.
 * New option `sessionsPerBrowser` allows to launch multiple session for each
   browser and run tests in parallel.
 
+<a name="0.12.8">
 ## 0.12.8 - 2015-07-23
 
 * Correctly restore window size when `setWindowSize` is called in `before`
   callback (@SevInf).
 
+<a name="0.12.7">
 ## 0.12.7 - 2015-07-20
 
 * Correctly calculate element position if WebDriver returns screenshot thinner
   then document (@SevInf).
 
+<a name="0.12.6">
 ## 0.12.6 - 2015-06-16
 
 * More clear error when capture are is hidden (@hatroman).
 
 * Mouse cursor is moved to (0,0) before the first test (@j0tunn).
 
+<a name="0.12.5">
 ## 0.12.5 - 2015-05-28
 
 Republish 0.12.4 due to another npm bug.
 
+<a name="0.12.4">
 ## 0.12.4 - 2015-05-28
 
 * Fix calibration to work in Chrome 43+ (@SevInf).
@@ -533,14 +598,17 @@ Republish 0.12.4 due to another npm bug.
 
 * `windowSize` option is ignored in Opera Presto browsers (@SevInf).
 
+<a name="0.12.3">
 ## 0.12.3 - 2015-05-21
 
 * Sizzle: work with selectors ending with space (@SevInf).
 
+<a name="0.12.2">
 ## 0.12.2 - 2015-05-19
 
 * Fix client bridge script injection (@SevInf).
 
+<a name="0.12.1">
 ## 0.12.1 - 2015-05-18
 
 CRITICAL BUG WAS INTRODUCED IN THIS VERSION.
@@ -554,19 +622,23 @@ Version was deleted from npm, use 0.12.2 instead.
 * Coverage now correctly detects intersection of the elements and capture area
   (@scff).
 
+<a name="0.12.0">
 ## 0.12.0 - 2015-05-07
 
 * When capturing element is visible compltely in the viewport do not scroll to
   element's location while taking the screenshot (@scff).
 
+<a name="0.11.5">
 ## 0.11.5 - 2015-04-30
 
 * Fix calibration in IE8 and add functional tests for it (@SevInf).
 
+<a name="0.11.4">
 ## 0.11.4 - 2015-04-29
 
 * Calibration affects only top and left sides of the screenshot (@scff).
 
+<a name="0.11.3">
 ## 0.11.3 - 2015-04-24
 
 * Take into account horizontal scrolling when validating capture area for
@@ -577,14 +649,17 @@ Version was deleted from npm, use 0.12.2 instead.
 
 * Correctly report execptions, thrown during coverage gathering (@SevInf).
 
+<a name="0.11.2">
 ## 0.11.2 - 2015-04-21
 
 * Republish 0.11.1 due to npm registry bug.
 
+<a name="0.11.1">
 ## 0.11.1 - 2015-04-21
 
 * Fix crash after all tests are finished (@SevInf).
 
+<a name="0.11.0">
 ## 0.11.0 - 2015-04-18
 
 * Plugins support (@Saulis).
@@ -617,6 +692,7 @@ Version was deleted from npm, use 0.12.2 instead.
 
 * HTML report refactoring (@hatroman).
 
+<a name="0.10.0">
 ## 0.10.0 - 2015-04-06
 
 * Fix calibration to work in IE8 again (@SevInf)
@@ -631,11 +707,13 @@ Version was deleted from npm, use 0.12.2 instead.
 
 * Ported 0.9.9 changes (@SevInf)
 
+<a name="0.10.0">
 ## 0.10.0-beta.2 - 2015-03-26
 
 * Use document height instead of body height to determine whether webdriver
   returns document or viewport screenshot (@SevInf)
 
+<a name="0.10.0">
 ## 0.10.0-beta.1 - 2015-03-19
 
 * Basic support for IE8 browser (@SevInf).
@@ -673,11 +751,13 @@ Version was deleted from npm, use 0.12.2 instead.
 * Warn if coverage for CSS file cannot be calculated due to same-origin policy
   (@SevInf)
 
+<a name="0.9.9">
 ## 0.9.9 - 2015-04-06
 
 * Adds new option `--browser` to the CLI and `browsers` to the API which allows
   to run tests in a subset of browsers (@SevInf).
 
+<a name="0.9.8">
 ## 0.9.8 - 2015-02-11
 
 * Work correctly if WebDriver implementation returns screenshot with
@@ -696,6 +776,7 @@ Version was deleted from npm, use 0.12.2 instead.
 
 * Correctly report image path in `gather` API (@SevInf).
 
+<a name="0.9.7">
 ## 0.9.7 - 2015-02-09
 
 * Add new wait methods (@SevInf):
@@ -706,14 +787,17 @@ Version was deleted from npm, use 0.12.2 instead.
 
   - `waitForJSCondition`
 
+<a name="0.9.6">
 ## 0.9.6 - 2015-01-27
 
 * Work on a pages that modify `Array.prototype` (@SevInf).
 
+<a name="0.9.5">
 ## 0.9.5 - 2014-12-10
 
 * Works on Windows again (@SevInf).
 
+<a name="0.9.4">
 ## 0.9.4 - 2014-12-03
 
 * Add `sendFile` action which now should be used instead of `sendKeys` to set
@@ -723,11 +807,13 @@ Version was deleted from npm, use 0.12.2 instead.
 
 * Fail only single test if reference image is not found (@SevInf).
 
+<a name="0.9.3">
 ## 0.9.3 - 2014-11-07
 
 * Coverage generator now follows symlinks while resolving the paths to CSS
   files. So the final report will have real paths but not pointing to symlinks.
 
+<a name="0.9.2">
 ## 0.9.2 - 2014-11-07
 
 * Move the coverage HTML templating code to separate module (gemini-coverage).
@@ -736,10 +822,12 @@ Version was deleted from npm, use 0.12.2 instead.
   error also will now fail only single state instead of a whole testing process
   (@SevInf).
 
+<a name="0.9.1">
 ## 0.9.1 - 2014-10-23
 
 * Ignore `@keyframes` at-rule while collecting coverage (@scf2k).
 
+<a name="0.9.0">
 ## 0.9.0 - 2014-10-22
 
 * Replace `GraphicsMagick` with lightweight `png-img` library (@j0tunn).
@@ -765,16 +853,19 @@ Version was deleted from npm, use 0.12.2 instead.
 * Restructure documentation and add quick start guide in russian and english
   (@jk708).
 
+<a name="0.8.2">
 ## 0.8.2 - 2014-10-06
 
 * Reset cursor position before reloading the page. When resetting it just after
   page load, old cursor position may trigger some transitions which will not be
   finished before first screenshot.
 
+<a name="0.8.1">
 ## 0.8.1 – 2014-09-30
 
 * `test` command will exit with correct codes
 
+<a name="0.8.0">
 ## 0.8.0 - 2014-09-30
 
 * New image comparison algorithm is implemented:
@@ -805,6 +896,7 @@ Version was deleted from npm, use 0.12.2 instead.
 * Show required dimensions in error message when origin does not fir to
   full-page screenshot (@scf2k)
 
+<a name="0.7.0">
 ## 0.7.0 - 2014-09-15
 
 * Show meaningful error when capture area origin does not fit to full-page
@@ -823,10 +915,12 @@ Version was deleted from npm, use 0.12.2 instead.
   (@scf2k).
 
 
+<a name="0.6.5">
 ## 0.6.5 - 2014-09-12
 
 Was republished as 0.7.0 due to a breaking change.
 
+<a name="0.6.4">
 ## 0.6.4 - 2014-08-13
 
 * Add command line completion (@unlok).
@@ -835,22 +929,26 @@ Was republished as 0.7.0 due to a breaking change.
 
 * Add `focus(element)` action (@arikon).
 
+<a name="0.6.3">
 ## 0.6.3 - 2014-08-05
 
 * Allow to use empty string with `sendKeys`. It can be used to focus on an
   element without changing states.
 
+<a name="0.6.2">
 ## 0.6.2 - 2014-08-01
 
 * Reset mouse position for each suite. Previously, cursor may stay at the
   position left from a previous suite and some elements was captured with hover
   effect when there shouldn't be any.
 
+<a name="0.6.1">
 ## 0.6.1 - 2014-07-30
 
 * Fix incorrect capture region rounding, causing bottom row of the element to
   be cropped sometimes.
 
+<a name="0.6.0">
 ## 0.6.0 - 2014-07-28
 
 * `:before` and `:after` pseudo-elements outline and shadow are now taken into
@@ -877,6 +975,7 @@ Was republished as 0.7.0 due to a breaking change.
 
 * Global installations of `gemini` now runs local one, if available.
 
+<a name="0.5.0">
 ## 0.5.0 - 2014-07-17
 
 * Browsers are now launched once for each run (previously, they were launched
@@ -901,14 +1000,17 @@ Was republished as 0.7.0 due to a breaking change.
 
 * Fix `--version` option.
 
+<a name="0.4.2">
 ## 0.4.2 - 2014-06-25
 
 * Fix missing images in html report.
 
+<a name="0.4.1">
 ## 0.4.1 - 2014-06-19
 
 * Correctly detect crop region in Firefox
 
+<a name="0.4.0">
 ## 0.4.0 - 2014-06-18
 
 * Crop region for screenshots is calculated via client script inside browser
@@ -956,6 +1058,7 @@ Was republished as 0.7.0 due to a breaking change.
 
 * If `gemini` is run without subcommand, help text will be shown.
 
+<a name="0.3.4">
 ## 0.3.4 - 2014-05-28
 
 * Enhanced html report:
@@ -969,6 +1072,7 @@ Was republished as 0.7.0 due to a breaking change.
   - stats of total numbers of tests run, failed, succeeded and skipped are
     shown at the top.
 
+<a name="0.3.3">
 ## 0.3.3 - 2014-05-19
 
 * Allow to use multiple reporters in `test` command.
@@ -992,6 +1096,7 @@ Was republished as 0.7.0 due to a breaking change.
 * Fix error when `gridUrl` was required even if there is only `phantomjs`
   browser.
 
+<a name="0.3.2">
 ## 0.3.2 - 2014-05-15
 
 * Allow to override `gridUrl` and `rootUrl` settings with cli options
@@ -999,6 +1104,7 @@ Was republished as 0.7.0 due to a breaking change.
 
 * Correctly report error, when wrong argument passed to an action.
 
+<a name="0.3.1">
 ## 0.3.1 - 2014-05-13
 
 * Ability to set additional capabilities for all browsers, using `capabilities`
@@ -1021,6 +1127,7 @@ Was republished as 0.7.0 due to a breaking change.
 * When `gemini` is unable to launch browser, more clearer error message will be
   displayed.
 
+<a name="0.3.0">
 ## 0.3.0 -  2014-04-30
 
 * Elements to take screen shots of and elements to perform action on are now
@@ -1097,11 +1204,13 @@ Was republished as 0.7.0 due to a breaking change.
 * Public API now has constants for special keys to use in `sendKeys` actions
   (i.e. `gemini.CONTROL` for `CTRL` key).
 
+<a name="0.2.1">
 ## 0.2.1 - 2014-04-23
 
 * Fix a bug with incorrect reference to the suite in states. Because of this
   bug dynamic elements was not updated properly.
 
+<a name="0.2.0">
 ## 0.2.0 - 2014-04-22
 
 * New test suites API.  Plans are replaced by test suites defined by explicit
@@ -1172,6 +1281,7 @@ Was republished as 0.7.0 due to a breaking change.
 
 * Tree reporter is now used for `gather` command.
 
+<a name="0.1.1">
 ## 0.1.1 - 2014-04-08
 
 * `phantomjs` always starts maximized. This fixes the error, when some shadows
@@ -1184,6 +1294,7 @@ Was republished as 0.7.0 due to a breaking change.
 
 * browsers are always closed, even if there was an error.
 
+<a name="0.1.0">
 ## 0.1.0 - 2014-03-27
 
 * Initial release

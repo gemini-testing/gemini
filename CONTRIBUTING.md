@@ -11,10 +11,8 @@ All bug fixes and new features should go to the [`master`](https://github.com/ge
 
 ## Commit messages
 
-Commit messages should describe what have been changed and why. The first line should be wrapped
-to 50 characters, the second one should be blank. All other lines should be wrapped to 72 characters.
-
-[Example of a good commit message](https://github.com/gemini-testing/gemini/commit/1096ee26d79be6e580e90146dbe161fb5a662d80).
+Commit messages should follow [conventional changelog
+standard](https://github.com/bcoe/conventional-changelog-standard/blob/master/convention.md).
 
 ## Code style and static analysis
 
