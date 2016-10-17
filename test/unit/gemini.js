@@ -4,9 +4,9 @@ const EventEmitter = require('events').EventEmitter;
 const _ = require('lodash');
 const proxyquire = require('proxyquire');
 const Promise = require('bluebird');
+const pluginsLoader = require('plugins-loader');
 
 const Config = require('lib/config');
-const plugins = require('lib/plugins');
 const Runner = require('lib/runner');
 const Events = require('lib/constants/events');
 const SuiteCollection = require('lib/suite-collection');
@@ -29,6 +29,8 @@ describe('gemini', () => {
     };
 
     const initGemini = (opts) => {
+        opts = opts || {};
+
         opts.rootSuite = opts.rootSuite || mkSuiteStub();
 
         testReaderStub = sandbox.stub().named('TestReader').returns(Promise.resolve(opts.rootSuite));
@@ -39,7 +41,8 @@ describe('gemini', () => {
             rootUrl: 'http://localhost',
             system: {
                 projectRoot: 'stub/project/root',
-                tempDir: opts.tempDir || 'stub/temp/dir'
+                tempDir: opts.tempDir || 'stub/temp/dir',
+                plugins: opts.plugins || {}
             },
             browsers: opts.browserIds ? stubBrowsers(opts.browserIds) : []
         });
@@ -60,7 +63,7 @@ describe('gemini', () => {
         sandbox.stub(Runner.prototype, 'on').returnsThis();
         sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
         sandbox.stub(console, 'warn');
-        sandbox.stub(plugins, 'load');
+        sandbox.stub(pluginsLoader, 'load');
     });
 
     afterEach(() => sandbox.restore());
@@ -115,12 +118,37 @@ describe('gemini', () => {
         });
     });
 
-    it('should load plugins before reading tests', () => {
-        sandbox.stub(temp, 'init');
-        return runGeminiTest()
-            .then(() => {
-                assert.callOrder(plugins.load, testReaderStub);
-            });
+    describe('load plugins', () => {
+        beforeEach(() => sandbox.stub(temp, 'init'));
+
+        it('should load plugins', () => {
+            return runGeminiTest()
+                .then(() => assert.calledOnce(pluginsLoader.load));
+        });
+
+        it('should load plugins before reading tests', () => {
+            return runGeminiTest()
+                .then(() => assert.callOrder(pluginsLoader.load, testReaderStub));
+        });
+
+        it('should load plugins for gemini instance', () => {
+            const gemini = initGemini();
+
+            return gemini.test()
+                .then(() => assert.calledWith(pluginsLoader.load, gemini));
+        });
+
+        it('should load plugins from config', () => {
+            return runGeminiTest({plugins: {'some-plugin': true}})
+                .then(() => assert.calledWith(pluginsLoader.load, sinon.match.any, {'some-plugin': true}));
+        });
+
+        it('should load plugins with appropriate prefix', () => {
+            const prefix = require('../../package').name + '-';
+
+            return runGeminiTest()
+                .then(() => assert.calledWith(pluginsLoader.load, sinon.match.any, sinon.match.any, prefix));
+        });
     });
 
     describe('readTests', () => {
