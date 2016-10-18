@@ -205,6 +205,10 @@ Rejects promise if critical error occurred.
 
 * `gemini.browserIds` – list of all browser identificators to use for tests.
 
+* `Gemini.readRawConfig` - reads configuration file for specified `filePath`
+and returns content as JS object. This method does not validate and analyze
+gemini configuration.
+
 ## Events
 
 `gemini` instance emits some events, which can be used by external scripts or
