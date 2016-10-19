@@ -1,5 +1,18 @@
 # Change Log
 
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="4.13.0"></a>
+# [4.13.0](https://github.com/gemini-testing/gemini/compare/v4.12.2...v4.13.0) (2016-10-19)
+
+
+### Features
+
+* **cli:** Add command 'list' to show list of browsers or sets from config ([b5e4b4a](https://github.com/gemini-testing/gemini/commit/b5e4b4a))
+* Implement readRawConfig static API method ([b269b0b](https://github.com/gemini-testing/gemini/commit/b269b0b))
+
+
+
 <a name="4.12.2">
 ## 4.12.2 - 20160-10-11
 
