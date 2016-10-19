@@ -336,4 +336,18 @@ describe('gemini', () => {
                 .then(() => assert.calledWith(console.warn, sinon.match('Unknown browsers id: b2')));
         });
     });
+
+    describe('readRawConfig', () => {
+        beforeEach(() => {
+            sandbox.stub(Config, 'readRawConfig');
+        });
+
+        it('should read configuration object from file by given path', () => {
+            Config.readRawConfig
+                .withArgs('some/file/path')
+                .returns({foo: 'bar'});
+
+            assert.deepEqual(Gemini.readRawConfig('some/file/path'), {foo: 'bar'});
+        });
+    });
 });

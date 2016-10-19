@@ -18,9 +18,21 @@ describe('config', function() {
         assert.calledWith(configReader.read, '/some/path');
     });
 
+    it('should have static API for reading of a configuration file', () => {
+        sandbox.stub(configReader, 'read')
+            .withArgs('/some/path')
+            .returns({foo: 'bar'});
+
+        assert.deepEqual(Config.readRawConfig('/some/path'), {
+            foo: 'bar',
+            system: {
+                projectRoot: '/some'
+            }
+        });
+    });
+
     describe('overrides', function() {
         beforeEach(function() {
-            /*jshint -W069*/
             this.configValue = '/from/config';
             this.envValue = '/from/env';
             this.cliValue = '/from/cli';
@@ -42,7 +54,6 @@ describe('config', function() {
         });
 
         afterEach(function() {
-            /*jshint -W069*/
             delete process.env['gemini_system_project_root'];
             process.argv = this.oldArgv;
         });
