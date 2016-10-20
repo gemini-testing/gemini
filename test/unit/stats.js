@@ -1,100 +1,120 @@
 'use strict';
 
 const EventEmitter = require('events').EventEmitter;
-const inherit = require('inherit');
+const _ = require('lodash');
+const RunnerEvents = require('../../lib/constants/events');
+const Stats = require('../../lib/stats');
 
-const Stats = require('lib/stats');
-const Events = require('lib/constants/events');
-
-describe('stats', () => {
+describe('Stats', () => {
     let stats;
-
-    beforeEach(() => {
-        stats = new Stats();
-    });
-
-    it('should return \'undefined\' before adding keys', () => {
-        assert.isUndefined(stats.get('counter'));
-    });
-
-    it('should allow to add new key', () => {
-        stats.add('counter');
-        assert.equal(stats.get('counter'), 1);
-    });
-
-    it('should increment existing keys', () => {
-        stats.add('counter');
-        stats.add('counter');
-        assert.equal(stats.get('counter'), 2);
-    });
-
-    it('should return all full stat', () => {
-        stats.add('counter');
-        stats.add('counter');
-        stats.add('counter');
-        stats.add('counter2');
-        stats.add('counter3');
-        stats.add('counter3');
-        assert.deepEqual(stats.get(), {
-            counter: 3,
-            counter2: 1,
-            counter3: 2
-        });
-    });
-});
-
-describe('stats listener', () => {
-    let stats;
-    let Runner = inherit(EventEmitter, {});
     let runner;
 
+    const stubTest = (opts) => {
+        opts = _.defaults(opts || {}, {name: 'default-name'});
+
+        return {
+            state: {fullName: 'full-' + opts.name, name: opts.name},
+            suite: {fullName: 'full-default-suite-name', name: 'default-suite-name'},
+            updated: opts.updated,
+            equal: opts.equal
+        };
+    };
+
     beforeEach(() => {
-        runner = new Runner();
+        runner = new EventEmitter();
         stats = new Stats(runner);
     });
 
-    it('should return undefined before triggering any events', () => {
-        assert.isUndefined(stats.get('total'));
-    });
+    it('should count skipped tests', () => {
+        runner.emit(RunnerEvents.SKIP_STATE, stubTest());
 
-    it('should count on beginState event', () => {
-        runner.emit(Events.BEGIN_STATE);
-        assert.equal(stats.get('total'), 1);
-    });
-
-    it('should count on skipState event', () => {
-        runner.emit(Events.SKIP_STATE);
-        assert.equal(stats.get('total'), 1);
         assert.equal(stats.get('skipped'), 1);
     });
 
-    it('should count on warning event', () => {
-        runner.emit(Events.WARNING);
+    it('should count warned tests', () => {
+        runner.emit(RunnerEvents.WARNING, stubTest());
+
         assert.equal(stats.get('warned'), 1);
     });
 
-    it('should count on error event', () => {
-        runner.emit(Events.ERROR);
+    it('should count errored tests', () => {
+        runner.emit(RunnerEvents.ERROR, stubTest());
+
         assert.equal(stats.get('errored'), 1);
     });
 
-    it('should count on updated images', () => {
-        runner.emit(Events.UPDATE_RESULT, {updated: true});
+    it('should count updated tests', () => {
+        runner.emit(RunnerEvents.UPDATE_RESULT, stubTest({updated: true}));
+
         assert.equal(stats.get('updated'), 1);
     });
 
-    it('should count on passed images', () => {
-        runner.emit(Events.UPDATE_RESULT, {updated: false});
+    it('should count passed tests on "UPDATE_RESULT" event', () => {
+        runner.emit(RunnerEvents.UPDATE_RESULT, stubTest({updated: false}));
+
         assert.equal(stats.get('passed'), 1);
     });
 
-    it('should count test passed', () => {
-        runner.emit(Events.TEST_RESULT, {equal: true});
-        assert.equal(stats.get('passed'), 1);
-    });
+    it('should count failed tests on "TEST_RESULT" event', () => {
+        runner.emit(RunnerEvents.TEST_RESULT, stubTest({equal: false}));
 
-    it('should count test failed', () => {
-        runner.emit(Events.TEST_RESULT, {equal: false});
         assert.equal(stats.get('failed'), 1);
+    });
+
+    it('should count passed tests on "TEST_RESULT" event', () => {
+        runner.emit(RunnerEvents.TEST_RESULT, stubTest({equal: true}));
+
+        assert.equal(stats.get('passed'), 1);
+    });
+
+    it('should count retried tests on "RETRY" event', () => {
+        runner.emit(RunnerEvents.RETRY, stubTest({name: 'some-test'}));
+        runner.emit(RunnerEvents.TEST_RESULT, stubTest({equal: true, name: 'some-test'}));
+
+        assert.equal(stats.get('total'), 1);
+        assert.equal(stats.get('retries'), 1);
+        assert.equal(stats.get('passed'), 1);
+    });
+
+    it('should count warned tests on "WARNING" event', () => {
+        runner.emit(RunnerEvents.WARNING, stubTest());
+
+        assert.equal(stats.get('warned'), 1);
+    });
+
+    it('should count total test count', () => {
+        runner.emit(RunnerEvents.TEST_RESULT, stubTest({equal: false, name: 'first'}));
+        runner.emit(RunnerEvents.TEST_RESULT, stubTest({equal: true, name: 'second'}));
+
+        assert.equal(stats.get('total'), 2);
+    });
+
+    it('should get full stat', () => {
+        runner.emit(RunnerEvents.UPDATE_RESULT, stubTest({updated: true, name: 'updated'}));
+        runner.emit(RunnerEvents.RETRY, stubTest({name: 'passed'}));
+        runner.emit(RunnerEvents.TEST_RESULT, stubTest({equal: true, name: 'passed'}));
+        runner.emit(RunnerEvents.TEST_RESULT, stubTest({equal: false, name: 'failed'}));
+        runner.emit(RunnerEvents.ERROR, stubTest({name: 'errored'}));
+        runner.emit(RunnerEvents.SKIP_STATE, stubTest({name: 'skipped'}));
+        runner.emit(RunnerEvents.WARNING, stubTest({name: 'warned'}));
+
+        assert.deepEqual(stats.get(), {
+            total: 6,
+            updated: 1,
+            passed: 1,
+            failed: 1,
+            errored: 1,
+            skipped: 1,
+            warned: 1,
+            retries: 1
+        });
+    });
+
+    it('should handle cases when several events were emitted for the same test', () => {
+        runner.emit(RunnerEvents.SKIP_STATE, stubTest({name: 'some-state'}));
+        runner.emit(RunnerEvents.ERROR, stubTest({name: 'some-state'}));
+
+        assert.equal(stats.get('skipped'), 0);
+        assert.equal(stats.get('errored'), 1);
     });
 });
