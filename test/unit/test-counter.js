@@ -1,8 +1,8 @@
 'use strict';
 
-const TestCounter = require('lib/reporters/utils/test-counter');
+const TestCounter = require('lib/test-counter');
 
-const mkCompleted_ = (opts) => {
+const stubTest = (opts) => {
     opts = opts || {};
 
     return {
@@ -37,20 +37,11 @@ describe('TestCounter', () => {
 
     describe('onRetry', () => {
         it('should increase `retries` count', () => {
-            const completed = mkCompleted_({state: 'defaultState'});
+            const completed = stubTest({state: 'defaultState'});
 
             counter.onRetry(completed);
 
             assert.equal(counter.getResult().retries, 1);
-        });
-
-        it('should clear stats for retried suite', () => {
-            const completed = mkCompleted_({state: 'defaultState'});
-
-            counter.onPassed(completed);
-            counter.onRetry(completed);
-
-            assert.equal(counter.getResult().passed, 0);
         });
     });
 
@@ -63,23 +54,27 @@ describe('TestCounter', () => {
             });
         });
 
-        it('should calculate total from `updated`, `passed`, `failed` and `skipped`', () => {
-            const updated = mkCompleted_({state: 'updated'});
-            const passed = mkCompleted_({state: 'passed'});
-            const failed = mkCompleted_({state: 'failed'});
-            const skipped = mkCompleted_({state: 'skipped'});
+        it('should calculate total from `updated`, `passed`, `failed`, `errored`, `skipped` and `warned`', () => {
+            const updated = stubTest({state: 'updated'});
+            const passed = stubTest({state: 'passed'});
+            const failed = stubTest({state: 'failed'});
+            const errored = stubTest({state: 'errored'});
+            const skipped = stubTest({state: 'skipped'});
+            const warned = stubTest({state: 'warned'});
 
             counter.onUpdated(updated);
             counter.onPassed(passed);
             counter.onFailed(failed);
+            counter.onErrored(errored);
             counter.onSkipped(skipped);
+            counter.onWarned(warned);
 
-            assert.equal(counter.getResult().total, 4);
+            assert.equal(counter.getResult().total, 6);
         });
 
         it('should not add retries to total', () => {
-            const passed = mkCompleted_({state: 'some_state'});
-            const retried = mkCompleted_({
+            const passed = stubTest({state: 'some_state'});
+            const retried = stubTest({
                 state: 'some_other_state',
                 browserId: 'some_browser'
             });
@@ -93,36 +88,18 @@ describe('TestCounter', () => {
 });
 
 function testCounter_(name) {
-    it('should count test result if it has state', () => {
-        const completed = mkCompleted_({state: 'defaultState'});
+    it('should count test result', () => {
+        const completed = stubTest({state: 'defaultState'});
         const counter = new TestCounter();
 
         counter['on' + name](completed);
 
         assert.equal(counter.getResult()[name.toLowerCase()], 1);
-    });
-
-    it('should count test result if it does not have state', () => {
-        const completed = mkCompleted_({state: undefined});
-        const counter = new TestCounter();
-
-        counter['on' + name](completed);
-
-        assert.equal(counter.getResult()[name.toLowerCase()], 1);
-    });
-
-    it('should not count test result if it does not have state or suite', () => {
-        const completed = {browserId: 'some_browser'};
-        const counter = new TestCounter();
-
-        counter['on' + name](completed);
-
-        assert.equal(counter.getResult()[name.toLowerCase()], 0);
     });
 
     it('should not count test result twice for same suite and browser', () => {
         const counter = new TestCounter();
-        const completed = mkCompleted_({
+        const completed = stubTest({
             browserId: 'test_browser',
             state: 'test_state'
         });
@@ -133,5 +110,3 @@ function testCounter_(name) {
         assert.equal(counter.getResult()[name.toLowerCase()], 1);
     });
 }
-
-
