@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.13.1"></a>
+## [4.13.1](https://github.com/gemini-testing/gemini/compare/v4.13.0...v4.13.1) (2016-10-25)
+
+
+### Bug Fixes
+
+* do not show skipped tests in retries ([799dc80](https://github.com/gemini-testing/gemini/commit/799dc80))
+
+
+
 <a name="4.13.0"></a>
 # [4.13.0](https://github.com/gemini-testing/gemini/compare/v4.12.2...v4.13.0) (2016-10-19)
 
