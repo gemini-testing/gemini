@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.13.2"></a>
+## [4.13.2](https://github.com/gemini-testing/gemini/compare/v4.13.1...v4.13.2) (2016-10-26)
+
+
+### Bug Fixes
+
+* **glob-extra:** replace isMasks to isMask ([830be2e](https://github.com/gemini-testing/gemini/commit/830be2e))
+* **test:** improve some tests ([c56bdcb](https://github.com/gemini-testing/gemini/commit/c56bdcb))
+
+
+
 <a name="4.13.1"></a>
 ## [4.13.1](https://github.com/gemini-testing/gemini/compare/v4.13.0...v4.13.1) (2016-10-25)
 
