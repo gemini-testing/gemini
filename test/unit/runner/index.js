@@ -490,32 +490,6 @@ describe('runner', () => {
         });
     });
 
-    describe('setTestBrowsers', () => {
-        it('should set browsers in which to run tests', () => {
-            const runner = createRunner();
-
-            runner.config.getBrowserIds.returns(['bro1', 'bro2']);
-
-            runner.setTestBrowsers(['bro1']);
-
-            return run(runner)
-                .then(() => {
-                    assert.calledOnce(BrowserRunner.create);
-                    assert.calledWith(BrowserRunner.create, 'bro1');
-                });
-        });
-
-        it('should not set browsers which are not specified in a config', () => {
-            const runner = createRunner();
-
-            runner.config.getBrowserIds.returns(['bro1', 'bro2']);
-
-            runner.setTestBrowsers(['unknown-bro', 'another-unknown-bro']);
-
-            return run(runner).then(() => assert.notCalled(BrowserRunner.create));
-        });
-    });
-
     describe('cancel', () => {
         it('should cancel all created browser runners', () => {
             const runner = createRunner();

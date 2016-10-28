@@ -1,2 +1,2 @@
 --require ./test/setup
--t 0 
+-t 0
