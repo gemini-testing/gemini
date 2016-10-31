@@ -198,7 +198,10 @@ describe('test-reader', () => {
             }
         };
 
-        return assert.isRejected(readTests_({paths: ['other/path'], config}), /Cannot find files/);
+        globExtra.expandPaths.withArgs(['some/path']).returns(Promise.resolve(['/some/path/file1.js']));
+        globExtra.expandPaths.withArgs(['other/path']).returns(Promise.resolve(['/other/path/file1.js']));
+
+        return assert.isRejected(readTests_({paths: ['other/path'], config}), 'Cannot find files by masks in sets');
     });
 
     describe('files of sets are specified as masks', () => {
@@ -247,9 +250,10 @@ describe('test-reader', () => {
                 }
             };
 
-            globExtra.expandPaths.withArgs(['other/path']).returns(Promise.resolve(['/root/other/path/file1.js']));
+            globExtra.expandPaths.withArgs(['some/path']).returns(Promise.resolve(['/some/path/file1.js']));
+            globExtra.expandPaths.withArgs(['other/path']).returns(Promise.resolve(['/other/path/file1.js']));
 
-            return assert.isRejected(readTests_({paths: ['other/path'], config}), /Cannot find files/);
+            return assert.isRejected(readTests_({paths: ['other/path'], config}), 'Cannot find files by masks in sets');
         });
     });
 

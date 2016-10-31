@@ -1,6 +1,6 @@
 {
   "name": "gemini",
-  "version": "4.13.1",
+  "version": "4.13.2",
   "description": "UI Screenshot testing utility",
   "engines": {
     "node": ">= 4.0.0"
@@ -22,7 +22,7 @@
     "fs-extra": "^0.30.0",
     "gemini-configparser": "^0.1.1",
     "gemini-coverage": "^1.0.0",
-    "glob-extra": "^1.3.0",
+    "glob-extra": "^1.3.2",
     "handlebars": "^4.0.5",
     "inherit": "~2.2.1",
     "install": "^0.6.1",
