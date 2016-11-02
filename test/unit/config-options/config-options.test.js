@@ -8,7 +8,10 @@ var Config = require('lib/config'),
 describe('config', function() {
     var VALID_OPTIONS = {
         system: {
-            projectRoot: '/some/path'
+            projectRoot: '/some/path',
+            plugins: {
+                plugin: {}
+            }
         },
         rootUrl: 'http://example.com/root',
         gridUrl: 'http://example.com/root',
@@ -221,6 +224,38 @@ describe('config', function() {
                 property: name,
                 value: 'false',
                 expected: false
+            });
+        });
+    }
+
+    function testObjectOption(name) {
+        it('should parse any of primitive type from environment', () => {
+            ['string', 1.0, 1, false, null, [], {a: 1}].forEach((expected) => {
+                const value = JSON.stringify(expected);
+                assertParsesEnv({property: name, value, expected});
+            });
+        });
+
+        it('should not throws if value from environment is not valid', () => {
+            ['{a:1}', '{', ']', '\'string\'', '\n'].forEach((value) => {
+                assert.doesNotThrow(() => {
+                    assertParsesEnv({property: name, value});
+                });
+            });
+        });
+
+        it('should parse any of primitive type from cli', () => {
+            ['string', 1.0, 1, false, null, [], {a: 1}].forEach((expected) => {
+                const value = JSON.stringify(expected);
+                assertParsesCli({property: name, value, expected});
+            });
+        });
+
+        it('should not throws if value from cli is not valid', () => {
+            ['{a:1}', '{', ']', '\'string\'', '\n'].forEach((value) => {
+                assert.doesNotThrow(() => {
+                    assertParsesCli({property: name, value});
+                });
             });
         });
     }
@@ -438,6 +473,10 @@ describe('config', function() {
                     ]);
                 });
             });
+        });
+
+        describe.only('plugins', () => {
+            testObjectOption('system.plugins.plugin');
         });
     });
 
