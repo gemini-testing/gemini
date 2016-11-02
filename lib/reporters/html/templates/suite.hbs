@@ -1,5 +1,14 @@
 <div class="section {{collapse}} {{section-status}} {{has-retries}}">
-    <div class="section__title">{{name}}</div>
+    <div class="section__title">
+        {{name}}
+        {{#if suitePath}}
+            <button
+                class="button section__icon section__icon_copy-to-clipboard"
+                title="copy to clipboard"
+                data-clipboard-text="{{suitePath}}">
+            </button>
+        {{/if}}
+    </div>
     <div class="section__body section__body_guided">
         {{#each browsers}}
             <div class="section section_collapsed {{section-status}} {{has-retries}}">
@@ -12,7 +21,15 @@
                     {{/unless}}
                 {{/if}}
                 {{#unless result.skipped}}
-                    <div class="section__title">{{name}}</div>
+                    <div class="section__title">
+                        {{name}}
+                        <a
+                            class="button section__icon section__icon_view-local"
+                            data-suite-view-link="{{result.suiteUrl}}" href="{{result.suiteUrl}}"
+                            title="view in browser"
+                            target="_blank">
+                        </a>
+                    </div>
                     <div class="section__body">
                         <div class="image-box {{image-box-status}}">
                             <div class="cswitcher">

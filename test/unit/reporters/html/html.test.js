@@ -25,6 +25,7 @@ describe('HTML Reporter', () => {
                 path: ['suite/path-default'],
                 metaInfo: {sessionId: 'sessionId-default'}
             },
+            saveDiffTo: sandbox.stub(),
             currentPath: 'current/path-default',
             referencePath: 'reference/path-default',
             equal: false
@@ -38,6 +39,11 @@ describe('HTML Reporter', () => {
         sandbox.stub(fs, 'mkdirsAsync').returns(Promise.resolve());
 
         emitter = new QEmitter();
+        emitter.config = {
+            forBrowser: sinon.stub().returns({
+                rootUrl: 'browser/root/url'
+            })
+        };
 
         // calling constructor for its side effect
         new HtmlReporter(emitter); // eslint-disable-line no-new
