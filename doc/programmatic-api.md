@@ -151,6 +151,9 @@ Options:
 * `browsers` — array of browser ids to execute tests in. By default, tests are
   executed in all browsers, specified in config.
 
+* `sets` — array of set names to execute tests in. By default, tests are
+  executed for all sets, specified in config.
+
 * `diff`(Boolean) - update only existing images with some diff, states with no reference images will be ignored.
 
 * `new`(Boolean) - generate only missing images.
@@ -185,12 +188,19 @@ Options:
 * `browsers` — array of browser ids to execute tests in. By default, tests are
   executed in all browsers, specified in config.
 
+* `sets` — array of set names to execute tests in. By default, tests are
+  executed for all sets, specified in config.
+
 Returns promise that resolve to a stats object with following keys:
 
 * `total` – total number of tests executed.
+
 * `skipped` – number of skipped tests.
+
 * `errored` – number of errored tests.
+
 * `passed` – number of passed tests.
+
 * `failed` – number of failed tests.
 
 Rejects promise if critical error occurred.
