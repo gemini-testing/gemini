@@ -236,11 +236,11 @@ describe('config', function() {
             });
         });
 
-        it('should not throws if value from environment is not valid', () => {
+        it('should throw if value from environment is not valid', () => {
             ['{a:1}', '{', ']', '\'string\'', '\n'].forEach((value) => {
-                assert.doesNotThrow(() => {
+                assert.throw(() => {
                     assertParsesEnv({property: name, value});
-                });
+                }, GeminiError);
             });
         });
 
@@ -251,11 +251,11 @@ describe('config', function() {
             });
         });
 
-        it('should not throws if value from cli is not valid', () => {
+        it('should throw if value from cli is not valid', () => {
             ['{a:1}', '{', ']', '\'string\'', '\n'].forEach((value) => {
-                assert.doesNotThrow(() => {
+                assert.throw(() => {
                     assertParsesCli({property: name, value});
-                });
+                }, GeminiError);
             });
         });
     }
@@ -475,7 +475,7 @@ describe('config', function() {
             });
         });
 
-        describe.only('plugins', () => {
+        describe('plugins', () => {
             testObjectOption('system.plugins.plugin');
         });
     });
