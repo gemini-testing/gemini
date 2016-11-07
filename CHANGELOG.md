@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.13.4"></a>
+## [4.13.4](https://github.com/gemini-testing/gemini/compare/v4.13.3...v4.13.4) (2016-11-07)
+
+
+### Bug Fixes
+
+* **config:** throw error if value contain not valid json string ([60cc4f0](https://github.com/gemini-testing/gemini/commit/60cc4f0))
+* **config:** use JSON.parse for plugins values from cli/env ([6039fd1](https://github.com/gemini-testing/gemini/commit/6039fd1))
+
+
+
 <a name="4.13.3"></a>
 ## [4.13.3](https://github.com/gemini-testing/gemini/compare/v4.13.1...v4.13.3) (2016-11-03)
 
