@@ -226,21 +226,28 @@ describe('suite', () => {
         });
     });
 
-    describe('hasChildNamed', () => {
+    describe('hasChild', () => {
         let suite;
 
         beforeEach(() => {
             suite = createSuite('parent');
             const child = createSuite('has', suite);
+            child.browsers = ['bro1', 'bro2'];
             suite.addChild(child);
         });
 
-        it('should return true when suite has child of a given name', () => {
-            assert.isTrue(suite.hasChildNamed('has'));
+        it('should return true when suite has child with given name and intersected browser set', () => {
+            assert.isTrue(suite.hasChild('has', ['bro1']));
         });
 
-        it('should return false when suite has no child of a given name', () => {
-            assert.isFalse(suite.hasChildNamed('has no'));
+        describe('should return false when', () => {
+            it('suite has no child with given name', () => {
+                assert.isFalse(suite.hasChild('has no', []));
+            });
+
+            it('has child with given name and not intersected browser set', () => {
+                assert.isFalse(suite.hasChild('has no', ['bad-bro']));
+            });
         });
     });
 
