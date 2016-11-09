@@ -161,6 +161,8 @@ describe('gemini', () => {
         beforeEach(() => {
             sandbox.stub(temp, 'init');
             sandbox.stub(Config.prototype);
+
+            Config.prototype.getBrowserIds.returns([]);
         });
 
         it('should pass sets from cli to test-reader', () => {
