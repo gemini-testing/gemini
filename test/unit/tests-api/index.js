@@ -47,11 +47,31 @@ describe('tests-api', function() {
             assert.equal(this.suite.children[0].children[0].name, 'child');
         });
 
-        it('should not allow create two child suites of the same name', function() {
-            assert.throws(function() {
-                gemini.suite('name', function() {
-                    gemini.suite('child', function() {});
-                    gemini.suite('child', function() {});
+        describe('child suites of the same name', () => {
+            beforeEach(function() {
+                gemini = testsAPI(this.suite, ['browser1']);
+            });
+
+            it('should not allow to create with intersect browsers', function() {
+                assert.throws(() => {
+                    gemini.suite('name', () => {
+                        gemini.suite('child', () => {});
+                        gemini.suite('child', () => {});
+                    });
+                });
+            });
+
+            it('should allow to create with not intersecting browser sets', function() {
+                gemini.suite('name', () => {
+                    gemini.suite('child', () => {});
+                });
+
+                gemini = testsAPI(this.suite, ['browser2']);
+
+                assert.doesNotThrow(() => {
+                    gemini.suite('name', () => {
+                        gemini.suite('child', () => {});
+                    });
                 });
             });
         });
