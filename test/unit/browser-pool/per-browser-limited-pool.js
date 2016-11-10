@@ -85,7 +85,7 @@ describe('PerBrowserLimitedPool', () => {
     });
 
     describe('cancel', () => {
-        it('should cancel all limited pools', () => {
+        it('should cancel all underlying pools', () => {
             const config = mkConfigStub_({
                 bro1: {sessionsPerBrowser: 1},
                 bro2: {sessionsPerBrowser: 2}

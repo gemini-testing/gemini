@@ -1,24 +1,53 @@
 'use strict';
 
-var signalHandler = require('lib/signal-handler');
+const _ = require('lodash');
+const Events = require('lib/constants/events');
+const signalHandler = require('lib/signal-handler');
+const logger = require('lib/utils').logger;
 
-describe.skip('signalHandler', function() {
-    var sandbox = sinon.sandbox.create(),
-        onExit;
+describe('SignalHandler', () => {
+    const sandbox = sinon.sandbox.create();
 
-    beforeEach(function() {
-        onExit = sinon.spy();
-        sandbox.stub(process, 'exit', () => {});
-        signalHandler.on('exit', onExit);
+    beforeEach(() => {
+        sandbox.stub(logger, 'warn');
+
+        sandbox.stub(process, 'exit');
     });
 
-    afterEach(function() {
-        sandbox.restore();
+    afterEach(() => sandbox.restore());
+
+    after(() => {
+        process.removeAllListeners('SIGHUP');
+        process.removeAllListeners('SIGTERM');
     });
 
-    // Can't test SIGINT and SIGTERM because these signals will kill test process
-    it('should send `exit` on SIGHUP, SIGINT and SIGTERM', function() {
-        process.emit('SIGHUP');
-        assert.calledOnce(onExit);
+    // SIGINT can not be tested as SIGTERM or SIGINT because mocha subscribes to SIGINT before running of tests
+    _.forEach({SIGHUP: 1, SIGTERM: 15}, (code, signal) => {
+        describe(`on ${signal}`, () => {
+            it('should emit "INTERRUPT" event', () => {
+                const onInterrupt = sinon.spy().named('onInterrupt');
+
+                signalHandler.on(Events.INTERRUPT, onInterrupt);
+                process.emit(`${signal}`);
+
+                assert.calledOnce(onInterrupt);
+            });
+
+            it('should pass exit code', () => {
+                const onInterrupt = sinon.spy().named('onExit');
+
+                signalHandler.on(Events.INTERRUPT, onInterrupt);
+                process.emit(`${signal}`);
+
+                assert.calledWith(onInterrupt, {exitCode: 128 + code});
+            });
+
+            it(`should provide force exit on double ${signal}`, () => {
+                process.emit(`${signal}`);
+                process.emit(`${signal}`);
+
+                assert.calledWith(process.exit, 128 + code);
+            });
+        });
     });
 });

@@ -1,6 +1,6 @@
 'use strict';
 
-const Browser = require('lib/browser');
+const Browser = require('lib/browser/new-browser');
 const Promise = require('bluebird');
 const State = require('lib/state');
 const Suite = require('lib/suite');
@@ -14,11 +14,11 @@ function makeBrowser(capabilities, config) {
             coverage: {}
         }
     }, config);
-    return Browser.create(config);
+    return new Browser(config);
 }
 
 function browserWithId(id) {
-    return Browser.create({
+    return new Browser({
         id,
         desiredCapabilities: {
             browserName: id

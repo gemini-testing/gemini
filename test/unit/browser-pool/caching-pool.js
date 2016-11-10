@@ -15,7 +15,8 @@ describe('CachingPool', () => {
         this.underlyingPool = {
             getBrowser: sinon.stub(),
             freeBrowser: sinon.stub().returns(Promise.resolve()),
-            finalizeBrowsers: sinon.stub().returns(Promise.resolve())
+            finalizeBrowsers: sinon.stub().returns(Promise.resolve()),
+            cancel: sinon.stub()
         };
 
         this.poolWithReuseLimits = (limits) => {
@@ -224,6 +225,16 @@ describe('CachingPool', () => {
                 .then(() => this.launchAndFree(pool, 'first'))
                 .then(() => pool.getBrowser('second'))
                 .then(() => assert.calledOnce(createSecondBrowser));
+        });
+    });
+
+    describe('cancel', () => {
+        it('should cancel an underlying pool', () => {
+            const pool = this.makePool();
+
+            pool.cancel();
+
+            assert.calledOnce(this.underlyingPool.cancel);
         });
     });
 });
