@@ -16,6 +16,7 @@
     "bluebird-q": "^2.1.1",
     "browserify": "^13.0.0",
     "chalk": "^1.1.3",
+    "clipboard": "^1.5.15",
     "commander": "^2.8.1",
     "css": "^2.1.0",
     "debug": "^2.2.0",
@@ -62,7 +63,9 @@
   },
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
-    "prepublish": "uglifyjs ./lib/browser/client-scripts/gemini.calibrate.js -m > ./lib/browser/client-scripts/gemini.calibrate.min.js --support-ie8",
+    "prepublish": "npm run prepare-calibrate-script && npm run prepare-report-script",
+    "prepare-calibrate-script": "uglifyjs ./lib/browser/client-scripts/gemini.calibrate.js -m > ./lib/browser/client-scripts/gemini.calibrate.min.js --support-ie8",
+    "prepare-report-script": "browserify ./lib/reporters/html/static/report.js | uglifyjs -o ./lib/reporters/html/static/report.min.js",
     "postpublish": "npm run publish-site",
     "test-func": "istanbul test _mocha test/functional",
     "test-browser": "istanbul test _mocha test/browser",

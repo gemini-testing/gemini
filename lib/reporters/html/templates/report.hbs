@@ -20,6 +20,7 @@
         <button id="showSkipped" class="button">Show skipped</button>
         <button id="showRetries" class="button">Expand retries</button>
         <button id="showOnlyDiff" class="button">Show only diff</button>
+        <input id="viewHostInput" class="text-input" size="40" placeholder="change original host for view in browser"/>
 
         <div id="skippedList" class="skipped__list collapsed">
             {{#if skips}}
@@ -36,6 +37,6 @@
             {{> suite}}
         {{/each}}
 
-        <script src="report.js"></script>
+        <script src="report.min.js"></script>
     </body>
 </html>
