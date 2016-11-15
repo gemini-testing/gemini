@@ -70,11 +70,11 @@ describe('HTML Reporter', () => {
         assert.equal(render(data), '<img data-src="images/fake/long%2Bpath/fakeName/fakeId~current.png">');
     });
 
-    it('should save only current when screenshots are equal', () => {
-        sandbox.stub(lib, 'currentAbsolutePath').returns('absolute/current/path');
+    it('should save only reference when screenshots are equal', () => {
+        sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
 
         emitter.emit(Events.TEST_RESULT, mkStubResult_({
-            currentPath: 'current/path',
+            referencePath: 'reference/path',
             equal: true
         }));
 
@@ -82,7 +82,7 @@ describe('HTML Reporter', () => {
 
         return emitter.emitAndWait(Events.END_RUNNER).then(() => {
             assert.calledOnce(fs.copyAsync);
-            assert.calledWith(fs.copyAsync, 'current/path', 'absolute/current/path');
+            assert.calledWith(fs.copyAsync, 'reference/path', 'absolute/reference/path');
         });
     });
 
