@@ -2,7 +2,6 @@
 
 const Promise = require('bluebird');
 const wdAgent = require('wd');
-const polyfillService = require('polyfill-service');
 
 const Camera = require('lib/browser/camera');
 const ClientBridge = require('lib/browser/client-bridge');
@@ -210,7 +209,6 @@ describe('browser/new-browser', () => {
 
         beforeEach(() => {
             sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
-            sandbox.stub(polyfillService, 'getPolyfillString').returns('function() {}');
         });
 
         describe('open', () => {
@@ -332,9 +330,9 @@ describe('browser/new-browser', () => {
             calibrator = sinon.createStubInstance(Calibrator);
         });
 
-        describe('when browser supports CSS3 selectors', () => {
+        describe('in modern browser', () => {
             beforeEach(() => {
-                calibrator.calibrate.returns(Promise.resolve({hasCSS3Selectors: true}));
+                calibrator.calibrate.returns(Promise.resolve({needsCompatLib: false}));
 
                 return browser.launch(calibrator);
             });
@@ -358,11 +356,11 @@ describe('browser/new-browser', () => {
             });
         });
 
-        describe('when browser does not support CSS3 selectors', () => {
+        describe('in legacy browser', () => {
             beforeEach(() => {
                 sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
 
-                calibrator.calibrate.returns(Promise.resolve({hasCSS3Selectors: false}));
+                calibrator.calibrate.returns(Promise.resolve({needsCompatLib: true}));
 
                 return browser.launch(calibrator);
             });
@@ -370,7 +368,7 @@ describe('browser/new-browser', () => {
             it('should return what client method returns', () => {
                 const element = {element: 'elem'};
 
-                ClientBridge.prototype.call.withArgs('query.first', ['.class']).returns(Promise.resolve(element));
+                ClientBridge.prototype.call.withArgs('queryFirst', ['.class']).returns(Promise.resolve(element));
 
                 return assert.eventually.equal(browser.findElement('.class'), element);
             });
