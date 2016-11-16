@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.14.0"></a>
+# [4.14.0](https://github.com/gemini-testing/gemini/compare/v4.13.4...v4.14.0) (2016-11-16)
+
+
+### Bug Fixes
+
+* **documentation:** update information about using gemini options ([251329b](https://github.com/gemini-testing/gemini/commit/251329b))
+* correct exit on 'SIGHUP', 'SIGINT' or 'SIGTERM' ([1f0ffbe](https://github.com/gemini-testing/gemini/commit/1f0ffbe))
+* Implement advanced verification for suites with same names ([2572af5](https://github.com/gemini-testing/gemini/commit/2572af5))
+
+
+### Features
+
+* **html-reporter:** add ability to copy suite name and open suite urls ([6219b74](https://github.com/gemini-testing/gemini/commit/6219b74))
+
+
+### Performance Improvements
+
+* Use reference images instead of actual(current) in HTML report ([ef198bc](https://github.com/gemini-testing/gemini/commit/ef198bc))
+
+
+
 <a name="4.13.4"></a>
 ## [4.13.4](https://github.com/gemini-testing/gemini/compare/v4.13.3...v4.13.4) (2016-11-07)
 
