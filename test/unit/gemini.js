@@ -21,6 +21,7 @@ describe('gemini', () => {
     let Gemini;
     let gemini;
     let testReaderStub;
+    let signalHandler;
 
     const stubBrowsers = (browserIds) => {
         return browserIds.reduce((fakeBrowsers, browser) => {
@@ -34,8 +35,12 @@ describe('gemini', () => {
         opts.rootSuite = opts.rootSuite || mkSuiteStub();
 
         testReaderStub = sandbox.stub().named('TestReader').returns(Promise.resolve(opts.rootSuite));
+        signalHandler = new EventEmitter();
 
-        Gemini = proxyquire('lib/gemini', {'./test-reader': testReaderStub});
+        Gemini = proxyquire('lib/gemini', {
+            './test-reader': testReaderStub,
+            './signal-handler': signalHandler
+        });
 
         return new Gemini({
             rootUrl: 'http://localhost',
@@ -62,15 +67,15 @@ describe('gemini', () => {
     beforeEach(() => {
         sandbox.stub(Runner.prototype, 'on').returnsThis();
         sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
+        sandbox.stub(Runner.prototype, 'cancel').returns(Promise.resolve());
         sandbox.stub(console, 'warn');
         sandbox.stub(pluginsLoader, 'load');
+        sandbox.stub(temp, 'init');
     });
 
     afterEach(() => sandbox.restore());
 
     it('should passthrough runner events', () => {
-        sandbox.stub(temp, 'init');
-
         const runner = new EventEmitter();
         sandbox.stub(Runner, 'create').returns(runner);
 
@@ -119,8 +124,6 @@ describe('gemini', () => {
     });
 
     describe('load plugins', () => {
-        beforeEach(() => sandbox.stub(temp, 'init'));
-
         it('should load plugins', () => {
             return runGeminiTest()
                 .then(() => assert.calledOnce(pluginsLoader.load));
@@ -159,7 +162,6 @@ describe('gemini', () => {
         };
 
         beforeEach(() => {
-            sandbox.stub(temp, 'init');
             sandbox.stub(Config.prototype);
 
             Config.prototype.getBrowserIds.returns([]);
@@ -283,10 +285,6 @@ describe('gemini', () => {
     });
 
     describe('test', () => {
-        beforeEach(function() {
-            sandbox.stub(temp, 'init');
-        });
-
         it('should initialize temp with specified temp dir', () => {
             runGeminiTest({tempDir: '/some/dir'});
 
@@ -309,7 +307,6 @@ describe('gemini', () => {
         beforeEach(() => {
             sandbox.stub(SuiteCollection.prototype, 'skipBrowsers');
             sandbox.stub(Runner.prototype, 'setTestBrowsers');
-            sandbox.stub(temp, 'init');
         });
 
         afterEach(() => {
@@ -378,6 +375,63 @@ describe('gemini', () => {
                 .returns({foo: 'bar'});
 
             assert.deepEqual(Gemini.readRawConfig('some/file/path'), {foo: 'bar'});
+        });
+    });
+
+    describe('on "INTERRUPT"', () => {
+        const stubRunner = (scenario) => {
+            Runner.prototype.run.restore();
+
+            sandbox.stub(Runner.prototype, 'run', function() {
+                return Promise.resolve(scenario(this));
+            });
+        };
+
+        const emulateRunnerInterrupt = (exitCode) => stubRunner(() => signalHandler.emit(Events.INTERRUPT, {exitCode}));
+
+        it('should emit "INTERRUPT" event from gemini', () => {
+            const gemini = initGemini();
+            const onCancel = sinon.spy().named('onCancel');
+
+            emulateRunnerInterrupt();
+
+            gemini.on(Events.INTERRUPT, onCancel);
+
+            return gemini.test()
+                .then(() => assert.calledOnce(onCancel));
+        });
+
+        it('should pass exit code when emitting "INTERRUPT" event', () => {
+            const gemini = initGemini();
+            const onCancel = sinon.spy().named('onCancel');
+
+            emulateRunnerInterrupt(130);
+
+            gemini.on(Events.INTERRUPT, onCancel);
+
+            return gemini.test()
+                .then(() => assert.calledWith(onCancel, {exitCode: 130}));
+        });
+
+        it('should cancel gemini runner', () => {
+            const gemini = initGemini();
+
+            emulateRunnerInterrupt();
+
+            return gemini.test()
+                .then(() => assert.calledOnce(Runner.prototype.cancel));
+        });
+
+        it('should emit "INTERRUPT" event from gemini before cancelling of gemini runner', () => {
+            const gemini = initGemini();
+            const onCancel = sinon.spy().named('onCancel');
+
+            emulateRunnerInterrupt();
+
+            gemini.on(Events.INTERRUPT, onCancel);
+
+            return gemini.test()
+                .then(() => assert.callOrder(onCancel, Runner.prototype.cancel));
         });
     });
 });

@@ -46,7 +46,9 @@ describe('runner', () => {
     };
 
     beforeEach(() => {
-        sandbox.stub(pool, 'create').returns(sinon.createStubInstance(Pool));
+        const browserPool = sinon.createStubInstance(Pool);
+        sandbox.stub(pool, 'create').returns(browserPool);
+        browserPool.cancel.returns(Promise.resolve());
 
         sandbox.spy(Coverage, 'create');
         sandbox.stub(Coverage.prototype, 'processStats');
@@ -56,6 +58,7 @@ describe('runner', () => {
 
         sandbox.spy(BrowserRunner, 'create');
         sandbox.stub(BrowserRunner.prototype, 'run').returns(Promise.resolve());
+        sandbox.stub(BrowserRunner.prototype, 'cancel');
     });
 
     afterEach(() => sandbox.restore());
@@ -214,7 +217,7 @@ describe('runner', () => {
                         assert.alwaysCalledWith(BrowserRunner.prototype.run, suiteCollection, stateProcessor);
                         assert.notEqual(
                             BrowserRunner.prototype.run.firstCall.thisValue,
-                             BrowserRunner.prototype.run.secondCall.thisValue
+                            BrowserRunner.prototype.run.secondCall.thisValue
                         );
                     });
             });
@@ -512,6 +515,56 @@ describe('runner', () => {
             runner.setTestBrowsers(['unknown-bro', 'another-unknown-bro']);
 
             return run(runner).then(() => assert.notCalled(BrowserRunner.create));
+        });
+    });
+
+    describe('cancel', () => {
+        it('should cancel all created browser runners', () => {
+            const runner = createRunner();
+            runner.config.getBrowserIds.returns(['bro1', 'bro2']);
+
+            return run(runner)
+                .then(() => runner.cancel())
+                .then(() => {
+                    assert.calledTwice(BrowserRunner.prototype.cancel);
+
+                    assert.notEqual(
+                        BrowserRunner.prototype.run.firstCall.thisValue,
+                        BrowserRunner.prototype.run.secondCall.thisValue
+                    );
+                });
+        });
+
+        it('should cancel browser pool', () => {
+            const browserPool = sinon.createStubInstance(Pool);
+
+            pool.create.returns(browserPool);
+
+            const runner = createRunner();
+
+            runner.cancel();
+
+            assert.calledOnce(browserPool.cancel);
+        });
+
+        it('should cancel browser pool after cancelling of browser runners', () => {
+            const browserPool = sinon.createStubInstance(Pool);
+
+            pool.create.returns(browserPool);
+
+            const runner = createRunner();
+
+            return run(runner)
+                .then(() => runner.cancel())
+                .then(() => assert.callOrder(BrowserRunner.prototype.cancel, browserPool.cancel));
+        });
+
+        it('should not run tests after cancel', () => {
+            const runner = createRunner();
+
+            runner.cancel();
+
+            return run(runner).then(() => assert.notCalled(BrowserRunner.prototype.run));
         });
     });
 });

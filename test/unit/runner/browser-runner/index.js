@@ -108,16 +108,6 @@ describe('runner/BrowserRunner', () => {
                 .then(() => assert.calledWith(suiteRunner.run, 'stateProcessor'));
         });
 
-        it('should not run suites after cancel', () => {
-            const runner = mkRunner_('browser');
-            const suiteCollection = new SuiteCollection([makeSuiteStub({browsers: ['browser']})]);
-
-            runner.cancel();
-
-            return runner.run(suiteCollection)
-                .then(() => assert.notCalled(suiteRunner.run));
-        });
-
         it('should cancel suite runners on cancel', () => {
             const runner = mkRunner_('browser');
             const suiteCollection = new SuiteCollection([

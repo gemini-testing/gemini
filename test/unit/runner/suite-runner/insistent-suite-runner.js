@@ -373,16 +373,66 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
     });
 
     describe('cancel', () => {
-        beforeEach(() => {
-            sandbox.stub(RegularSuiteRunner.prototype, 'cancel');
+        it('should not retry after cancel', () => {
+            const config = mkConfigStub_({retry: 1});
+            const insistantRunner = mkInsistentRunner_({config});
+
+            stubWrappedRun_((runner) => {
+                runner.emit(Events.TEST_RESULT, {state: makeStateStub(), equal: false});
+
+                insistantRunner.cancel();
+            });
+
+            return insistantRunner
+                .run()
+                .then(() => assert.calledOnce(RegularSuiteRunner.prototype.run));
         });
 
-        it('should cancel created regular suite runner', () => {
-            const runner = mkInsistentRunner_();
-            stubWrappedRun_(() => runner.cancel());
+        it('should not emit retry events after cancel', () => {
+            const config = mkConfigStub_({retry: 1});
+            const insistantRunner = mkInsistentRunner_({config});
+            const onRetry = sinon.spy().named('onRetry');
 
-            return runner.run()
-                .then(() => assert.calledOnce(RegularSuiteRunner.prototype.cancel));
+            stubWrappedRun_((runner) => {
+                insistantRunner.cancel();
+
+                runner.emit(Events.TEST_RESULT, {state: makeStateStub(), equal: false});
+            });
+
+            return insistantRunner
+                .on(Events.RETRY, onRetry)
+                .run()
+                .then(() => assert.notCalled(onRetry));
+        });
+
+        describe('should not passthrough event after cancel', () => {
+            [
+                Events.BEGIN_STATE,
+                Events.SKIP_STATE,
+                Events.END_STATE,
+                Events.UPDATE_RESULT,
+                Events.TEST_RESULT,
+                Events.WARNING,
+                Events.ERROR,
+                Events.CAPTURE
+            ].forEach((event) => {
+                it(`${event}`, () => {
+                    const config = mkConfigStub_({retry: 0});
+                    const insistantRunner = mkInsistentRunner_({config});
+                    const onEventHandler = sinon.spy().named(event);
+
+                    stubWrappedRun_((runner) => {
+                        insistantRunner.cancel();
+
+                        runner.emit(event, {state: makeStateStub()});
+                    });
+
+                    return insistantRunner
+                        .on(event, onEventHandler)
+                        .run()
+                        .then(() => assert.notCalled(onEventHandler));
+                });
+            });
         });
     });
 });

@@ -295,17 +295,6 @@ describe('runner/suite-runner/regular-suite-runner', () => {
                 });
         });
 
-        it('should not run states after cancel', () => {
-            const state = util.makeStateStub();
-            const suite = makeSuiteStub({states: [state]});
-            const runner = mkRunner_(suite);
-
-            runner.cancel();
-
-            return runner.run()
-                .then(() => assert.notCalled(stateRunner.run));
-        });
-
         it('should not run state after failed state', () => {
             const state1 = util.makeStateStub();
             const state2 = util.makeStateStub();
