@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.14.1"></a>
+## [4.14.1](https://github.com/gemini-testing/gemini/compare/v4.14.0...v4.14.1) (2016-11-22)
+
+
+### Bug Fixes
+
+* fix invalid urls to reference images ([85a426d](https://github.com/gemini-testing/gemini/commit/85a426d))
+* fix invalid urls to reference images ([ed2ac15](https://github.com/gemini-testing/gemini/commit/ed2ac15))
+* remove polyfill-service dependency ([364bcbf](https://github.com/gemini-testing/gemini/commit/364bcbf)), closes [#673](https://github.com/gemini-testing/gemini/issues/673) [#635](https://github.com/gemini-testing/gemini/issues/635)
+
+
+
 <a name="4.14.0"></a>
 # [4.14.0](https://github.com/gemini-testing/gemini/compare/v4.13.4...v4.14.0) (2016-11-16)
 
