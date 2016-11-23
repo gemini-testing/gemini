@@ -68,7 +68,7 @@ describe('runner', () => {
             const runner = createRunner();
 
             assert.calledOnce(pool.create);
-            assert.calledWith(pool.create, runner.config);
+            assert.calledWith(pool.create, runner.config, runner);
         });
 
         it('should create "Coverage" instance if coverage is enabled', () => {
@@ -433,8 +433,6 @@ describe('runner', () => {
             describe('should passthrough', () => {
                 [
                     Events.RETRY,
-                    Events.START_BROWSER,
-                    Events.STOP_BROWSER,
                     Events.BEGIN_SUITE,
                     Events.SKIP_STATE,
                     Events.BEGIN_STATE,

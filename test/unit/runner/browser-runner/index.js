@@ -44,16 +44,6 @@ describe('runner/BrowserRunner', () => {
             };
         });
 
-        it('should emit `startBrowser` event when starting browser', () => {
-            const onStartBrowser = sinon.spy().named('onStartBrowser');
-            const runner = mkRunner_('browser');
-
-            runner.on('startBrowser', onStartBrowser);
-
-            return runner.run(suiteCollection)
-                .then(() => assert.calledWith(onStartBrowser, {browserId: 'browser'}));
-        });
-
         it('should run only suites expected to be run in current browser', () => {
             const someSuite = makeSuiteStub({browsers: ['browser1', 'browser2']});
             const suiteCollection = new SuiteCollection([
@@ -120,35 +110,6 @@ describe('runner/BrowserRunner', () => {
                     runner.cancel();
 
                     assert.calledTwice(suiteRunner.cancel);
-                });
-        });
-
-        it('should emit `stopBrowser` after all suites', () => {
-            const onStopBrowser = sinon.spy().named('onStopBrowser');
-            const runner = mkRunner_('browser');
-
-            runner.on('startBrowser', onStopBrowser);
-
-            return runner.run(suiteCollection)
-                .then(() => assert.calledWith(onStopBrowser, {browserId: 'browser'}));
-        });
-
-        it('should emit events in correct order', () => {
-            const startBrowser = sinon.spy().named('onStartBrowser');
-            const stopBrowser = sinon.spy().named('onStopBrowser');
-            const suiteCollection = new SuiteCollection([makeSuiteStub({browsers: ['browser']})]);
-            const runner = mkRunner_('browser');
-
-            runner.on('startBrowser', startBrowser);
-            runner.on('stopBrowser', stopBrowser);
-
-            return runner.run(suiteCollection)
-                .then(() => {
-                    assert.callOrder(
-                        startBrowser,
-                        suiteRunner.run,
-                        stopBrowser
-                    );
                 });
         });
     });

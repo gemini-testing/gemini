@@ -12,3 +12,7 @@
 
 * `INTERRUPT` - emitted on signal events `SIGHUP`, `SIGINT` or `SIGTERM`. The event is emitted with 1 argument `data`:
     * `data.exitCode` - exit code with which gemini will be interrupted
+
+* `START_BROWSER` - emitted on browser session start. Emitted with [browser instance](../lib/browser/new-browser.js). If handler returns a promise tests will be executed in this session only after the promise is resolved.
+
+* `STOP_BROWSER` - emitted right before browser session end. Emitted with [browser instance](../lib/browser/new-browser.js). If handler returns a promise quit will be performed only after the promise is resolved.
