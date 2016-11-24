@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.14.2"></a>
+## [4.14.2](https://github.com/gemini-testing/gemini/compare/v4.14.1...v4.14.2) (2016-11-24)
+
+
+### Bug Fixes
+
+* emit browser start/stop events in correct places ([e8a427e](https://github.com/gemini-testing/gemini/commit/e8a427e))
+* IE9 does not include pseudo-element styles ([906988b](https://github.com/gemini-testing/gemini/commit/906988b))
+
+
+
 <a name="4.14.1"></a>
 ## [4.14.1](https://github.com/gemini-testing/gemini/compare/v4.14.0...v4.14.1) (2016-11-22)
 
