@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.14.3"></a>
+## [4.14.3](https://github.com/gemini-testing/gemini/compare/v4.14.2...v4.14.3) (2016-12-05)
+
+
+### Bug Fixes
+
+* correct implementation of doubleClick action ([f8746a9](https://github.com/gemini-testing/gemini/commit/f8746a9))
+
+
+
 <a name="4.14.2"></a>
 ## [4.14.2](https://github.com/gemini-testing/gemini/compare/v4.14.1...v4.14.2) (2016-11-24)
 
