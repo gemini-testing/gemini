@@ -64,7 +64,7 @@ describe('browser/new-browser', () => {
 
         [
             'sleep', 'waitForElementByCssSelector', 'waitForElementByCssSelector', 'waitFor', 'moveTo',
-            'click', 'doubleClick', 'buttonDown', 'buttonUp', 'keys', 'type', 'tapElement', 'execute',
+            'click', 'doubleclick', 'buttonDown', 'buttonUp', 'keys', 'type', 'tapElement', 'execute',
             'setWindowSize', 'getWindowSize', 'getOrientation', 'setOrientation'
         ].forEach((method) => it(method, () => testExposedWdMethod(method)));
 

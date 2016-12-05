@@ -110,32 +110,6 @@ describe('tests-api/actions-builder', () => {
             });
         });
 
-        describe('doubleClick', () => {
-            beforeEach(() => {
-                sandbox.stub(browser, 'doubleClick').returns(Promise.resolve());
-            });
-
-            it('should use left button if not specified', () => {
-                const doubleClick = mkAction('doubleClick', browser);
-
-                return doubleClick('.some-selector')
-                    .then(() => assert.calledWith(browser.doubleClick, '.some-selector', 0));
-            });
-
-            it('should use passed button', () => {
-                const doubleClick = mkAction('doubleClick', browser);
-
-                return doubleClick('.some-selector', 1)
-                    .then(() => assert.calledWith(browser.doubleClick, '.some-selector', 1));
-            });
-
-            it('should throw on bad button (not 0, 1 or 2)', () => {
-                const doubleClick = mkAction('doubleClick', browser);
-
-                assert.throws(() => doubleClick('.some-selector', 3), /Mouse button should be/);
-            });
-        });
-
         describe('mouseDown', () => {
             beforeEach(() => {
                 sandbox.stub(browser, 'buttonDown').returns(Promise.resolve());
