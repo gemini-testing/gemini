@@ -280,6 +280,54 @@ describe('browser/new-browser', () => {
         });
     });
 
+    describe('prepareScreenshot', () => {
+        beforeEach(() => {
+            sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
+        });
+
+        const launchBrowser_ = (calibrator) => {
+            const browser = makeBrowser({}, {calibrate: Boolean(calibrator)});
+
+            return browser.launch(calibrator)
+                .then(() => browser);
+        };
+
+        it('should prepare screenshot on client', () => {
+            return launchBrowser_()
+                .then((browser) => browser.prepareScreenshot(['some-selector'], {some: 'opt'}))
+                .then(() => {
+                    assert.calledWith(ClientBridge.prototype.call, 'prepareScreenshot');
+
+                    const selectors = ClientBridge.prototype.call.firstCall.args[1][0];
+                    assert.deepEqual(selectors, ['some-selector']);
+
+                    const opts = ClientBridge.prototype.call.firstCall.args[1][1];
+                    assert.match(opts, {some: 'opt'});
+                });
+        });
+
+        it('should use pixel ratio by default', () => {
+            return launchBrowser_()
+                .then((browser) => browser.prepareScreenshot())
+                .then(() => {
+                    const opts = ClientBridge.prototype.call.firstCall.args[1][1];
+                    assert.match(opts, {usePixelRatio: true});
+                });
+        });
+
+        it('should use calibration pixel ratio if any', () => {
+            const calibrator = sinon.createStubInstance(Calibrator);
+            calibrator.calibrate.returns(Promise.resolve({usePixelRatio: false}));
+
+            return launchBrowser_(calibrator)
+                .then((browser) => browser.prepareScreenshot())
+                .then(() => {
+                    const opts = ClientBridge.prototype.call.firstCall.args[1][1];
+                    assert.match(opts, {usePixelRatio: false});
+                });
+        });
+    });
+
     describe('captureViewportImage', () => {
         let browser;
 
