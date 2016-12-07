@@ -1,8 +1,8 @@
 'use strict';
-var Browser = require('lib/browser'),
-    Promise = require('bluebird'),
+var Promise = require('bluebird'),
     LimitedPool = require('lib/browser-pool/limited-pool'),
     rejectedPromise = require('test/util').rejectedPromise,
+    browserWithId = require('test/util').browserWithId,
     CancelledError = require('lib/errors/cancelled-error');
 
 describe('LimitedPool', function() {
@@ -20,12 +20,7 @@ describe('LimitedPool', function() {
         };
 
         this.makeBrowser = function() {
-            var config = {
-                id: 'id',
-                desiredCapabilities: {browserName: 'id'}
-            };
-
-            return this.sinon.stub(Browser.create(config, 'id'));
+            return this.sinon.stub(browserWithId('id'));
         };
     });
 

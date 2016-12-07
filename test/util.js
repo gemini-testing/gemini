@@ -22,6 +22,9 @@ function browserWithId(id) {
         id,
         desiredCapabilities: {
             browserName: id
+        },
+        system: {
+            coverage: {}
         }
     });
 }

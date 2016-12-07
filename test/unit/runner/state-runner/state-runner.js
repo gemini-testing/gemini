@@ -4,7 +4,6 @@ var Promise = require('bluebird'),
     CaptureSession = require('lib/capture-session'),
     StateError = require('lib/errors/state-error'),
     StateProcessor = require('lib/state-processor/state-processor'),
-    Config = require('lib/config'),
     util = require('../../../util');
 
 describe('runner/state-runner/state-runner', function() {
@@ -24,9 +23,8 @@ describe('runner/state-runner/state-runner', function() {
     function mkRunner_(state, browserSession) {
         state = state || util.makeStateStub();
         browserSession = browserSession || mkBrowserSessionStub_();
-        var config = sinon.createStubInstance(Config);
 
-        return new StateRunner(state, browserSession, config);
+        return new StateRunner(state, browserSession);
     }
 
     function mkStateProcessor_() {

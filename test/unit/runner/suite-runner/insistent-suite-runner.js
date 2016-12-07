@@ -61,7 +61,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             .run()
             .then(() => {
                 assert.calledOnce(RegularSuiteRunner.create);
-                assert.calledWith(RegularSuiteRunner.create, suite, browserAgent, config);
+                assert.calledWith(RegularSuiteRunner.create, suite, browserAgent);
             });
     });
 

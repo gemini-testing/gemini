@@ -2,6 +2,7 @@
 
 const Promise = require('bluebird');
 const wdAgent = require('wd');
+const _ = require('lodash');
 
 const Camera = require('lib/browser/camera');
 const ClientBridge = require('lib/browser/client-bridge');
@@ -285,10 +286,14 @@ describe('browser/new-browser', () => {
             sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
         });
 
-        const launchBrowser_ = (calibrator) => {
-            const browser = makeBrowser({}, {calibrate: Boolean(calibrator)});
+        const launchBrowser_ = (opts) => {
+            opts = opts || {};
+            const config = _.extend(opts.config, {
+                calibrate: Boolean(opts.calibrator)
+            });
+            const browser = makeBrowser({}, config);
 
-            return browser.launch(calibrator)
+            return browser.launch(opts.calibrator)
                 .then(() => browser);
         };
 
@@ -319,11 +324,22 @@ describe('browser/new-browser', () => {
             const calibrator = sinon.createStubInstance(Calibrator);
             calibrator.calibrate.returns(Promise.resolve({usePixelRatio: false}));
 
-            return launchBrowser_(calibrator)
+            return launchBrowser_({calibrator})
                 .then((browser) => browser.prepareScreenshot())
                 .then(() => {
                     const opts = ClientBridge.prototype.call.firstCall.args[1][1];
                     assert.match(opts, {usePixelRatio: false});
+                });
+        });
+
+        it('should enable coverage if it is enabled in config', () => {
+            const config = {system: {coverage: {enabled: true}}};
+
+            return launchBrowser_({config})
+                .then((browser) => browser.prepareScreenshot())
+                .then(() => {
+                    const opts = ClientBridge.prototype.call.firstCall.args[1][1];
+                    assert.match(opts, {coverage: true});
                 });
         });
     });

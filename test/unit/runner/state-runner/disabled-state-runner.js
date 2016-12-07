@@ -2,7 +2,6 @@
 var Promise = require('bluebird'),
     DisabledStateRunner = require('lib/runner/state-runner/disabled-state-runner'),
     CaptureSession = require('lib/capture-session'),
-    Config = require('lib/config'),
     util = require('../../../util');
 
 describe('runner/state-runner/disabled-state-runner', function() {
@@ -21,9 +20,8 @@ describe('runner/state-runner/disabled-state-runner', function() {
     function mkRunner_(state, browserSession) {
         state = state || util.makeStateStub();
         browserSession = browserSession || mkBrowserSessionStub_();
-        var config = sinon.createStubInstance(Config);
 
-        return new DisabledStateRunner(state, browserSession, config);
+        return new DisabledStateRunner(state, browserSession);
     }
 
     it('should perform state actions', function() {
