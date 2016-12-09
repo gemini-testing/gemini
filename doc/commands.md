@@ -66,6 +66,14 @@ You can also use multiple reporters at the same time using multiple
 gemini test --reporter flat --reporter html
 ```
 
+It is possible to specify the output folder for each reporter. In case of html reports, you can set path like this:
+
+```
+gemini test --reporter html --html-reporter-path=tmp/gemini-reports
+```
+
+In the example above the html reporter will save reports in a `tmp/gemini-reports` folder in the project.
+
 ### CSS code coverage (experimental)
 
 Path `--coverage` (or set `coverage` option in config file) to enable code
