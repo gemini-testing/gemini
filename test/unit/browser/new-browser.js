@@ -301,6 +301,7 @@ describe('browser/new-browser', () => {
             return launchBrowser_()
                 .then((browser) => browser.prepareScreenshot(['some-selector'], {some: 'opt'}))
                 .then(() => {
+                    assert.calledOnce(ClientBridge.prototype.call);
                     assert.calledWith(ClientBridge.prototype.call, 'prepareScreenshot');
 
                     const selectors = ClientBridge.prototype.call.firstCall.args[1][0];
