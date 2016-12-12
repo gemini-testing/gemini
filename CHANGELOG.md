@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.14.4"></a>
+## [4.14.4](https://github.com/gemini-testing/gemini/compare/v4.14.1...v4.14.4) (2016-12-12)
+
+
+### Bug Fixes
+
+* correct implementation of doubleClick action ([f8746a9](https://github.com/gemini-testing/gemini/commit/f8746a9))
+* emit browser start/stop events in correct places ([e8a427e](https://github.com/gemini-testing/gemini/commit/e8a427e))
+* IE9 does not include pseudo-element styles ([906988b](https://github.com/gemini-testing/gemini/commit/906988b))
+* Remove session id console output for skipped tests ([6aa92e1](https://github.com/gemini-testing/gemini/commit/6aa92e1))
+
+
+
 <a name="4.14.3"></a>
 ## [4.14.3](https://github.com/gemini-testing/gemini/compare/v4.14.2...v4.14.3) (2016-12-05)
 
