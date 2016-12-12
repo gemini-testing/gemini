@@ -11,6 +11,16 @@ describe('Reporter#FlatVerbose', () => {
     const sandbox = sinon.sandbox.create();
     let emitter;
 
+    function getTestLog(test) {
+        emitter.emit(Events.BEGIN);
+        emitter.emit(Events.UPDATE_RESULT, test);
+        emitter.emit(Events.END);
+
+        return chalk
+            .stripColor(logger.log.firstCall.args[0])
+            .substr(2); // remove first symbol (icon)
+    }
+
     beforeEach(() => {
         const reporter = new FlatVerboseReporter();
 
@@ -32,14 +42,16 @@ describe('Reporter#FlatVerbose', () => {
             sessionId: '0fc23des'
         };
 
-        emitter.emit(Events.BEGIN);
-        emitter.emit(Events.UPDATE_RESULT, test);
-        emitter.emit(Events.END);
+        assert.equal(getTestLog(test), 'block size big hover [chrome: 0fc23des]');
+    });
 
-        const deserealizedResult = chalk
-            .stripColor(logger.log.firstCall.args[0])
-            .substr(2); // remove first symbol (icon)
+    it('should not render session identifier for skipped tests', () => {
+        const test = {
+            suite: {path: ['some-path'], skipped: {}},
+            state: {name: 'some-name'},
+            browserId: 'chrome'
+        };
 
-        assert.equal(deserealizedResult, 'block size big hover [chrome: 0fc23des]');
+        assert.equal(getTestLog(test), 'some-path some-name [chrome]');
     });
 });
