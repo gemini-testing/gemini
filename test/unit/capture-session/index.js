@@ -110,13 +110,10 @@ describe('capture session', () => {
                 ignoreSelectors: ['.ignore1', '.ignore2']
             };
 
-            return session.prepareScreenshot(state, {some: 'opt'})
+            return session.prepareScreenshot(state)
                 .then(() => assert.calledWith(browser.prepareScreenshot,
                     ['.selector1', '.selector2'],
-                    {
-                        some: 'opt',
-                        ignoreSelectors: ['.ignore1', '.ignore2']
-                    }
+                    {ignoreSelectors: ['.ignore1', '.ignore2']}
                 ));
         });
     });

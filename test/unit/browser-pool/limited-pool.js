@@ -1,221 +1,201 @@
 'use strict';
-var Browser = require('lib/browser'),
-    Promise = require('bluebird'),
-    LimitedPool = require('lib/browser-pool/limited-pool'),
-    rejectedPromise = require('test/util').rejectedPromise,
-    CancelledError = require('lib/errors/cancelled-error');
+const Promise = require('bluebird');
+const LimitedPool = require('lib/browser-pool/limited-pool');
+const rejectedPromise = require('test/util').rejectedPromise;
+const browserWithId = require('test/util').browserWithId;
+const CancelledError = require('lib/errors/cancelled-error');
 
-describe('LimitedPool', function() {
-    beforeEach(function() {
-        this.underlyingPool = {
+describe('LimitedPool', () => {
+    const sandbox = sinon.sandbox.create();
+    let underlyingPool;
+
+    const makePool_ = (limit) => new LimitedPool(limit || 1, underlyingPool);
+    const makeBrowser_ = () => sandbox.stub(browserWithId('id'));
+
+    beforeEach(() => {
+        underlyingPool = {
             getBrowser: sinon.stub(),
             freeBrowser: sinon.stub().returns(Promise.resolve()),
             cancel: sinon.stub()
         };
-
-        this.sinon = sinon.sandbox.create();
-
-        this.makePool = function(limit) {
-            return new LimitedPool(limit || 1, this.underlyingPool);
-        };
-
-        this.makeBrowser = function() {
-            var config = {
-                id: 'id',
-                desiredCapabilities: {browserName: 'id'}
-            };
-
-            return this.sinon.stub(Browser.create(config, 'id'));
-        };
     });
 
-    afterEach(function() {
-        this.sinon.restore();
-    });
+    afterEach(() => sandbox.restore());
 
-    it('should request browser from underlying pool', function() {
-        var browser = this.makeBrowser();
-        this.underlyingPool.getBrowser.returns(Promise.resolve(browser));
-        var pool = this.makePool();
+    it('should request browser from underlying pool', () => {
+        const browser = makeBrowser_();
+        underlyingPool.getBrowser.returns(Promise.resolve(browser));
+        const pool = makePool_();
+
         return assert.eventually.equal(pool.getBrowser('id'), browser);
     });
 
-    describe('should return browser to underlying pool', function() {
+    describe('should return browser to underlying pool', () => {
         let browser;
         let pool;
 
-        beforeEach(function() {
-            browser = this.makeBrowser();
-            pool = this.makePool();
-            this.underlyingPool.getBrowser.returns(Promise.resolve(browser));
+        beforeEach(() => {
+            browser = makeBrowser_();
+            pool = makePool_();
+            underlyingPool.getBrowser.returns(Promise.resolve(browser));
         });
 
-        it('when freed', function() {
+        it('when freed', () => {
             return pool.freeBrowser(browser)
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser));
+                .then(() => assert.calledWith(underlyingPool.freeBrowser, browser));
         });
 
-        it('for release if there are no more requests', function() {
+        it('for release if there are no more requests', () => {
             return pool.getBrowser('first')
                 .then(() => pool.freeBrowser(browser))
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: true}));
+                .then(() => assert.calledWith(underlyingPool.freeBrowser, browser, {force: true}));
         });
 
-        it('for caching if there is at least one pending request', function() {
+        it('for caching if there is at least one pending request', () => {
             return pool.getBrowser('first')
                 .then(() => {
                     pool.getBrowser('second');
                     return pool.freeBrowser(browser);
                 })
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: false}));
+                .then(() => assert.calledWith(underlyingPool.freeBrowser, browser, {force: false}));
         });
 
-        it('for release if there are pending requests but forced to free', function() {
+        it('for release if there are pending requests but forced to free', () => {
             return pool.getBrowser('first')
                 .then(() => {
                     pool.getBrowser('second');
                     return pool.freeBrowser(browser, {force: true});
                 })
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: true}));
+                .then(() => assert.calledWith(underlyingPool.freeBrowser, browser, {force: true}));
         });
 
-        it('for caching if there are pending requests', function() {
+        it('for caching if there are pending requests', () => {
             return pool.getBrowser('first')
                 .then(() => {
                     pool.getBrowser('second');
                     pool.getBrowser('third');
                     return pool.freeBrowser(browser);
                 })
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: false}));
+                .then(() => assert.calledWith(underlyingPool.freeBrowser, browser, {force: false}));
         });
 
-        it('taking into account number of failed browser requests', function() {
-            const browser = this.makeBrowser();
-            const pool = this.makePool(2);
+        it('taking into account number of failed browser requests', () => {
+            const browser = makeBrowser_();
+            const pool = makePool_(2);
 
-            this.underlyingPool.getBrowser
+            underlyingPool.getBrowser
                 .withArgs('first').returns(Promise.resolve(browser))
                 .withArgs('second').returns(rejectedPromise());
 
-            return Promise.all([
-                pool.getBrowser('first'),
-                pool.getBrowser('second').reflect()
-            ])
+            return Promise
+                .all([
+                    pool.getBrowser('first'),
+                    pool.getBrowser('second').reflect()
+                ])
                 .then(() => pool.freeBrowser(browser))
-                .then(() => assert.calledWith(this.underlyingPool.freeBrowser, browser, {force: true}));
+                .then(() => assert.calledWith(underlyingPool.freeBrowser, browser, {force: true}));
         });
     });
 
-    it('should launch next request from queue on fail to receive browser from underlying pool', function() {
-        var browser = this.makeBrowser(),
-            pool = this.makePool();
+    it('should launch next request from queue on fail to receive browser from underlying pool', () => {
+        var browser = makeBrowser_(),
+            pool = makePool_();
 
-        this.underlyingPool.getBrowser.onFirstCall().returns(rejectedPromise());
-        this.underlyingPool.getBrowser.onSecondCall().returns(Promise.resolve(browser));
+        underlyingPool.getBrowser.onFirstCall().returns(rejectedPromise());
+        underlyingPool.getBrowser.onSecondCall().returns(Promise.resolve(browser));
 
         pool.getBrowser('id').catch(() => {});
 
         assert.eventually.equal(pool.getBrowser('id'), browser);
     });
 
-    describe('limit', function() {
-        it('should launch all browser in limit', function() {
-            var _this = this;
-            this.underlyingPool.getBrowser
-                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
-                .withArgs('second').returns(Promise.resolve(this.makeBrowser()));
-            var pool = this.makePool(2);
+    describe('limit', () => {
+        it('should launch all browser in limit', () => {
+            underlyingPool.getBrowser
+                .withArgs('first').returns(Promise.resolve(makeBrowser_()))
+                .withArgs('second').returns(Promise.resolve(makeBrowser_()));
+            const pool = makePool_(2);
+
             return Promise.all([pool.getBrowser('first'), pool.getBrowser('second')])
-                .then(function() {
-                    assert.calledTwice(_this.underlyingPool.getBrowser);
-                    assert.calledWith(_this.underlyingPool.getBrowser, 'first');
-                    assert.calledWith(_this.underlyingPool.getBrowser, 'second');
+                .then(() => {
+                    assert.calledTwice(underlyingPool.getBrowser);
+                    assert.calledWith(underlyingPool.getBrowser, 'first');
+                    assert.calledWith(underlyingPool.getBrowser, 'second');
                 });
         });
 
-        it('should not launch browsers out of limit', function() {
-            this.underlyingPool.getBrowser.returns(Promise.resolve(this.makeBrowser()));
-            var pool = this.makePool(1);
-            var result = pool.getBrowser('first')
-                .then(function() {
-                    return pool.getBrowser('second').timeout(100, 'timeout');
-                });
+        it('should not launch browsers out of limit', () => {
+            underlyingPool.getBrowser.returns(Promise.resolve(makeBrowser_()));
+            const pool = makePool_(1);
+
+            const result = pool.getBrowser('first')
+                .then(() => pool.getBrowser('second').timeout(100, 'timeout'));
+
             return assert.isRejected(result, /timeout$/);
         });
 
-        it('should launch next browsers after previous are released', function() {
-            var expectedBrowser = this.makeBrowser(),
-                pool = this.makePool(1);
+        it('should launch next browsers after previous are released', () => {
+            const expectedBrowser = makeBrowser_();
+            const pool = makePool_(1);
 
-            this.underlyingPool.getBrowser
-                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
+            underlyingPool.getBrowser
+                .withArgs('first').returns(Promise.resolve(makeBrowser_()))
                 .withArgs('second').returns(Promise.resolve(expectedBrowser));
 
-            var result = pool.getBrowser('first')
-                .then(function(browser) {
-                    return pool.freeBrowser(browser);
-                })
-                .then(function() {
-                    return pool.getBrowser('second');
+            const result = pool.getBrowser('first')
+                .then((browser) => pool.freeBrowser(browser))
+                .then(() => pool.getBrowser('second'));
+
+            return assert.eventually.equal(result, expectedBrowser);
+        });
+
+        it('should launch queued browser when previous are released', () => {
+            const expectedBrowser = makeBrowser_();
+            const pool = makePool_(1);
+
+            underlyingPool.getBrowser
+                .withArgs('first').returns(Promise.resolve(makeBrowser_()))
+                .withArgs('second').returns(Promise.resolve(expectedBrowser));
+
+            const result = pool.getBrowser('first')
+                .then((browser) => {
+                    const secondPromise = pool.getBrowser('second');
+                    return Promise.delay(100)
+                        .then(() => pool.freeBrowser(browser))
+                        .then(() => secondPromise);
                 });
 
             return assert.eventually.equal(result, expectedBrowser);
         });
 
-        it('should launch queued browser when previous are released', function() {
-            var expectedBrowser = this.makeBrowser(),
-                pool = this.makePool(1);
+        it('should launch next browsers if free failed', () => {
+            var expectedBrowser = makeBrowser_();
+            const pool = makePool_(1);
 
-            this.underlyingPool.getBrowser
-                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
+            underlyingPool.getBrowser
+                .withArgs('first').returns(Promise.resolve(makeBrowser_()))
                 .withArgs('second').returns(Promise.resolve(expectedBrowser));
 
+            underlyingPool.freeBrowser.returns(rejectedPromise());
+
             var result = pool.getBrowser('first')
-                .then(function(browser) {
+                .then((browser) => {
                     var secondPromise = pool.getBrowser('second');
                     return Promise.delay(100)
-                        .then(function() {
-                            return pool.freeBrowser(browser);
-                        })
-                        .then(function() {
-                            return secondPromise;
-                        });
-                });
-            return assert.eventually.equal(result, expectedBrowser);
-        });
-
-        it('should launch next browsers if free failed', function() {
-            var expectedBrowser = this.makeBrowser(),
-                pool = this.makePool(1);
-
-            this.underlyingPool.getBrowser
-                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
-                .withArgs('second').returns(Promise.resolve(expectedBrowser));
-
-            this.underlyingPool.freeBrowser.returns(rejectedPromise());
-
-            var result = pool.getBrowser('first')
-                .then(function(browser) {
-                    var secondPromise = pool.getBrowser('second');
-                    return Promise.delay(100)
-                        .then(function() {
-                            return pool.freeBrowser(browser);
-                        })
-                        .catch(function() {
-                            return secondPromise;
-                        });
+                        .then(() => pool.freeBrowser(browser))
+                        .catch(() => secondPromise);
                 });
 
             return assert.eventually.equal(result, expectedBrowser);
         });
 
-        it('should not wait for queued browser to start after release browser', function() {
-            const pool = this.makePool(1);
+        it('should not wait for queued browser to start after release browser', () => {
+            const pool = makePool_(1);
             const afterFree = sinon.spy().named('afterFree');
             const afterSecondGet = sinon.spy().named('afterSecondGet');
 
-            this.underlyingPool.getBrowser
-                .withArgs('first').returns(Promise.resolve(this.makeBrowser()))
+            underlyingPool.getBrowser
+                .withArgs('first').returns(Promise.resolve(makeBrowser_()))
                 .withArgs('second').returns(Promise.resolve());
 
             return pool.getBrowser('first')
@@ -232,30 +212,29 @@ describe('LimitedPool', function() {
                 });
         });
 
-        it('should reject the queued call when underlying pool rejects the request', function() {
-            var pool = this.makePool(1),
-                error = new Error('You shall not pass');
-            this.underlyingPool.getBrowser
-                .onFirstCall().returns(Promise.resolve(this.makeBrowser()))
+        it('should reject the queued call when underlying pool rejects the request', () => {
+            const pool = makePool_(1);
+            const error = new Error('You shall not pass');
+            underlyingPool.getBrowser
+                .onFirstCall().returns(Promise.resolve(makeBrowser_()))
                 .onSecondCall().returns(rejectedPromise(error));
 
             return pool.getBrowser('id')
-                .then(function(browser) {
-                    var secondRequest = pool.getBrowser('id');
+                .then((browser) => {
+                    const secondRequest = pool.getBrowser('id');
                     return pool.freeBrowser(browser)
-                        .then(function() {
-                            return assert.isRejected(secondRequest, error);
-                        });
+                        .then(() => assert.isRejected(secondRequest, error));
                 });
         });
     });
 
     describe('cancel', () => {
-        it('should cancel queued browsers', function() {
-            var pool = this.makePool(1);
-            this.underlyingPool.getBrowser.returns(Promise.resolve(this.makeBrowser()));
+        it('should cancel queued browsers', () => {
+            const pool = makePool_(1);
+            underlyingPool.getBrowser.returns(Promise.resolve(makeBrowser_()));
+
             return pool.getBrowser('id')
-                .then(function() {
+                .then(() => {
                     var secondRequest = pool.getBrowser('id');
 
                     pool.cancel();
@@ -264,19 +243,19 @@ describe('LimitedPool', function() {
                 });
         });
 
-        it('should cancel an underlying pool', function() {
-            const pool = this.makePool(1);
+        it('should cancel an underlying pool', () => {
+            const pool = makePool_(1);
 
             pool.cancel();
 
-            assert.calledOnce(this.underlyingPool.cancel);
+            assert.calledOnce(underlyingPool.cancel);
         });
 
-        it('should reset request queue', function() {
-            const firstBrowser = this.makeBrowser();
-            const pool = this.makePool(1);
+        it('should reset request queue', () => {
+            const firstBrowser = makeBrowser_();
+            const pool = makePool_(1);
 
-            this.underlyingPool.getBrowser
+            underlyingPool.getBrowser
                 .withArgs('first').returns(Promise.resolve(firstBrowser));
 
             const result = pool.getBrowser('first')
@@ -290,8 +269,8 @@ describe('LimitedPool', function() {
 
             return result
                 .catch(() => {
-                    assert.calledOnce(this.underlyingPool.getBrowser);
-                    assert.neverCalledWith(this.underlyingPool.getBrowser, 'second');
+                    assert.calledOnce(underlyingPool.getBrowser);
+                    assert.neverCalledWith(underlyingPool.getBrowser, 'second');
                 });
         });
     });

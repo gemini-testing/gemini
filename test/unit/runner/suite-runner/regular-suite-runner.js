@@ -7,7 +7,6 @@ const StateRunnerFactory = require('lib/runner/state-runner');
 const StateRunner = require('lib/runner/state-runner/state-runner');
 const CaptureSession = require('lib/capture-session');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
-const Config = require('lib/config');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
 const util = require('../../../util');
 const makeSuiteStub = util.makeSuiteStub;
@@ -20,7 +19,6 @@ describe('runner/suite-runner/regular-suite-runner', () => {
     let stateRunnerFactory;
 
     let browser;
-    let config;
 
     beforeEach(() => {
         browser = util.browserWithId('default-browser');
@@ -37,11 +35,6 @@ describe('runner/suite-runner/regular-suite-runner', () => {
         CaptureSession.prototype.runActions.returns(Promise.resolve());
         CaptureSession.prototype.browser = browser;
 
-        config = sinon.createStubInstance(Config);
-        config.forBrowser.returns({
-            rootUrl: 'http://localhost/foo/default'
-        });
-
         stateRunner = sinon.createStubInstance(StateRunner);
         stateRunnerFactory = sandbox.stub(StateRunnerFactory);
         stateRunnerFactory.create.returns(stateRunner);
@@ -55,8 +48,7 @@ describe('runner/suite-runner/regular-suite-runner', () => {
 
         return RegularSuiteRunner.create(
             suite || makeSuiteStub(),
-            browserAgent,
-            config
+            browserAgent
         );
     };
 

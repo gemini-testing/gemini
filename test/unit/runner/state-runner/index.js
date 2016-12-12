@@ -12,11 +12,9 @@ describe('runner/state-runner', () => {
     let DisabledStateRunner;
 
     let sessionStub;
-    let configStub;
 
     beforeEach(() => {
         sessionStub = {browser: {}};
-        configStub = {fake: 'value'};
 
         DisabledStateRunner = sandbox.stub();
 
@@ -38,9 +36,9 @@ describe('runner/state-runner', () => {
     it('should pass state, browser session and config to the constructor of DisabledStateRunner', () => {
         const state = util.makeStateStub();
 
-        StateRunnerFactory.create(state, sessionStub, configStub);
+        StateRunnerFactory.create(state, sessionStub);
 
-        assert.calledWith(DisabledStateRunner, state, sessionStub, configStub);
+        assert.calledWith(DisabledStateRunner, state, sessionStub);
     });
 
     it('should create StateRunner by default', () => {
