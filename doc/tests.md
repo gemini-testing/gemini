@@ -62,8 +62,10 @@ All methods are chainable:
 
   All tests in a suite will fail if none of the elements will be found.
 
-* `ignoreElements('selector1', 'selector2', ...)` - elements, matching
+* `ignoreElements('.selector1', {every: '.selector2'}, ...)` - elements, matching
   specified selectors will be ignored when comparing images.
+  - `.selector1` - Ignore only the first matched element.
+  - `{every: '.selector2'}` - Ignore all matched elements.
 
 * `setTolerance(value)` - overrides global tolerance value for the whole suite
   (See `tolerance`option description in [config](./config.md) documentation
