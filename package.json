@@ -69,7 +69,7 @@
     "test-func": "istanbul test _mocha test/functional",
     "test-browser": "istanbul test _mocha test/browser",
     "test": "istanbul test _mocha -- --recursive test/unit test/functional test/browser",
-    "lint": "eslint .",
+    "lint": "conventional-changelog-lint --from origin/master && eslint .",
     "release": "standard-version",
     "precommit": "npm run lint",
     "commitmsg": "conventional-changelog-lint -e",

@@ -1,5 +1,6 @@
 language: node_js
 sudo: false
+before_script: git fetch origin master
 script: npm run ${NPM_SCRIPT}
 after_success: cat ${TRAVIS_BUILD_DIR}/coverage/lcov.info | coveralls
 node_js: '4'
