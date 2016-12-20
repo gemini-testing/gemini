@@ -1,10 +1,12 @@
 'use strict';
 
+const _ = require('lodash');
 const Promise = require('bluebird');
 const BrowserRunner = require('lib/runner/browser-runner');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const SuiteRunner = require('lib/runner/suite-runner/suite-runner');
 const suiteRunnerFabric = require('lib/runner/suite-runner');
+const createSuite = require('lib/suite').create;
 const BasicPool = require('lib/browser-pool/basic-pool');
 const Config = require('lib/config');
 const SuiteCollection = require('lib/suite-collection');
@@ -26,11 +28,15 @@ describe('runner/BrowserRunner', () => {
 
     afterEach(() => sandbox.restore());
 
-    const mkRunner_ = (browser, browserPool) => {
+    const mkRunner_ = (browser, config) => {
+        const configStub = sinon.createStubInstance(Config);
+        const browserConfig = _.get(config, 'browser', {});
+        configStub.forBrowser.returns(browserConfig);
+
         return BrowserRunner.create(
             browser || 'default-browser',
-            sinon.createStubInstance(Config),
-            browserPool || sinon.createStubInstance(BasicPool)
+            configStub,
+            sinon.createStubInstance(BasicPool)
         );
     };
 
@@ -55,7 +61,7 @@ describe('runner/BrowserRunner', () => {
             return runner.run(suiteCollection)
                 .then(() => {
                     assert.calledOnce(suiteRunnerFabric.create);
-                    assert.calledWith(suiteRunnerFabric.create, someSuite);
+                    assert.calledWithMatch(suiteRunnerFabric.create, someSuite);
                 });
         });
 
@@ -111,6 +117,57 @@ describe('runner/BrowserRunner', () => {
 
                     assert.calledTwice(suiteRunner.cancel);
                 });
+        });
+
+        describe('add "fullUrl" to suite', () => {
+            const makeChildSuiteStub = (browsers) => {
+                const parentSuite = makeSuiteStub(browsers);
+                return createSuite('child', parentSuite);
+            };
+
+            const run_ = (opts) => {
+                _.defaults(opts || {}, {
+                    browser: 'browser',
+                    rootUrl: 'http://default/url'
+                });
+
+                const config = {[opts.browser]: {rootUrl: opts.rootUrl}};
+
+                const someSuite = opts.suiteUrl
+                    ? makeSuiteStub({browsers: [opts.browser], url: opts.suiteUrl})
+                    : makeChildSuiteStub({browsers: [opts.browser]});
+
+                const suiteCollection = new SuiteCollection([someSuite]);
+                const runner = mkRunner_(opts.browser, config);
+
+                return runner.run(suiteCollection)
+                    .then(() => suiteRunnerFabric.create.args[0][0]); // resolve with modified suite
+            };
+
+            it('should not modify suite without "url" as own property', () => {
+                return run_({rootUrl: 'http://localhost/foo/bar/'})
+                    .then((suite) => assert.isUndefined(suite.fullUrl));
+            });
+
+            it('should concatenate rootUrl and suiteUrl', () => {
+                return run_({rootUrl: 'http://localhost/foo/bar/', suiteUrl: 'testUrl'})
+                    .then((suite) => assert.equal(suite.fullUrl, '/foo/bar/testUrl'));
+            });
+
+            it('should concatenate with slash between rootUrl and suiteUrl', () => {
+                return run_({rootUrl: 'http://localhost/foo/baz', suiteUrl: 'testUrl'})
+                    .then((suite) => assert.equal(suite.fullUrl, '/foo/baz/testUrl'));
+            });
+
+            it('should remove consecutive slashes', () => {
+                return run_({rootUrl: 'http://localhost/foo/qux/', suiteUrl: '/testUrl'})
+                    .then((suite) => assert.equal(suite.fullUrl, '/foo/qux/testUrl'));
+            });
+
+            it('should cut latest slashes from url', () => {
+                return run_({rootUrl: 'http://localhost/foo/bat/', suiteUrl: 'testUrl//'})
+                    .then((suite) => assert.equal(suite.fullUrl, '/foo/bat/testUrl'));
+            });
         });
     });
 });
