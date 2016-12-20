@@ -59,41 +59,86 @@ describe('tests-api/suite-builder', function() {
         });
     });
 
-    testSelectorListProperty('setCaptureElements', 'captureSelectors');
-    testSelectorListProperty('ignoreElements', 'ignoreSelectors');
-
-    function testSelectorListProperty(method, property) {
-        describe(method, function() {
-            it ('should throw if selector is not a string', function() {
-                assert.throws(function() {
-                    suiteBuilder[method]({everything: true});
-                }, TypeError);
-            });
-
-            it ('should throw if selector in array is not a string', function() {
-                assert.throws(function() {
-                    suiteBuilder[method]([{everything: true}, '.selector']);
-                }, TypeError);
-            });
-
-            it('should set ' + property + ' property', function() {
-                suiteBuilder[method]('.selector');
-
-                assert.deepEqual(suite[property], ['.selector']);
-            });
-
-            it('should accept multiple arguments', function() {
-                suiteBuilder[method]('.selector1', '.selector2');
-                assert.deepEqual(suite[property], ['.selector1', '.selector2']);
-            });
-
-            it('should accept array', function() {
-                suiteBuilder[method](['.selector1', '.selector2']);
-
-                assert.deepEqual(suite[property], ['.selector1', '.selector2']);
-            });
+    describe('setCaptureElements', function() {
+        it('should throw if selector is not a string', function() {
+            assert.throws(function() {
+                suiteBuilder.setCaptureElements({everything: true});
+            }, TypeError);
         });
-    }
+
+        it('should throw if selector in array is not a string', function() {
+            assert.throws(function() {
+                suiteBuilder.setCaptureElements([{everything: true}, '.selector']);
+            }, TypeError);
+        });
+
+        it('should set captureSelectors property', function() {
+            suiteBuilder.setCaptureElements('.selector');
+
+            assert.deepEqual(suite.captureSelectors, ['.selector']);
+        });
+
+        it('should accept multiple arguments', function() {
+            suiteBuilder.setCaptureElements('.selector1', '.selector2');
+            assert.deepEqual(suite.captureSelectors, ['.selector1', '.selector2']);
+        });
+
+        it('should accept array', function() {
+            suiteBuilder.setCaptureElements(['.selector1', '.selector2']);
+
+            assert.deepEqual(suite.captureSelectors, ['.selector1', '.selector2']);
+        });
+    });
+
+    describe('ignoreElements', function() {
+        it('should throw if selector is a null', function() {
+            assert.throws(function() {
+                suiteBuilder.ignoreElements(null);
+            }, TypeError);
+        });
+
+        it('should throw if selector is object without property "every"', function() {
+            assert.throws(function() {
+                suiteBuilder.ignoreElements({});
+            }, TypeError);
+        });
+
+        it('should throw if selector is an object with property "every" that not a string', function() {
+            assert.throws(function() {
+                suiteBuilder.ignoreElements({every: null});
+            }, TypeError);
+        });
+
+        it('should throw if one of selectors in array has wrong type', function() {
+            assert.throws(function() {
+                suiteBuilder.ignoreElements([{every: true}, '.selector']);
+            }, TypeError);
+        });
+
+        it('should set ignoreSelectors property as string', function() {
+            suiteBuilder.ignoreElements('.selector');
+
+            assert.deepEqual(suite.ignoreSelectors, ['.selector']);
+        });
+
+        it('should set ignoreSelectors property as object with property "every"', function() {
+            suiteBuilder.ignoreElements({every: '.selector'});
+
+            assert.deepEqual(suite.ignoreSelectors, [{every: '.selector'}]);
+        });
+
+        it('should accept multiple arguments', function() {
+            suiteBuilder.ignoreElements('.selector1', {every: '.selector2'});
+
+            assert.deepEqual(suite.ignoreSelectors, ['.selector1', {every: '.selector2'}]);
+        });
+
+        it('should accept array', function() {
+            suiteBuilder.ignoreElements(['.selector1', {every: '.selector2'}]);
+
+            assert.deepEqual(suite.ignoreSelectors, ['.selector1', {every: '.selector2'}]);
+        });
+    });
 
     describe('before', function() {
         beforeEach(function() {
