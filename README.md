@@ -105,7 +105,8 @@ Required software:
 2. Compiler with support of C++11 (`GCC@4.6` or higher). This is a
    [png-img](https://github.com/gemini-testing/png-img) requirement.
 
-3. Python
+3. Python (version > 2.5 and < 3.0). This is a
+   [png-img](https://github.com/gemini-testing/png-img) requirement.
 
 ## Installation
 
