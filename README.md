@@ -105,6 +105,8 @@ Required software:
 2. Compiler with support of C++11 (`GCC@4.6` or higher). This is a
    [png-img](https://github.com/gemini-testing/png-img) requirement.
 
+3. Python
+
 ## Installation
 
 To install the utility use [npm](https://www.npmjs.org/) command `install`:
