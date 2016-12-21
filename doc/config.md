@@ -248,11 +248,11 @@ sets:
      ...
 ```
 
-* `files` - list of test files or directories with test files. Should be relative to project root directory. `gemini` by default. Also, you can use masks for this property. For example: `gemini/test-suites/*.gemini.js`. Can be a string if you want to specify just one file or directory.
+* `files` - list of test files or directories with test files. Should be relative to project root directory. Also, you can use masks for this property. For example: `gemini/test-suites/*.gemini.js`. Can be a string if you want to specify just one file or directory.
 
 * `browsers` - list of browser ids to run tests specified in `files`. All browsers by default.
 
-If no sets specified then default set named `all` with all defaults will be created.
+If sets are not specified in config, all files from `gemini` directory will be launched in all browsers specified in a config.
 
 You can specify sets to run using CLI option [`--set`](./commands.md#common-cli-options).
 
