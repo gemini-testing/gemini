@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.15.0"></a>
+# [4.15.0](https://github.com/gemini-testing/gemini/compare/v4.14.4...v4.15.0) (2016-12-21)
+
+
+### Features
+
+* Allow to ignore every element, matching selector ([c36ed78](https://github.com/gemini-testing/gemini/commit/c36ed78))
+* **html-reporter:** add ability to specify output path for each report ([b25409e](https://github.com/gemini-testing/gemini/commit/b25409e))
+
+
+
 <a name="4.14.4"></a>
 ## [4.14.4](https://github.com/gemini-testing/gemini/compare/v4.14.1...v4.14.4) (2016-12-12)
 
