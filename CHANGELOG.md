@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.16.0"></a>
+# [4.16.0](https://github.com/gemini-testing/gemini/compare/v4.15.0...v4.16.0) (2016-12-23)
+
+
+### Bug Fixes
+
+* log a path to an HTML report after tests finish ([86a8466](https://github.com/gemini-testing/gemini/commit/86a8466))
+* set default reporter for command 'update' ([feb72bc](https://github.com/gemini-testing/gemini/commit/feb72bc))
+
+
+### Features
+
+* Add extended WebDriver error data in output ([73a26ed](https://github.com/gemini-testing/gemini/commit/73a26ed))
+
+
+
 <a name="4.15.0"></a>
 # [4.15.0](https://github.com/gemini-testing/gemini/compare/v4.14.4...v4.15.0) (2016-12-21)
 
