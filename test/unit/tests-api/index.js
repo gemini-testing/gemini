@@ -1,58 +1,54 @@
 'use strict';
 
-var testsAPI = require('lib/tests-api'),
-    Suite = require('lib/suite');
+const testsAPI = require('lib/tests-api');
+const Suite = require('lib/suite');
 
-describe('tests-api', function() {
-    beforeEach(function() {
-        this.suite = Suite.create('');
+describe('tests-api', () => {
+    let rootSuite;
+
+    beforeEach(() => {
+        rootSuite = Suite.create('');
     });
 
-    describe('.suite method', function() {
-        var gemini;
+    describe('.suite method', () => {
+        let gemini;
 
-        beforeEach(function() {
-            gemini = testsAPI(this.suite);
+        beforeEach(() => {
+            gemini = testsAPI(rootSuite);
         });
 
-        it('should throw an error if first argument is not a string', function() {
-            assert.throws(function() {
-                gemini.suite(123, function() {});
-            }, TypeError);
+        it('should throw an error if first argument is not a string', () => {
+            assert.throws(() => gemini.suite(123, () => {}), TypeError);
         });
 
-        it('should throw an error if second argument is not a function', function() {
-            assert.throws(function() {
-                gemini.suite('name');
-            }, TypeError);
+        it('should throw an error if second argument is not a function', () => {
+            assert.throws(() => gemini.suite('name'), TypeError);
         });
 
-        it('should create new suite with corresponding name', function() {
-            gemini.suite('name', function() {});
+        it('should create new suite with corresponding name', () => {
+            gemini.suite('name', () => {});
 
-            assert.equal(this.suite.children[0].name, 'name');
+            assert.equal(rootSuite.children[0].name, 'name');
         });
 
-        it('should call callback', function() {
-            var spy = sinon.spy();
+        it('should call callback', () => {
+            const spy = sinon.spy();
             gemini.suite('name', spy);
             assert.called(spy);
         });
 
-        it('should created nested suites when called nestedly', function() {
-            gemini.suite('name', function() {
-                gemini.suite('child', function() {});
-            });
+        it('should created nested suites when called nestedly', () => {
+            gemini.suite('name', () => gemini.suite('child', () => {}));
 
-            assert.equal(this.suite.children[0].children[0].name, 'child');
+            assert.equal(rootSuite.children[0].children[0].name, 'child');
         });
 
         describe('child suites of the same name', () => {
-            beforeEach(function() {
-                gemini = testsAPI(this.suite, ['browser1']);
+            beforeEach(() => {
+                gemini = testsAPI(rootSuite, ['browser1']);
             });
 
-            it('should not allow to create with intersect browsers', function() {
+            it('should not allow to create with intersect browsers', () => {
                 assert.throws(() => {
                     gemini.suite('name', () => {
                         gemini.suite('child', () => {});
@@ -61,12 +57,10 @@ describe('tests-api', function() {
                 });
             });
 
-            it('should allow to create with not intersecting browser sets', function() {
-                gemini.suite('name', () => {
-                    gemini.suite('child', () => {});
-                });
+            it('should allow to create with not intersecting browser sets', () => {
+                gemini.suite('name', () => gemini.suite('child', () => {}));
 
-                gemini = testsAPI(this.suite, ['browser2']);
+                gemini = testsAPI(rootSuite, ['browser2']);
 
                 assert.doesNotThrow(() => {
                     gemini.suite('name', () => {
@@ -76,35 +70,35 @@ describe('tests-api', function() {
             });
         });
 
-        it('should create non-nested suite at the root level', function() {
-            gemini.suite('first', function() {});
-            gemini.suite('second', function() {});
+        it('should create non-nested suite at the root level', () => {
+            gemini.suite('first', () => {});
+            gemini.suite('second', () => {});
 
-            assert.equal(this.suite.children[1].name, 'second');
+            assert.equal(rootSuite.children[1].name, 'second');
         });
 
-        it('should throw when suite has states but does not has URL', function() {
-            assert.throws(function() {
-                gemini.suite('first', function(suite) {
+        it('should throw when suite has states but does not has URL', () => {
+            assert.throws(() => {
+                gemini.suite('first', (suite) => {
                     suite.setCaptureElements('.element')
                          .capture('plain');
                 });
             });
         });
 
-        it('should throw when suite has no states nor URL', function() {
-            assert.doesNotThrow(function() {
-                gemini.suite('first', function(suite) {
+        it('should throw when suite has no states nor URL', () => {
+            assert.doesNotThrow(() => {
+                gemini.suite('first', (suite) => {
                     suite.setCaptureElements('.element');
                 });
             });
         });
 
-        it('should not throw when suite has states and url is inherited from parent', function() {
-            assert.doesNotThrow(function() {
-                gemini.suite('first', function(suite) {
+        it('should not throw when suite has states and url is inherited from parent', () => {
+            assert.doesNotThrow(() => {
+                gemini.suite('first', (suite) => {
                     suite.setUrl('/url');
-                    gemini.suite('child', function(suite) {
+                    gemini.suite('child', (suite) => {
                         suite.setCaptureElements('.element')
                              .capture('plain');
                     });
@@ -112,28 +106,28 @@ describe('tests-api', function() {
             });
         });
 
-        it('should throw if suite has states but does not has captureSelectors', function() {
-            assert.throws(function() {
-                gemini.suite('first', function(suite) {
+        it('should throw if suite has states but does not has captureSelectors', () => {
+            assert.throws(() => {
+                gemini.suite('first', (suite) => {
                     suite.setUrl('/url')
                          .capture('plain');
                 });
             });
         });
 
-        it('should not throw if suite has no states nor captureSelectors', function() {
-            assert.doesNotThrow(function() {
-                gemini.suite('first', function(suite) {
+        it('should not throw if suite has no states nor captureSelectors', () => {
+            assert.doesNotThrow(() => {
+                gemini.suite('first', (suite) => {
                     suite.setUrl('/url');
                 });
             });
         });
 
-        it('should not throw when suite has states and captureSelectors are inherited from parent', function() {
-            assert.doesNotThrow(function() {
-                gemini.suite('first', function(suite) {
+        it('should not throw when suite has states and captureSelectors are inherited from parent', () => {
+            assert.doesNotThrow(() => {
+                gemini.suite('first', (suite) => {
                     suite.setCaptureElements('.element');
-                    gemini.suite('child', function(suite) {
+                    gemini.suite('child', (suite) => {
                         suite.setUrl('/url')
                              .capture('plain');
                     });
@@ -141,58 +135,83 @@ describe('tests-api', function() {
             });
         });
 
-        it('should assign suite ids', function() {
-            gemini.suite('suite', function() {});
-            assert.equal(this.suite.children[0].id, 1);
+        it('should assign suite ids', () => {
+            gemini.suite('suite', () => {});
+            assert.equal(rootSuite.children[0].id, 1);
         });
 
-        it('should assign incrementing suite ids for following suites', function() {
-            gemini.suite('suite', function() {});
-            gemini.suite('suite2', function() {});
-            assert.equal(this.suite.children[1].id, 2);
+        it('should assign incrementing suite ids for following suites', () => {
+            gemini.suite('suite', () => {});
+            gemini.suite('suite2', () => {});
+            assert.equal(rootSuite.children[1].id, 2);
         });
 
-        it('should assign incrementing suite ids for child suites', function() {
-            gemini.suite('suite', function() {
-                gemini.suite('suite2', function() {});
+        it('should assign incrementing suite ids for child suites', () => {
+            gemini.suite('suite', () => {
+                gemini.suite('suite2', () => {});
             });
-            assert.equal(this.suite.children[0].children[0].id, 2);
+            assert.equal(rootSuite.children[0].children[0].id, 2);
         });
 
-        it('should assign child suite ids before siblings', function() {
-            gemini.suite('suite', function() {
-                gemini.suite('suite2', function() {});
+        it('should assign child suite ids before siblings', () => {
+            gemini.suite('suite', () => {
+                gemini.suite('suite2', () => {});
             });
 
-            gemini.suite('suite3', function() {});
+            gemini.suite('suite3', () => {});
 
-            assert.equal(this.suite.children[0].children[0].id, 2);
-            assert.equal(this.suite.children[1].id, 3);
+            assert.equal(rootSuite.children[0].children[0].id, 2);
+            assert.equal(rootSuite.children[1].id, 3);
         });
     });
 
-    describe('browsers', function() {
-        var browsers = ['some-browser', 'other-browser'],
-            gemini;
+    describe('browsers', () => {
+        const browsers = ['some-browser', 'other-browser'];
+        let gemini;
 
-        beforeEach(function() {
-            gemini = testsAPI(this.suite, browsers);
+        beforeEach(() => {
+            gemini = testsAPI(rootSuite, browsers);
         });
 
-        it('should be set for top level suite', function() {
-            gemini.suite('suite', function() {});
+        it('should be set for top level suite', () => {
+            gemini.suite('suite', () => {});
 
-            assert.equal(this.suite.children[0].browsers, browsers);
-            assert.isTrue(this.suite.children[0].hasOwnProperty('browsers'));
+            assert.equal(rootSuite.children[0].browsers, browsers);
+            assert.isTrue(rootSuite.children[0].hasOwnProperty('browsers'));
         });
 
-        it('should not be set for not top level suite', function() {
-            gemini.suite('suite', function() {
-                gemini.suite('child', function() {});
+        it('should not be set for not top level suite', () => {
+            gemini.suite('suite', () => {
+                gemini.suite('child', () => {});
             });
 
-            assert.equal(this.suite.children[0].children[0].browsers, browsers);
-            assert.isFalse(this.suite.children[0].children[0].hasOwnProperty('browsers'));
+            assert.equal(rootSuite.children[0].children[0].browsers, browsers);
+            assert.isFalse(rootSuite.children[0].children[0].hasOwnProperty('browsers'));
+        });
+    });
+
+    describe('file path', () => {
+        const file = 'path/file.js';
+        let gemini;
+
+        beforeEach(() => {
+            gemini = testsAPI(rootSuite, [], file);
+        });
+
+        it('should be set for suite', () => {
+            gemini.suite('suite', () => {});
+
+            assert.equal(rootSuite.children[0].file, file);
+            assert.isTrue(rootSuite.children[0].hasOwnProperty('file'));
+        });
+
+        it('should not be set for not top level suite', () => {
+            gemini.suite('suite', () => {
+                gemini.suite('child', () => {});
+            });
+
+            assert.equal(rootSuite.children[0].children[0].file, file);
+            assert.isFalse(rootSuite.children[0].children[0].hasOwnProperty('file'));
         });
     });
 });
