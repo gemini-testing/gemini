@@ -25,21 +25,31 @@ describe('config/config-reader', () => {
     }
 
     describe('default config (js|json)', () => {
-        function test_(fileName) {
+        const test_ = (fileName) => {
             it('should read ' + fileName, () => {
-                const files = {};
-                files[fileName] = {some: 'data'};
-                const reader = initReader_(files);
-
+                const reader = initReader_({[fileName]: {foo: 'bar'}});
                 const result = reader.read();
-
-                assert.deepEqual(result, {some: 'data'});
+                assert.deepEqual(result, {foo: 'bar'});
             });
-        }
+        };
 
         test_('.gemini.conf.js');
         test_('.gemini.js');
         test_('.gemini.conf.json');
         test_('.gemini.json');
+    });
+
+    describe('custom config (js|json)', () => {
+        const test_ = (fileName) => {
+            it('should read ' + fileName, () => {
+                const reader = initReader_({[fileName]: {foo: 'bar'}});
+                const result = reader.read(fileName);
+                assert.deepEqual(result, {foo: 'bar'});
+            });
+        };
+        test_('some-file.js');
+        test_('some-file.json');
+        test_('some-dir/some-file.js');
+        test_('some-dir/some-file.json');
     });
 });
