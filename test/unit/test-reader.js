@@ -135,6 +135,19 @@ describe('test-reader', () => {
                     );
                 });
         });
+
+        it('should call "testsApi" with relative file path', () => {
+            const groupByFile = () => ({'/project/root/path/file1.js': []});
+
+            const config = mkConfigStub({
+                system: {projectRoot: '/project/root'}
+            });
+
+            SetsBuilder.prototype.build.returns(Promise.resolve({groupByFile}));
+
+            return readTests_({config})
+                .then(() => assert.calledWith(testsApi, sinon.match.any, sinon.match.any, 'path/file1.js'));
+        });
     });
 
     describe('global "gemini" variable', () => {
