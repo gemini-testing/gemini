@@ -18,7 +18,7 @@ Its key features are:
   - IE8+
   - Opera 12+
 
-* Ability to test separate sections of a web page;
+* Ability to test separate sections of a web page
 
 * Position and size of an element are calculated including its `box-shadow` and
   `outline` properties;
