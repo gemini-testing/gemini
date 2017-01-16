@@ -15,11 +15,7 @@ const _ = require('lodash');
 describe('runner/suite-runner/insistent-suite-runner', () => {
     const sandbox = sinon.sandbox.create();
 
-    const mkConfigStub_ = (opts) => {
-        return {
-            forBrowser: () => opts || {foo: 'default-bar'}
-        };
-    };
+    const mkConfigStub_ = (opts) => opts || {foo: 'default-bar'};
 
     const mkBrowserAgentStub_ = (browserId) => {
         const browserAgent = new BrowserAgent();

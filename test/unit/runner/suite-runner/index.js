@@ -1,9 +1,6 @@
 'use strict';
 
 const proxyquire = require('proxyquire');
-
-const DecoratorSuiteRunner = require('lib/runner/suite-runner/decorator-suite-runner');
-const Config = require('lib/config');
 const suiteUtil = require('lib/suite-util');
 const util = require('../../../util');
 
@@ -20,18 +17,13 @@ describe('runner/suite-runner/create', () => {
     const makeSuite = () => util.makeSuiteStub({states: [util.makeStateStub()]});
 
     const makeSuiteRunner = (suite) => {
-        const config = sinon.createStubInstance(Config);
-        config.forBrowser.returns({rootUrl: 'http://localhost/foo/default'});
-
-        return SuiteRunnerFactory.create(suite, {}, config);
+        return SuiteRunnerFactory.create(suite, {}, {});
     };
 
     beforeEach(() => {
-        const runnerStub = {on: () => {}};
-
-        StatelessRunner = sandbox.stub().returns(runnerStub);
-        SkippedRunner = sandbox.stub().returns(runnerStub);
-        InsistentRunner = sandbox.stub().returns(runnerStub);
+        StatelessRunner = sandbox.stub();
+        SkippedRunner = sandbox.stub();
+        InsistentRunner = sandbox.stub();
 
         SuiteRunnerFactory = proxyquire('lib/runner/suite-runner', {
             './stateless-suite-runner': StatelessRunner,
@@ -51,10 +43,10 @@ describe('runner/suite-runner/create', () => {
             assert.notCalled(InsistentRunner);
         });
 
-        it('should return DecoratorSuiteRunner for StatelessSuiteRunner', () => {
-            const runner = makeSuiteRunner(makeStatelessSuite());
+        it('should return StatelessSuiteRunner for suite without states', () => {
+            const runner = makeSuiteRunner(makeStatelessSuite(), {}, {});
 
-            assert.instanceOf(runner, DecoratorSuiteRunner);
+            assert.instanceOf(runner, StatelessRunner);
         });
     });
 
@@ -71,10 +63,10 @@ describe('runner/suite-runner/create', () => {
             assert.notCalled(InsistentRunner);
         });
 
-        it('should return DecoratorSuiteRunner for SkippedSuiteRunner', () => {
-            const runner = makeSuiteRunner(makeSuite());
+        it('should return SkippedSuiteRunner for skipped suite', () => {
+            const runner = makeSuiteRunner(makeSuite(), {});
 
-            assert.instanceOf(runner, DecoratorSuiteRunner);
+            assert.instanceOf(runner, SkippedRunner);
         });
     });
 
@@ -87,10 +79,10 @@ describe('runner/suite-runner/create', () => {
             assert.notCalled(SkippedRunner);
         });
 
-        it('should return DecoratorSuiteRunner for InsistentSuiteRunner', () => {
+        it('should return InsistentSuiteRunner for other suites', () => {
             const runner = makeSuiteRunner(makeSuite());
 
-            assert.instanceOf(runner, DecoratorSuiteRunner);
+            assert.instanceOf(runner, InsistentRunner);
         });
     });
 });
