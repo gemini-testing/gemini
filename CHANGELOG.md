@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.17.0"></a>
+# [4.17.0](https://github.com/gemini-testing/gemini/compare/v4.16.0...v4.17.0) (2017-01-16)
+
+
+### Features
+
+* Add test filename to html report's metaInfo section ([0311f6d](https://github.com/gemini-testing/gemini/commit/0311f6d))
+
+
+
 <a name="4.16.0"></a>
 # [4.16.0](https://github.com/gemini-testing/gemini/compare/v4.15.0...v4.16.0) (2016-12-23)
 
