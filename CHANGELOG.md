@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.17.1"></a>
+## [4.17.1](https://github.com/gemini-testing/gemini/compare/v4.17.0...v4.17.1) (2017-01-18)
+
+
+### Bug Fixes
+
+* roll back striptags version without breaking changes ([cd4e26e](https://github.com/gemini-testing/gemini/commit/cd4e26e))
+
+
+
 <a name="4.17.0"></a>
 # [4.17.0](https://github.com/gemini-testing/gemini/compare/v4.16.0...v4.17.0) (2017-01-16)
 
