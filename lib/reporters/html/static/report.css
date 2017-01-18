@@ -81,6 +81,16 @@
     user-select: none;
 }
 
+.section__title_skipped {
+    color: #ccc;
+    cursor: default;
+
+    -moz-user-select: text;
+    -webkit-user-select: text;
+    -ms-user-select: text;
+    user-select: text;    
+}
+
 .section__title:before, .meta-info__switcher:before {
     display: inline-block;
     margin-right: 2px;
