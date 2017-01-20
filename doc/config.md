@@ -147,6 +147,8 @@ exclude:
 
   - `html` - set to false to disable html report and save only JSON.
 
+* `ctx` – a context which will be available in tests via method `gemini.ctx`. 
+
 ## Browsers settings
 
 These settings specify the configuration of each browser used for tests. Each
