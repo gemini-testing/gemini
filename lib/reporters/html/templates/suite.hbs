@@ -13,12 +13,14 @@
         {{#each browsers}}
             <div class="section section_collapsed {{section-status}} {{has-retries}}">
                 {{#if result.skipped}}
-                    {{#if result.reason}}
-                        <div class="section__title">[skipped] {{result.name}}, reason: {{result.reason}}</div>
-                    {{/if}}
-                    {{#unless result.reason}}
-                        <div class="section__title">[skipped] {{result.name}}</div>
-                    {{/unless}}
+                    <div class="section__title section__title_skipped">
+                        {{#if result.reason}}
+                            [skipped] {{result.name}}, reason: {{{result.reason}}}
+                        {{/if}}
+                        {{#unless result.reason}}
+                            [skipped] {{result.name}}
+                        {{/unless}}
+                    </div>
                 {{/if}}
                 {{#unless result.skipped}}
                     <div class="section__title">
