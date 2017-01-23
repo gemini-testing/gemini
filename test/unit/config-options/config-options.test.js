@@ -11,6 +11,9 @@ describe('config', function() {
             projectRoot: '/some/path',
             plugins: {
                 plugin: {}
+            },
+            ctx: {
+                variable: 'value'
             }
         },
         rootUrl: 'http://example.com/root',
@@ -477,6 +480,10 @@ describe('config', function() {
 
         describe('plugins', () => {
             testObjectOption('system.plugins.plugin');
+        });
+
+        describe('ctx', () => {
+            testObjectOption('system.ctx.variable');
         });
     });
 

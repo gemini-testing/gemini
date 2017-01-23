@@ -123,7 +123,7 @@ describe('test-reader', () => {
                 });
         });
 
-        it('should call set-builder methods in rigth order', () => {
+        it('should call set-builder methods in right order', () => {
             return readTests_()
                 .then(() => {
                     assert.callOrder(
@@ -136,17 +136,22 @@ describe('test-reader', () => {
                 });
         });
 
-        it('should call "testsApi" with relative file path', () => {
+        it('should call "testsApi" with absolute file path', () => {
             const groupByFile = () => ({'/project/root/path/file1.js': []});
-
-            const config = mkConfigStub({
-                system: {projectRoot: '/project/root'}
-            });
 
             SetsBuilder.prototype.build.returns(Promise.resolve({groupByFile}));
 
+            return readTests_()
+                .then(() => {
+                    assert.calledWith(testsApi, sinon.match.any, sinon.match.any, '/project/root/path/file1.js');
+                });
+        });
+
+        it('should call "testsApi" with a config', () => {
+            const config = mkConfigStub();
+
             return readTests_({config})
-                .then(() => assert.calledWith(testsApi, sinon.match.any, sinon.match.any, 'path/file1.js'));
+                .then(() => assert.calledWith(testsApi, sinon.match.any, sinon.match.any, sinon.match.any, config));
         });
     });
 

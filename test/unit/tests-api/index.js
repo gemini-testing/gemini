@@ -5,16 +5,17 @@ const Suite = require('lib/suite');
 
 describe('tests-api', () => {
     let rootSuite;
+    let gemini;
+
+    const stubConfig = () => ({system: {}});
 
     beforeEach(() => {
         rootSuite = Suite.create('');
     });
 
     describe('.suite method', () => {
-        let gemini;
-
         beforeEach(() => {
-            gemini = testsAPI(rootSuite);
+            gemini = testsAPI(rootSuite, null, null, stubConfig());
         });
 
         it('should throw an error if first argument is not a string', () => {
@@ -44,8 +45,10 @@ describe('tests-api', () => {
         });
 
         describe('child suites of the same name', () => {
+            const initTestAPI = (browser) => testsAPI(rootSuite, [browser], null, stubConfig());
+
             beforeEach(() => {
-                gemini = testsAPI(rootSuite, ['browser1']);
+                gemini = initTestAPI('browser1');
             });
 
             it('should not allow to create with intersect browsers', () => {
@@ -60,7 +63,7 @@ describe('tests-api', () => {
             it('should allow to create with not intersecting browser sets', () => {
                 gemini.suite('name', () => gemini.suite('child', () => {}));
 
-                gemini = testsAPI(rootSuite, ['browser2']);
+                gemini = initTestAPI('browser2');
 
                 assert.doesNotThrow(() => {
                     gemini.suite('name', () => {
@@ -163,55 +166,72 @@ describe('tests-api', () => {
             assert.equal(rootSuite.children[0].children[0].id, 2);
             assert.equal(rootSuite.children[1].id, 3);
         });
-    });
 
-    describe('browsers', () => {
-        const browsers = ['some-browser', 'other-browser'];
-        let gemini;
+        describe('browsers', () => {
+            const browsers = ['some-browser', 'other-browser'];
 
-        beforeEach(() => {
-            gemini = testsAPI(rootSuite, browsers);
-        });
-
-        it('should be set for top level suite', () => {
-            gemini.suite('suite', () => {});
-
-            assert.equal(rootSuite.children[0].browsers, browsers);
-            assert.isTrue(rootSuite.children[0].hasOwnProperty('browsers'));
-        });
-
-        it('should not be set for not top level suite', () => {
-            gemini.suite('suite', () => {
-                gemini.suite('child', () => {});
+            beforeEach(() => {
+                gemini = testsAPI(rootSuite, browsers, null, stubConfig());
             });
 
-            assert.equal(rootSuite.children[0].children[0].browsers, browsers);
-            assert.isFalse(rootSuite.children[0].children[0].hasOwnProperty('browsers'));
+            it('should be set for top level suite', () => {
+                gemini.suite('suite', () => {});
+
+                assert.equal(rootSuite.children[0].browsers, browsers);
+                assert.isTrue(rootSuite.children[0].hasOwnProperty('browsers'));
+            });
+
+            it('should not be set for not top level suite', () => {
+                gemini.suite('suite', () => {
+                    gemini.suite('child', () => {});
+                });
+
+                assert.equal(rootSuite.children[0].children[0].browsers, browsers);
+                assert.isFalse(rootSuite.children[0].children[0].hasOwnProperty('browsers'));
+            });
+        });
+
+        describe('file path', () => {
+            const file = '/root/path/file.js';
+            const relativeFile = 'path/file.js';
+
+            beforeEach(() => {
+                gemini = testsAPI(rootSuite, [], file, {system: {projectRoot: '/root'}});
+            });
+
+            it('should be set relative for suite', () => {
+                gemini.suite('suite', () => {});
+
+                assert.equal(rootSuite.children[0].file, relativeFile);
+                assert.isTrue(rootSuite.children[0].hasOwnProperty('file'));
+            });
+
+            it('should not be set for not top level suite', () => {
+                gemini.suite('suite', () => {
+                    gemini.suite('child', () => {});
+                });
+
+                assert.equal(rootSuite.children[0].children[0].file, relativeFile);
+                assert.isFalse(rootSuite.children[0].children[0].hasOwnProperty('file'));
+            });
         });
     });
 
-    describe('file path', () => {
-        const file = 'path/file.js';
-        let gemini;
+    describe('.ctx method', () => {
+        it('should contain `ctx` from a config', () => {
+            gemini = testsAPI(rootSuite, null, null, {system: {ctx: {some: 'ctx'}}});
 
-        beforeEach(() => {
-            gemini = testsAPI(rootSuite, [], file);
+            assert.deepEqual(gemini.ctx, {some: 'ctx'});
         });
 
-        it('should be set for suite', () => {
-            gemini.suite('suite', () => {});
+        it('should not mutate a config', () => {
+            const config = {system: {ctx: {}}};
 
-            assert.equal(rootSuite.children[0].file, file);
-            assert.isTrue(rootSuite.children[0].hasOwnProperty('file'));
-        });
+            gemini = testsAPI(rootSuite, null, null, config);
 
-        it('should not be set for not top level suite', () => {
-            gemini.suite('suite', () => {
-                gemini.suite('child', () => {});
-            });
+            Object.defineProperty(gemini.ctx, 'other', {});
 
-            assert.equal(rootSuite.children[0].children[0].file, file);
-            assert.isFalse(rootSuite.children[0].children[0].hasOwnProperty('file'));
+            assert.notProperty(config.system.ctx, 'other');
         });
     });
 });

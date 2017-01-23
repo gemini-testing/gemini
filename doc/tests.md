@@ -305,3 +305,26 @@ Full list of special keys (there are shortcuts for commonly used keys):
 * `tap(element)` - tap specified element on touch enabled device.
 
 * `changeOrientation()` – change orientation on touch enabled device (from `PORTRAIT` to `LANDSCAPE` and vice versa). :warning: Does not work on mobile emulation.
+
+## Passing a context to tests
+
+Add `system.ctx` field to your configuration file:
+
+```js
+module.exports = {
+    // ...
+    system: {
+        ctx: {
+            foo: 'bar'
+        }
+    }
+};
+```
+
+`ctx` will be available in tests via `gemini.ctx` method:
+
+```js
+console.log(gemini.ctx); // {foo: 'bar'}
+```
+
+**Recommendation**: use `ctx` in your tests in favor of global variables.
