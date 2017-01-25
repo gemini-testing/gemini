@@ -9,6 +9,8 @@
 [Gemini](https://github.com/gemini-testing/gemini) is the utility for regression
 testing of web pages appearance.
 
+Read all documentation on the https://gemini-testing.github.io/.
+
 Its key features are:
 
 * Compatibility with different browsers:
