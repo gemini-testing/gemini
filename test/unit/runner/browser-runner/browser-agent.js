@@ -48,7 +48,7 @@ describe('runner/browser-runner/browser-agent', () => {
             .then((bro) => {
                 assert.equal(bro, otherBro);
                 assert.calledTwice(browserPool.getBrowser);
-                assert.calledWith(browserPool.freeBrowser, someBro);
+                assert.calledWith(browserPool.freeBrowser, someBro, {force: true});
             });
     });
 
