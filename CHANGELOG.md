@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.18.2"></a>
+## [4.18.2](https://github.com/gemini-testing/gemini/compare/v4.18.1...v4.18.2) (2017-02-02)
+
+
+### Bug Fixes
+
+* prevent endless loop when suitesPerSession is set to infinity ([2b399b6](https://github.com/gemini-testing/gemini/commit/2b399b6))
+
+
+
 <a name="4.18.1"></a>
 ## [4.18.1](https://github.com/gemini-testing/gemini/compare/v4.18.0...v4.18.1) (2017-01-25)
 
