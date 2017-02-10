@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.19.0"></a>
+# [4.19.0](https://github.com/gemini-testing/gemini/compare/v4.18.2...v4.19.0) (2017-02-10)
+
+
+### Features
+
+* Pass suiteCollection on BEGIN event to allow to modify it ([7d04923](https://github.com/gemini-testing/gemini/commit/7d04923))
+
+
+
 <a name="4.18.2"></a>
 ## [4.18.2](https://github.com/gemini-testing/gemini/compare/v4.18.1...v4.18.2) (2017-02-02)
 
