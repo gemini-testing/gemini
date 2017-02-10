@@ -133,7 +133,18 @@ describe('runner', () => {
                 return run(runner).then(() => assert.calledOnce(onBegin));
             });
 
-            it('should pass total number of states when emitting "BEGIN" event', () => {
+            it('should pass suite collection on "BEGIN" event', () => {
+                const runner = createRunner();
+                const suiteCollection = {allSuites: sinon.stub()};
+                const onBegin = sinon.spy().named('onBegin');
+
+                runner.on(Events.BEGIN, onBegin);
+
+                return run(runner, suiteCollection)
+                    .then(() => assert.calledWithMatch(onBegin, {suiteCollection}));
+            });
+
+            it('should pass total number of states on "BEGIN" event', () => {
                 const runner = createRunner();
                 const suiteCollection = {allSuites: sinon.stub()};
                 const suites = [
@@ -150,7 +161,7 @@ describe('runner', () => {
                 return run(runner, suiteCollection).then(() => assert.calledWithMatch(onBegin, {totalStates: 3}));
             });
 
-            it('should pass all browser ids when emitting "BEGIN" event', () => {
+            it('should pass all browser ids on "BEGIN" event', () => {
                 const runner = createRunner();
                 const onBegin = sinon.spy().named('onBegin');
 
@@ -161,7 +172,7 @@ describe('runner', () => {
                 return run(runner).then(() => assert.calledWithMatch(onBegin, {browserIds: ['bro1', 'bro2']}));
             });
 
-            it('should pass config when emitting "BEGIN" event', () => {
+            it('should pass config on "BEGIN" event', () => {
                 const runner = createRunner();
                 const config = runner.config;
                 const onBegin = sinon.spy().named('onBegin');

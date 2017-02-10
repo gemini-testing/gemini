@@ -16,3 +16,9 @@
 * `START_BROWSER` - emitted on browser session start. Emitted with [browser instance](../lib/browser/new-browser.js). If handler returns a promise tests will be executed in this session only after the promise is resolved.
 
 * `STOP_BROWSER` - emitted right before browser session end. Emitted with [browser instance](../lib/browser/new-browser.js). If handler returns a promise quit will be performed only after the promise is resolved.
+
+* `BEGIN` - runner event. Emitted on runner start with 1 argument `data`:
+    * `data.suiteCollection` - suite collection which will be run
+    * `data.config` - gemini config
+    * `data.totalStates` - number of states in collection
+    * `data.browserIds` - all browser ids from config
