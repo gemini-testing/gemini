@@ -87,6 +87,13 @@ settings. These settings can not be set per-browser.
   After run created directory will be removed. If not set system temp
   directory will be used.
 
+* `testFormats` - array of filename extensions for tests to proceed. `.js` is available by default, override this if you want:
+
+```yaml
+testFormats:
+  - .jsx
+```
+
 * `exclude` - array of glob patterns to exclude paths from the test search. For example:
 
 ```yaml
@@ -147,7 +154,7 @@ exclude:
 
   - `html` - set to false to disable html report and save only JSON.
 
-* `ctx` – a context which will be available in tests via method `gemini.ctx`. 
+* `ctx` – a context which will be available in tests via method `gemini.ctx`.
 
 ## Browsers settings
 
