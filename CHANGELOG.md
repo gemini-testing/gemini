@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.19.1"></a>
+## [4.19.1](https://github.com/gemini-testing/gemini/compare/v4.19.0...v4.19.1) (2017-02-15)
+
+
+### Bug Fixes
+
+* method "fullUrl" should resolve url in runtime ([e796dce](https://github.com/gemini-testing/gemini/commit/e796dce))
+* Prevented EMFILE error (too many open files) ([e8e4dca](https://github.com/gemini-testing/gemini/commit/e8e4dca))
+
+
+
 <a name="4.19.0"></a>
 # [4.19.0](https://github.com/gemini-testing/gemini/compare/v4.18.2...v4.19.0) (2017-02-10)
 
