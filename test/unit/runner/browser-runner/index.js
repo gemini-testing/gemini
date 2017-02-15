@@ -144,6 +144,14 @@ describe('runner/BrowserRunner', () => {
                     .then(() => suiteRunnerFabric.create.args[0][0]); // resolve with modified suite
             };
 
+            it('should resolve url in runtime', () => {
+                return run_({rootUrl: 'http://localhost/', suiteUrl: 'testUrl'})
+                    .then((suite) => {
+                        suite.url += '/?query=value';
+                        assert.equal(suite.fullUrl, '/testUrl/?query=value');
+                    });
+            });
+
             it('should not modify suite without "url" as own property', () => {
                 return run_({rootUrl: 'http://localhost/foo/bar/'})
                     .then((suite) => assert.isUndefined(suite.fullUrl));
