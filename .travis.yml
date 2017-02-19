@@ -6,9 +6,9 @@ node_js: '4'
 env:
   global:
   # SAUCE_USERNAME
-  - secure: g1hP6mcOh5BRX1+4yxm6/vXYoWIHwNoIIIn0wfT8iFe8TIPwf8xAddXgU6KRAW8gUrS6hZvblpEyhz6khJ7pHsxcla5FmGg5ok8uvaD5H7o0ihmaWAOw8YYD9KgwZz6cJEk9EtsXUQmxwiDFO0Y03f97B8nxp56ENXzHQ7JGoQ4=
+  - secure: SGYVs5XUYWTZVbc7OCXjw8EeWZvmoM46vWk/bTJRLLLDrNGxSSNubhuToDmEWC0lV02qtp8W1XKJt2d/nmG/dJ7K1SZfLQSZi/zTRfkPWtf9uaaPOHMGt7O69lipnuaaSOavVlZfOPIg02iVjCj9Mwy/BAaRSR4qWeN+N6Sp0kI=
   # SAUCE_ACCESS_KEY
-  - secure: UondfJRnFfyjIOHoC5CXMiC8kPotq4dmgI93G5KETC2yLplRMNLBGSgaa+wuow3kDk0gDamYPWl/wV0tGbKG5qAvtm8DcvgONzIamTKYElf+7wmeHSoBZQ8vbrvu2Eo+zw8kGIzreBvOnm8TxpTM1vE6mAtfXq+aBGhW3l/2Mkw=
+  - secure: gmcCnuKOboJ2hFKZV8gxUzg1w/RbYr2YN0fky6llXQWi+VHZMa+YIN4HPOP4JVyvbGQA/6JQTj4E9JVAb9MnnBk58nXcEn5R8V9RU5EMBC8+zme22ILMFIvnrPhcMzjoEuupfGxbXmqzASNTWtQQd0qQ2flm8OyOMl+jCqAWCHs=
   - CXX=g++-4.8
 
 cache:
