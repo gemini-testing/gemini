@@ -147,7 +147,7 @@ exclude:
 
   - `html` - set to false to disable html report and save only JSON.
 
-* `ctx` – a context which will be available in tests via method `gemini.ctx`. 
+* `ctx` – a context which will be available in tests via method `gemini.ctx`.
 
 ## Browsers settings
 
@@ -233,6 +233,8 @@ Settings list:
 * `compositeImage` – allows testing of regions which bottom bounds are outside of a viewport height (default: `false`).
   In the resulting screenshot the area which fits the viewport bounds will be **joined** with the area which is outside
   of the viewport height.
+
+  :warning: Option does not work in Opera@12.16.
 
 ## Sets
 
