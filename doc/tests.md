@@ -255,6 +255,8 @@ call:
    Note that function is executed in a browser context, so any references to
    outer scope of callback won't work.
 
+   :warning: `window.scrollTo` does not work in Opera@12.16 (see [details](https://github.com/operasoftware/operaprestodriver/issues/108)).
+
 * `wait(milliseconds)` – wait for specified amount of time before next action.
   If it is the last action in sequence, delay the screenshot for this amount
   of time.
