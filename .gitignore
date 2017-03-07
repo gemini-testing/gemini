@@ -17,6 +17,6 @@ build
 
 node_modules
 /coverage
-/lib/browser/client-scripts/gemini.calibrate.min.js
-/lib/reporters/html/static/report.min.js
+#/lib/browser/client-scripts/gemini.calibrate.min.js
+#/lib/reporters/html/static/report.min.js
 /_book
