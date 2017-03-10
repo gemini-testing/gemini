@@ -4,8 +4,8 @@ Gemini plugin is just an npm package with a `gemini-<plugin name>` name.
 Module should export a single function which receives `Gemini` class instance
 and user-specified options.
 `Gemini` instance contains two fields:
-* `config` - current config with specified options
-* `events` - all emitted events, which can be used by plugins
+* `config` — current config with specified options
+* `events` — all emitted events, which can be used by plugins
 
 For example:
 ```js

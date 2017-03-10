@@ -214,8 +214,8 @@ We are creating a new test suite `yandex-search`, assuming that we will capture 
 `.main-table` element from the root URL `http://yandex.com`. We know that the
 block has two states:
 
-* `plain` – right after the page is loaded
-* `with text` – with the `hello gemini` text inserted into `.input__control`
+* `plain` — right after the page is loaded
+* `with text` — with the `hello gemini` text inserted into `.input__control`
 
 States are executed one after another in the order in which they are defined, without the browser
 reloading in between.

@@ -72,22 +72,22 @@ system:
 There is a `system` section in the config file, which contains global `gemini`
 settings. These settings can not be set per-browser.
 
-* `projectRoot` – root directory of a project. All relative paths in config or
+* `projectRoot` — root directory of a project. All relative paths in config or
   options will be resolved relatively to it. By default it is the directory
   config file is placed in.
 
-* `sourceRoot` – directory which contains the source files.  Local sources
+* `sourceRoot` — directory which contains the source files.  Local sources
   will be used in the coverage report when the source map is available, but
   the sources can not be downloaded via URLs from the test pages. By default,
   it is equal to `projectRoot`.
 
-* `tempDir` – directory to save temporary images (current states) to. This
+* `tempDir` — directory to save temporary images (current states) to. This
   directory should exist. Gemini will create own temp directory in it with name
   starting with `.gemini.tmp.` where all temporary images will be saved.
   After run created directory will be removed. If not set system temp
   directory will be used.
 
-* `exclude` - array of glob patterns to exclude paths from the test search. For example:
+* `exclude` — array of glob patterns to exclude paths from the test search. For example:
 
 ```yaml
 exclude:
@@ -96,7 +96,7 @@ exclude:
   - foo/{bar,baz}/*.js
 ```
 
-* `plugins` - list of plugins to enable. Should have form of `pluginName:
+* `plugins` — list of plugins to enable. Should have form of `pluginName:
   settings`.  For example:
 
   ```yaml
@@ -109,32 +109,32 @@ exclude:
 
   Each plugin should be an installed npm package named `gemini-<pluginName>`.
 
-* `debug` – turn on debug logging to the terminal.
+* `debug` — turn on debug logging to the terminal.
 
-* `parallelLimit` – by default, `gemini` will run all browsers simultaneously.
+* `parallelLimit` — by default, `gemini` will run all browsers simultaneously.
   Sometimes (i.e. when using cloud services, such as SauceLabs) you have
   a limit of a number of browser that can be run once at a time. Use this
   option to limit the number of browsers that `gemini` will try to run in
   parallel.
 
-* `diffColor` – specifies color which will be used to highlight differences
+* `diffColor` — specifies color which will be used to highlight differences
   between images. Specified in hexadecimal RGB (`#RRGGBB`). Magenta by default
   (`#FF00FF`).
 
-* `coverage` - `gemini` can gather and report CSS tests coverage. It supports
+* `coverage` — `gemini` can gather and report CSS tests coverage. It supports
   source maps, so you can get the report even if you are using preprocessor or
   minifier. The JSON and html reports are saved to `gemini-coverage`
   directory. There are many settings under this section:
 
-  - `enabled` – set to `true` to enable coverage reporting.
+  - `enabled` — set to `true` to enable coverage reporting.
 
-  - `map` - function which can be used for overriding default logic of source root path resolving.
+  - `map` — function which can be used for overriding default logic of source root path resolving.
   By default it returns path to CSS file relative to the source root.
   This function accepts 2 arguments:
-    * `url` - full url of source file which coverage should be obtained
-    * `rootUrl` - root url specified in the config for current browser
+    * `url` — full url of source file which coverage should be obtained
+    * `rootUrl` — root url specified in the config for current browser
 
-  - `exclude` – array of file paths or glob patterns to exclude from coverage
+  - `exclude` — array of file paths or glob patterns to exclude from coverage
     report. For example:
 
       ```yaml
@@ -145,9 +145,9 @@ exclude:
             - path/to/some.css
       ```
 
-  - `html` - set to false to disable html report and save only JSON.
+  - `html` — set to false to disable html report and save only JSON.
 
-* `ctx` – a context which will be available in tests via method `gemini.ctx`.
+* `ctx` — a context which will be available in tests via method `gemini.ctx`.
 
 ## Browsers settings
 
@@ -172,65 +172,65 @@ for constructing screens file names.
 
 Settings list:
 
-* `rootUrl` (required) – the root URL of your website. Target URLs of your
+* `rootUrl` (required) — the root URL of your website. Target URLs of your
   test suites will be resolved relatively to it. If top level `rootUrl` value is set
-  and browser `rootUrl` - is relative url, then resolved `rootUrl` will be result of
+  and browser `rootUrl` — is relative url, then resolved `rootUrl` will be result of
   concatenation of top level `rootUrl` and individual browser `rootUrl`.
 
-* `desiredCapabilities` (required) - WebDriver
+* `desiredCapabilities` (required) — WebDriver
   [DesiredCapabilites](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities)
   for the browser. Per-browser value will be merged with top-level value
   instead of overriding it.
 
-* `gridUrl` – WebDriver URL to use for taking screenshots. By default is
+* `gridUrl` — WebDriver URL to use for taking screenshots. By default is
   http://localhost:4444/wd/hub
 
-* `calibrate` - does this browser need to perform the calibration procedure.
+* `calibrate` — does this browser need to perform the calibration procedure.
   This procedure allows to correctly capture the image in case the particular
   WebDriver implementation captures browser UI along with web page. Enabled by
   default. If you are sure this is not the case for your WebDriver, you can
   disable it by setting this option to `false`.
 
-* `httpTimeout` - timeout for HTTP requests to WebDriver, milliseconds. By
+* `httpTimeout` — timeout for HTTP requests to WebDriver, milliseconds. By
   default the server timeout is used.
 
-* `sessionRequestTimeout` - timeout for getting of browser sessions, milliseconds. By default the value of option `httpTimeout` is used.
+* `sessionRequestTimeout` — timeout for getting of browser sessions, milliseconds. By default the value of option `httpTimeout` is used.
 
-* `sessionQuitTimeout` - timeout for closing browser sessions, milliseconds. By default the value of option `httpTimeout` is used.
+* `sessionQuitTimeout` — timeout for closing browser sessions, milliseconds. By default the value of option `httpTimeout` is used.
 
-* `screenshotsDir` – directory to save reference screenshots to.
+* `screenshotsDir` — directory to save reference screenshots to.
   `<projectRoot>/gemini/screens` by default.
 
-* `tolerance` - indicates maximum allowed
+* `tolerance` — indicates maximum allowed
   [CIEDE2000](http://en.wikipedia.org/wiki/Color_difference#CIEDE2000)
   difference between colors. Used only in non-strict mode. By default it's 2.3
   which should be enough for the most cases. Increasing global default is not
   recommended, prefer changing tolerance for particular suites or states
   instead.
 
-* `windowSize` – specify browser window dimensions (i.e. `1600x1200`). If not
+* `windowSize` — specify browser window dimensions (i.e. `1600x1200`). If not
   specified, the size of the window depends on WebDriver. :warning: You can't set specific resolutions for browser Opera or mobile platforms. They use only full-screen resolution.
 
-* `sessionsPerBrowser` - how many WebDriver sessions  can be launched
+* `sessionsPerBrowser` — how many WebDriver sessions  can be launched
   simultaneously for this browser. Default is 1. Increase the value if you
   want to speed up your tests.
 
-* `suitesPerSession` - maximum amount of test suites to run in each web driver
+* `suitesPerSession` — maximum amount of test suites to run in each web driver
   session. After limit is reached, session gets closed and new session gets
   started. By default is `.inf` (no limit). Set to smaller number if you are
   experiencing stability problems.
 
-* `retry` – maximum amount of relaunch fallen tests with a critical error. If not
+* `retry` — maximum amount of relaunch fallen tests with a critical error. If not
   specified, the fallen tests will not be relaunched (by default it's 0).
 
   Note that the same test never be performed in the same browser session.
 
-* `screenshotMode` - image capture mode. There are 3 allowed values for this option:
+* `screenshotMode` — image capture mode. There are 3 allowed values for this option:
     * `auto` (default). Mode will be obtained automatically.
     * `fullpage`. Gemini will deal with screenshot of full page.
     * `viewport`. Only viewport area will be used.
 
-* `compositeImage` – allows testing of regions which bottom bounds are outside of a viewport height (default: `false`).
+* `compositeImage` — allows testing of regions which bottom bounds are outside of a viewport height (default: `false`).
   In the resulting screenshot the area which fits the viewport bounds will be **joined** with the area which is outside
   of the viewport height.
 
@@ -252,9 +252,9 @@ sets:
      ...
 ```
 
-* `files` - list of test files or directories with test files. Should be relative to project root directory. Also, you can use masks for this property. For example: `gemini/test-suites/*.gemini.js`. Can be a string if you want to specify just one file or directory.
+* `files` — list of test files or directories with test files. Should be relative to project root directory. Also, you can use masks for this property. For example: `gemini/test-suites/*.gemini.js`. Can be a string if you want to specify just one file or directory.
 
-* `browsers` - list of browser ids to run tests specified in `files`. All browsers by default.
+* `browsers` — list of browser ids to run tests specified in `files`. All browsers by default.
 
 If sets are not specified in config, all files from `gemini` directory will be launched in all browsers specified in a config.
 

@@ -24,8 +24,8 @@ By default, this command will do two things:
 
  Also, you can run this command with options:
 
- * `--diff` - update only existing images, states with no reference images will be ignored;
- * `--new` - generate only missing images.
+ * `--diff` — update only existing images, states with no reference images will be ignored;
+ * `--new` — generate only missing images.
 
 If no paths are specified, each `.js` file from `gemini` directory will be
 processed. By default, configuration will be loaded from `.gemini.yml` in the
@@ -83,9 +83,9 @@ report), partially (yellow) or was not captured at all (red).
 
 ## Common CLI options
 
-* `--config`, `-c` – specify config file to use.
+* `--config`, `-c` — specify config file to use.
 
-* `--grep PATTERN` – execute only suites with names that match the regular
+* `--grep PATTERN` — execute only suites with names that match the regular
   expression pattern.
 
 * `--browser ID` — execute suite only for specified browser id. Can be used
@@ -93,11 +93,11 @@ report), partially (yellow) or was not captured at all (red).
   environment variables (browsers should be separated by a coma). If both CLI option
   and env variable are set, CLI has precedence.
 
-* `--set`, `-s` - specify set to run
+* `--set`, `-s` — specify set to run
 
-* `--help` – display help message.
+* `--help` — display help message.
 
-* `--version` – display version.
+* `--version` — display version.
 
 ## Overriding config options
 
