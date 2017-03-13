@@ -35,7 +35,7 @@ console.log(gemini.config.rootUrl);
 
 ## Reading the tests
 
-`gemini.readTests(paths, grep)` – read all of the tests from specified paths into
+`gemini.readTests(paths, grep)` — read all of the tests from specified paths into
 one suite collection.
 
 * `paths` is an array of files or directories paths containing Gemini tests.
@@ -68,29 +68,29 @@ Also SuiteCollection object is returned by `gemini.readTests` method.
 
 SuiteCollection API:
 
-* `SuiteCollection([suites])` - constructor.
+* `SuiteCollection([suites])` — constructor.
   Takes optional `suites` parameter, these are the top level suites.
 
-* `add(suite)` - add suite to collection.
+* `add(suite)` — add suite to collection.
 
-* `topLevelSuites()` - return array of top level suites.
+* `topLevelSuites()` — return array of top level suites.
 
-* `allSuites()` - return array of all suites in collection. Goes through all suites
+* `allSuites()` — return array of all suites in collection. Goes through all suites
   children recursively.
 
-* `disableAll()` - disable all suites in collection
+* `disableAll()` — disable all suites in collection
 
-* `enableAll()` - enable all suites in collection
+* `enableAll()` — enable all suites in collection
 
-* `disable(suite, [opts])` - disable suite and all its children
+* `disable(suite, [opts])` — disable suite and all its children
 
   `suite` can be a real suite object, or suite full name
 
   `opts` are optional:
-    * `opts.browser` - browser to disable suite in
-    * `opts.state` - disable only specified state
+    * `opts.browser` — browser to disable suite in
+    * `opts.state` — disable only specified state
 
-* `enable(suite, [opts])` - enable suite and all its children. Arguments are the same as in
+* `enable(suite, [opts])` — enable suite and all its children. Arguments are the same as in
   `disable`
 
 Example on how to run only certain states in certain browsers:
@@ -110,24 +110,24 @@ return gemini.test(collection);
 
 Suite objects have the following properties:
 
-* `id` – unique numeric identificator of the suite. Automatically generated
+* `id` — unique numeric identificator of the suite. Automatically generated
   when loading suites.
 
-* `name` – the name of the suite.
+* `name` — the name of the suite.
 
-* `children` – array of subsuites of the current suite.
+* `children` — array of subsuites of the current suite.
 
-* `states` – array of the `State` objects, defined in a suite.
+* `states` — array of the `State` objects, defined in a suite.
 
 ### State
 
 Suite objects have the following properties:
 
-* `name` – the name of the state.
+* `name` — the name of the state.
 
 Methods:
 
-* `shouldSkip(browserId)` – returns `true` if this state should be skipped for
+* `shouldSkip(browserId)` — returns `true` if this state should be skipped for
   a browser.
 
 ## Updating reference screenshots
@@ -140,11 +140,11 @@ or `SuiteCollection` instance.
 
 Options:
 
-* `reporters` – array of reporters to use. Each element can be either string
+* `reporters` — array of reporters to use. Each element can be either string
   (to use corresponding built-in reporter) or reporter function (to use
   a custom reporter).
 
-* `grep` – regular expression to filter suites to run. By default, all tests
+* `grep` — regular expression to filter suites to run. By default, all tests
   will be executed. If this option is set, only suites with name matching the
   pattern will be executed.
 
@@ -154,17 +154,17 @@ Options:
 * `sets` — array of set names to execute tests in. By default, tests are
   executed for all sets, specified in config.
 
-* `diff`(Boolean) - update only existing images with some diff, states with no reference images will be ignored.
+* `diff`(Boolean) — update only existing images with some diff, states with no reference images will be ignored.
 
-* `new`(Boolean) - generate only missing images.
+* `new`(Boolean) — generate only missing images.
 
 Returns promise that resolve to a stats object with following keys:
 
-* `total` – total number of tests executed.
+* `total` — total number of tests executed.
 
-* `skipped` – number of skipped tests.
+* `skipped` — number of skipped tests.
 
-* `errored` – number of errored tests.
+* `errored` — number of errored tests.
 
 Rejects promise if critical error occurred.
 
@@ -177,11 +177,11 @@ or `SuiteCollection` instance.
 
 Options:
 
-* `reporters` – array of reporter to use. Each element can be either string
+* `reporters` — array of reporter to use. Each element can be either string
   (to use corresponding built-in reporter) or reporter function (to use
   a custom reporter).
 
-* `grep` – regular expression to filter suites to run. By default, all tests
+* `grep` — regular expression to filter suites to run. By default, all tests
   will be executed. If this option is set, only suites with name matching the
   pattern will be executed.
 
@@ -193,29 +193,29 @@ Options:
 
 Returns promise that resolve to a stats object with following keys:
 
-* `total` – total number of tests executed.
+* `total` — total number of tests executed.
 
-* `skipped` – number of skipped tests.
+* `skipped` — number of skipped tests.
 
-* `errored` – number of errored tests.
+* `errored` — number of errored tests.
 
-* `passed` – number of passed tests.
+* `passed` — number of passed tests.
 
-* `failed` – number of failed tests.
+* `failed` — number of failed tests.
 
 Rejects promise if critical error occurred.
 
 ## Utilites
 
-* `gemini.getScreenshotPath(suite, stateName, browserId)` – returns path to
+* `gemini.getScreenshotPath(suite, stateName, browserId)` — returns path to
   the reference screenshot of the specified state for specified browser.
 
-* `gemini.getBrowserCapabilites(browserId)` – returns WebDriver capabilities
+* `gemini.getBrowserCapabilites(browserId)` — returns WebDriver capabilities
   for specified `browserId`.
 
-* `gemini.browserIds` – list of all browser identificators to use for tests.
+* `gemini.browserIds` — list of all browser identificators to use for tests.
 
-* `Gemini.readRawConfig` - reads configuration file for specified `filePath`
+* `Gemini.readRawConfig` — reads configuration file for specified `filePath`
 and returns content as JS object. This method does not validate and analyze
 gemini configuration.
 
@@ -224,16 +224,16 @@ gemini configuration.
 `gemini` instance emits some events, which can be used by external scripts or
 plugins:
 
-* `START_RUNNER` - emitted before the start of `test` or `update` command. If
+* `START_RUNNER` — emitted before the start of `test` or `update` command. If
   you return a promise from the event handler, the start of the command will
   be delayed until the promise resolves.
 
-* `END_RUNNER` - emitted after the end of the `test` or `update` command.
+* `END_RUNNER` — emitted after the end of the `test` or `update` command.
 
-* `BEFORE_FILE_READ` – emitted before each test file is read. The event is emitted
+* `BEFORE_FILE_READ` — emitted before each test file is read. The event is emitted
   with 1 argument `filePath` which is the absolute path to the file to be read.
 
-* `AFTER_FILE_READ` – emitted after each test file have been read. The event is
+* `AFTER_FILE_READ` — emitted after each test file have been read. The event is
   emitted with 1 argument `filePath` which is the absolute path to the file that
   was read.
 
