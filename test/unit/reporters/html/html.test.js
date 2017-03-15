@@ -13,25 +13,25 @@ const path = require('path');
 const lib = require('lib/reporters/html/lib');
 const view = require('lib/reporters/html/view');
 
+const sandbox = sinon.sandbox.create();
+let emitter;
+
+function mkStubResult_(options) {
+	return _.defaultsDeep(options, {
+		state: {name: 'name-default'},
+		browserId: 'browserId-default',
+		suite: {
+			path: ['suite/path-default'],
+			metaInfo: {sessionId: 'sessionId-default'}
+		},
+		saveDiffTo: sandbox.stub(),
+		currentPath: 'current/path-default',
+		referencePath: 'reference/path-default',
+		equal: false
+	});
+}
+
 describe('HTML Reporter', () => {
-    const sandbox = sinon.sandbox.create();
-    let emitter;
-
-    function mkStubResult_(options) {
-        return _.defaultsDeep(options, {
-            state: {name: 'name-default'},
-            browserId: 'browserId-default',
-            suite: {
-                path: ['suite/path-default'],
-                metaInfo: {sessionId: 'sessionId-default'}
-            },
-            saveDiffTo: sandbox.stub(),
-            currentPath: 'current/path-default',
-            referencePath: 'reference/path-default',
-            equal: false
-        });
-    }
-
     beforeEach(() => {
         sandbox.stub(view, 'save');
         sandbox.stub(logger, 'log');
@@ -70,22 +70,6 @@ describe('HTML Reporter', () => {
         assert.equal(render(data), '<img data-src="images/fake/long%2Bpath/fakeName/fakeId~current.png">');
     });
 
-    it('should save only reference when screenshots are equal', () => {
-        sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
-
-        emitter.emit(Events.TEST_RESULT, mkStubResult_({
-            referencePath: 'reference/path',
-            equal: true
-        }));
-
-        emitter.emit(Events.END);
-
-        return emitter.emitAndWait(Events.END_RUNNER).then(() => {
-            assert.calledOnce(fs.copyAsync);
-            assert.calledWith(fs.copyAsync, 'reference/path', 'absolute/reference/path');
-        });
-    });
-
     describe('when screenshots are not equal', () => {
         function emitResult_(options) {
             emitter.emit(Events.TEST_RESULT, mkStubResult_(options));
@@ -120,6 +104,57 @@ describe('HTML Reporter', () => {
                 .then(() => {
                     assert.calledWith(saveDiffTo, '/absolute/report/diff/path');
                 });
+        });
+    });
+});
+
+describe('HTML reporter --html-failed-only flag', () => {
+    beforeEach(() => {
+        sandbox.stub(view, 'save');
+        sandbox.stub(logger, 'log');
+        sandbox.stub(fs, 'copyAsync').returns(Promise.resolve());
+        sandbox.stub(fs, 'mkdirsAsync').returns(Promise.resolve());
+
+        emitter = new QEmitter();
+        emitter.config = {
+            forBrowser: sinon.stub().returns({
+                rootUrl: 'browser/root/url'
+            })
+        };
+    });
+
+	afterEach(() => sandbox.restore());
+
+    it('should copy reference screenshots when turned off', () => {
+        new HtmlReporter(emitter, null, { failedOnly: false });
+        sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
+
+        emitter.emit(Events.TEST_RESULT, mkStubResult_({
+            referencePath: 'reference/path',
+            equal: true
+        }));
+
+        emitter.emit(Events.END);
+
+        return emitter.emitAndWait(Events.END_RUNNER).then(() => {
+            assert.calledOnce(fs.copyAsync);
+            assert.calledWith(fs.copyAsync, 'reference/path', 'absolute/reference/path');
+        });
+    });
+
+    it('should not copy reference screenshots when turned on', () => {
+        new HtmlReporter(emitter, null, { failedOnly: true });
+        sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
+
+        emitter.emit(Events.TEST_RESULT, mkStubResult_({
+            referencePath: 'reference/path',
+            equal: true
+        }));
+
+        emitter.emit(Events.END);
+
+        return emitter.emitAndWait(Events.END_RUNNER).then(() => {
+            assert.notCalled(fs.copyAsync);
         });
     });
 });
