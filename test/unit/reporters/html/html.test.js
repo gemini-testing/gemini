@@ -17,18 +17,18 @@ const sandbox = sinon.sandbox.create();
 let emitter;
 
 function mkStubResult_(options) {
-	return _.defaultsDeep(options, {
-		state: {name: 'name-default'},
-		browserId: 'browserId-default',
-		suite: {
-			path: ['suite/path-default'],
-			metaInfo: {sessionId: 'sessionId-default'}
-		},
-		saveDiffTo: sandbox.stub(),
-		currentPath: 'current/path-default',
-		referencePath: 'reference/path-default',
-		equal: false
-	});
+    return _.defaultsDeep(options, {
+        state: {name: 'name-default'},
+        browserId: 'browserId-default',
+        suite: {
+            path: ['suite/path-default'],
+            metaInfo: {sessionId: 'sessionId-default'}
+        },
+        saveDiffTo: sandbox.stub(),
+        currentPath: 'current/path-default',
+        referencePath: 'reference/path-default',
+        equal: false
+    });
 }
 
 describe('HTML Reporter', () => {
@@ -123,7 +123,7 @@ describe('HTML reporter --html-failed-only flag', () => {
         };
     });
 
-	afterEach(() => sandbox.restore());
+    afterEach(() => sandbox.restore());
 
     it('should copy reference screenshots when turned off', () => {
         new HtmlReporter(emitter, null, { failedOnly: false });
