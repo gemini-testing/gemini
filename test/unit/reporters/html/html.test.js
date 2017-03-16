@@ -126,7 +126,7 @@ describe('HTML reporter --html-failed-only flag', () => {
     afterEach(() => sandbox.restore());
 
     it('should copy reference screenshots when turned off', () => {
-        new HtmlReporter(emitter, null, { failedOnly: false });
+        new HtmlReporter(emitter, null, {failedOnly: false}); // eslint-disable-line no-new
         sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
 
         emitter.emit(Events.TEST_RESULT, mkStubResult_({
@@ -143,7 +143,7 @@ describe('HTML reporter --html-failed-only flag', () => {
     });
 
     it('should not copy reference screenshots when turned on', () => {
-        new HtmlReporter(emitter, null, { failedOnly: true });
+        new HtmlReporter(emitter, null, {failedOnly: true}); // eslint-disable-line no-new
         sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
 
         emitter.emit(Events.TEST_RESULT, mkStubResult_({
