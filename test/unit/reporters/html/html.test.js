@@ -133,7 +133,7 @@ describe('HTML Reporter', () => {
     describe('without --html-failed-only flag', () => {
         beforeEach(() => {
             // calling constructor for its side effect
-                new HtmlReporter(emitter, {failedOnly: false}); // eslint-disable-line no-new
+            new HtmlReporter(emitter, {failedOnly: false}); // eslint-disable-line no-new
         });
 
         it('should save only reference when screenshots are equal', () => {
