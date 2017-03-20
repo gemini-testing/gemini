@@ -31,7 +31,7 @@ describe('ViewModel', () => {
 
         model.addSuccess(stubTest_({
             suite: {file: '/path/file.js'}
-        }));
+        }), {failedOnly: false});
 
         const metaInfo = JSON.parse(getModelResult_(model).metaInfo);
 
@@ -43,10 +43,23 @@ describe('ViewModel', () => {
 
         model.addSuccess(stubTest_({
             suite: {fullUrl: '/test/url'}
-        }));
+        }), {failedOnly: false});
 
         const metaInfo = JSON.parse(getModelResult_(model).metaInfo);
 
         assert.equal(metaInfo.url, '/test/url');
+    });
+
+    it('should not prepare "metaInfo", when "failedOnly" is true', () => {
+        const model = mkViewModel_();
+
+        model.addSuccess(stubTest_({
+            suite: {
+                file: '/path/file.js',
+                fullUrl: '/test/url'
+            }
+        }), {failedOnly: true});
+
+        assert.isUndefined(model.getResult().suites);
     });
 });
