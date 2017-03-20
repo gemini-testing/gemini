@@ -31,6 +31,12 @@ function mkStubResult_(options) {
     });
 }
 
+function emitResult_(options) {
+    emitter.emit(Events.TEST_RESULT, mkStubResult_(options));
+    emitter.emit(Events.END);
+    return emitter.emitAndWait(Events.END_RUNNER);
+}
+
 describe('HTML Reporter', () => {
     beforeEach(() => {
         sandbox.stub(view, 'save');
@@ -71,12 +77,6 @@ describe('HTML Reporter', () => {
     });
 
     describe('when screenshots are not equal', () => {
-        function emitResult_(options) {
-            emitter.emit(Events.TEST_RESULT, mkStubResult_(options));
-            emitter.emit(Events.END);
-            return emitter.emitAndWait(Events.END_RUNNER);
-        }
-
         it('should save current image', () => {
             sandbox.stub(lib, 'currentAbsolutePath').returns('/absolute/report/current/path');
 
@@ -125,7 +125,7 @@ describe('HTML reporter --html-failed-only flag', () => {
 
     afterEach(() => sandbox.restore());
 
-    it('should copy reference screenshots when turned off', () => {
+    it('should copy reference screenshots when turned off and the test passed', () => {
         new HtmlReporter(emitter, null, {failedOnly: false}); // eslint-disable-line no-new
         sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
 
@@ -142,7 +142,17 @@ describe('HTML reporter --html-failed-only flag', () => {
         });
     });
 
-    it('should not copy reference screenshots when turned on', () => {
+    it('should copy reference screenshots when turned on and the test failed', () => {
+		new HtmlReporter(emitter, null, {failedOnly: true}); // eslint-disable-line no-new
+		sandbox.stub(lib, 'referenceAbsolutePath').returns('/absolute/report/reference/path');
+
+		return emitResult_({referencePath: 'reference/path'})
+			.then(() => {
+				assert.calledWith(fs.copyAsync, 'reference/path', '/absolute/report/reference/path');
+			});
+    });
+
+    it('should not copy reference screenshots when turned on and the test passed', () => {
         new HtmlReporter(emitter, null, {failedOnly: true}); // eslint-disable-line no-new
         sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
 
