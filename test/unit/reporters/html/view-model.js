@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 const ViewModel = require('lib/reporters/html/view-model');
+const TestCounter = require('lib/test-counter');
 
 describe('ViewModel', () => {
     const sandbox = sinon.sandbox.create();
@@ -62,4 +63,13 @@ describe('ViewModel', () => {
 
         assert.isUndefined(model.getResult().suites);
     });
+
+    it('should incrase the passed counter, when "failedOnly" is true', () => {
+        const model = mkViewModel_();
+        sandbox.stub(model._counter, 'onPassed');
+
+        model.addSuccess(stubTest_({}), {failedOnly: true});
+
+        assert.calledOnce(model._counter.onPassed);
+    })
 });
