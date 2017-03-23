@@ -32,8 +32,8 @@ describe('HTML Reporter', () => {
         });
     }
 
-    function emitResult_(options) {
-        emitter.emit(Events.TEST_RESULT, mkStubResult_(options));
+    function emitResult_(result) {
+        emitter.emit(Events.TEST_RESULT, result);
         emitter.emit(Events.END);
         return emitter.emitAndWait(Events.END_RUNNER);
     }
@@ -55,8 +55,7 @@ describe('HTML Reporter', () => {
     afterEach(() => sandbox.restore());
 
     it('should log correct path to html report', () => {
-        // calling constructor for its side effect
-        new HtmlReporter(emitter); // eslint-disable-line no-new
+        new HtmlReporter(emitter, {}); // eslint-disable-line no-new
         emitter.emit(Events.END);
 
         return emitter.emitAndWait(Events.END_RUNNER).then(() => {
@@ -66,8 +65,7 @@ describe('HTML Reporter', () => {
     });
 
     it('should escape special chars in urls', () => {
-        // calling constructor for its side effect
-        new HtmlReporter(emitter); // eslint-disable-line no-new
+        new HtmlReporter(emitter, {}); // eslint-disable-line no-new
         const data = {
             actualPath: 'images/fake/long+path/fakeName/fakeId~current.png'
         };
@@ -79,107 +77,77 @@ describe('HTML Reporter', () => {
 
     describe('with --html-failed-only flag', () => {
         beforeEach(() => {
-            // calling constructor for its side effect
             new HtmlReporter(emitter, {failedOnly: true}); // eslint-disable-line no-new
         });
 
         it('should not save reference when screenshots are equal', () => {
-            sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
-
-            emitter.emit(Events.TEST_RESULT, mkStubResult_({
-                referencePath: 'reference/path',
-                equal: true
-            }));
-
-            emitter.emit(Events.END);
-
-            return emitter.emitAndWait(Events.END_RUNNER).then(() => {
+            return emitResult_(mkStubResult_({equal: true})).then(() => {
                 assert.notCalled(fs.copyAsync);
             });
         });
 
         describe('when screenshots are not equal', () => {
-            it('should save current image', () => {
-                sandbox.stub(lib, 'currentAbsolutePath').returns('/absolute/report/current/path');
-
-                return emitResult_({currentPath: 'current/path'})
-                    .then(() => {
-                        assert.calledWith(fs.copyAsync, 'current/path', '/absolute/report/current/path');
-                    });
-            });
-
             it('should save reference image', () => {
                 sandbox.stub(lib, 'referenceAbsolutePath').returns('/absolute/report/reference/path');
 
-                return emitResult_({referencePath: 'reference/path'})
-                    .then(() => {
-                        assert.calledWith(fs.copyAsync, 'reference/path', '/absolute/report/reference/path');
-                    });
+                return emitResult_(mkStubResult_({referencePath: 'reference/path'}))
+                    .then(() => assert.calledWith(fs.copyAsync, 'reference/path', '/absolute/report/reference/path'));
+            });
+
+            it('should save current image', () => {
+                sandbox.stub(lib, 'currentAbsolutePath').returns('/absolute/report/current/path');
+
+                return emitResult_(mkStubResult_({currentPath: 'current/path'}))
+                    .then(() => assert.calledWith(fs.copyAsync, 'current/path', '/absolute/report/current/path'));
             });
 
             it('should save diff image', () => {
-                const saveDiffTo = sandbox.stub();
-
                 sandbox.stub(lib, 'diffAbsolutePath').returns('/absolute/report/diff/path');
 
-                return emitResult_({saveDiffTo})
-                    .then(() => {
-                        assert.calledWith(saveDiffTo, '/absolute/report/diff/path');
-                    });
+                const result = mkStubResult_();
+
+                return emitResult_(result)
+                    .then(() => assert.calledWith(result.saveDiffTo, '/absolute/report/diff/path'));
             });
         });
     });
 
     describe('without --html-failed-only flag', () => {
         beforeEach(() => {
-            // calling constructor for its side effect
             new HtmlReporter(emitter, {failedOnly: false}); // eslint-disable-line no-new
         });
 
         it('should save only reference when screenshots are equal', () => {
             sandbox.stub(lib, 'referenceAbsolutePath').returns('absolute/reference/path');
 
-            emitter.emit(Events.TEST_RESULT, mkStubResult_({
-                referencePath: 'reference/path',
-                equal: true
-            }));
-
-            emitter.emit(Events.END);
-
-            return emitter.emitAndWait(Events.END_RUNNER).then(() => {
+            return emitResult_(mkStubResult_({referencePath: 'reference/path', equal: true})).then(() => {
                 assert.calledOnce(fs.copyAsync);
                 assert.calledWith(fs.copyAsync, 'reference/path', 'absolute/reference/path');
             });
         });
 
         describe('when screenshots are not equal', () => {
-            it('should save current image', () => {
-                sandbox.stub(lib, 'currentAbsolutePath').returns('/absolute/report/current/path');
-
-                return emitResult_({currentPath: 'current/path'})
-                    .then(() => {
-                        assert.calledWith(fs.copyAsync, 'current/path', '/absolute/report/current/path');
-                    });
-            });
-
             it('should save reference image', () => {
                 sandbox.stub(lib, 'referenceAbsolutePath').returns('/absolute/report/reference/path');
 
-                return emitResult_({referencePath: 'reference/path'})
-                    .then(() => {
-                        assert.calledWith(fs.copyAsync, 'reference/path', '/absolute/report/reference/path');
-                    });
+                return emitResult_(mkStubResult_({referencePath: 'reference/path'}))
+                    .then(() => assert.calledWith(fs.copyAsync, 'reference/path', '/absolute/report/reference/path'));
+            });
+
+            it('should save current image', () => {
+                sandbox.stub(lib, 'currentAbsolutePath').returns('/absolute/report/current/path');
+
+                return emitResult_(mkStubResult_({currentPath: 'current/path'}))
+                    .then(() => assert.calledWith(fs.copyAsync, 'current/path', '/absolute/report/current/path'));
             });
 
             it('should save diff image', () => {
-                const saveDiffTo = sandbox.stub();
-
                 sandbox.stub(lib, 'diffAbsolutePath').returns('/absolute/report/diff/path');
 
-                return emitResult_({saveDiffTo})
-                    .then(() => {
-                        assert.calledWith(saveDiffTo, '/absolute/report/diff/path');
-                    });
+                const result = mkStubResult_();
+
+                return emitResult_(result)
+                    .then(() => assert.calledWith(result.saveDiffTo, '/absolute/report/diff/path'));
             });
         });
     });
