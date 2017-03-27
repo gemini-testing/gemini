@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.19.2"></a>
+## [4.19.2](https://github.com/gemini-testing/gemini/compare/v4.19.1...v4.19.2) (2017-03-27)
+
+
+### Bug Fixes
+
+* enable correct suite through suite collection api ([60c1147](https://github.com/gemini-testing/gemini/commit/60c1147))
+
+
+
 <a name="4.19.1"></a>
 ## [4.19.1](https://github.com/gemini-testing/gemini/compare/v4.19.0...v4.19.1) (2017-02-15)
 
