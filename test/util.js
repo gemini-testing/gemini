@@ -47,6 +47,7 @@ function makeSuiteStub(opts) {
         suite.addState(state);
     });
     suite.url = opts.url;
+    suite.file = opts.file;
 
     return suite;
 }
