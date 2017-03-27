@@ -2,6 +2,7 @@
 
 const proxyquire = require('proxyquire');
 const mkTree = require('../util').makeSuiteTree;
+const mkSuite = require('../util').makeSuiteStub;
 
 describe('suite-collection', () => {
     const sandbox = sinon.sandbox.create();
@@ -383,6 +384,26 @@ describe('suite-collection', () => {
                     .enable(tree.child.fullName);
 
                 assert.deepEqual(tree.child.browsers, ['b1', 'b2']);
+            });
+
+            it('should enable only current suite if there are the same suites exists in the tree', () => {
+                const suite1 = mkSuite({
+                    name: 'suite',
+                    browsers: ['b1', 'b2'],
+                    file: 'some/path.js'
+                });
+                const suite2 = mkSuite({
+                    name: 'suite',
+                    browsers: ['b3', 'b4'],
+                    file: 'another/path.js'
+                });
+
+                new SuiteCollection([suite1, suite2])
+                    .disableAll()
+                    .enable(suite1);
+
+                assert.deepEqual(suite1.browsers, ['b1', 'b2']);
+                assert.deepEqual(suite2.browsers, []);
             });
 
             it('should fail on attempt to enable unknown suite', () => {
