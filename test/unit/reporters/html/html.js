@@ -75,6 +75,16 @@ describe('HTML Reporter', () => {
         assert.equal(render(data), '<img data-src="images/fake/long%2Bpath/fakeName/fakeId~current.png">');
     });
 
+    it('can handle error event', () => {
+        new HtmlReporter(emitter, {}); // eslint-disable-line no-new
+        sandbox.stub(lib, 'currentAbsolutePath').returns('/absolute/report/current/path');
+
+        emitter.emit(Events.ERROR, mkStubResult_());
+
+        emitter.emitAndWait(Events.END_RUNNER)
+            .then(() => assert.calledWith(lib.currentAbsolutePath, '/absolute/report/current/path'));
+    });
+
     describe('with --html-failed-only flag', () => {
         beforeEach(() => {
             new HtmlReporter(emitter, {failedOnly: true}); // eslint-disable-line no-new

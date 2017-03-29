@@ -67,12 +67,7 @@ describe('ViewModel', () => {
         const model = mkViewModel_();
         sandbox.stub(model._counter, 'onPassed');
 
-        model.addSuccess(stubTest_({
-            suite: {
-                file: '/path/file.js',
-                fullUrl: '/test/url'
-            }
-        }), {failedOnly: true});
+        model.addSuccess(stubTest_(), {failedOnly: true});
 
         assert.calledOnce(model._counter.onPassed);
     });
