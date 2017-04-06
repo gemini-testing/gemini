@@ -51,15 +51,17 @@ describe('state-processor/capture-processor/tester', () => {
             const options = {
                 refPath: 'some/ref/path',
                 pixelRatio: 99,
-                tolerance: 23
+                tolerance: 23,
+                ignoreAntialiasing: true
             };
 
             return tester.exec(capture, options)
                 .then(() => {
                     assert.calledWith(Image.compare, 'tmp/path', 'some/ref/path', {
-                        canHaveCaret: true,
+                        ignoreCaret: true,
                         pixelRatio: 99,
-                        tolerance: 23
+                        tolerance: 23,
+                        ignoreAntialiasing: true
                     });
                 });
         });

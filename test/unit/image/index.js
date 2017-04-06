@@ -131,19 +131,16 @@ describe('Image', () => {
 
     it('should compare two images', () => {
         looksSameStub.yields();
-
-        return Image.compare('some/path', 'other/path', {
-            canHaveCaret: true,
+        const compareOpts = {
+            ignoreCaret: true,
             tolerance: 250,
             pixelRatio: 11
-        })
+        };
+
+        return Image.compare('some/path', 'other/path', compareOpts)
             .then(() => {
                 assert.calledOnce(looksSameStub);
-                assert.calledWith(looksSameStub, 'some/path', 'other/path', {
-                    ignoreCaret: true,
-                    tolerance: 250,
-                    pixelRatio: 11
-                });
+                assert.calledWith(looksSameStub, 'some/path', 'other/path', compareOpts);
             });
     });
 
