@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.19.3"></a>
+## [4.19.3](https://github.com/gemini-testing/gemini/compare/v4.19.2...v4.19.3) (2017-05-03)
+
+
+### Performance Improvements
+
+* lazy load of images in HTML report for retries ([754368a](https://github.com/gemini-testing/gemini/commit/754368a))
+
+
+
 <a name="4.19.2"></a>
 ## [4.19.2](https://github.com/gemini-testing/gemini/compare/v4.19.1...v4.19.2) (2017-03-27)
 
