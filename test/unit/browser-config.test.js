@@ -14,16 +14,16 @@ describe('BrowserConfig', function() {
             assert.equal(url, 'http://example.com/path/sub/path');
         });
 
-        it('should ignore slash at the end of the root', function() {
+        it('should resolve url without slash at the end of the root', function() {
             var config = createConfig({rootUrl: 'http://example.com/path'}),
                 url = config.getAbsoluteUrl('sub/path');
             assert.equal(url, 'http://example.com/path/sub/path');
         });
 
-        it('should ignore slash at the begining of the passed relUrl', function() {
+        it('should resolve url with slash at the begining of the passed relUrl', function() {
             var config = createConfig({rootUrl: 'http://example.com/path/'}),
                 url = config.getAbsoluteUrl('/sub/path');
-            assert.equal(url, 'http://example.com/path/sub/path');
+            assert.equal(url, 'http://example.com/sub/path');
         });
     });
 
