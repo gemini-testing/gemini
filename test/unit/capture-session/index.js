@@ -86,7 +86,7 @@ describe('capture session', () => {
             const browser = {config: {}};
             const session = new CaptureSession(browser);
 
-            sandbox.stub(ActionsBuilder.prototype, '__constructor', (postActions) => {
+            sandbox.stub(ActionsBuilder.prototype, '__constructor').callsFake((postActions) => {
                 postActions.push(1, 2, 3);
             });
             session.runActions([]);

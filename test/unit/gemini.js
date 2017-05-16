@@ -65,8 +65,6 @@ describe('gemini', () => {
     };
 
     beforeEach(() => {
-        sandbox.stub(Runner.prototype, 'on').returnsThis();
-        sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
         sandbox.stub(Runner.prototype, 'cancel').returns(Promise.resolve());
         sandbox.stub(console, 'warn');
         sandbox.stub(pluginsLoader, 'load');
@@ -121,6 +119,17 @@ describe('gemini', () => {
             assert.calledOnce(spy);
             assert.calledWith(spy, 'value');
         });
+    });
+
+    it('should return statistic after the tests are completed', () => {
+        sandbox.stub(Runner.prototype, 'run').callsFake(function() {
+            this.emit(Events.END, {foo: 'bar'});
+            return Promise.resolve();
+        });
+        const gemini = initGemini({});
+
+        return gemini.test()
+            .then((stats) => assert.deepEqual(stats, {foo: 'bar'}));
     });
 
     describe('load plugins', () => {
@@ -304,6 +313,10 @@ describe('gemini', () => {
     });
 
     describe('test', () => {
+        beforeEach(() => {
+            sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
+        });
+
         it('should initialize temp with specified temp dir', () => {
             runGeminiTest({tempDir: '/some/dir'});
 
@@ -405,11 +418,7 @@ describe('gemini', () => {
 
     describe('on "INTERRUPT"', () => {
         const stubRunner = (scenario) => {
-            Runner.prototype.run.restore();
-
-            sandbox.stub(Runner.prototype, 'run', function() {
-                return Promise.resolve(scenario(this));
-            });
+            sandbox.stub(Runner.prototype, 'run').callsFake(() => Promise.resolve(scenario()));
         };
 
         const emulateRunnerInterrupt = (exitCode) => stubRunner(() => signalHandler.emit(Events.INTERRUPT, {exitCode}));

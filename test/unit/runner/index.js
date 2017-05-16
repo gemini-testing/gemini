@@ -10,7 +10,9 @@ const Coverage = require('lib/coverage');
 const Runner = require('lib/runner');
 const BrowserRunner = require('lib/runner/browser-runner');
 const StateProcessor = require('lib/state-processor/state-processor');
+const RunnerStats = require('lib/stats');
 const SuiteMonitor = require('lib/suite-monitor');
+const makeStateResult = require('../../util').makeStateResult;
 
 describe('runner', () => {
     const sandbox = sinon.sandbox.create();
@@ -38,9 +40,7 @@ describe('runner', () => {
     };
 
     const stubBrowserRunner = (scenario) => {
-        BrowserRunner.prototype.run.restore();
-
-        sandbox.stub(BrowserRunner.prototype, 'run', function() {
+        BrowserRunner.prototype.run.callsFake(function() {
             return Promise.resolve(scenario(this));
         });
     };
@@ -233,6 +233,26 @@ describe('runner', () => {
                     });
             });
 
+            it('should aggregate statistic for all browsers', () => {
+                const emitStateResult_ = (name) => function() {
+                    this.emit(Events.ERROR, makeStateResult({name}));
+                    return Promise.resolve();
+                };
+
+                BrowserRunner.prototype.run
+                    .onFirstCall().callsFake(emitStateResult_('some-name'))
+                    .onSecondCall().callsFake(emitStateResult_('other-name'));
+
+                const runner = createRunner();
+                runner.config.getBrowserIds.returns(['bro1', 'bro2']);
+
+                let testsStatistic;
+                runner.on(Events.END, (stat) => testsStatistic = stat);
+
+                return run(runner)
+                    .then(() => assert.equal(testsStatistic.total, 2));
+            });
+
             it('should not be immediately rejected if running of tests in some browser was rejected', () => {
                 const runner = createRunner();
                 const rejected = q.reject();
@@ -300,13 +320,17 @@ describe('runner', () => {
                     .then(() => assert.callOrder(BrowserRunner.prototype.run, Coverage.prototype.processStats));
             });
 
-            it('should emit "END" event', () => {
+            it('should emit "END" event with tests statistic', () => {
+                sandbox.stub(RunnerStats.prototype, 'getResult').returns({foo: 'bar'});
                 const runner = createRunner({config: stubConfig({isCoverageEnabled: true})});
                 const onEnd = sinon.spy().named('onEnd');
 
                 runner.on(Events.END, onEnd);
 
-                return run(runner).then(() => assert.calledOnce(onEnd));
+                return run(runner).then(() => {
+                    assert.calledOnce(onEnd);
+                    assert.calledWith(onEnd, {foo: 'bar'});
+                });
             });
 
             it('should emit "END" event after collecting of a coverage', () => {
@@ -390,6 +414,10 @@ describe('runner', () => {
         });
 
         describe('handling of events from browser runner', () => {
+            beforeEach(() => {
+                sandbox.stub(RunnerStats.prototype, 'attachRunner');
+            });
+
             const testPassthrough = (event, msg) => {
                 it(msg || `${event}`, () => {
                     stubBrowserRunner((runner) => runner.emit(event, {foo: 'bar'}));

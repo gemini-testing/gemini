@@ -14,7 +14,7 @@ describe('Reporter#FlatVerbose', () => {
     function getTestLog(test) {
         emitter.emit(Events.BEGIN);
         emitter.emit(Events.UPDATE_RESULT, test);
-        emitter.emit(Events.END);
+        emitter.emit(Events.END, {});
 
         return chalk
             .stripColor(logger.log.firstCall.args[0])

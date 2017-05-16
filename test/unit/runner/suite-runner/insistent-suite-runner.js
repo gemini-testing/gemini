@@ -34,8 +34,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
     };
 
     const stubWrappedRun_ = (scenario) => {
-        RegularSuiteRunner.prototype.run.restore();
-        sandbox.stub(RegularSuiteRunner.prototype, 'run', function() {
+        RegularSuiteRunner.prototype.run.callsFake(function() {
             return Promise.resolve(scenario(this));
         });
     };
