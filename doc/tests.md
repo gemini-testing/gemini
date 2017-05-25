@@ -243,17 +243,17 @@ call:
 * `flick(offsets, speed, element)` — flick element with starting point at its
   center by `offsets.x` and `offset.y` offsets.
 
-* `executeJS(function(window))` — run specified function in a browser. The
-  argument of a function is the browser's `window` object:
+* `executeJS(function(window, [args]), [args])` — run specified function in a browser. The
+  argument of a function is the browser's `window` object and optional arguments:
 
   ```js
-  actions.executeJS(function(window) {
-      window.alert('Hello!');
-  });
+  actions.executeJS(function(window, name) {
+      window.alert('Hello!', name);
+  }, name);
   ```
 
    Note that function is executed in a browser context, so any references to
-   outer scope of callback won't work.
+   outer scope of callback won't work unless passed via args.
 
    :warning: `window.scrollTo` does not work in Opera@12.16 (see [details](https://github.com/operasoftware/operaprestodriver/issues/108)).
 
