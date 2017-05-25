@@ -1,6 +1,6 @@
 {
   "name": "gemini",
-  "version": "4.19.3",
+  "version": "5.0.0-alpha.0",
   "description": "UI Screenshot testing utility",
   "engines": {
     "node": ">= 4.0.0"

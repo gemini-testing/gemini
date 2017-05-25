@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.0"></a>
+# [5.0.0-alpha.0](https://github.com/gemini-testing/gemini/compare/v4.19.3...v5.0.0-alpha.0) (2017-05-25)
+
+
+### Features
+
+* make setUrl work like url.resolve ([dcf6f17](https://github.com/gemini-testing/gemini/commit/dcf6f17))
+
+
+
 <a name="4.19.3"></a>
 ## [4.19.3](https://github.com/gemini-testing/gemini/compare/v4.19.2...v4.19.3) (2017-05-03)
 
