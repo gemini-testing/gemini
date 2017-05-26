@@ -1,6 +1,6 @@
 # Contributing
 
-New contributions are welcomed. Follow this guide if you want to make one.
+New contributions are welcomed. Follow this guide and [CLA](CLA.md) if you want to make one.
 
 ## Make a pull request
 

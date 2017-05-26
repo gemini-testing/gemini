@@ -10,3 +10,4 @@
 * [Plugins list](https://www.npmjs.com/browse/keyword/gemini-plugin)
 * [Contributing](CONTRIBUTING.md)
 * [Changelog](CHANGELOG.md)
+* [CLA](CLA.md)
