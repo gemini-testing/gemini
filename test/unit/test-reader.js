@@ -163,7 +163,7 @@ describe('test-reader', () => {
         });
 
         it('should use global "gemini" variable', () => {
-            sandbox.stub(utils, 'requireWithNoCache', () => gemini = global.gemini);
+            sandbox.stub(utils, 'requireWithNoCache').callsFake(() => gemini = global.gemini);
             const api = {suite: 'api'};
 
             testsApi.returns(api);
@@ -181,7 +181,7 @@ describe('test-reader', () => {
                 .onFirstCall().returns({suite: 'apiInstance'})
                 .onSecondCall().returns({suite: 'anotherApiInstance'});
 
-            sandbox.stub(utils, 'requireWithNoCache', () => {
+            sandbox.stub(utils, 'requireWithNoCache').callsFake(() => {
                 globalGemini.push(global.gemini.suite);
             });
 

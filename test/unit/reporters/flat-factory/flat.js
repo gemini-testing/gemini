@@ -1,7 +1,6 @@
 'use strict';
 
 const chalk = require('chalk');
-const _ = require('lodash');
 
 const EventEmitter = require('events').EventEmitter;
 const FlatReporter = require('lib/reporters/flat-factory/flat');
@@ -14,16 +13,6 @@ describe('Reporter#Flat', () => {
     let test;
     let emitter;
 
-    const getLoggedCounters = () => {
-        const str = logger.log.lastCall.args[0];
-        const chunks = chalk.stripColor(str).match(/([a-z]+):\s?([0-9]+)/ig);
-
-        return _(chunks)
-            .map((val) => val.toLowerCase().split(/:\s/))
-            .fromPairs()
-            .value();
-    };
-
     const emit = (event, data) => {
         emitter.emit(Events.BEGIN);
 
@@ -31,7 +20,7 @@ describe('Reporter#Flat', () => {
             emitter.emit(event, data);
         }
 
-        emitter.emit(Events.END);
+        emitter.emit(Events.END, {});
     };
 
     beforeEach(() => {
@@ -54,137 +43,6 @@ describe('Reporter#Flat', () => {
         emitter.removeAllListeners();
     });
 
-    it('should initialize all counters with 0 except updated', () => {
-        emit();
-
-        const counters = getLoggedCounters();
-
-        ['total', 'passed', 'failed', 'skipped', 'retries'].forEach((type) => assert.equal(counters[type], 0));
-    });
-
-    it('should not initialize update counter', () => {
-        emit();
-
-        const counters = getLoggedCounters();
-
-        assert.isUndefined(counters.updated);
-    });
-
-    describe('should correctly calculate counters for', () => {
-        describe('updated', () => {
-            it('should increment "total" and "updated" counters', () => {
-                test.updated = true;
-
-                emit(Events.UPDATE_RESULT, test);
-
-                const counters = getLoggedCounters();
-
-                assert.equal(counters.total, 1);
-                assert.equal(counters.updated, 1);
-            });
-
-            it('should initialize all remaining counters with 0', () => {
-                test.updated = true;
-
-                emit(Events.UPDATE_RESULT, test);
-
-                const counters = getLoggedCounters();
-
-                assert.equal(counters.passed, 0);
-                assert.equal(counters.failed, 0);
-                assert.equal(counters.skipped, 0);
-                assert.equal(counters.retries, 0);
-            });
-        });
-
-        it('failed', () => {
-            emit(Events.ERROR, test);
-
-            const counters = getLoggedCounters();
-
-            assert.equal(counters.total, 1);
-            assert.equal(counters.passed, 0);
-            assert.equal(counters.failed, 1);
-            assert.equal(counters.skipped, 0);
-        });
-
-        describe('skipped', () => {
-            it('should increment skipped count on WARNING event', () => {
-                emit(Events.WARNING, test);
-
-                const counters = getLoggedCounters();
-
-                assert.equal(counters.total, 1);
-                assert.equal(counters.skipped, 1);
-            });
-
-            it('should increment skipped count on SKIP_STATE event', () => {
-                emit(Events.SKIP_STATE, test);
-
-                const counters = getLoggedCounters();
-
-                assert.equal(counters.total, 1);
-                assert.equal(counters.skipped, 1);
-            });
-        });
-
-        it('retry', () => {
-            emit(Events.RETRY, test);
-
-            const counters = getLoggedCounters();
-
-            assert.equal(counters.retries, 1);
-        });
-    });
-
-    describe('should correctly choose a handler if `equal` is', () => {
-        it('true', () => {
-            test.equal = true;
-
-            emit(Events.TEST_RESULT, test);
-
-            const counters = getLoggedCounters();
-
-            assert.equal(counters.passed, 1);
-            assert.equal(counters.failed, 0);
-        });
-
-        it('false', () => {
-            test.equal = false;
-
-            emit(Events.TEST_RESULT, test);
-
-            const counters = getLoggedCounters();
-
-            assert.equal(counters.passed, 0);
-            assert.equal(counters.failed, 1);
-        });
-    });
-
-    describe('should correctly choose a handler if `updated` is', () => {
-        it('true', () => {
-            test.updated = true;
-
-            emit(Events.UPDATE_RESULT, test);
-
-            const counters = getLoggedCounters();
-
-            assert.equal(counters.updated, 1);
-            assert.equal(counters.passed, 0);
-        });
-
-        it('false', () => {
-            test.updated = false;
-
-            emit(Events.UPDATE_RESULT, test);
-
-            const counters = getLoggedCounters();
-
-            assert.equal(counters.passed, 1);
-            assert.isUndefined(counters.updated);
-        });
-    });
-
     describe('should print an error if it there is in', () => {
         it('result', () => {
             test.message = 'Error from result';
@@ -201,6 +59,21 @@ describe('Reporter#Flat', () => {
 
             assert.calledWith(logger.error, test.originalError.stack);
         });
+    });
+
+    it('should log result from stats', () => {
+        emit(Events.END, {
+            total: 15,
+            updated: 1,
+            passed: 2,
+            failed: 3,
+            skipped: 4,
+            retries: 5
+        });
+
+        const deserealizedResult = chalk.stripColor(logger.log.firstCall.args[0]);
+
+        assert.equal(deserealizedResult, 'Total: 15 Updated: 1 Passed: 2 Failed: 3 Skipped: 4 Retries: 5');
     });
 
     it('should correctly do the rendering', () => {

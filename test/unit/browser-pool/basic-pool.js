@@ -16,7 +16,7 @@ describe('BasicPool', () => {
     const stubBrowser_ = (id) => {
         id = id || 'id';
         const browser = browserWithId(id);
-        sandbox.stub(browser, 'launch', () => {
+        sandbox.stub(browser, 'launch').callsFake(() => {
             browser.sessionId = Date.now();
             return Promise.resolve();
         });
