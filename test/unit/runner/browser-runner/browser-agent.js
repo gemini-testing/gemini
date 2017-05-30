@@ -2,16 +2,21 @@
 
 const Promise = require('bluebird');
 const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
-const BasicPool = require('lib/browser-pool/basic-pool');
 
 describe('runner/browser-runner/browser-agent', () => {
     const sandbox = sinon.sandbox.create();
     let browserPool;
 
+    const stubBrowserPool = () => {
+        return {
+            getBrowser: sinon.stub().returns(Promise.resolve({})),
+            freeBrowser: sinon.stub().returns(Promise.resolve()),
+            cancel: sinon.stub()
+        };
+    };
+
     beforeEach(() => {
-        browserPool = sinon.createStubInstance(BasicPool);
-        browserPool.freeBrowser.returns(Promise.resolve());
-        browserPool.getBrowser.returns(Promise.resolve({}));
+        browserPool = stubBrowserPool();
     });
 
     afterEach(() => {

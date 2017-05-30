@@ -3,7 +3,6 @@
 const Promise = require('bluebird');
 const q = require('bluebird-q');
 const pool = require('lib/browser-pool');
-const Pool = require('lib/browser-pool/pool');
 const Config = require('lib/config');
 const Events = require('lib/constants/events');
 const Coverage = require('lib/coverage');
@@ -45,8 +44,16 @@ describe('runner', () => {
         });
     };
 
+    const stubBrowserPool = () => {
+        return {
+            getBrowser: sinon.stub(),
+            freeBrowser: sinon.stub(),
+            cancel: sinon.stub()
+        };
+    };
+
     beforeEach(() => {
-        const browserPool = sinon.createStubInstance(Pool);
+        const browserPool = stubBrowserPool();
         sandbox.stub(pool, 'create').returns(browserPool);
         browserPool.cancel.returns(Promise.resolve());
 
@@ -547,7 +554,7 @@ describe('runner', () => {
         });
 
         it('should cancel browser pool', () => {
-            const browserPool = sinon.createStubInstance(Pool);
+            const browserPool = stubBrowserPool();
 
             pool.create.returns(browserPool);
 
@@ -559,7 +566,7 @@ describe('runner', () => {
         });
 
         it('should cancel browser pool after cancelling of browser runners', () => {
-            const browserPool = sinon.createStubInstance(Pool);
+            const browserPool = stubBrowserPool();
 
             pool.create.returns(browserPool);
 
