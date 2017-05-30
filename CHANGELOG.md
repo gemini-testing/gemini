@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.1"></a>
+# [5.0.0-alpha.1](https://github.com/gemini-testing/gemini/compare/v4.15.0...v5.0.0-alpha.1) (2017-05-30)
+
+
+### Bug Fixes
+
+* enable correct suite through suite collection api ([60c1147](https://github.com/gemini-testing/gemini/commit/60c1147))
+* log a path to an HTML report after tests finish ([86a8466](https://github.com/gemini-testing/gemini/commit/86a8466))
+* Make clickable reason-links for skipped results in html report ([d266665](https://github.com/gemini-testing/gemini/commit/d266665))
+* method "fullUrl" should resolve url in runtime ([e796dce](https://github.com/gemini-testing/gemini/commit/e796dce))
+* prevent endless loop when suitesPerSession is set to infinity ([2b399b6](https://github.com/gemini-testing/gemini/commit/2b399b6))
+* Prevented EMFILE error (too many open files) ([e8e4dca](https://github.com/gemini-testing/gemini/commit/e8e4dca))
+* roll back striptags version without breaking changes ([cd4e26e](https://github.com/gemini-testing/gemini/commit/cd4e26e))
+* set default reporter for command 'update' ([feb72bc](https://github.com/gemini-testing/gemini/commit/feb72bc))
+
+
+### Features
+
+* Add extended WebDriver error data in output ([73a26ed](https://github.com/gemini-testing/gemini/commit/73a26ed))
+* add method 'gemini.ctx' to tests API ([66f2aa6](https://github.com/gemini-testing/gemini/commit/66f2aa6))
+* Add test filename to html report's metaInfo section ([0311f6d](https://github.com/gemini-testing/gemini/commit/0311f6d))
+* make setUrl work like url.resolve ([dcf6f17](https://github.com/gemini-testing/gemini/commit/dcf6f17))
+* Pass suiteCollection on BEGIN event to allow to modify it ([7d04923](https://github.com/gemini-testing/gemini/commit/7d04923))
+
+
+### Performance Improvements
+
+* lazy load of images in HTML report for retries ([754368a](https://github.com/gemini-testing/gemini/commit/754368a))
+
+
+
 <a name="5.0.0-alpha.0"></a>
 # [5.0.0-alpha.0](https://github.com/gemini-testing/gemini/compare/v4.19.3...v5.0.0-alpha.0) (2017-05-25)
 
