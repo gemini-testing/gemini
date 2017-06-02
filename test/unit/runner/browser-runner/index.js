@@ -7,7 +7,6 @@ const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const SuiteRunner = require('lib/runner/suite-runner/suite-runner');
 const suiteRunnerFabric = require('lib/runner/suite-runner');
 const createSuite = require('lib/suite').create;
-const BasicPool = require('lib/browser-pool/basic-pool');
 const Config = require('lib/config');
 const SuiteCollection = require('lib/suite-collection');
 
@@ -31,12 +30,13 @@ describe('runner/BrowserRunner', () => {
     const mkRunner_ = (browser, config) => {
         const configStub = sinon.createStubInstance(Config);
         const browserConfig = _.get(config, 'browser', {});
+        const browserPool = {};
         configStub.forBrowser.returns(browserConfig);
 
         return BrowserRunner.create(
             browser || 'default-browser',
             configStub,
-            sinon.createStubInstance(BasicPool)
+            browserPool
         );
     };
 
