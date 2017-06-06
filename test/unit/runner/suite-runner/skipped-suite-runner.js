@@ -1,6 +1,6 @@
 'use strict';
 
-const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
+const BrowserAgent = require('gemini-core').BrowserAgent;
 const SkippedSuiteRunner = require('lib/runner/suite-runner/skipped-suite-runner');
 const util = require('../../../util');
 
