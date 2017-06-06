@@ -164,8 +164,6 @@ Returns promise that resolve to a stats object with following keys:
 
 * `skipped` — number of skipped tests.
 
-* `errored` — number of errored tests.
-
 Rejects promise if critical error occurred.
 
 ## Running tests
@@ -196,8 +194,6 @@ Returns promise that resolve to a stats object with following keys:
 * `total` — total number of tests executed.
 
 * `skipped` — number of skipped tests.
-
-* `errored` — number of errored tests.
 
 * `passed` — number of passed tests.
 
