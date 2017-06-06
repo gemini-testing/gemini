@@ -28,7 +28,7 @@
     "inherit": "~2.2.1",
     "js-yaml": "^3.2.5",
     "lodash": "^4.15.0",
-    "looks-same": "^3.0.0",
+    "looks-same": "gemini-testing/looks-same#fix-carriage-crossed-with-letters",
     "micromatch": "^2.3.11",
     "node-fetch": "^1.6.3",
     "plugins-loader": "^1.0.1",
