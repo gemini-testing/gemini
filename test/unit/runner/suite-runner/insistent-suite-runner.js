@@ -3,12 +3,12 @@
 const Events = require('lib/constants/events');
 const InsistentSuiteRunner = require('lib/runner/suite-runner/insistent-suite-runner');
 const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
-const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const CancelledError = require('lib/errors/cancelled-error');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
 const makeStateStub = require('../../../util').makeStateStub;
 const makeSuiteStub = require('../../../util').makeSuiteStub;
 const makeSuiteTree = require('../../../util').makeSuiteTree;
+const BrowserAgent = require('gemini-core').BrowserAgent;
 const Promise = require('bluebird');
 const _ = require('lodash');
 

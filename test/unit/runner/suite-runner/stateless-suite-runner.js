@@ -1,13 +1,13 @@
 'use strict';
 
-const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
+const BrowserAgent = require('gemini-core').BrowserAgent;
 const StatelessSuiteRunner = require('lib/runner/suite-runner/stateless-suite-runner');
 const util = require('../../../util');
 
 describe('runner/suite-runner/stateless-suite-runner', () => {
     const sandbox = sinon.sandbox.create();
     const suite = util.makeSuiteStub();
-    const browserAgent = new BrowserAgent('default-browser');
+    const browserAgent = BrowserAgent.create('default-browser');
     const runner = new StatelessSuiteRunner(suite, browserAgent);
 
     beforeEach(() => {

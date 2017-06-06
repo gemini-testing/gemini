@@ -1,12 +1,12 @@
 'use strict';
 
 const Promise = require('bluebird');
+const BrowserAgent = require('gemini-core').BrowserAgent;
 
 const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
 const StateRunnerFactory = require('lib/runner/state-runner');
 const StateRunner = require('lib/runner/state-runner/state-runner');
 const CaptureSession = require('lib/capture-session');
-const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
 const util = require('../../../util');
 const makeSuiteStub = util.makeSuiteStub;

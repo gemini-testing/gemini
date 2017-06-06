@@ -2,8 +2,8 @@
 
 const _ = require('lodash');
 const Promise = require('bluebird');
+const BrowserAgent = require('gemini-core').BrowserAgent;
 const BrowserRunner = require('lib/runner/browser-runner');
-const BrowserAgent = require('lib/runner/browser-runner/browser-agent');
 const SuiteRunner = require('lib/runner/suite-runner/suite-runner');
 const suiteRunnerFabric = require('lib/runner/suite-runner');
 const createSuite = require('lib/suite').create;
