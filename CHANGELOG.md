@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.2"></a>
+# [5.0.0-alpha.2](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.0...v5.0.0-alpha.2) (2017-06-06)
+
+
+### Bug Fixes
+
+* bug with count of failed tests in the statistic ([ef550c5](https://github.com/gemini-testing/gemini/commit/ef550c5))
+
+
+
 <a name="5.0.0-alpha.0"></a>
 # [5.0.0-alpha.0](https://github.com/gemini-testing/gemini/compare/v4.19.3...v5.0.0-alpha.0) (2017-05-25)
 
