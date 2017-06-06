@@ -27,12 +27,6 @@ describe('Stats', () => {
         assert.equal(stats.getResult().warned, 1);
     });
 
-    it('should count errored tests', () => {
-        runner.emit(RunnerEvents.ERROR, makeStateResult());
-
-        assert.equal(stats.getResult().errored, 1);
-    });
-
     it('should count updated tests', () => {
         runner.emit(RunnerEvents.UPDATE_RESULT, makeStateResult({updated: true}));
 
@@ -43,6 +37,12 @@ describe('Stats', () => {
         runner.emit(RunnerEvents.UPDATE_RESULT, makeStateResult({updated: false}));
 
         assert.equal(stats.getResult().passed, 1);
+    });
+
+    it('should count failed tests on "ERROR" event', () => {
+        runner.emit(RunnerEvents.ERROR, makeStateResult());
+
+        assert.equal(stats.getResult().failed, 1);
     });
 
     it('should count failed tests on "TEST_RESULT" event', () => {
@@ -79,7 +79,7 @@ describe('Stats', () => {
         assert.equal(stats.getResult().total, 2);
     });
 
-    it('should getResult full stat', () => {
+    it('should return correct full statistic', () => {
         runner.emit(RunnerEvents.UPDATE_RESULT, makeStateResult({updated: true, name: 'updated'}));
         runner.emit(RunnerEvents.RETRY, makeStateResult({name: 'passed'}));
         runner.emit(RunnerEvents.TEST_RESULT, makeStateResult({equal: true, name: 'passed'}));
@@ -92,8 +92,7 @@ describe('Stats', () => {
             total: 6,
             updated: 1,
             passed: 1,
-            failed: 1,
-            errored: 1,
+            failed: 2,
             skipped: 1,
             warned: 1,
             retries: 1
@@ -105,7 +104,7 @@ describe('Stats', () => {
         runner.emit(RunnerEvents.ERROR, makeStateResult({name: 'some-state'}));
 
         assert.equal(stats.getResult().skipped, 0);
-        assert.equal(stats.getResult().errored, 1);
+        assert.equal(stats.getResult().failed, 1);
     });
 
     it('should not count test result twice for same state and browser', () => {
@@ -118,10 +117,10 @@ describe('Stats', () => {
         runner.emit(RunnerEvents.ERROR, test);
 
         assert.equal(stats.getResult().total, 1);
-        assert.equal(stats.getResult().errored, 1);
+        assert.equal(stats.getResult().failed, 1);
     });
 
-    it('should create suite key by suite full name and suite browser id divided by space', () => {
+    it('should correctly handle tests with the similar titles', () => {
         const test1 = makeStateResult({
             suite: {fullName: 'some case'},
             browserId: 'bro'
@@ -135,6 +134,6 @@ describe('Stats', () => {
         runner.emit(RunnerEvents.ERROR, test2);
 
         assert.equal(stats.getResult().total, 2);
-        assert.equal(stats.getResult().errored, 2);
+        assert.equal(stats.getResult().failed, 2);
     });
 });
