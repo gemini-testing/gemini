@@ -44,35 +44,17 @@ Paths and configuration are treated the same way as in `update` command.
 Each state with appearance different from reference image will be treated as
 the failed test.
 
-By default, only names of the states are listed in shell. To get more
-information you can use HTML reporter:
-
-`gemini test --reporter html [paths to suites]`
-
-This will produce an HTML file in `gemini-report` directory. It will display
-reference image, current image and differences between them, for each state in
-each browser.
-
-Available reporters are:
+By default, only names of the states are listed in shell, but you can use available
+reporters:
 
 * `flat` (default console reporter);
 * `vflat` (verbose console reporter);
-* `html` for HTML report.
 
-You can also use multiple reporters at the same time using multiple
-`--reporter` options:
+You can choose them using option `--reporter`:
 
 ```
-gemini test --reporter flat --reporter html
+gemini test --reporter vlat
 ```
-
-It is possible to specify the output folder for each reporter. In case of html reports, you can set path like this:
-
-```
-gemini test --reporter html --html-reporter-path=tmp/gemini-reports
-```
-
-In the example above the html reporter will save reports in a `tmp/gemini-reports` folder in the project.
 
 ### CSS code coverage (experimental)
 

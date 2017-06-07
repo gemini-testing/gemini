@@ -77,9 +77,9 @@ Start `selenium-standalone` in a separate tab before running the tests:
 selenium-standalone start
 ```
 
-Run gemini tests with flat and html reporters:
+Run gemini tests with flat reporter:
 ```
-gemini test --reporter flat --reporter html
+gemini test --reporter flat
 ```
 
 ## Dependencies
@@ -238,20 +238,6 @@ the command:
 gemini test [paths to test suites]
 ```
 
-To see the difference between the current state of a block and a reference picture
-more clearly, use the HTML reporter:
-
-```
-gemini test --reporter html [paths to test suites]
-```
-When all tests are completed, you will see a link to an HTML report.
-
-You can use both console and HTML reporters at the same time:
-
-```
-gemini test --reporter html --reporter flat [paths to test suites]
-```
-
 [See the details](doc/commands.md) of interaction with CLI and available
 options.
 
@@ -287,6 +273,14 @@ system:
     some-awesome-plugin:
       plugin-option: value
 ```
+
+## HTML report
+
+To see the difference between the current state of a block and a reference picture
+more clearly, use the [HTML reporter](https://github.com/gemini-testing/html-reporter) - plugin for gemini. This
+plugin produces HTML report, which displays reference image, current image and
+differences between them, for each state in each browser. When all tests are
+completed, you will see a link to HTML report.
 
 ## Programmatic API
 
