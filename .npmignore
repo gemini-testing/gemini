@@ -3,7 +3,6 @@ test/
 coverage/
 CONTRIBUTING.md
 /lib/browser/client-scripts/gemini.calibrate.js
-/lib/reporters/html/static/report.js
 /_book
 /book.json
 /.bookignore
