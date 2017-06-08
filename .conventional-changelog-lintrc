@@ -1,0 +1,5 @@
+{
+  "rules": {
+    "lang": [2, "always", "eng"]
+  }
+}
