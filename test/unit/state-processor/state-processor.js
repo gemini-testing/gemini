@@ -7,7 +7,7 @@ var CaptureSession = require('lib/capture-session'),
     errorUtils = require('lib/errors/utils'),
     proxyquire = require('proxyquire').noCallThru(),
     _ = require('lodash'),
-    QEmitter = require('qemitter'),
+    AsyncEmitter = require('gemini-core').AsyncEmitter,
     Promise = require('bluebird');
 
 describe('state-processor/state-processor', () => {
@@ -56,7 +56,7 @@ describe('state-processor/state-processor', () => {
             var StateProcessor = proxyquire('lib/state-processor/state-processor', stubs),
                 stateProcessor = new StateProcessor(opts.captureProcessorInfo);
 
-            stateProcessor.prepare(new QEmitter());
+            stateProcessor.prepare(new AsyncEmitter());
             return stateProcessor.exec(opts.state, browserSession, opts.page);
         }
 
