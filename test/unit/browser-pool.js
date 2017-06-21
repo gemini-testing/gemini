@@ -5,7 +5,7 @@ const BrowserFabric = require('lib/browser');
 const Calibrator = require('lib/calibrator');
 const RunnerEvents = require('lib/constants/events');
 const CoreBrowserPool = require('gemini-core').BrowserPool;
-const QEmitter = require('qemitter');
+const AsyncEmitter = require('gemini-core').AsyncEmitter;
 const _ = require('lodash');
 const Promise = require('bluebird');
 
@@ -120,7 +120,7 @@ describe('browser-pool', () => {
 
         describe('events', () => {
             it('should emit START_BROWSER on start', () => {
-                const emitter = new QEmitter();
+                const emitter = new AsyncEmitter();
                 const onBrowserStart = sinon.spy();
                 emitter.on(RunnerEvents.START_BROWSER, onBrowserStart);
 
@@ -134,7 +134,7 @@ describe('browser-pool', () => {
             });
 
             it('should wait START_BROWSER handler', () => {
-                const emitter = new QEmitter();
+                const emitter = new AsyncEmitter();
                 const spy1 = sinon.spy();
                 const spy2 = sinon.spy();
 
@@ -148,7 +148,7 @@ describe('browser-pool', () => {
             });
 
             it('should emit STOP_BROWSER on quit', () => {
-                const emitter = new QEmitter();
+                const emitter = new AsyncEmitter();
                 const onBrowserQuit = sinon.spy();
                 emitter.on(RunnerEvents.STOP_BROWSER, onBrowserQuit);
 
@@ -162,7 +162,7 @@ describe('browser-pool', () => {
             });
 
             it('should wait STOP_BROWSER handler', () => {
-                const emitter = new QEmitter();
+                const emitter = new AsyncEmitter();
                 const spy1 = sinon.spy();
                 const spy2 = sinon.spy();
 
