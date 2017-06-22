@@ -7,7 +7,7 @@ to specify only a few settings specific for your project:
 
 ```yaml
 rootUrl: https://example.com/root
-gridUrl: http://webdriber.example.com
+gridUrl: http://webdriver.example.com
 desiredCapabilities:
   commonThing: value
 calibrate: false
