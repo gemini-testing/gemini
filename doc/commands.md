@@ -53,7 +53,7 @@ reporters:
 You can choose them using option `--reporter`:
 
 ```
-gemini test --reporter vlat
+gemini test --reporter vflat
 ```
 
 ### CSS code coverage (experimental)
