@@ -116,6 +116,18 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             });
     });
 
+    it('should provide the ability to mutate the passed config', () => {
+        stubWrappedRun_((runner) => runner.emit(Events.ERROR, {state: makeStateStub()}));
+
+        const config = mkConfigStub_({retry: 1});
+        const runner = mkInsistentRunner_({config});
+
+        config.retry = 0;
+
+        return runner.run()
+            .then(() => assert.calledOnce(RegularSuiteRunner.prototype.run));
+    });
+
     describe('run without retries', () => {
         describe('on ERROR', () => {
             it('should emit ERROR', () => {
@@ -248,6 +260,23 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                         assert.calledOnce(RegularSuiteRunner.prototype.run);
                     });
             });
+
+            it('should not retry if retries count is below zero', () => {
+                const onError = sinon.spy().named('onError');
+                const onRetry = sinon.spy().named('onRetry');
+
+                stubWrappedRun_((runner) => runner.emit(Events.ERROR, {state: makeStateStub()}));
+
+                return mkInsistentRunner_({config: mkConfigStub_({retry: -1})})
+                    .on(Events.ERROR, onError)
+                    .on(Events.RETRY, onRetry)
+                    .run()
+                    .then(() => {
+                        assert.notCalled(onRetry);
+                        assert.calledOnce(onError);
+                        assert.calledOnce(RegularSuiteRunner.prototype.run);
+                    });
+            });
         });
 
         describe('on TEST_RESULT without diff', () => {
@@ -342,6 +371,23 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 return mkRunnerWithRetries_()
                     .run()
                     .catch(() => assert.calledOnce(RegularSuiteRunner.prototype.run));
+            });
+
+            it('should not retry if retries count is below zero', () => {
+                const onTestResult = sinon.spy().named('onTestResult');
+                const onRetry = sinon.spy().named('onRetry');
+
+                stubWrappedRun_((runner) => runner.emit(Events.TEST_RESULT, {equal: false, state: makeStateStub()}));
+
+                return mkInsistentRunner_({config: mkConfigStub_({retry: -1})})
+                    .on(Events.TEST_RESULT, onTestResult)
+                    .on(Events.RETRY, onRetry)
+                    .run()
+                    .then(() => {
+                        assert.notCalled(onRetry);
+                        assert.calledOnce(onTestResult);
+                        assert.calledOnce(RegularSuiteRunner.prototype.run);
+                    });
             });
         });
 
