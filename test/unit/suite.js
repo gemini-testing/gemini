@@ -226,6 +226,51 @@ describe('suite', () => {
         });
     });
 
+    describe('shouldSkip', () => {
+        let suite;
+
+        const createBrowserSkipMatcher = (browserId) => {
+            const matcher = {matches: sinon.stub()};
+            matcher.matches.withArgs(browserId).returns(true);
+
+            return matcher;
+        };
+
+        beforeEach(() => suite = createSuite('suite'));
+
+        it('should be "false" for any browser if a suite is not skipped', function() {
+            assert.isFalse(suite.shouldSkip('browser'));
+        });
+
+        it('should be "true" for any browser if a suite is skipped', () => {
+            suite.skip();
+
+            assert.isTrue(suite.shouldSkip('browser'));
+        });
+
+        it('should be "true" for a browser if a suite is skipped in it', () => {
+            suite.skip(createBrowserSkipMatcher('1st-skipped-bro'));
+            suite.skip(createBrowserSkipMatcher('2nd-skipped-bro'));
+
+            assert.isTrue(suite.shouldSkip('1st-skipped-bro'));
+            assert.isTrue(suite.shouldSkip('2nd-skipped-bro'));
+        });
+
+        it('should set a skip comment if a suite is skipped in a browser', () => {
+            suite.skip({matches: sinon.stub().withArgs('skipped-bro').returns(true), comment: 'skip-comment'});
+
+            suite.shouldSkip('skipped-bro');
+            assert.equal(suite.skipComment, 'skip-comment');
+        });
+
+        it('should be "false" for a browser if a suite is not skipped in it', () => {
+            suite.skip(createBrowserSkipMatcher('1st-skipped-bro'));
+            suite.skip(createBrowserSkipMatcher('2st-skipped-bro'));
+
+            assert.isFalse(suite.shouldSkip('some-bro'));
+        });
+    });
+
     describe('hasChild', () => {
         let suite;
 
