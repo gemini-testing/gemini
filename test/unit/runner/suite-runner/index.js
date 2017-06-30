@@ -1,7 +1,6 @@
 'use strict';
 
 const proxyquire = require('proxyquire');
-const suiteUtil = require('lib/suite-util');
 const util = require('../../../util');
 
 describe('runner/suite-runner/create', () => {
@@ -51,12 +50,15 @@ describe('runner/suite-runner/create', () => {
     });
 
     describe('SkippedSuiteRunner', () => {
+        let suite;
+
         beforeEach(() => {
-            sandbox.stub(suiteUtil, 'shouldSkip').returns(true);
+            suite = makeSuite();
+            suite.shouldSkip = sinon.stub().returns(true);
         });
 
         it('should create SkippedSuiteRunner', () => {
-            makeSuiteRunner(makeSuite());
+            makeSuiteRunner(suite);
 
             assert.calledOnce(SkippedRunner);
             assert.notCalled(StatelessRunner);
@@ -64,7 +66,7 @@ describe('runner/suite-runner/create', () => {
         });
 
         it('should return SkippedSuiteRunner for skipped suite', () => {
-            const runner = makeSuiteRunner(makeSuite(), {});
+            const runner = makeSuiteRunner(suite, {});
 
             assert.instanceOf(runner, SkippedRunner);
         });

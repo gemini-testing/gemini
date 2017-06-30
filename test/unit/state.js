@@ -2,18 +2,16 @@
 
 const State = require('lib/state');
 const util = require('../util');
-const suiteUtil = require('lib/suite-util');
 
 describe('state methods', () => {
     describe('shouldSkip', () => {
         it('should check if state will be skipped', () => {
             const suite = util.makeSuiteStub();
+            suite.shouldSkip = sinon.stub();
+            suite.shouldSkip.withArgs('browserId').returns(true);
             const state = new State(suite);
-            sinon.stub(suiteUtil, 'shouldSkip').returns(true);
 
-            state.shouldSkip('browserId');
-
-            assert.calledWithMatch(suiteUtil.shouldSkip, suite, 'browserId');
+            assert.isTrue(state.shouldSkip('browserId'));
         });
     });
 
