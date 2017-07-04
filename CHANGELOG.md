@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.4"></a>
+# [5.0.0-alpha.4](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.3...v5.0.0-alpha.4) (2017-07-04)
+
+
+### Bug Fixes
+
+* incorrect .js config resolving ([db6b539](https://github.com/gemini-testing/gemini/commit/db6b539))
+
+
+### Features
+
+* add method 'shouldSkip(browserId)' to suite instance ([bad551c](https://github.com/gemini-testing/gemini/commit/bad551c))
+* provide the ability to modify retries count from plugins ([deafd55](https://github.com/gemini-testing/gemini/commit/deafd55))
+
+
+
 <a name="5.0.0-alpha.3"></a>
 # [5.0.0-alpha.3](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.2...v5.0.0-alpha.3) (2017-06-08)
 
