@@ -260,6 +260,18 @@ describe('runner', () => {
                     .then(() => assert.equal(testsStatistic.total, 2));
             });
 
+            it('should include tests state data emitted from main runner to the statistic', () => {
+                const runner = createRunner();
+
+                runner.emit(Events.ERROR, makeStateResult({name: 'some-name'}));
+
+                let testsStatistic;
+                runner.on(Events.END, (stat) => testsStatistic = stat);
+
+                return run(runner)
+                    .then(() => assert.equal(testsStatistic.total, 1));
+            });
+
             it('should not be immediately rejected if running of tests in some browser was rejected', () => {
                 const runner = createRunner();
                 const rejected = q.reject();
