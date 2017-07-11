@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.5"></a>
+# [5.0.0-alpha.5](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.4...v5.0.0-alpha.5) (2017-07-11)
+
+
+### Bug Fixes
+
+* tests statistic should listen events on main runner ([e676c3a](https://github.com/gemini-testing/gemini/commit/e676c3a))
+
+
+
 <a name="5.0.0-alpha.4"></a>
 # [5.0.0-alpha.4](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.3...v5.0.0-alpha.4) (2017-07-04)
 
