@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.6"></a>
+# [5.0.0-alpha.6](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.5...v5.0.0-alpha.6) (2017-08-02)
+
+
+
 <a name="5.0.0-alpha.5"></a>
 # [5.0.0-alpha.5](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.4...v5.0.0-alpha.5) (2017-07-11)
 
