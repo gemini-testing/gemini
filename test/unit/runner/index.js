@@ -1,7 +1,6 @@
 'use strict';
 
 const Promise = require('bluebird');
-const q = require('bluebird-q');
 const pool = require('lib/browser-pool');
 const Config = require('lib/config');
 const Events = require('lib/constants/events');
@@ -274,8 +273,8 @@ describe('runner', () => {
 
             it('should not be immediately rejected if running of tests in some browser was rejected', () => {
                 const runner = createRunner();
-                const rejected = q.reject();
-                const delayed = q.delay(50);
+                const rejected = Promise.reject();
+                const delayed = Promise.delay(50);
 
                 runner.config.getBrowserIds.returns(['bro1', 'bro2']);
 
@@ -287,8 +286,8 @@ describe('runner', () => {
 
             it('should be rejected with the first error if running of tests in several browsers were rejected', () => {
                 const runner = createRunner();
-                const firstReject = q.reject('first-runner');
-                const secondReject = q.reject('second-runner');
+                const firstReject = Promise.reject('first-runner');
+                const secondReject = Promise.reject('second-runner');
 
                 runner.config.getBrowserIds.returns(['bro1', 'bro2']);
 
@@ -313,7 +312,7 @@ describe('runner', () => {
 
                 runner.on(Events.END_SESSION, onEndSession);
 
-                BrowserRunner.prototype.run.returns(q.reject());
+                BrowserRunner.prototype.run.returns(Promise.reject());
 
                 return run(runner).catch(() => assert.calledOnce(onEndSession));
             });
@@ -327,7 +326,7 @@ describe('runner', () => {
             it('should be rejected if collecting of coverage fails', () => {
                 const runner = createRunner({config: stubConfig({isCoverageEnabled: true})});
 
-                Coverage.prototype.processStats.returns(q.reject());
+                Coverage.prototype.processStats.returns(Promise.reject());
 
                 return assert.isRejected(run(runner));
             });
@@ -376,7 +375,7 @@ describe('runner', () => {
 
                 runner.on(Events.END, onEnd);
 
-                BrowserRunner.prototype.run.returns(q.reject());
+                BrowserRunner.prototype.run.returns(Promise.reject());
 
                 return run(runner).catch(() => assert.calledOnce(onEnd));
             });
@@ -416,7 +415,7 @@ describe('runner', () => {
 
                 runner.on(Events.END_RUNNER, onEndRunner);
 
-                BrowserRunner.prototype.run.returns(q.reject());
+                BrowserRunner.prototype.run.returns(Promise.reject());
 
                 return run(runner).catch(() => assert.calledOnce(onEndRunner));
             });

@@ -1,5 +1,6 @@
 'use strict';
-const PassthroughEmitter = require('lib/passthrough-emitter');
+
+const PassthroughEmitter = require('gemini-core').PassthroughEmitter;
 
 describe('PassthroughEmitter', () => {
     let runner,
@@ -47,4 +48,3 @@ describe('PassthroughEmitter', () => {
             });
     });
 });
-
