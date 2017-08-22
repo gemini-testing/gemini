@@ -19,7 +19,7 @@ describe('state-processor/update-state-processor', () => {
             emit: sinon.spy()
         });
 
-        return new UpdateStateProcessor().exec(opts.state, opts.browserSession, opts.page, opts.emit);
+        return new UpdateStateProcessor({}).exec(opts.state, opts.browserSession, opts.page, opts.emit);
     };
 
     beforeEach(() => sandbox.stub(StateProcessor.prototype, 'exec'));
@@ -27,31 +27,21 @@ describe('state-processor/update-state-processor', () => {
     afterEach(() => sandbox.restore());
 
     describe('exec', () => {
-        it('should call base class exec method with correct args', () => {
+        it('should call base class "exec" method with correct args', () => {
             const state = util.makeStateStub();
             const page = {};
             const browserSession = sinon.createStubInstance(CaptureSession);
 
             StateProcessor.prototype.exec.returns(Promise.resolve({}));
 
-            return new UpdateStateProcessor().exec(state, browserSession, page, sinon.spy())
+            return exec_({state, browserSession, page})
                 .then(() => {
                     assert.calledWithExactly(StateProcessor.prototype.exec, state, browserSession, page);
                 });
         });
 
-        it('should emit UPDATE_RESULT event with update results', () => {
+        it('should emit "UPDATE_RESULT" event', () => {
             const result = {updated: true};
-            const emit = sandbox.stub();
-
-            StateProcessor.prototype.exec.returns(Promise.resolve(result));
-
-            return exec_({emit})
-                .then(() => assert.calledWithExactly(emit, 'updateResult', result));
-        });
-
-        it('should emit UPDATE_RESULT event with update results even if update image didn\'t occur', () => {
-            const result = {updated: false};
             const emit = sandbox.stub();
 
             StateProcessor.prototype.exec.returns(Promise.resolve(result));

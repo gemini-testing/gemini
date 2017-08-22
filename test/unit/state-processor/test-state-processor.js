@@ -39,7 +39,7 @@ describe('state-processor/test-state-processor', () => {
 
             StateProcessor.prototype.exec.returns(Promise.resolve({}));
 
-            return mkTestStateProc_().exec(state, browserSession, page, sinon.spy())
+            return exec_({state, browserSession, page})
                 .then(() => {
                     assert.calledWithExactly(StateProcessor.prototype.exec, state, browserSession, page);
                 });
@@ -52,11 +52,11 @@ describe('state-processor/test-state-processor', () => {
 
             return exec_()
                 .then(() => {
-                    assert.eventually.equal(StateProcessor.prototype.exec.getCall(0).returnValue, result);
+                    assert.eventually.deepEqual(StateProcessor.prototype.exec.getCall(0).returnValue, result);
                 });
         });
 
-        it('should emit TEST_RESULT event with saveDiffTo func when images aren\'t equal', () => {
+        it('should emit "TEST_RESULT" event with "saveDiffTo" func when images aren\'t equal', () => {
             const result = {equal: false};
             const emit = sandbox.stub();
 
@@ -68,23 +68,16 @@ describe('state-processor/test-state-processor', () => {
                 });
         });
 
-        it('should emit TEST_RESULT event with diff results when images are equal', () => {
+        it('should emit "TEST_RESULT" event without "saveDiffTo" func when images are equal', () => {
             const result = {equal: true};
             const emit = sandbox.stub();
 
             StateProcessor.prototype.exec.returns(Promise.resolve(result));
 
             return exec_({emit})
-                .then(() => assert.calledWithExactly(emit, 'testResult', result));
-        });
-
-        it('should emit TEST_RESULT event without saveDiffTo func when images are equal', () => {
-            const emit = sandbox.stub();
-
-            StateProcessor.prototype.exec.returns(Promise.resolve({equal: true}));
-
-            return exec_({emit})
-                .then(() => assert.notProperty(emit.getCall(0).args[1], 'saveDiffTo'));
+                .then(() => {
+                    assert.calledWithExactly(emit, 'testResult', result);
+                });
         });
     });
 });
