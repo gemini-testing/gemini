@@ -109,10 +109,31 @@ describe('state-processor/capture-processor/capture-processor', () => {
             exec_ = mkExecMethod(tester);
         });
 
-        it('should be rejected with "NoRefImageError" if reference image does not exist', () => {
-            utils.existsRef.resolves(false);
+        describe('reference image does not exist', () => {
+            beforeEach(() => {
+                utils.existsRef.withArgs('/non-existent/path').resolves(false);
+            });
 
-            return assert.isRejected(exec_({refPath: '/non-existent/path'}), NoRefImageError);
+            it('should save current image to a temporary directory', () => {
+                temp.path.withArgs({suffix: '.png'}).returns('/temp/path');
+
+                return exec_({referencePath: '/non-existent/path'})
+                    .catch(() => assert.calledOnceWith(Image.prototype.save, '/temp/path'));
+            });
+
+            it('should be rejected with "NoRefImageError"', () => {
+                return assert.isRejected(exec_({referencePath: '/non-existent/path'}), NoRefImageError);
+            });
+
+            it('should pass reference and current image paths to "NoRefImageError"', () => {
+                temp.path.withArgs({suffix: '.png'}).returns('/temp/path');
+
+                return exec_({referencePath: '/non-existent/path'})
+                    .catch((err) => {
+                        assert.equal(err.refImagePath, '/non-existent/path');
+                        assert.equal(err.currentPath, '/temp/path');
+                    });
+            });
         });
 
         describe('should return image comparison result if images are', () => {
