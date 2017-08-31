@@ -16,7 +16,6 @@ build
 .grunt
 
 node_modules
-package-lock.json
 /coverage
 /lib/browser/client-scripts/gemini.calibrate.min.js
 /_book
