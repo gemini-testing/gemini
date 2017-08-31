@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.8"></a>
+# [5.0.0-alpha.8](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.7...v5.0.0-alpha.8) (2017-08-31)
+
+
+### Bug Fixes
+
+* **errors:** stacktraces of custom errors should include error message ([63eb59b](https://github.com/gemini-testing/gemini/commit/63eb59b))
+* pass current image path to reference image error ([968fe9a](https://github.com/gemini-testing/gemini/commit/968fe9a))
+
+
+
 <a name="5.0.0-alpha.7"></a>
 # [5.0.0-alpha.7](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.6...v5.0.0-alpha.7) (2017-08-28)
 
