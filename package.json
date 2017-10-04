@@ -63,7 +63,7 @@
   },
   "scripts": {
     "test-unit": "istanbul test _mocha -- --recursive test/unit",
-    "prepublish": "npm run prepare-calibrate-script",
+    "prepublishOnly": "npm run prepare-calibrate-script",
     "prepare-calibrate-script": "uglifyjs ./lib/browser/client-scripts/gemini.calibrate.js -m > ./lib/browser/client-scripts/gemini.calibrate.min.js --support-ie8",
     "postpublish": "npm run publish-site",
     "test-func": "istanbul test _mocha test/functional",
