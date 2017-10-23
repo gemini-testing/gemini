@@ -203,7 +203,7 @@ Settings list:
 
 * `tolerance` — indicates maximum allowed
   [CIEDE2000](http://en.wikipedia.org/wiki/Color_difference#CIEDE2000)
-  difference between colors. Used only in non-strict mode. By default it's 2.3
+  difference between colors. Used only in non-strict mode. By default it's 1.7
   which should be enough for the most cases. Increasing global default is not
   recommended, prefer changing tolerance for particular suites or states
   instead.
