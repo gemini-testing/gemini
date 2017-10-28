@@ -67,57 +67,57 @@ describe('gemini', () => {
     beforeEach(() => {
         sandbox.stub(Runner.prototype, 'cancel').returns(Promise.resolve());
         sandbox.stub(console, 'warn');
-        sandbox.stub(pluginsLoader, 'load');
+        sandbox.stub(pluginsLoader, 'load').returns([]);
         sandbox.stub(temp, 'init');
     });
 
     afterEach(() => sandbox.restore());
 
-    it('should passthrough runner events', () => {
-        const runner = new EventEmitter();
-        sandbox.stub(Runner, 'create').returns(runner);
+    [
+        Events.START_RUNNER,
+        Events.END_RUNNER,
+        Events.BEGIN,
+        Events.END,
 
-        const gemini = initGemini({});
-        gemini.test();
+        Events.BEGIN_SESSION,
+        Events.END_SESSION,
 
-        [
-            Events.START_RUNNER,
-            Events.END_RUNNER,
-            Events.BEGIN,
-            Events.END,
+        Events.RETRY,
 
-            Events.BEGIN_SESSION,
-            Events.END_SESSION,
+        Events.START_BROWSER,
+        Events.STOP_BROWSER,
 
-            Events.RETRY,
+        Events.BEGIN_SUITE,
+        Events.END_SUITE,
 
-            Events.START_BROWSER,
-            Events.STOP_BROWSER,
+        Events.SKIP_STATE,
+        Events.BEGIN_STATE,
+        Events.END_STATE,
 
-            Events.BEGIN_SUITE,
-            Events.END_SUITE,
+        Events.INFO,
+        Events.WARNING,
+        Events.ERROR,
 
-            Events.SKIP_STATE,
-            Events.BEGIN_STATE,
-            Events.END_STATE,
+        Events.END_TEST,
+        Events.CAPTURE,
 
-            Events.INFO,
-            Events.WARNING,
-            Events.ERROR,
+        Events.TEST_RESULT,
+        Events.UPDATE_RESULT
+    ].forEach((event) => {
+        it(`should passthrough '${event}' runner event`, () => {
+            const runner = new EventEmitter();
+            runner.run = () => {
+                runner.emit(event, 'foo');
+                return Promise.resolve();
+            };
+            sandbox.stub(Runner, 'create').returns(runner);
 
-            Events.END_TEST,
-            Events.CAPTURE,
-
-            Events.TEST_RESULT,
-            Events.UPDATE_RESULT
-        ].forEach((event, name) => {
-            const spy = sinon.spy().named(`${name} handler`);
+            const gemini = initGemini({});
+            const spy = sinon.spy();
             gemini.on(event, spy);
 
-            runner.emit(event, 'value');
-
-            assert.calledOnce(spy);
-            assert.calledWith(spy, 'value');
+            return gemini.test()
+                .then(() => assert.calledOnceWith(spy, 'foo'));
         });
     });
 
@@ -160,6 +160,28 @@ describe('gemini', () => {
 
             return runGeminiTest()
                 .then(() => assert.calledWith(pluginsLoader.load, sinon.match.any, sinon.match.any, prefix));
+        });
+
+        it('should wait until plugins loaded', () => {
+            const afterPluginLoad = sinon.spy();
+            pluginsLoader.load.callsFake(() => {
+                return [Promise.delay(20).then(afterPluginLoad)];
+            });
+            sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
+
+            return runGeminiTest()
+                .then(() => assert.callOrder(afterPluginLoad, Runner.prototype.run));
+        });
+
+        it('should not run tests if plugin failed on load', () => {
+            const err = new Error('o.O');
+            pluginsLoader.load.callsFake(() => [Promise.reject(err)]);
+            sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
+
+            const result = runGeminiTest();
+
+            return assert.isRejected(result, err)
+                .then(() => assert.notCalled(Runner.prototype.run));
         });
     });
 
@@ -318,10 +340,8 @@ describe('gemini', () => {
         });
 
         it('should initialize temp with specified temp dir', () => {
-            runGeminiTest({tempDir: '/some/dir'});
-
-            assert.calledOnce(temp.init);
-            assert.calledWith(temp.init, '/some/dir');
+            return runGeminiTest({tempDir: '/some/dir'})
+                .then(() => assert.calledOnceWith(temp.init, '/some/dir'));
         });
 
         it('should initialize temp before start runner', () => {
