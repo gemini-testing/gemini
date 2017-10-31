@@ -6,7 +6,7 @@ const util = require('../../util');
 const errorUtils = require('lib/errors/utils');
 const proxyquire = require('proxyquire').noCallThru();
 const _ = require('lodash');
-const QEmitter = require('qemitter');
+const AsyncEmitter = require('gemini-core').events.AsyncEmitter;
 const Promise = require('bluebird');
 
 describe('state-processor/state-processor', () => {
@@ -40,7 +40,7 @@ describe('state-processor/state-processor', () => {
             });
             const stateProcessor = new StateProcessor(opts.captureProcessorType);
 
-            stateProcessor.prepare(new QEmitter());
+            stateProcessor.prepare(new AsyncEmitter());
             return stateProcessor.exec(opts.state, browserSession, opts.page);
         };
 
