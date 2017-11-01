@@ -27,7 +27,7 @@ describe('state-processor/capture-processor/utils', () => {
             });
 
             it('"false" if a current image was not copied', () => {
-                fs.copyAsync.returns(Promise.reject());
+                fs.copyAsync.rejects();
 
                 return utils.copyImg('/temp/path', '/ref/path')
                     .then((res) => assert.isFalse(res));
@@ -70,14 +70,14 @@ describe('state-processor/capture-processor/utils', () => {
             });
 
             it('"false" if the directory was not created', () => {
-                fs.mkdirsAsync.returns(Promise.reject());
+                fs.mkdirsAsync.rejects();
 
                 return save_({refPath: '/ref/path'})
                     .then((res) => assert.isFalse(res));
             });
 
             it('"false" if the image was not saved', () => {
-                Image.prototype.save.returns(Promise.reject());
+                Image.prototype.save.rejects();
 
                 return save_({refPath: '/ref/path'})
                     .then((res) => assert.isFalse(res));
@@ -100,7 +100,7 @@ describe('state-processor/capture-processor/utils', () => {
             });
 
             it('"false" if the reference image does not exists', () => {
-                fs.accessAsync.returns(Promise.reject());
+                fs.accessAsync.rejects();
 
                 return utils.existsRef('/ref/path')
                     .then((res) => assert.isFalse(res));

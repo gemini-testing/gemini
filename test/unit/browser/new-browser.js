@@ -193,13 +193,13 @@ describe('browser/new-browser', () => {
             });
 
             it('should not fail if not supported in legacy Opera', () => {
-                wd.setWindowSize.returns(Promise.reject({cause: {value: {message: 'Not supported in OperaDriver yet'}}}));
+                wd.setWindowSize.rejects({cause: {value: {message: 'Not supported in OperaDriver yet'}}});
 
                 return assert.isFulfilled(launchBrowser());
             });
 
             it('should fail if setWindowSize fails with other error', () => {
-                wd.setWindowSize.returns(Promise.reject(new Error('other')));
+                wd.setWindowSize.rejects(new Error('other'));
 
                 return assert.isRejected(launchBrowser());
             });
@@ -207,40 +207,40 @@ describe('browser/new-browser', () => {
 
         describe('catch error on wd init', () => {
             it('should fail if wd init fails', () => {
-                wd.init.returns(Promise.reject(new Error('o.O')));
+                wd.init.rejects(new Error('o.O'));
 
                 return assert.isRejected(launchBrowser());
             });
 
             it('should fail with GeminiError instance', () => {
-                wd.init.returns(Promise.reject({message: 'defaultError'}));
+                wd.init.rejects({message: 'defaultError'});
 
                 return assert.isRejected(launchBrowser(), GeminiError);
             });
 
             it('should fail with the error message by default', () => {
-                wd.init.returns(Promise.reject({message: 'error text'}));
+                wd.init.rejects({message: 'error text'});
 
                 return launchBrowser()
                     .catch((e) => assert.include(e.message, 'error text'));
             });
 
             it('should extend error message with error data if it exists', () => {
-                wd.init.returns(Promise.reject({data: 'error text'}));
+                wd.init.rejects({data: 'error text'});
 
                 return launchBrowser()
                     .catch((e) => assert.include(e.message, 'error text'));
             });
 
             it('should not add to the message fail reason if error data does not exists', () => {
-                wd.init.returns(Promise.reject({message: 'defaultError'}));
+                wd.init.rejects({message: 'defaultError'});
 
                 return launchBrowser()
                     .catch((e) => assert.notInclude(e.message, 'Reason'));
             });
 
             it('should cut all tags from error', () => {
-                wd.init.returns(Promise.reject({data: '<title></title><body><h1>Error</h1> text</body>'}));
+                wd.init.rejects({data: '<title></title><body><h1>Error</h1> text</body>'});
 
                 return launchBrowser()
                     .catch((e) => {
@@ -251,28 +251,28 @@ describe('browser/new-browser', () => {
             });
 
             it('should skip text from all tags except body', () => {
-                wd.init.returns(Promise.reject({data: '<title>4xx</title><body>Error</body>'}));
+                wd.init.rejects({data: '<title>4xx</title><body>Error</body>'});
 
                 return launchBrowser()
                     .catch((e) => assert.notInclude(e.message, '4xx'));
             });
 
             it('should not skip text from internal tags in body tag', () => {
-                wd.init.returns(Promise.reject({data: '<body><h1>Error</h1> text</body>'}));
+                wd.init.rejects({data: '<body><h1>Error</h1> text</body>'});
 
                 return launchBrowser()
                     .catch((e) => assert.include(e.message, 'Error text'));
             });
 
             it('should replace newlines to spaces', () => {
-                wd.init.returns(Promise.reject({data: '<body>Error\ntext</body>'}));
+                wd.init.rejects({data: '<body>Error\ntext</body>'});
 
                 return launchBrowser()
                     .catch((e) => assert.include(e.message, 'Error text'));
             });
 
             it('should fail with full html if <body> tag is empty', () => {
-                wd.init.returns(Promise.reject({data: '<html><body></body></html>'}));
+                wd.init.rejects({data: '<html><body></body></html>'});
 
                 return launchBrowser()
                     .catch((e) => assert.include(e.message, '<html><body></body></html>'));
@@ -349,7 +349,7 @@ describe('browser/new-browser', () => {
 
         it('should reject promise with browserId and sessionId if error happened', () => {
             browser.sessionId = 'test_session_id';
-            wd.eval.returns(Promise.reject());
+            wd.eval.rejects();
 
             return browser.reset()
                 .catch((e) => assert.deepEqual(e, {browserId: 'id', sessionId: 'test_session_id'}));
@@ -489,7 +489,7 @@ describe('browser/new-browser', () => {
                 const error = new Error('Element not found');
                 error.status = WdErrors.ELEMENT_NOT_FOUND;
 
-                wd.elementByCssSelector.returns(Promise.reject(error));
+                wd.elementByCssSelector.rejects(error);
 
                 return assert.isRejected(browser.findElement('.class'))
                     .then((error) => assert.equal(error.selector, '.class'));

@@ -120,7 +120,7 @@ describe('runner/state-runner/state-runner', () => {
             const runner = mkRunner_(state, browserSession);
 
             const error = new StateError('some error');
-            browserSession.runActions.returns(Promise.reject(error));
+            browserSession.runActions.callsFake(() => Promise.reject(error));
 
             return run_(runner)
                 .then(() => {
@@ -154,7 +154,7 @@ describe('runner/state-runner/state-runner', () => {
             const runner = mkRunner_(state, browserSession);
 
             const error = new StateError('some error');
-            browserSession.prepareScreenshot.returns(Promise.reject(error));
+            browserSession.prepareScreenshot.rejects(error);
 
             return run_(runner)
                 .then(() => {
@@ -186,7 +186,7 @@ describe('runner/state-runner/state-runner', () => {
 
             runner.on('err', onStateError);
 
-            stateProcessor.exec.returns(Promise.reject(new StateError()));
+            stateProcessor.exec.rejects(new StateError());
 
             return run_(runner, stateProcessor)
                 .then(() => {
