@@ -1,5 +1,8 @@
 # Gemini events
 
+* `AFTER_TESTS_READ` - emitted after all tests were read (during `run`, `update` or `readTests` call). The event is emitted with 1 argument `data`:
+    * `data.suiteCollection` - suite collection with all suites parsed from test files
+
 * `UPDATE_RESULT` — emitted always during update. The event is emitted with 1 argument `result`:
     * `result.imagePath` — absolute path to the reference image
     * `result.updated` — boolean value which is `true` when reference image have been changed and `false` when not

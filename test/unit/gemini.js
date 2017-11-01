@@ -230,9 +230,16 @@ describe('gemini', () => {
 
         it('should return SuiteCollection instance', () => {
             return readTests_()
-                .then((result) => {
-                    assert.instanceOf(result, SuiteCollection);
-                });
+                .then((result) => assert.instanceOf(result, SuiteCollection));
+        });
+
+        it('should emit AFTER_TESTS_READ event with created suite collection', () => {
+            const onAfterTestRead = sinon.spy();
+            gemini = initGemini();
+            gemini.on(Events.AFTER_TESTS_READ, onAfterTestRead);
+
+            return gemini.readTests()
+                .then((suiteCollection) => assert.calledOnceWith(onAfterTestRead, {suiteCollection}));
         });
 
         it('should add to suite collection all read tests excluding root', () => {
@@ -352,6 +359,15 @@ describe('gemini', () => {
                         Runner.prototype.run
                     );
                 });
+        });
+
+        it('should emit AFTER_TESTS_READ event with suite collection', () => {
+            const onAfterTestRead = sinon.spy();
+            gemini = initGemini();
+            gemini.on(Events.AFTER_TESTS_READ, onAfterTestRead);
+
+            return gemini.test()
+                .then(() => assert.calledOnceWith(onAfterTestRead, {suiteCollection: sinon.match.instanceOf(SuiteCollection)}));
         });
     });
 
