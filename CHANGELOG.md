@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.11"></a>
+# [5.0.0-alpha.11](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.10...v5.0.0-alpha.11) (2017-11-01)
+
+
+### Features
+
+* AFTER_TESTS_READ event with suite tree ([c67b644](https://github.com/gemini-testing/gemini/commit/c67b644))
+* wait for plugins load ([340286f](https://github.com/gemini-testing/gemini/commit/340286f))
+
+
+
 <a name="5.0.0-alpha.10"></a>
 # [5.0.0-alpha.10](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.9...v5.0.0-alpha.10) (2017-10-31)
 
