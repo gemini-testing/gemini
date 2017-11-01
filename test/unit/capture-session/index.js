@@ -147,7 +147,7 @@ describe('capture session', () => {
         });
 
         it('should not add an image to error if can not captureViewportImage', () => {
-            browser.captureViewportImage = sinon.stub().returns(Promise.reject({}));
+            browser.captureViewportImage = sinon.stub().callsFake(() => Promise.reject({}));
 
             error = new StateError('some error');
 

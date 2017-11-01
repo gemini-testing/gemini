@@ -64,14 +64,14 @@ describe('tests-api/actions-builder', () => {
         });
 
         it('should be rejected if getting of orientation fails', () => {
-            browser.getOrientation.returns(Promise.reject('awesome error'));
+            browser.getOrientation.rejects('awesome error');
             const changeOrientation = mkAction('changeOrientation', browser);
 
             return assert.isRejected(changeOrientation(), /awesome error/);
         });
 
         it('should be rejected if setting of orientation fails', () => {
-            browser.setOrientation.returns(Promise.reject('awesome error'));
+            browser.setOrientation.rejects('awesome error');
             const changeOrientation = mkAction('changeOrientation', browser);
 
             return assert.isRejected(changeOrientation(), /awesome error/);

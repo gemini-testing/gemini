@@ -152,7 +152,7 @@ describe('state-processor/state-processor', () => {
         });
 
         it('should restore error object inheritance', () => {
-            sandbox.stub(Promise, 'fromCallback').returns(Promise.reject({name: 'NoRefImageError'}));
+            sandbox.stub(Promise, 'fromCallback').rejects({name: 'NoRefImageError'});
             sandbox.stub(errorUtils, 'fromPlainObject')
                 .withArgs({name: 'NoRefImageError'})
                 .returns({restored: 'object'});
