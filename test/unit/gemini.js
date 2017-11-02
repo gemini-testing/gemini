@@ -183,6 +183,14 @@ describe('gemini', () => {
             return assert.isRejected(result, err)
                 .then(() => assert.notCalled(Runner.prototype.run));
         });
+
+        it('should load plugins only once', () => {
+            const gemini = initGemini();
+
+            return gemini.readTests()
+                .then((collection) => gemini.test(collection))
+                .then(() => assert.calledOnce(pluginsLoader.load));
+        });
     });
 
     describe('readTests', () => {
