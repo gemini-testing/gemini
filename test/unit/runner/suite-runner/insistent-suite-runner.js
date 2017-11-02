@@ -65,7 +65,6 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
         Events.SKIP_STATE,
         Events.END_STATE,
         Events.TEST_RESULT,
-        Events.CAPTURE,
         Events.UPDATE_RESULT,
         Events.WARNING
     ].forEach((stateEvent) => it(`should passthrough ${stateEvent} state`, () => {
@@ -454,8 +453,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 Events.UPDATE_RESULT,
                 Events.TEST_RESULT,
                 Events.WARNING,
-                Events.ERROR,
-                Events.CAPTURE
+                Events.ERROR
             ].forEach((event) => {
                 it(`${event}`, () => {
                     const config = mkConfigStub_({retry: 0});

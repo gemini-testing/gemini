@@ -502,7 +502,6 @@ describe('runner', () => {
             });
 
             [
-                Events.CAPTURE,
                 Events.TEST_RESULT,
                 Events.UPDATE_RESULT
             ].forEach((event) => {

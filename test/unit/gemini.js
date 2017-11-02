@@ -98,8 +98,6 @@ describe('gemini', () => {
         Events.WARNING,
         Events.ERROR,
 
-        Events.CAPTURE,
-
         Events.TEST_RESULT,
         Events.UPDATE_RESULT
     ].forEach((event) => {
