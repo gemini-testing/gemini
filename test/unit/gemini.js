@@ -79,9 +79,6 @@ describe('gemini', () => {
         Events.BEGIN,
         Events.END,
 
-        Events.BEGIN_SESSION,
-        Events.END_SESSION,
-
         Events.RETRY,
 
         Events.START_BROWSER,

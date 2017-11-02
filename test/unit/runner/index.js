@@ -196,15 +196,6 @@ describe('runner', () => {
                 return run(runner).then(() => assert.callOrder(stateProcessor.prepare, BrowserRunner.prototype.run));
             });
 
-            it('should emit "BEGIN_SESSION" before running of tests', () => {
-                const runner = createRunner();
-                const onBeginSession = sinon.spy().named('onBeginSession');
-
-                runner.on(Events.BEGIN_SESSION, onBeginSession);
-
-                return run(runner).then(() => assert.calledOnce(onBeginSession));
-            });
-
             it('should create all browser runners', () => {
                 pool.create.returns('some-pool');
 
@@ -296,26 +287,6 @@ describe('runner', () => {
                 BrowserRunner.prototype.run.onSecondCall().returns(secondReject);
 
                 return assert.isRejected(run(runner), /first-runner/);
-            });
-
-            it('should emit "END_SESSION" event after running of tests', () => {
-                const runner = createRunner();
-                const onEndSession = sinon.spy().named('onEndSession');
-
-                runner.on(Events.END_SESSION, onEndSession);
-
-                return run(runner).then(() => assert.callOrder(BrowserRunner.prototype.run, onEndSession));
-            });
-
-            it('should unconditionally emit "END_SESSION" event even if running of tests was rejected', () => {
-                const runner = createRunner();
-                const onEndSession = sinon.spy().named('onEndSession');
-
-                runner.on(Events.END_SESSION, onEndSession);
-
-                BrowserRunner.prototype.run.returns(q.reject());
-
-                return run(runner).catch(() => assert.calledOnce(onEndSession));
             });
 
             it('should collect coverage', () => {
