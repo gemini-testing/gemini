@@ -21,12 +21,6 @@ describe('Stats', () => {
         assert.equal(stats.getResult().skipped, 1);
     });
 
-    it('should count warned tests', () => {
-        runner.emit(RunnerEvents.WARNING, makeStateResult());
-
-        assert.equal(stats.getResult().warned, 1);
-    });
-
     it('should count updated tests', () => {
         runner.emit(RunnerEvents.UPDATE_RESULT, makeStateResult({updated: true}));
 
@@ -66,12 +60,6 @@ describe('Stats', () => {
         assert.equal(stats.getResult().passed, 1);
     });
 
-    it('should count warned tests on "WARNING" event', () => {
-        runner.emit(RunnerEvents.WARNING, makeStateResult());
-
-        assert.equal(stats.getResult().warned, 1);
-    });
-
     it('should count total test count', () => {
         runner.emit(RunnerEvents.TEST_RESULT, makeStateResult({equal: false, name: 'first'}));
         runner.emit(RunnerEvents.TEST_RESULT, makeStateResult({equal: true, name: 'second'}));
@@ -86,15 +74,13 @@ describe('Stats', () => {
         runner.emit(RunnerEvents.TEST_RESULT, makeStateResult({equal: false, name: 'failed'}));
         runner.emit(RunnerEvents.ERROR, makeStateResult({name: 'errored'}));
         runner.emit(RunnerEvents.SKIP_STATE, makeStateResult({name: 'skipped'}));
-        runner.emit(RunnerEvents.WARNING, makeStateResult({name: 'warned'}));
 
         assert.deepEqual(stats.getResult(), {
-            total: 6,
+            total: 5,
             updated: 1,
             passed: 1,
             failed: 2,
             skipped: 1,
-            warned: 1,
             retries: 1
         });
     });

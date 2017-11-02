@@ -467,7 +467,6 @@ describe('runner', () => {
                     Events.BEGIN_STATE,
                     Events.END_STATE,
                     Events.INFO,
-                    Events.WARNING,
                     Events.ERROR
                 ].forEach((event) => testPassthrough(event));
             });
