@@ -35,15 +35,17 @@ console.log(gemini.config.rootUrl);
 
 ## Reading the tests
 
-`gemini.readTests(paths, grep)` — read all of the tests from specified paths into
+`gemini.readTests(paths, options)` — read all of the tests from specified paths into
 one suite collection.
 
 * `paths` is an array of files or directories paths containing Gemini tests.
   If not specified, will look for tests in `$projectRoot/gemini` directory.
 
-* `grep` is a regular expression to filter suites to read. By default, all tests
-  will be read. If this option is set, only suites with name matching the
-  pattern will be read.
+Options:
+
+* `grep` — regular expression to filter suites to read. By default, all tests
+  will be added to collection. If this option is set, only suites with name matching the
+  pattern will be added to collection.
 
 Returns promise which resolves to a `SuiteCollection` object.
 

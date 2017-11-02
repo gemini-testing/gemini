@@ -340,13 +340,6 @@ describe('gemini', () => {
                     assert.include(allSuites, matchingBranchLeaf);
                 });
         });
-
-        it('should warn if RegExp was passed instead of object', () => {
-            return readTests_(null, new RegExp(/string/))
-                .then(() => assert.calledWith(console.warn, sinon.match(
-                    'Passing grep to readTests is deprecated. You should pass an object with options: {grep: /string/}.'
-                )));
-        });
     });
 
     describe('test', () => {
