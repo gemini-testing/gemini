@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-alpha.12"></a>
+# [5.0.0-alpha.12](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.11...v5.0.0-alpha.12) (2017-11-02)
+
+
+### Bug Fixes
+
+* load plugins only once ([a56e39b](https://github.com/gemini-testing/gemini/commit/a56e39b))
+
+
+
 <a name="5.0.0-alpha.11"></a>
 # [5.0.0-alpha.11](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.10...v5.0.0-alpha.11) (2017-11-01)
 
