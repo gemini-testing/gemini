@@ -503,6 +503,7 @@ describe('runner', () => {
 
             [
                 Events.CAPTURE,
+                Events.TEST_RESULT,
                 Events.UPDATE_RESULT
             ].forEach((event) => {
                 describe(`on ${event}`, () => {
@@ -510,40 +511,6 @@ describe('runner', () => {
 
                     testCoverage(event);
                 });
-            });
-
-            describe('on testResult', () => {
-                testPassthrough(Events.TEST_RESULT, 'should passthrough "testResult" event');
-
-                it('should passthrough "endTest" event', () => {
-                    stubBrowserRunner((runner) => runner.emit(Events.TEST_RESULT, {foo: 'bar'}));
-
-                    const runner = createRunner();
-                    const onEndTest = sinon.spy().named('onEndTest');
-
-                    runner.on(Events.END_TEST, onEndTest);
-
-                    return run(runner)
-                        .then(() => {
-                            assert.calledOnce(onEndTest);
-                            assert.calledWith(onEndTest, {foo: 'bar'});
-                        });
-                });
-
-                it('should emit "testResult" event after "endTest" one', () => {
-                    stubBrowserRunner((runner) => runner.emit(Events.TEST_RESULT));
-
-                    const runner = createRunner();
-                    const onEndTest = sinon.spy().named('onEndTest');
-                    const onTestResult = sinon.spy().named('onTestResult');
-
-                    runner.on(Events.END_TEST, onEndTest);
-                    runner.on(Events.TEST_RESULT, onTestResult);
-
-                    return run(runner).then(() => assert.callOrder(onEndTest, onTestResult));
-                });
-
-                testCoverage(Events.TEST_RESULT);
             });
         });
     });

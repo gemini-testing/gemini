@@ -98,7 +98,6 @@ describe('gemini', () => {
         Events.WARNING,
         Events.ERROR,
 
-        Events.END_TEST,
         Events.CAPTURE,
 
         Events.TEST_RESULT,
