@@ -65,9 +65,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
         Events.SKIP_STATE,
         Events.END_STATE,
         Events.TEST_RESULT,
-        Events.CAPTURE,
-        Events.UPDATE_RESULT,
-        Events.WARNING
+        Events.UPDATE_RESULT
     ].forEach((stateEvent) => it(`should passthrough ${stateEvent} state`, () => {
         stubWrappedRun_((runner) => runner.emit(stateEvent, {foo: 'bar'}));
         const handler = sinon.spy().named(stateEvent + 'Handler');
@@ -453,9 +451,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 Events.END_STATE,
                 Events.UPDATE_RESULT,
                 Events.TEST_RESULT,
-                Events.WARNING,
-                Events.ERROR,
-                Events.CAPTURE
+                Events.ERROR
             ].forEach((event) => {
                 it(`${event}`, () => {
                     const config = mkConfigStub_({retry: 0});

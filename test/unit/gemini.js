@@ -79,9 +79,6 @@ describe('gemini', () => {
         Events.BEGIN,
         Events.END,
 
-        Events.BEGIN_SESSION,
-        Events.END_SESSION,
-
         Events.RETRY,
 
         Events.START_BROWSER,
@@ -95,11 +92,7 @@ describe('gemini', () => {
         Events.END_STATE,
 
         Events.INFO,
-        Events.WARNING,
         Events.ERROR,
-
-        Events.END_TEST,
-        Events.CAPTURE,
 
         Events.TEST_RESULT,
         Events.UPDATE_RESULT
