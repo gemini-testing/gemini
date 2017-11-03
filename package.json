@@ -75,7 +75,7 @@
     "preversion": "npm run lint && npm test",
     "prepare-site": "gitbook install",
     "build-site": "npm run prepare-site && gitbook build",
-    "publish-site": "npm run build-site && cd _book && git init && git add -A && git commit -m 'Update site' && git push --force git@github.com:gemini-testing/gemini-testing.github.io.git master"
+    "publish-site": "npm run build-site && cd _book && git init && git add -A && git commit -m 'Update site' && git push --force https://github.com/gemini-testing/gemini-testing.github.io.git master"
   },
   "author": "Sergey Tatarintsev <tatarincev.serg@yandex.ua> (https://github.com/SevInf)",
   "license": "MIT",
