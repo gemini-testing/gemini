@@ -28,7 +28,7 @@ describe('capture session', () => {
 
         beforeEach(() => {
             browser = {config: {}};
-            session = new CaptureSession(browser);
+            session = CaptureSession.create(browser);
         });
 
         it('should call action in associated browser', () => {
@@ -77,7 +77,7 @@ describe('capture session', () => {
 
         beforeEach(() => {
             browser = {config: {}};
-            session = new CaptureSession(browser);
+            session = CaptureSession.create(browser);
         });
 
         it('should call action in associated browser', () => {
@@ -122,7 +122,7 @@ describe('capture session', () => {
                 config: {},
                 prepareScreenshot: sinon.stub().returns(Promise.resolve())
             };
-            const session = new CaptureSession(browser);
+            const session = CaptureSession.create(browser);
             const state = {
                 captureSelectors: ['.selector1', '.selector2'],
                 ignoreSelectors: ['.ignore1', '.ignore2']
@@ -148,7 +148,7 @@ describe('capture session', () => {
                     save: sinon.stub()
                 }))
             };
-            session = new CaptureSession(browser);
+            session = CaptureSession.create(browser);
             error = {};
         });
 
@@ -181,7 +181,7 @@ describe('capture session', () => {
                 config: {someKey: 'some-value'}
             };
 
-            const session = new CaptureSession(browser);
+            const session = CaptureSession.create(browser);
 
             const obj = session.serialize();
 
@@ -227,7 +227,7 @@ describe('capture session', () => {
             sandbox.spy(Viewport, 'create');
             sandbox.spy(Viewport.prototype, 'extendBy');
 
-            captureSession = new CaptureSession(browserStub);
+            captureSession = CaptureSession.create(browserStub);
         });
 
         it('should take screenshot', () => {
