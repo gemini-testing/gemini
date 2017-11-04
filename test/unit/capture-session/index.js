@@ -2,7 +2,6 @@
 
 const Promise = require('bluebird');
 const _ = require('lodash');
-const promiseUtils = require('q-promise-utils');
 
 const CaptureSession = require('lib/capture-session');
 const ActionsBuilder = require('lib/tests-api/actions-builder');
@@ -17,8 +16,6 @@ describe('capture session', () => {
 
     beforeEach(() => {
         imageStub = sinon.createStubInstance(Image);
-        sandbox.stub(promiseUtils);
-        promiseUtils.sequence.returns(Promise.resolve());
 
         sandbox.stub(temp);
     });
@@ -34,67 +31,88 @@ describe('capture session', () => {
             session = new CaptureSession(browser);
         });
 
-        it('should perform passed action sequence', () => {
-            const actions = [];
+        it('should call action in associated browser', () => {
+            const action = sinon.spy().named('action');
 
-            session.runActions(actions);
-
-            assert.calledOnce(promiseUtils.sequence);
-            assert.calledWith(promiseUtils.sequence, actions);
+            return session.runActions([action])
+                .then(() => assert.calledOnceWith(action, browser));
         });
 
-        it('should perform actions sequence in associated browser', () => {
-            session.runActions([]);
+        it('should call action with "postActions"', () => {
+            const action = sinon.spy().named('action');
 
-            assert.calledWith(promiseUtils.sequence, sinon.match.any, browser);
+            return session.runActions([action])
+                .then(() => assert.calledOnceWith(action, sinon.match.any, sinon.match.instanceOf(ActionsBuilder)));
         });
 
-        it('should peform actions sequence with postActions', () => {
-            session.runActions([]);
-
-            assert.calledWith(promiseUtils.sequence,
-                sinon.match.any,
-                sinon.match.any,
-                sinon.match.instanceOf(ActionsBuilder)
-            );
-        });
-
-        it('should perform all actions with the same postActions instance', () => {
+        it('should perform all actions with the same "postActions" instance', () => {
+            const action = sinon.spy().named('action');
             sandbox.stub(ActionsBuilder.prototype, '__constructor').returnsArg(0);
 
-            session.runActions([]);
-            session.runActions([]);
+            return session.runActions([action])
+                .then(() => session.runActions([action]))
+                .then(() => assert.deepEqual(action.firstCall.args[1], action.secondCall.args[1]));
+        });
 
-            assert.equal(
-                promiseUtils.sequence.firstCall.args[2],
-                promiseUtils.sequence.secondCall.args[2]
-            );
+        it('should perform passed actions in order', () => {
+            const mediator = sinon.spy().named('mediator');
+            const action1 = sinon.stub().named('action1').callsFake(() => Promise.delay(1).then(mediator));
+            const action2 = sinon.spy().named('action2');
+
+            return session.runActions([action1, action2])
+                .then(() => assert.callOrder(action1, mediator, action2));
+        });
+
+        it('should rejects if any of passed actions rejected', () => {
+            const action1 = sinon.stub().named('action1').resolves();
+            const action2 = sinon.stub().named('action2').rejects('foo');
+
+            return assert.isRejected(session.runActions([action1, action2]), /foo/);
         });
     });
 
     describe('runPostActions', () => {
-        it('should not pass postActions while performing postActions', () => {
-            const browser = {config: {}};
-            const session = new CaptureSession(browser);
+        let browser;
+        let session;
 
-            session.runPostActions();
+        beforeEach(() => {
+            browser = {config: {}};
+            session = new CaptureSession(browser);
+        });
 
-            assert.lengthOf(promiseUtils.sequence.firstCall.args, 2);
+        it('should call action in associated browser', () => {
+            const action = sinon.spy().named('action');
+
+            sandbox.stub(ActionsBuilder.prototype, '__constructor')
+                .callsFake((postActions) => postActions.push(action));
+
+            return session.runActions([action])
+                .then(() => session.runPostActions())
+                .then(() => assert.deepEqual(action.secondCall.args, [browser]));
         });
 
         it('should perform post actions in reverse order', () => {
-            const browser = {config: {}};
-            const session = new CaptureSession(browser);
+            const mediator = sinon.spy().named('mediator');
+            const action1 = sinon.spy().named('action1');
+            const action2 = sinon.stub().named('action2').callsFake(() => Promise.delay(1).then(mediator));
 
-            sandbox.stub(ActionsBuilder.prototype, '__constructor').callsFake((postActions) => {
-                postActions.push(1, 2, 3);
-            });
-            session.runActions([]);
-            session.runActions([]);
+            sandbox.stub(ActionsBuilder.prototype, '__constructor')
+                .callsFake((postActions) => postActions.push(action1, action2));
 
-            session.runPostActions();
+            return session.runActions([action1, action2])
+                .then(() => session.runPostActions())
+                .then(() => assert.callOrder(action2, mediator, action1));
+        });
 
-            assert.calledWith(promiseUtils.sequence, [3, 2, 1, 3, 2, 1]);
+        it('should rejects if any of post actions rejected', () => {
+            const action1 = sinon.stub().named('action1').resolves();
+            const action2 = sinon.stub().named('action2').rejects('foo');
+
+            sandbox.stub(ActionsBuilder.prototype, '__constructor')
+                .callsFake((postActions) => postActions.push(action1, action2));
+
+            return session.runActions([action1, action2])
+                .catch(() => assert.isRejected(session.runPostActions(), /foo/));
         });
     });
 
