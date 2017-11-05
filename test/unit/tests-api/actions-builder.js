@@ -9,7 +9,7 @@ describe('tests-api/actions-builder', () => {
     const sandbox = sinon.sandbox.create();
     const browser = util.makeBrowser();
 
-    const mkActionsBuilder = (actions) => new ActionsBuilder(actions || []);
+    const mkActionsBuilder = (actions) => ActionsBuilder.create(actions || []);
 
     const mkAction = (actionName, browser, postActions) => {
         return function() {

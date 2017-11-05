@@ -47,7 +47,7 @@ describe('capture session', () => {
 
         it('should perform all actions with the same "postActions" instance', () => {
             const action = sinon.spy().named('action');
-            sandbox.stub(ActionsBuilder.prototype, '__constructor').returnsArg(0);
+            sandbox.stub(ActionsBuilder, 'create').returnsArg(0);
 
             return session.runActions([action])
                 .then(() => session.runActions([action]))
@@ -83,7 +83,7 @@ describe('capture session', () => {
         it('should call action in associated browser', () => {
             const action = sinon.spy().named('action');
 
-            sandbox.stub(ActionsBuilder.prototype, '__constructor')
+            sandbox.stub(ActionsBuilder, 'create')
                 .callsFake((postActions) => postActions.push(action));
 
             return session.runActions([action])
@@ -96,7 +96,7 @@ describe('capture session', () => {
             const action1 = sinon.spy().named('action1');
             const action2 = sinon.stub().named('action2').callsFake(() => Promise.delay(1).then(mediator));
 
-            sandbox.stub(ActionsBuilder.prototype, '__constructor')
+            sandbox.stub(ActionsBuilder, 'create')
                 .callsFake((postActions) => postActions.push(action1, action2));
 
             return session.runActions([action1, action2])
@@ -108,7 +108,7 @@ describe('capture session', () => {
             const action1 = sinon.stub().named('action1').resolves();
             const action2 = sinon.stub().named('action2').rejects('foo');
 
-            sandbox.stub(ActionsBuilder.prototype, '__constructor')
+            sandbox.stub(ActionsBuilder, 'create')
                 .callsFake((postActions) => postActions.push(action1, action2));
 
             return session.runActions([action1, action2])

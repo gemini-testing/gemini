@@ -142,7 +142,7 @@ describe('tests-api/suite-builder', function() {
 
     describe('before', function() {
         beforeEach(function() {
-            sandbox.stub(ActionsBuilder.prototype, '__constructor');
+            sandbox.stub(ActionsBuilder, 'create').returns(new ActionsBuilder());
         });
 
         it('should call before hook with actions builder and find', function() {
@@ -155,7 +155,7 @@ describe('tests-api/suite-builder', function() {
         });
 
         it('should call before hook and set beforeActions property', function() {
-            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            ActionsBuilder.create.returnsArg(0);
 
             suiteBuilder.before(function(actions) {
                 actions.push(1, 2, 3);
@@ -180,7 +180,7 @@ describe('tests-api/suite-builder', function() {
                 suite = Suite.create('suite', parent);
 
             parent.beforeActions = [1, 2, 3];
-            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            ActionsBuilder.create.returnsArg(0);
             new SuiteBuilder(suite).before(function(actions) {
                 actions.push(4, 5);
             });
@@ -193,7 +193,7 @@ describe('tests-api/suite-builder', function() {
                 suite = Suite.create('suite', parent);
 
             parent.beforeActions = [1, 2, 3];
-            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            ActionsBuilder.create.returnsArg(0);
             new SuiteBuilder(suite).before(function(actions) {
                 actions.push(4, 5);
             });
@@ -204,7 +204,7 @@ describe('tests-api/suite-builder', function() {
 
     describe('after', function() {
         beforeEach(function() {
-            sandbox.stub(ActionsBuilder.prototype, '__constructor');
+            sandbox.stub(ActionsBuilder, 'create').returns(new ActionsBuilder());
         });
 
         it('should call after hook with actions builder and find', function() {
@@ -217,7 +217,7 @@ describe('tests-api/suite-builder', function() {
         });
 
         it('should call after hook and set afterActions property', function() {
-            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            ActionsBuilder.create.returnsArg(0);
 
             suiteBuilder.after(function(actions) {
                 actions.push(1, 2, 3);
@@ -242,7 +242,7 @@ describe('tests-api/suite-builder', function() {
                 suite = Suite.create('suite', parent);
 
             parent.afterActions = [4, 5];
-            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            ActionsBuilder.create.returnsArg(0);
             new SuiteBuilder(suite).after(function(actions) {
                 actions.push(1, 2, 3);
             });
@@ -255,7 +255,7 @@ describe('tests-api/suite-builder', function() {
                 suite = Suite.create('suite', parent);
 
             parent.afterActions = [4, 5];
-            ActionsBuilder.prototype.__constructor.returnsArg(0);
+            ActionsBuilder.create.returnsArg(0);
             new SuiteBuilder(suite).after(function(actions) {
                 actions.push(1, 2, 3);
             });
@@ -336,7 +336,7 @@ describe('tests-api/suite-builder', function() {
         });
 
         it('should set `actions` property', function() {
-            sandbox.stub(ActionsBuilder.prototype, '__constructor').returnsArg(0);
+            sandbox.stub(ActionsBuilder, 'create').returnsArg(0);
 
             suiteBuilder.capture('state', function(actions) {
                 actions.push(1, 2, 3);
