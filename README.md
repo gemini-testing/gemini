@@ -103,6 +103,7 @@ Required software:
 
 2. Compiler with support for C++11 (`GCC@4.6` or higher). This is a
    [png-img](https://github.com/gemini-testing/png-img) requirement.
+   Compiling on Windows machines requires the [node-gyp prerequisites](https://github.com/nodejs/node-gyp#on-windows).
 
 ## Installing
 
