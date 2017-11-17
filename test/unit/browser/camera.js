@@ -1,5 +1,6 @@
 'use strict';
 
+const Promise = require('bluebird');
 const Camera = require('lib/browser/camera');
 const Image = require('lib/image');
 const util = require('lib/browser/util');
