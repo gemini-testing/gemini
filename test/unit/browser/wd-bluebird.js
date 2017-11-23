@@ -1,7 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
-const q = require('bluebird-q');
+const q = require('q');
 const proxyquire = require('proxyquire');
 
 describe('wd-bluebird', () => {
