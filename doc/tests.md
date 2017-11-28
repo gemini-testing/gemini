@@ -308,6 +308,10 @@ Full list of special keys (there are shortcuts for commonly used keys):
 
 * `changeOrientation()` — change orientation on touch enabled device (from `PORTRAIT` to `LANDSCAPE` and vice versa). :warning: Does not work on mobile emulation.
 
+* `switchToFrame(frameElement)` — Switch the frame of the browser to another the context of an iframe element
+
+* `switchToWindow()` — Switches frame of browser back to main window context
+
 ## Passing a context to tests
 
 Add `system.ctx` field to your configuration file:
