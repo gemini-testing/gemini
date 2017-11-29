@@ -1,6 +1,8 @@
 # Gemini events
 
-* `AFTER_TESTS_READ` - emitted after all tests were read (during `run`, `update` or `readTests` call). The event is emitted with 1 argument `data`:
+* `INIT` - emitted before any job start (`test`, `update` or `readTests`). If handler returns a promise then job will start only after the promise will be resolved. Emitted only once no matter how many times job will be performed.
+
+* `AFTER_TESTS_READ` - emitted after all tests were read (during `test`, `update` or `readTests` call). The event is emitted with 1 argument `data`:
     * `data.suiteCollection` - suite collection with all suites parsed from test files
 
 * `UPDATE_RESULT` — emitted always during update. The event is emitted with 1 argument `result`:
