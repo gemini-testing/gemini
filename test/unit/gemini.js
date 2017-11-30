@@ -67,7 +67,7 @@ describe('gemini', () => {
     beforeEach(() => {
         sandbox.stub(Runner.prototype, 'cancel').returns(Promise.resolve());
         sandbox.stub(console, 'warn');
-        sandbox.stub(pluginsLoader, 'load').returns([]);
+        sandbox.stub(pluginsLoader, 'load');
         sandbox.stub(temp, 'init');
     });
 
@@ -126,63 +126,36 @@ describe('gemini', () => {
     });
 
     describe('load plugins', () => {
-        it('should load plugins', () => {
-            return runGeminiTest()
-                .then(() => assert.calledOnce(pluginsLoader.load));
-        });
+        it('should load plugins on construction', () => {
+            initGemini();
 
-        it('should load plugins before reading tests', () => {
-            return runGeminiTest()
-                .then(() => assert.callOrder(pluginsLoader.load, testReaderStub));
+            assert.calledOnce(pluginsLoader.load);
         });
 
         it('should load plugins for gemini instance', () => {
             const gemini = initGemini();
 
-            return gemini.test()
-                .then(() => assert.calledWith(pluginsLoader.load, gemini));
+            assert.calledWith(pluginsLoader.load, gemini);
+        });
+
+        it('should fail on plugin load error', () => {
+            pluginsLoader.load.throws(new Error('o.O'));
+
+            assert.throws(() => initGemini(), /o.O/);
         });
 
         it('should load plugins from config', () => {
-            return runGeminiTest({plugins: {'some-plugin': true}})
-                .then(() => assert.calledWith(pluginsLoader.load, sinon.match.any, {'some-plugin': true}));
+            initGemini({plugins: {'some-plugin': true}});
+
+            assert.calledWith(pluginsLoader.load, sinon.match.any, {'some-plugin': true});
         });
 
         it('should load plugins with appropriate prefix', () => {
             const prefix = require('../../package').name + '-';
 
-            return runGeminiTest()
-                .then(() => assert.calledWith(pluginsLoader.load, sinon.match.any, sinon.match.any, prefix));
-        });
+            initGemini();
 
-        it('should wait until plugins loaded', () => {
-            const afterPluginLoad = sinon.spy();
-            pluginsLoader.load.callsFake(() => {
-                return [Promise.delay(20).then(afterPluginLoad)];
-            });
-            sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
-
-            return runGeminiTest()
-                .then(() => assert.callOrder(afterPluginLoad, Runner.prototype.run));
-        });
-
-        it('should not run tests if plugin failed on load', () => {
-            const err = new Error('o.O');
-            pluginsLoader.load.callsFake(() => [Promise.reject(err)]);
-            sandbox.stub(Runner.prototype, 'run').returns(Promise.resolve());
-
-            const result = runGeminiTest();
-
-            return assert.isRejected(result, err)
-                .then(() => assert.notCalled(Runner.prototype.run));
-        });
-
-        it('should load plugins only once', () => {
-            const gemini = initGemini();
-
-            return gemini.readTests()
-                .then((collection) => gemini.test(collection))
-                .then(() => assert.calledOnce(pluginsLoader.load));
+            assert.calledWith(pluginsLoader.load, sinon.match.any, sinon.match.any, prefix);
         });
     });
 
@@ -197,6 +170,46 @@ describe('gemini', () => {
             sandbox.stub(Config.prototype);
 
             Config.prototype.getBrowserIds.returns([]);
+        });
+
+        describe('INIT', () => {
+            it('should emit INIT event on reading', () => {
+                const onInit = sinon.spy();
+
+                gemini = initGemini()
+                    .on(Events.INIT, onInit);
+
+                return gemini.readTests()
+                    .then(() => assert.calledOnce(onInit));
+            });
+
+            it('should wait INIT handler before reading any test', () => {
+                const afterInit = sinon.spy();
+
+                gemini = initGemini()
+                    .on(Events.INIT, () => Promise.delay(10).then(afterInit));
+
+                return gemini.readTests()
+                    .then(() => assert.callOrder(afterInit, testReaderStub));
+            });
+
+            it('should fail on INIT handler reject', () => {
+                gemini = initGemini()
+                    .on(Events.INIT, () => Promise.reject('o.O'));
+
+                return assert.isRejected(gemini.readTests(), /o.O/);
+            });
+
+            it('should emit INIT only once', () => {
+                const onInit = sinon.spy();
+
+                gemini = initGemini()
+                    .on(Events.INIT, onInit);
+
+                return gemini.readTests()
+                    .then(() => gemini.readTests())
+                    .then(() => assert.calledOnce(onInit));
+            });
         });
 
         it('should pass sets from cli to test-reader', () => {
@@ -362,6 +375,46 @@ describe('gemini', () => {
 
             return gemini.test()
                 .then(() => assert.calledOnceWith(onAfterTestRead, {suiteCollection: sinon.match.instanceOf(SuiteCollection)}));
+        });
+
+        describe('INIT', () => {
+            it('should emit INIT event on run', () => {
+                const onInit = sinon.spy();
+
+                gemini = initGemini()
+                    .on(Events.INIT, onInit);
+
+                return gemini.test()
+                    .then(() => assert.calledOnce(onInit));
+            });
+
+            it('should wait INIT handler before run', () => {
+                const afterInit = sinon.spy();
+
+                gemini = initGemini()
+                    .on(Events.INIT, () => Promise.delay(10).then(afterInit));
+
+                return gemini.test()
+                    .then(() => assert.callOrder(afterInit, Runner.prototype.run));
+            });
+
+            it('should fail on INIT handler reject', () => {
+                gemini = initGemini()
+                    .on(Events.INIT, () => Promise.reject('o.O'));
+
+                return assert.isRejected(gemini.test(), /o.O/);
+            });
+
+            it('should emit INIT only once', () => {
+                const onInit = sinon.spy();
+
+                gemini = initGemini()
+                    .on(Events.INIT, onInit);
+
+                return gemini.test()
+                    .then(() => gemini.test())
+                    .then(() => assert.calledOnce(onInit));
+            });
         });
     });
 
