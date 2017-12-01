@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0"></a>
+# [5.0.0](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.12...v5.0.0) (2017-12-01)
+
+
+### Bug Fixes
+
+* Fixed not checking if dragTo is a valid element ([13566a1](https://github.com/gemini-testing/gemini/commit/13566a1))
+
+
+### Features
+
+* emit async INIT event instead of async plugins load ([b21aa58](https://github.com/gemini-testing/gemini/commit/b21aa58))
+* remove backwards compatibility for passing grep to readTests ([ed4ece5](https://github.com/gemini-testing/gemini/commit/ed4ece5))
+* remove bluebird-q compatibility layer ([7844620](https://github.com/gemini-testing/gemini/commit/7844620))
+* remove deprecated BEGIN_SESSION and END_SESSION events ([2c22d1d](https://github.com/gemini-testing/gemini/commit/2c22d1d))
+* remove deprecated CAPTURE event ([d06a913](https://github.com/gemini-testing/gemini/commit/d06a913))
+* remove deprecated END_TEST event ([9c7c8e2](https://github.com/gemini-testing/gemini/commit/9c7c8e2))
+* remove deprecated WARNING event ([c906b1f](https://github.com/gemini-testing/gemini/commit/c906b1f))
+* remove q-promise-utils ([67b3682](https://github.com/gemini-testing/gemini/commit/67b3682))
+
+
+
 <a name="5.0.0-alpha.12"></a>
 # [5.0.0-alpha.12](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.11...v5.0.0-alpha.12) (2017-11-02)
 
