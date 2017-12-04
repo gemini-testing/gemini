@@ -162,4 +162,24 @@ describe('tests-api/actions-builder', () => {
             });
         });
     });
+
+    describe('waitForElementToShow', () => {
+        beforeEach(() => sandbox.stub(browser, 'waitForElementByCssSelector').resolves());
+
+        const waitForElementToShowAction = (selector, timeout) => mkAction('waitForElementToShow', browser)(selector, timeout);
+
+        it('should throw if passed timeout is not a number', () => {
+            assert.throws(() => waitForElementToShowAction('.some-selector', 'string'),
+                /waitForElementToShow accepts only numeric timeout/);
+        });
+
+        it('should not throw if timeout is not passed', () => {
+            assert.doesNotThrow(() => waitForElementToShowAction('.some-selector'));
+        });
+
+        it('should use passed numeric timeout', () => {
+            return waitForElementToShowAction('.some-selector', 100500)
+                .then(() => assert.calledOnceWith(browser.waitForElementByCssSelector, sinon.match.any, sinon.match.any, 100500));
+        });
+    });
 });
