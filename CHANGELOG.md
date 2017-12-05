@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.1"></a>
+## [5.0.1](https://github.com/gemini-testing/gemini/compare/v5.0.0...v5.0.1) (2017-12-05)
+
+
+### Bug Fixes
+
+* validate timeout type in wait element actions ([007a836](https://github.com/gemini-testing/gemini/commit/007a836))
+
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/gemini-testing/gemini/compare/v5.0.0-alpha.12...v5.0.0) (2017-12-01)
 
