@@ -1,5 +1,7 @@
 # Gemini events
 
+* `CLI` - emitted right at start, before cli is parsed. Allows to add new commands and extend help message. The event is emitted with 1 argument `parser` which is the [commander](https://github.com/tj/commander.js) instance used inside gemini itself.
+
 * `INIT` - emitted before any job start (`test`, `update` or `readTests`). If handler returns a promise then job will start only after the promise will be resolved. Emitted only once no matter how many times job will be performed.
 
 * `AFTER_TESTS_READ` - emitted after all tests were read (during `test`, `update` or `readTests` call). The event is emitted with 1 argument `data`:
