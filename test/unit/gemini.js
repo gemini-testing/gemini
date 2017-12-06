@@ -159,6 +159,20 @@ describe('gemini', () => {
         });
     });
 
+    describe('extendCli', () => {
+        it ('should emit CLI event with passed parser', () => {
+            const gemini = initGemini({});
+            const onCli = sinon.spy().named('onCli');
+            const parser = {foo: 'bar'};
+
+            gemini.on(Events.CLI, onCli);
+
+            gemini.extendCli(parser);
+
+            assert.calledOnceWith(onCli, parser);
+        });
+    });
+
     describe('readTests', () => {
         const readTests_ = (rootSuite, options) => {
             gemini = initGemini({rootSuite});
