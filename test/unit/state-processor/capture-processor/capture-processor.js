@@ -2,9 +2,8 @@
 
 const _ = require('lodash');
 const Promise = require('bluebird');
+const {temp, Image} = require('gemini-core');
 
-const Image = require('lib/image');
-const temp = require('lib/temp');
 const utils = require('lib/state-processor/capture-processor/utils');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
 const CaptureProcessor = require('lib/state-processor/capture-processor/capture-processor');

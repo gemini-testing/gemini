@@ -1,18 +1,19 @@
 'use strict';
-var Promise = require('bluebird'),
-    path = require('path'),
-    fs = require('fs'),
-    Calibrator = require('lib/calibrator'),
-    Image = require('lib/image'),
-    GeminiError = require('lib/errors/gemini-error'),
-    browserWithId = require('../util').browserWithId;
+
+const Promise = require('bluebird');
+const path = require('path');
+const fs = require('fs');
+const {Image} = require('gemini-core');
+const Calibrator = require('lib/calibrator');
+const GeminiError = require('lib/errors/gemini-error');
+const {browserWithId} = require('../util');
 
 describe('calibrator', function() {
-    var browser, calibrator;
+    let browser, calibrator;
 
     function setScreenshot(imageName) {
-        var imgPath = path.join(__dirname, '..', 'functional', 'data', 'image', imageName),
-            imgData = fs.readFileSync(imgPath);
+        const imgPath = path.join(__dirname, '..', 'functional', 'data', 'image', imageName);
+        const imgData = fs.readFileSync(imgPath);
 
         browser.captureViewportImage.returns(Promise.resolve(new Image(imgData)));
     }
@@ -27,7 +28,7 @@ describe('calibrator', function() {
 
     it('should calculate correct crop area', function() {
         setScreenshot('calibrate.png');
-        var result = calibrator.calibrate(browser);
+        const result = calibrator.calibrate(browser);
         return Promise.all([
             assert.eventually.propertyVal(result, 'top', 2),
             assert.eventually.propertyVal(result, 'left', 2)
@@ -37,16 +38,14 @@ describe('calibrator', function() {
     it('should return also features detected by script', function() {
         setScreenshot('calibrate.png');
         browser.evalScript.returns(Promise.resolve({feature: 'value', innerWidth: 984}));
-        var result = calibrator.calibrate(browser);
+        const result = calibrator.calibrate(browser);
         return assert.eventually.propertyVal(result, 'feature', 'value');
     });
 
     it('should not perform the calibration process two times', function() {
         setScreenshot('calibrate.png');
         return calibrator.calibrate(browser)
-            .then(function() {
-                return calibrator.calibrate(browser);
-            })
+            .then(() => calibrator.calibrate(browser))
             .then(function() {
                 assert.calledOnce(browser.open);
                 assert.calledOnce(browser.evalScript);
@@ -56,10 +55,8 @@ describe('calibrator', function() {
 
     it('should return cached result second time', function() {
         setScreenshot('calibrate.png');
-        var result = calibrator.calibrate(browser)
-                        .then(function() {
-                            return calibrator.calibrate(browser);
-                        });
+        const result = calibrator.calibrate(browser)
+            .then(() => calibrator.calibrate(browser));
         return Promise.all([
             assert.eventually.propertyVal(result, 'top', 2),
             assert.eventually.propertyVal(result, 'left', 2)

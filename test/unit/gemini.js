@@ -10,7 +10,7 @@ const Config = require('lib/config');
 const Runner = require('lib/runner');
 const Events = require('lib/constants/events');
 const SuiteCollection = require('lib/suite-collection');
-const temp = require('lib/temp');
+const {temp} = require('gemini-core');
 
 const mkSuiteStub = require('../util').makeSuiteStub;
 const mkStateStub = require('../util').makeStateStub;

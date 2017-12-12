@@ -2,7 +2,7 @@
 
 const CaptureSession = require('lib/capture-session');
 const CaptureProcessor = require('lib/state-processor/capture-processor/capture-processor');
-const temp = require('lib/temp');
+const {temp} = require('gemini-core');
 const proxyquire = require('proxyquire').noCallThru();
 const Promise = require('bluebird');
 const _ = require('lodash');

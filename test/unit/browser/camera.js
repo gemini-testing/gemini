@@ -1,8 +1,8 @@
 'use strict';
 
 const Promise = require('bluebird');
+const {Image} = require('gemini-core');
 const Camera = require('lib/browser/camera');
-const Image = require('lib/image');
 const util = require('lib/browser/util');
 
 describe('browser/camera', function() {
