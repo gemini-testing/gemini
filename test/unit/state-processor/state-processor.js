@@ -1,7 +1,7 @@
 'use strict';
 
 const CaptureSession = require('lib/capture-session');
-const temp = require('lib/temp');
+const {temp} = require('gemini-core');
 const util = require('../../util');
 const errorUtils = require('lib/errors/utils');
 const proxyquire = require('proxyquire').noCallThru();

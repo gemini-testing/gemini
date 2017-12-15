@@ -7,8 +7,7 @@ const CaptureSession = require('lib/capture-session');
 const ActionsBuilder = require('lib/tests-api/actions-builder');
 const Viewport = require('lib/capture-session/viewport');
 const StateError = require('lib/errors/state-error');
-const temp = require('lib/temp');
-const Image = require('lib/image');
+const {temp, Image} = require('gemini-core');
 
 describe('capture session', () => {
     const sandbox = sinon.sandbox.create();

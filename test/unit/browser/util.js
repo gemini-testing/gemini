@@ -1,8 +1,8 @@
 'use strict';
 
 const _ = require('lodash');
+const {Image} = require('gemini-core');
 const util = require('lib/browser/util');
-const Image = require('lib/image');
 
 describe('browser util.isFullPage', () => {
     const sandbox = sinon.sandbox.create();

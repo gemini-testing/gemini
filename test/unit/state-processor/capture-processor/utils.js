@@ -3,8 +3,8 @@
 const _ = require('lodash');
 const fs = require('fs-extra');
 const Promise = require('bluebird');
+const {Image} = require('gemini-core');
 
-const Image = require('lib/image');
 const utils = require('lib/state-processor/capture-processor/utils');
 
 describe('state-processor/capture-processor/utils', () => {
