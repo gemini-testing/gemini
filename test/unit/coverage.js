@@ -49,4 +49,42 @@ describe('coverage', () => {
             assert.deepEqual(coverage.byURL['http://some/url'].coverage, {'.some-selector': 'full'});
         });
     });
+
+    describe('getSourceMap', () => {
+        it('parse source map', () => {
+            const config = createConfig();
+            const coverage = new Coverage(config);
+
+            const ast = {
+                stylesheet: {
+                    rules: [{
+                        type: 'comment',
+                        comment: '# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzdHlsZXMuY3NzIiwic291cmNlUm9vdCI6IiJ9'
+                    }]
+                }
+            };
+
+            const map = coverage.getSourceMap(ast, '', '');
+
+            assert.equal(map.file, 'styles.css');
+        });
+
+        it('parse webpack source map', () => {
+            const config = createConfig();
+            const coverage = new Coverage(config);
+
+            const ast = {
+                stylesheet: {
+                    rules: [{
+                        type: 'comment',
+                        comment: '# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzdHlsZXMuY3NzIiwic291cmNlUm9vdCI6IiJ9'
+                    }]
+                }
+            };
+
+            const map = coverage.getSourceMap(ast, '', '');
+
+            assert.equal(map.file, 'styles.css');
+        });
+    });
 });
