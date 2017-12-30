@@ -71,15 +71,23 @@ gemini.suite('yandex-search', (suite) => {
 });
 ```
 
+### Saving reference images
+
+You have written a new test and should save a reference image for it:
+```
+gemini update
+```
+
 ### Running tests
+
 Start `selenium-standalone` in a separate tab before running the tests:
 ```
 selenium-standalone start
 ```
 
-Run gemini tests with flat reporter:
+Run gemini tests:
 ```
-gemini test --reporter flat
+gemini test
 ```
 
 ## Dependencies
@@ -203,20 +211,20 @@ For example, let's write a test for a search block at
 ```javascript
 gemini.suite('yandex-search', function(suite) {
     suite.setUrl('/')
-        .setCaptureElements('.main-table')
+        .setCaptureElements('.search2__input')
         .capture('plain')
         .capture('with text', function(actions, find) {
-            actions.sendKeys(find('.input__control'), 'hello gemini');
+            actions.sendKeys(find('.search2__input .input__control'), 'hello gemini');
         });
 });
 ```
 
 We are creating a new test suite `yandex-search`, assuming that we will capture the
-`.main-table` element from the root URL `http://yandex.com`. We know that the
+`.search2__input` element from the root URL `http://yandex.com`. We know that the
 block has two states:
 
 * `plain` — right after the page is loaded
-* `with text` — with the `hello gemini` text inserted into `.input__control`
+* `with text` — with the `hello gemini` text inserted into `.search2__input .input__control`
 
 States are executed one after another in the order in which they are defined, without the browser
 reloading in between.
