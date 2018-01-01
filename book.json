@@ -2,7 +2,7 @@
   "gitbook": "3.2.0",
   "title": "Gemini",
   "description": "Visual regression testing tool",
-  "plugins": ["edit-link", "github"],
+  "plugins": ["edit-link", "github", "advanced-emoji"],
   "pluginsConfig": {
     "edit-link": {
       "base": "https://github.com/gemini-testing/gemini/edit/master",
