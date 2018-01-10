@@ -1,6 +1,7 @@
 'use strict';
-var eachSupportedBrowser = require('./util').eachSupportedBrowser,
-    Calibrator = require('lib/calibrator');
+
+const {eachSupportedBrowser} = require('./util');
+const {Calibrator} = require('gemini-core');
 
 describe('calibrator', function() {
     eachSupportedBrowser(function() {

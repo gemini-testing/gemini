@@ -2,9 +2,8 @@
 
 const BrowserPool = require('lib/browser-pool');
 const BrowserFabric = require('lib/browser');
-const Calibrator = require('lib/calibrator');
 const RunnerEvents = require('lib/constants/events');
-const CoreBrowserPool = require('gemini-core').BrowserPool;
+const {BrowserPool: CoreBrowserPool, Calibrator} = require('gemini-core');
 const AsyncEmitter = require('gemini-core').events.AsyncEmitter;
 const _ = require('lodash');
 const Promise = require('bluebird');

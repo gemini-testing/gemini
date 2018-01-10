@@ -6,7 +6,7 @@ const _ = require('lodash');
 
 const Camera = require('lib/browser/camera');
 const ClientBridge = require('lib/browser/client-bridge');
-const Calibrator = require('lib/calibrator');
+const {Calibrator} = require('gemini-core');
 const WdErrors = require('lib/constants/wd-errors');
 const GeminiError = require('lib/errors/gemini-error');
 
