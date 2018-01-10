@@ -304,14 +304,14 @@ describe('browser/new-browser', () => {
                     .then(() => assert.calledWith(wd.get, 'http://www.example.com'));
             });
 
-            it('should reset page zoom by default', () => {
+            it('should not reset page zoom by default', () => {
                 return open(browser, {url: 'http://www.example.com'})
-                    .then(() => assert.calledWith(ClientBridge.prototype.call, 'resetZoom'));
+                    .then(() => assert.neverCalledWith(ClientBridge.prototype.call, 'resetZoom'));
             });
 
-            it('should not reset page zoom if `resetZoom` param passed as false', () => {
-                return open(browser, {url: 'http://www.example.com', resetZoom: false})
-                    .then(() => assert.neverCalledWith(ClientBridge.prototype.call, 'resetZoom'));
+            it('should reset page zoom if `resetZoom` param passed as true', () => {
+                return open(browser, {url: 'http://www.example.com', resetZoom: true})
+                    .then(() => assert.calledWith(ClientBridge.prototype.call, 'resetZoom'));
             });
         });
 
