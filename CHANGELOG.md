@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.2.0"></a>
+# [5.2.0](https://github.com/gemini-testing/gemini/compare/v5.1.2...v5.2.0) (2018-01-12)
+
+
+### Features
+
+* **calibrator:** move to gemini-core ([fc87b21](https://github.com/gemini-testing/gemini/commit/fc87b21))
+* **new-browser:** change default value for resetZoom ([5006927](https://github.com/gemini-testing/gemini/commit/5006927))
+
+
+
 <a name="5.1.2"></a>
 ## [5.1.2](https://github.com/gemini-testing/gemini/compare/v5.1.1...v5.1.2) (2017-12-20)
 
