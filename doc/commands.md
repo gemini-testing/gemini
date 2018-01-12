@@ -33,7 +33,7 @@ current directory. To specify other config, use `--config` or `-c` option.
 
 ## Running tests
 
-To compare you reference screenshots with current state of blocks, use:
+To compare your reference screenshots with current state of blocks, use:
 
 ```
 gemini test [paths to suites]

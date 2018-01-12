@@ -1,6 +1,7 @@
 # Gemini configuration
 
-**Gemini** is configured using `.gemini.yml` file at the root of the project.
+In the following example **gemini** is configured using `.gemini.yml` file at the root of the project.
+But you can use one of the files specified in [configuring section](../readme.md#configuring).
 
 Complete example with all available settings looks like this, but you'll need
 to specify only a few settings specific for your project:
@@ -15,7 +16,7 @@ tolerance: 3.5
 httpTimeout: 5000
 sessionRequestTimeout: 60000
 sessionQuitTimeout: 5000
-screenshotsDir: './screens'
+screenshotsDir: ./screens
 windowSize: 1600x1080
 sessionsPerBrowser: 2
 suitesPerSession: 100
@@ -29,7 +30,7 @@ browsers:
 
   firefox-latest:
     rootUrl: https://example.com/special-for-ff
-    screenshotsDir: './ff-screens'
+    screenshotsDir: ./ff-screens
     calibrate: true
     desiredCapabilities:
       version: "31.0"
@@ -51,6 +52,7 @@ sets:
 system:
   projectRoot: ../project
   sourceRoot: ../project/src
+  tempDir: ./temp-images
   exclude:
     - node_modules/**
   plugins:
@@ -97,7 +99,7 @@ exclude:
 ```
 
 * `plugins` — list of plugins to enable. Should have form of `pluginName:
-  settings`.  For example:
+  settings`. For example:
 
   ```yaml
   plugins:
@@ -107,7 +109,7 @@ exclude:
       password: pass
   ```
 
-  Each plugin should be an installed npm package named `gemini-<pluginName>`.
+  Each plugin should be an installed npm package.
 
 * `debug` — turn on debug logging to the terminal.
 
@@ -287,7 +289,7 @@ To save screenshots for IE9 to different location (considering you have
 browser with `ie9` id in the config):
 
 ```
-gemini update --browsers-ie9-screenshots-dir ./ie9-screens
+gemini update --browsers-ie-9-screenshots-dir ./ie9-screens
 ```
 
 To override setting with environment variable, convert its full path to
