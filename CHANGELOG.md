@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.2.1"></a>
+## [5.2.1](https://github.com/gemini-testing/gemini/compare/v5.2.0...v5.2.1) (2018-01-14)
+
+
+### Bug Fixes
+
+* update gemini-core to 2.3.2 ([d74403d](https://github.com/gemini-testing/gemini/commit/d74403d))
+
+
+
 <a name="5.2.0"></a>
 # [5.2.0](https://github.com/gemini-testing/gemini/compare/v5.1.2...v5.2.0) (2018-01-12)
 
