@@ -71,38 +71,46 @@ All methods are chainable:
   (See `tolerance`option description in [config](./config.md) documentation
   for details).
 
-* `skip([browser])` — skip all tests and nested suites for:
+* `skip.in([browser])` — skip all tests and nested suites for:
 
-  - `skip()` — all browsers;
+  - `skip.in()` — all browsers;
 
-  - `skip('id')` — browser with specified `id`;
+  - `skip.in('id')` — browser with specified `id`;
 
-  - `skip('id', comment)` — browser with specified `id` and show `comment` in the report;
+  - `skip.in('id', comment)` — browser with specified `id` and show `comment` in the report;
 
-  - `skip(/some RegExp/)` — browser with `id` which matches `/some RegExp/`;
+  - `skip.in(/some RegExp/)` — browser with `id` which matches `/some RegExp/`;
 
-  - `skip(/some RegExp/, comment)` — browser with `id` which matches `/some RegExp/` and show `comment` in the report;
+  - `skip.in(/some RegExp/, comment)` — browser with `id` which matches `/some RegExp/` and show `comment` in the report;
 
-  - `skip(['id1', /RegExp1/, ...])` — multiple browsers;
+  - `skip.in(['id1', /RegExp1/, ...])` — multiple browsers;
 
-  - `skip(['id1', /RegExp1/, ...], comment)` — multiple browsers and show `comment` in the report.
-
-  All browsers from subsequent calls to `.skip()` are added to the skip list:
+  - `skip.in(['id1', /RegExp1/, ...], comment)` — multiple browsers and show `comment` in the report.
+  
+  All browsers from subsequent calls to `.skip.in()` are added to the skip list:
 
   ```js
   suite
-      .skip('id1')
-      .skip(/RegExp1/);
+      .skip.in('id1')
+      .skip.in(/RegExp1/);
   ```
 
   is equivalent to
 
   ```js
-  suite.skip([
+  suite.skip.in([
       'id1',
       /RegExp1/
   ]);
   ```
+  
+  Method can also be called as `skip([browser])`
+  (left for backward compatibility).
+  
+* `skip.notIn([browser])` — skip all test and nested suites
+for all browsers, except for the ones in the arguments.
+Has the same principle of work as `skip.in([browser])`.
+Note that `skip.notIn()` does nothing.
 
 * `browsers([browser])` — run all tests and nested suites in specified browsers:
 
