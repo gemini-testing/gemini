@@ -71,47 +71,6 @@ All methods are chainable:
   (See `tolerance`option description in [config](./config.md) documentation
   for details).
 
-* `skip([browser])` — skip all tests and nested suites for:
-
-  - `skip()` — all browsers;
-
-  - `skip('id')` — browser with specified `id`;
-
-  - `skip('id', comment)` — browser with specified `id` and show `comment` in the report;
-
-  - `skip(/some RegExp/)` — browser with `id` which matches `/some RegExp/`;
-
-  - `skip(/some RegExp/, comment)` — browser with `id` which matches `/some RegExp/` and show `comment` in the report;
-
-  - `skip(['id1', /RegExp1/, ...])` — multiple browsers;
-
-  - `skip(['id1', /RegExp1/, ...], comment)` — multiple browsers and show `comment` in the report.
-
-  All browsers from subsequent calls to `.skip()` are added to the skip list:
-
-  ```js
-  suite
-      .skip('id1')
-      .skip(/RegExp1/);
-  ```
-
-  is equivalent to
-
-  ```js
-  suite.skip([
-      'id1',
-      /RegExp1/
-  ]);
-  ```
-
-* `browsers([browser])` — run all tests and nested suites in specified browsers:
-
-  - `browsers('id')` — browser with specified `id`;
-
-  - `browsers(/some RegExp/)` — browser `id` which matches `/some RegExp/`;
-
-  - `browsers(['id1', /RegExp1/, ...])` — multiple browsers.
-
 * `capture(stateName, [options], callback(actions, find))` — defines a new
   state to capture. Optional callback describes a sequence of actions to bring
   the page to this state, starting from a **previous** state of the suite.
@@ -169,6 +128,72 @@ All methods are chainable:
 * `after(callback(actions, find))` — use this function to execute some code
   after the last state. The arguments of a callback are the same as for
   `capture` and `before` callbacks and context is shared between all of them.
+  
+### Skip tests
+
+Sometimes you need to skip tests in specific browsers. For example, tested features
+are not available in some browsers yet.
+  
+* `skip.in([browser])` — skip all tests and nested suites for:
+
+  - `skip.in('id')` — browser with specified `id`;
+
+  - `skip.in('id', comment)` — browser with specified `id` and show `comment` in the report;
+
+  - `skip.in(/some RegExp/)` — browser with `id` which matches `/some RegExp/`;
+
+  - `skip.in(/some RegExp/, comment)` — browser with `id` which matches `/some RegExp/`
+  and show `comment` in the report;
+
+  - `skip.in(['id1', /RegExp1/, ...])` — multiple browsers;
+
+  - `skip.in(['id1', /RegExp1/, ...], comment)` — multiple browsers and show `comment` in the report.
+
+  To skip all tests in suite you can use `skip.in(/.*/)`.
+  
+  All browsers from subsequent calls to `.skip.in` are added to the skip list:
+
+  ```js
+  suite
+      .skip.in('id1')
+      .skip.in(/RegExp1/);
+  ```
+
+  is equivalent to
+
+  ```js
+  suite.skip.in([
+      'id1',
+      /RegExp1/
+  ]);
+  ```
+  
+* ~`skip([browser])`~ — _deprecated_.
+Works the same way as `skip.in`, except to skip all tests you can also write `skip()`.
+  
+* `skip.notIn([browser])` — skip all tests and nested suites for all browsers,
+except ones in the arguments. Accepts same arguments as `skip.in`.
+  
+To skip test silently, use `only.in` function. This way, skipped browsers will not appear in the report.
+  
+* `only.in([browser])` — run all tests and nested suites in specified browsers:
+
+  - `only.in('id')` — browser with specified `id`;
+
+  - `only.in(/some RegExp/)` — browser `id` which matches `/some RegExp/`;
+
+  - `only.in('id1', /RegExp1/, ...)` — multiple browsers, also accepts an array as argument.
+  
+* ~`browsers([browser])`~ — _deprecated_. Use `only.in` instead.
+  
+* `only.notIn([browser])` — run all tests and nested suites in all browsers, except
+ones in the arguments. Accepts same arguments as `only.in`.
+
+For example:
+```js
+suite.only.in(['chrome', 'firefox']);
+suite.only.notIn(/ie/, 'opera');
+```
 
 ## Nested suites
 
@@ -180,7 +205,7 @@ browser, even if URL was not changed.
 ```js
 gemini.suite('parent', function(parent) {
     parent.setUrl('/some/path')
-        .setCaptureElements('.selector1', '.selector2');
+        .setCaptureElements('.selector1', '.selector2')
         .capture('state');
 
     gemini.suite('first child', function(child) {
@@ -194,7 +219,7 @@ gemini.suite('parent', function(parent) {
         child.setCaptureElements('.next-selector')
             .capture('third state', function(actions, elements) {
                 // ...
-            })
+            });
 
         gemini.suite('grandchild', function(grandchild) {
             //child suites can have own childs
@@ -206,7 +231,7 @@ gemini.suite('parent', function(parent) {
     gemini.suite('third child', function(child) {
         //this suite uses completely different URL and set of elements
         child.setUrl('/some/another/path')
-            .setCaptureElements('.different-selector');
+            .setCaptureElements('.different-selector')
             .capture('fifth state');
     });
 });
