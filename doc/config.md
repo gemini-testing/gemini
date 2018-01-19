@@ -238,6 +238,11 @@ Settings list:
 
   :warning: Option does not work in Opera@12.16.
 
+* `screenshotDelay` — allows to specify a delay (in milliseconds) before making any screenshot.
+  By default there is no delay.
+
+  This is useful when the page has elements which are animated.
+
 ## Sets
 
 You can link some set of tests with certain browsers using `sets`.

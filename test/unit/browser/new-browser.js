@@ -421,16 +421,25 @@ describe('browser/new-browser', () => {
     });
 
     describe('captureViewportImage', () => {
-        let browser;
-
         beforeEach(() => {
             sandbox.stub(Camera.prototype, 'captureViewportImage');
+            sandbox.stub(Promise, 'delay').returns(Promise.resolve());
+        });
 
-            browser = makeBrowser({browserName: 'browser', version: '1.0'}, {calibrate: true});
+        it('should delay capturing by the configured amount', () => {
+            const browser = makeBrowser({browserName: 'browser', version: '1.0'}, {calibrate: false, screenshotDelay: 42});
+
+            return browser.launch()
+                .then(() => browser.captureViewportImage())
+                .then(() => {
+                    assert.calledOnce(Promise.delay);
+                    assert.calledWith(Promise.delay, 42);
+                    assert.callOrder(Promise.delay, Camera.prototype.captureViewportImage);
+                });
         });
 
         it('should delegate actual capturing to camera object', () => {
-            browser = makeBrowser({browserName: 'browser', version: '1.0'}, {calibrate: false});
+            const browser = makeBrowser({browserName: 'browser', version: '1.0'}, {calibrate: false});
 
             Camera.prototype.captureViewportImage.returns(Promise.resolve({some: 'image'}));
 
