@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/gemini-testing/gemini/compare/v5.2.1...v5.3.0) (2018-01-30)
+
+
+### Features
+
+* introduce option to specify delay before a screenshot is made ([ec52a5e](https://github.com/gemini-testing/gemini/commit/ec52a5e))
+* use new versions of glob-extra and gemini-coverage ([74ae6bf](https://github.com/gemini-testing/gemini/commit/74ae6bf))
+
+
+
 <a name="5.2.1"></a>
 ## [5.2.1](https://github.com/gemini-testing/gemini/compare/v5.2.0...v5.2.1) (2018-01-14)
 
