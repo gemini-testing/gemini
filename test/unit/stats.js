@@ -1,9 +1,9 @@
 'use strict';
 
-const EventEmitter = require('events').EventEmitter;
+const {EventEmitter} = require('events');
 const RunnerEvents = require('../../lib/constants/events');
 const Stats = require('../../lib/stats');
-const makeStateResult = require('../util').makeStateResult;
+const {makeStateResult} = require('../util');
 
 describe('Stats', () => {
     let stats;
