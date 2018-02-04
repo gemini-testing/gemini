@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.4.0"></a>
+# [5.4.0](https://github.com/gemini-testing/gemini/compare/v5.3.0...v5.4.0) (2018-02-04)
+
+
+### Features
+
+* **stats:** move part of the logic to the gemini-core ([99e7e0c](https://github.com/gemini-testing/gemini/commit/99e7e0c))
+
+
+
 <a name="5.3.0"></a>
 # [5.3.0](https://github.com/gemini-testing/gemini/compare/v5.2.1...v5.3.0) (2018-01-30)
 
