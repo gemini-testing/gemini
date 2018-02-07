@@ -36,6 +36,32 @@ describe('state methods', () => {
         });
     });
 
+    describe('viewportOnly', () => {
+        let suite, state;
+
+        beforeEach(() => {
+            suite = util.makeSuiteStub();
+            state = new State(suite);
+        });
+
+        it('viewportOnly should be false by default', () => {
+            assert.isFalse(state.viewportOnly);
+        });
+
+        it('should set viewportOnly for the current state', () => {
+            state.viewportOnly = true;
+
+            assert.isTrue(state.viewportOnly);
+        });
+
+        it('should return null for captureSelectors if viewportOnly is true', () => {
+            suite.captureSelectors = 'selector';
+            state.viewportOnly = true;
+
+            assert.isNull(state.captureSelectors);
+        });
+    });
+
     it('should return state fullName', () => {
         const suite = util.makeSuiteStub({name: 'suite-name'});
         const state = new State(suite, 'plain');
@@ -78,6 +104,15 @@ describe('state methods', () => {
             const clonedState = state.clone();
 
             assert.equal(clonedState.tolerance, 100);
+        });
+
+        it('should clone viewportOnly from the origin state', () => {
+            const state = new State({});
+            state.viewportOnly = true;
+
+            const clonedState = state.clone();
+
+            assert.isTrue(clonedState.viewportOnly);
         });
     });
 });

@@ -147,6 +147,32 @@ describe('suite', () => {
         });
     });
 
+    describe('hasCaptureSelectorsStates', () => {
+        let suite;
+
+        beforeEach(() => {
+            suite = createSuite('suite');
+        });
+
+        it('should be false if there is no states', () => {
+            assert.isFalse(suite.hasCaptureSelectorsStates);
+        });
+
+        it('should be false if all states are created to capture viewport', () => {
+            suite.addState({name: 'state1', viewportOnly: true});
+            suite.addState({name: 'state2', viewportOnly: true});
+
+            assert.isFalse(suite.hasCaptureSelectorsStates);
+        });
+
+        it('should be true if some states are created to capture selectors', () => {
+            suite.addState({name: 'state1', viewportOnly: true});
+            suite.addState({name: 'state2', viewportOnly: false});
+
+            assert.isTrue(suite.hasCaptureSelectorsStates);
+        });
+    });
+
     describe('isRoot', () => {
         it('should be true for root suites', () => {
             const suite = createSuite('suite');

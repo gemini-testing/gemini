@@ -105,6 +105,10 @@ All methods are chainable:
 
     See `tolerance`option description in [config](./config.md)
     documentation for details.
+    
+* `captureViewport(stateName, [options], callback(actions, find))` –
+same as `capture`, except this method ignores `setCaptureElements`
+and takes screenshot of whole visible viewport.
 
 * `before(callback(actions, find))` — use this function to execute some code
   before the first state. The arguments of a callback are the same as for

@@ -89,7 +89,7 @@ describe('tests-api', () => {
             });
         });
 
-        it('should throw when suite has no states nor URL', () => {
+        it('should not throw when suite has neither states nor URL', () => {
             assert.doesNotThrow(() => {
                 gemini.suite('first', (suite) => {
                     suite.setCaptureElements('.element');
@@ -118,7 +118,7 @@ describe('tests-api', () => {
             });
         });
 
-        it('should not throw if suite has no states nor captureSelectors', () => {
+        it('should not throw if suite has neither states nor captureSelectors', () => {
             assert.doesNotThrow(() => {
                 gemini.suite('first', (suite) => {
                     suite.setUrl('/url');
@@ -134,6 +134,15 @@ describe('tests-api', () => {
                         suite.setUrl('/url')
                              .capture('plain');
                     });
+                });
+            });
+        });
+
+        it('should not throw if suite has states and does not has captureSelectors but captureViewport is used', () => {
+            assert.doesNotThrow(() => {
+                gemini.suite('first', (suite) => {
+                    suite.setUrl('/url')
+                        .captureViewport('plain');
                 });
             });
         });
