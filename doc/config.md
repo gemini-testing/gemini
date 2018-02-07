@@ -226,6 +226,11 @@ Settings list:
   specified, the fallen tests will not be relaunched (by default it's 0).
 
   Note that the same test never be performed in the same browser session.
+  
+* `shouldRetry` — function which defines whether to make a retry. Should returns `Boolean` value. First argument is `data` which is the result of the test run, it's an Object with following fields:
+    * `attempt {Number}` number of retries performed for the test
+    * `retriesLeft {Number}` number of retries left
+    * `[equal] {Boolean}` notice that if the test fails with critical error equal can be absent
 
 * `screenshotMode` — image capture mode. There are 3 allowed values for this option:
     * `auto` (default). Mode will be obtained automatically.
