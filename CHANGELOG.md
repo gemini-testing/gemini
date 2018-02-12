@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.4.1"></a>
+## [5.4.1](https://github.com/gemini-testing/gemini/compare/v5.4.0...v5.4.1) (2018-02-12)
+
+
+### Bug Fixes
+
+* ignoreElements fail if outside viewport ([0f8b2c7](https://github.com/gemini-testing/gemini/commit/0f8b2c7))
+
+
+
 <a name="5.4.0"></a>
 # [5.4.0](https://github.com/gemini-testing/gemini/compare/v5.3.0...v5.4.0) (2018-02-04)
 
