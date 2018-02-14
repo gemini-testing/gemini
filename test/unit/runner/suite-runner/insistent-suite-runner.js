@@ -275,6 +275,37 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                         assert.calledOnce(RegularSuiteRunner.prototype.run);
                     });
             });
+
+            it('should not retry if config shouldRetry() told so', () => {
+                stubWrappedRun_((runner) => runner.emit(Events.ERROR, {state: makeStateStub()}));
+                const config = mkConfigStub_({
+                    retry: 100,
+                    shouldRetry: () => false
+                });
+
+                return mkInsistentRunner_({config})
+                    .run()
+                    .then(() => assert(RegularSuiteRunner.prototype.run.calledOnce));
+            });
+
+            it('shouldRetry() should have proper argument', () => {
+                stubWrappedRun_((runner) => runner.emit(Events.ERROR, {state: makeStateStub()}));
+                const rule = sandbox.spy();
+                const config = mkConfigStub_({
+                    retry: 1,
+                    shouldRetry: rule
+                });
+
+                return mkInsistentRunner_({config})
+                    .run()
+                    .then(() => {
+                        const firstCallArgs = rule.firstCall.args;
+                        const arg = firstCallArgs[0];
+                        assert.equal(firstCallArgs.length, 1, 'shouldRetry() expect one argument');
+                        assert.typeOf(arg.retriesLeft, 'number', 'No "retriesLeft" property in shouldRetry argument');
+                        assert.typeOf(arg.attempt, 'number', 'No "attempt" property in shouldRetry argument');
+                    });
+            });
         });
 
         describe('on TEST_RESULT without diff', () => {
@@ -385,6 +416,38 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                         assert.notCalled(onRetry);
                         assert.calledOnce(onTestResult);
                         assert.calledOnce(RegularSuiteRunner.prototype.run);
+                    });
+            });
+
+            it('should not retry if config shouldRetry() told so', () => {
+                stubWrappedRun_((runner) => runner.emit(Events.TEST_RESULT, {state: makeStateStub()}));
+                const config = mkConfigStub_({
+                    retry: 100,
+                    shouldRetry: () => false
+                });
+
+                return mkInsistentRunner_({config})
+                    .run()
+                    .then(() => assert(RegularSuiteRunner.prototype.run.calledOnce));
+            });
+
+            it('shouldRetry() should have proper argument', () => {
+                stubWrappedRun_((runner) => runner.emit(Events.TEST_RESULT, {equal: false, state: makeStateStub()}));
+                const rule = sandbox.spy();
+                const config = mkConfigStub_({
+                    retry: 1,
+                    shouldRetry: rule
+                });
+
+                return mkInsistentRunner_({config})
+                    .run()
+                    .then(() => {
+                        const firstCallArgs = rule.firstCall.args;
+                        const arg = firstCallArgs[0];
+                        assert.equal(firstCallArgs.length, 1, 'shouldRetry() expect one argument');
+                        assert.typeOf(arg.retriesLeft, 'number', 'No "retriesLeft" property in shouldRetry argument');
+                        assert.typeOf(arg.attempt, 'number', 'No "attempt" property in shouldRetry argument');
+                        assert.typeOf(arg.equal, 'boolean', 'No "equal" property in shouldRetry argument');
                     });
             });
         });
