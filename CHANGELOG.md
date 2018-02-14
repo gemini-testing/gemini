@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.5.0"></a>
+# [5.5.0](https://github.com/gemini-testing/gemini/compare/v5.4.1...v5.5.0) (2018-02-14)
+
+
+### Features
+
+* **config:** introduce shouldRerty config option ([pull/878](https://github.com/gemini-testing/gemini/pull/878))
+
+
 <a name="5.4.1"></a>
 ## [5.4.1](https://github.com/gemini-testing/gemini/compare/v5.4.0...v5.4.1) (2018-02-12)
 
