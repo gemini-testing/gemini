@@ -2,9 +2,8 @@
 
 const _ = require('lodash');
 const Promise = require('bluebird');
-const {Image} = require('gemini-core');
+const {Image, CoordValidator} = require('gemini-core');
 
-const CoordValidator = require('lib/capture-session/coord-validator');
 const Viewport = require('lib/capture-session/viewport');
 
 describe('Viewport', () => {

@@ -1,12 +1,12 @@
 'use strict';
 
-var ClientBridge = require('lib/browser/client-bridge'),
-    eachSupportedBrowser = require('./util').eachSupportedBrowser,
+const {clientBridge: {ClientBridge}} = require('gemini-core');
+const eachSupportedBrowser = require('./util').eachSupportedBrowser;
 
-    TEST_SCRIPT = 'window.__gemini = {}; window.__gemini.add2 = function(x) { return x + 2; }';
+const TEST_SCRIPT = 'window.__gemini = {}; window.__gemini.add2 = function(x) { return x + 2; }';
 
-describe('ClientBridge', function() {
-    eachSupportedBrowser(function() {
+describe('ClientBridge', () => {
+    eachSupportedBrowser(() => {
         beforeEach(function() {
             this.bridge = new ClientBridge(this.browser, TEST_SCRIPT);
             return this.browser.initSession();
