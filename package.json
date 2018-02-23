@@ -17,7 +17,7 @@
     "debug": "^2.2.0",
     "fs-extra": "^0.30.0",
     "gemini-configparser": "^1.0.0",
-    "gemini-core": "gemini-testing/gemini-core#7620629c9ed5ba03f9e5e93ee17d4c27b7c20790",
+    "gemini-core": "gemini-testing/gemini-core#assertView/selectors",
     "gemini-coverage": "^2.0.0",
     "graceful-fs": "^4.1.11",
     "handlebars": "^4.0.5",
