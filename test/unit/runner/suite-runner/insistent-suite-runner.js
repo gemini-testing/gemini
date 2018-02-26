@@ -45,9 +45,21 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
 
     afterEach(() => sandbox.restore());
 
-    it('should create regular suite runner', () => {
+    it('should clone suite on creation', () => {
         const suite = makeSuiteStub();
         const browserAgent = mkBrowserAgentStub_();
+        const config = mkConfigStub_();
+
+        sandbox.spy(suite, 'clone');
+        const runner = InsistentSuiteRunner.create(suite, browserAgent, config);
+
+        assert.calledOnce(suite.clone);
+        assert.notEqual(suite, runner._suite);
+    });
+
+    it('should create regular suite runner and pass cloned suite', () => {
+        const suite = makeSuiteStub();
+        const browserAgent = mkBrowserAgentStub_('bro');
         const config = mkConfigStub_();
 
         sandbox.spy(RegularSuiteRunner, 'create');
@@ -57,6 +69,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
             .then(() => {
                 assert.calledOnce(RegularSuiteRunner.create);
                 assert.calledWith(RegularSuiteRunner.create, suite, browserAgent);
+                assert.notEqual(RegularSuiteRunner.create.getCall(0).args[0], suite);
             });
     });
 
@@ -208,9 +221,9 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                         assert.notCalled(onError);
 
                         assert.calledOnce(onRetry);
-                        assert.calledWith(onRetry, {
+                        assert.calledWithMatch(onRetry, {
                             foo: 'bar',
-                            suite,
+                            suite: _.omit(suite, 'browsers'),
                             state,
                             browserId: 'bro',
                             attempt: 0,
@@ -226,6 +239,21 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                 return mkInsistentRunner_({config})
                     .run()
                     .then(() => assert.callCount(RegularSuiteRunner.prototype.run, 1 + 2));
+            });
+
+            it('should not modify original suite', () => {
+                const suite = makeSuiteStub();
+                const state = makeStateStub(suite);
+                const browserAgent = mkBrowserAgentStub_();
+                stubWrappedRun_((runner) => runner.emit(Events.ERROR, {state}));
+                const config = mkConfigStub_({retry: 1});
+
+                sandbox.spy(RegularSuiteRunner, 'create');
+                const suiteBefore = suite.clone();
+
+                return mkInsistentRunner_({suite, browserAgent, config})
+                    .run()
+                    .then(() => assert.deepEqual(suite, suiteBefore));
             });
 
             it('should count few errors during run for one', () => {
@@ -359,7 +387,7 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
                         assert.calledOnce(onRetry);
                         assert.calledWithMatch(onRetry, {
                             equal: false,
-                            suite,
+                            suite: _.omit(suite, 'browsers'),
                             state,
                             browserId: 'bro',
                             attempt: 0,
