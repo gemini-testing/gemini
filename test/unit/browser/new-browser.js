@@ -281,10 +281,12 @@ describe('browser/new-browser', () => {
     });
 
     describe('URL opening', () => {
-        let browser;
+        let browser, clientBridge;
 
         beforeEach(() => {
-            sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
+            clientBridge = {call: sandbox.stub().resolves()};
+
+            sandbox.stub(ClientBridge, 'build').resolves(clientBridge);
         });
 
         describe('open', () => {
@@ -306,12 +308,12 @@ describe('browser/new-browser', () => {
 
             it('should not reset page zoom by default', () => {
                 return open(browser, {url: 'http://www.example.com'})
-                    .then(() => assert.neverCalledWith(ClientBridge.prototype.call, 'resetZoom'));
+                    .then(() => assert.neverCalledWith(clientBridge.call, 'resetZoom'));
             });
 
             it('should reset page zoom if `resetZoom` param passed as true', () => {
                 return open(browser, {url: 'http://www.example.com', resetZoom: true})
-                    .then(() => assert.calledWith(ClientBridge.prototype.call, 'resetZoom'));
+                    .then(() => assert.calledWith(clientBridge.call, 'resetZoom'));
             });
         });
 
@@ -357,8 +359,12 @@ describe('browser/new-browser', () => {
     });
 
     describe('prepareScreenshot', () => {
+        let clientBridge;
+
         beforeEach(() => {
-            sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
+            clientBridge = {call: sandbox.stub().resolves()};
+
+            sandbox.stub(ClientBridge, 'build').resolves(clientBridge);
         });
 
         const launchBrowser_ = (opts) => {
@@ -376,13 +382,13 @@ describe('browser/new-browser', () => {
             return launchBrowser_()
                 .then((browser) => browser.prepareScreenshot(['some-selector'], {some: 'opt'}))
                 .then(() => {
-                    assert.calledOnce(ClientBridge.prototype.call);
-                    assert.calledWith(ClientBridge.prototype.call, 'prepareScreenshot');
+                    assert.calledOnce(clientBridge.call);
+                    assert.calledWith(clientBridge.call, 'prepareScreenshot');
 
-                    const selectors = ClientBridge.prototype.call.firstCall.args[1][0];
+                    const selectors = clientBridge.call.firstCall.args[1][0];
                     assert.deepEqual(selectors, ['some-selector']);
 
-                    const opts = ClientBridge.prototype.call.firstCall.args[1][1];
+                    const opts = clientBridge.call.firstCall.args[1][1];
                     assert.match(opts, {some: 'opt'});
                 });
         });
@@ -391,7 +397,7 @@ describe('browser/new-browser', () => {
             return launchBrowser_()
                 .then((browser) => browser.prepareScreenshot())
                 .then(() => {
-                    const opts = ClientBridge.prototype.call.firstCall.args[1][1];
+                    const opts = clientBridge.call.firstCall.args[1][1];
                     assert.match(opts, {usePixelRatio: true});
                 });
         });
@@ -403,7 +409,7 @@ describe('browser/new-browser', () => {
             return launchBrowser_({calibrator})
                 .then((browser) => browser.prepareScreenshot())
                 .then(() => {
-                    const opts = ClientBridge.prototype.call.firstCall.args[1][1];
+                    const opts = clientBridge.call.firstCall.args[1][1];
                     assert.match(opts, {usePixelRatio: false});
                 });
         });
@@ -414,7 +420,7 @@ describe('browser/new-browser', () => {
             return launchBrowser_({config})
                 .then((browser) => browser.prepareScreenshot())
                 .then(() => {
-                    const opts = ClientBridge.prototype.call.firstCall.args[1][1];
+                    const opts = clientBridge.call.firstCall.args[1][1];
                     assert.match(opts, {coverage: true});
                 });
         });
@@ -453,20 +459,16 @@ describe('browser/new-browser', () => {
     });
 
     describe('buildScripts', () => {
-        it('should include coverage script when coverage is on', () => {
-            const browser = makeBrowser({browserName: 'browser', version: '1.0'},
-                {system: {coverage: {enabled: true}}});
-            const scripts = browser.buildScripts();
+        beforeEach(() => sandbox.stub(ClientBridge, 'build').resolves());
 
-            return assert.eventually.include(scripts, 'exports.collectCoverage');
-        });
+        it('should build client scripts', () => {
+            const browser = makeBrowser({browserName: 'bro'}, {calibrate: true, system: {coverage: {enabled: true}}});
+            const calibrator = sinon.createStubInstance(Calibrator);
 
-        it('should not include coverage script when coverage is off', () => {
-            const browser = makeBrowser({browserName: 'browser', version: '1.0'},
-                {system: {coverage: {enabled: false}}});
-            const scripts = browser.buildScripts();
+            calibrator.calibrate.resolves({foo: 'bar'});
 
-            return assert.eventually.notInclude(scripts, 'exports.collectCoverage');
+            return browser.launch(calibrator)
+                .then(() => assert.calledOnceWith(ClientBridge.build, browser, {calibration: {foo: 'bar'}, coverage: true}));
         });
     });
 
@@ -506,8 +508,12 @@ describe('browser/new-browser', () => {
         });
 
         describe('in legacy browser', () => {
+            let clientBridge;
+
             beforeEach(() => {
-                sandbox.stub(ClientBridge.prototype, 'call').returns(Promise.resolve({}));
+                clientBridge = {call: sandbox.stub().resolves()};
+
+                sandbox.stub(ClientBridge, 'build').resolves(clientBridge);
 
                 calibrator.calibrate.returns(Promise.resolve({needsCompatLib: true}));
 
@@ -517,13 +523,13 @@ describe('browser/new-browser', () => {
             it('should return what client method returns', () => {
                 const element = {element: 'elem'};
 
-                ClientBridge.prototype.call.withArgs('queryFirst', ['.class']).returns(Promise.resolve(element));
+                clientBridge.call.withArgs('queryFirst', ['.class']).resolves(element);
 
                 return assert.eventually.equal(browser.findElement('.class'), element);
             });
 
             it('should reject with element not found error if client method returns null', () => {
-                ClientBridge.prototype.call.returns(Promise.resolve(null));
+                clientBridge.call.resolves(null);
 
                 return assert.isRejected(browser.findElement('.class'))
                     .then((error) => {
