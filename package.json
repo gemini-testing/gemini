@@ -3,7 +3,7 @@
   "version": "5.5.1",
   "description": "UI Screenshot testing utility",
   "engines": {
-    "node": ">= 6.0.0"
+    "node": ">= 6.1.0"
   },
   "bin": {
     "gemini": "./bin/gemini"
