@@ -12,10 +12,6 @@ env:
   # SAUCE_ACCESS_KEY
   - secure: gmcCnuKOboJ2hFKZV8gxUzg1w/RbYr2YN0fky6llXQWi+VHZMa+YIN4HPOP4JVyvbGQA/6JQTj4E9JVAb9MnnBk58nXcEn5R8V9RU5EMBC8+zme22ILMFIvnrPhcMzjoEuupfGxbXmqzASNTWtQQd0qQ2flm8OyOMl+jCqAWCHs=
 
-cache:
-  directories:
-    - node_modules
-
 matrix:
   fast_finish: true
   include:
