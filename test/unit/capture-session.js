@@ -5,9 +5,8 @@ const _ = require('lodash');
 
 const CaptureSession = require('lib/capture-session');
 const ActionsBuilder = require('lib/tests-api/actions-builder');
-const Viewport = require('lib/capture-session/viewport');
 const StateError = require('lib/errors/state-error');
-const {temp, Image} = require('gemini-core');
+const {temp, Image, Viewport} = require('gemini-core');
 
 describe('capture session', () => {
     const sandbox = sinon.sandbox.create();
