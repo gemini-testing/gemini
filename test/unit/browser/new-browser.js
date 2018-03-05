@@ -4,9 +4,8 @@ const Promise = require('bluebird');
 const wdAgent = require('wd');
 const _ = require('lodash');
 
-const Camera = require('lib/browser/camera');
 const ClientBridge = require('lib/browser/client-bridge');
-const {Calibrator} = require('gemini-core');
+const {Calibrator, browser: {Camera}} = require('gemini-core');
 const WdErrors = require('lib/constants/wd-errors');
 const GeminiError = require('lib/errors/gemini-error');
 
@@ -31,13 +30,90 @@ describe('browser/new-browser', () => {
             on: sinon.stub(),
             currentContext: sinon.stub().returns(Promise.resolve()),
             context: sinon.stub().returns(Promise.resolve()),
-            quit: sinon.stub().returns(Promise.resolve())
+            quit: sinon.stub().returns(Promise.resolve()),
+            takeScreenshot: sinon.stub().returns(Promise.resolve({}))
         };
 
         sandbox.stub(wdAgent, 'promiseRemote').returns(wd);
     });
 
     afterEach(() => sandbox.restore());
+
+    describe('constructor', () => {
+        describe('takeScreenshot', () => {
+            const takeScreenshot = () => {
+                if (!Camera.create.lastCall) {
+                    makeBrowser();
+                }
+
+                return Camera.create.lastCall.args[1]();
+            };
+
+            beforeEach(() => sandbox.spy(Camera, 'create'));
+
+            it('should take screenshot', () => {
+                return takeScreenshot()
+                    .then(() => assert.calledOnce(wd.takeScreenshot));
+            });
+
+            it('should not switch context', () => {
+                return takeScreenshot()
+                    .then(() => assert.notCalled(wd.context));
+            });
+
+            it('should not switch context if capture succeeds for the first, but fails for the second time', () => {
+                const error = new Error('not today');
+
+                wd.takeScreenshot.onSecondCall().rejects(error);
+
+                return assert.isRejected(takeScreenshot().then(() => takeScreenshot()), error)
+                    .then(() => assert.notCalled(wd.context));
+            });
+
+            it('should try to switch context if taking screenshot fails', () => {
+                wd.takeScreenshot.onFirstCall().rejects(new Error('not today'));
+
+                return takeScreenshot()
+                    .then(() => assert.calledWithExactly(wd.context, 'NATIVE_APP'));
+            });
+
+            it('should try to take screenshot after switching context', () => {
+                wd.takeScreenshot.onFirstCall().rejects(new Error('not today'));
+
+                return takeScreenshot()
+                    .then(() => assert.calledTwice(wd.takeScreenshot));
+            });
+
+            it('should restore original context after taking screenshot', () => {
+                wd.currentContext.resolves('Original');
+                wd.takeScreenshot.onFirstCall().rejects(new Error('not today'));
+
+                return takeScreenshot()
+                    .then(() => assert.calledWithExactly(wd.context, 'Original'));
+            });
+
+            it('should fail with original error if switching context does not helps', function() {
+                const originalError = new Error('Original');
+
+                wd.takeScreenshot
+                    .onFirstCall().rejects(originalError)
+                    .onSecondCall().rejects(new Error('still does not work'));
+
+                return assert.isRejected(takeScreenshot(), originalError);
+            });
+
+            it('should not try to take screenshot without switching context if it failed first time', function() {
+                const error = new Error('not today');
+
+                wd.takeScreenshot
+                    .onFirstCall().rejects(error)
+                    .onThirdCall().rejects(error);
+
+                return assert.isRejected(takeScreenshot().then(() => takeScreenshot()))
+                    .then(() => assert.calledThrice(wd.takeScreenshot));
+            });
+        });
+    });
 
     describe('properties', () => {
         it('should have browserName property', () => {
