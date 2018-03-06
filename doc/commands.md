@@ -69,6 +69,9 @@ report), partially (yellow) or was not captured at all (red).
 
 * `--grep PATTERN` — execute only suites with names that match the regular
   expression pattern.
+  For example:
+  - `--grep 'suite name'` - execute suites which includes name `suite name`
+  - `--grep '^(?!suite name)'` - execute suites which do not start with `suite name`
 
 * `--browser ID` — execute suite only for specified browser id. Can be used
   multiple times. Can be also specified with `GEMINI_BROWSERS` and `GEMINI_SKIP_BROWSERS`
