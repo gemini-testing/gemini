@@ -544,7 +544,7 @@ describe('browser/new-browser', () => {
             calibrator.calibrate.resolves({foo: 'bar'});
 
             return browser.launch(calibrator)
-                .then(() => assert.calledOnceWith(ClientBridge.build, browser, {calibration: {foo: 'bar'}, coverage: true}));
+                .then(() => assert.calledOnceWith(ClientBridge.build, browser, {calibration: {foo: 'bar'}, coverage: true, deprecatedMode: true}));
         });
     });
 
