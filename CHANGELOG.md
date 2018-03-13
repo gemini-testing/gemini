@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.5.2"></a>
+## [5.5.2](https://github.com/gemini-testing/gemini/compare/v5.5.1...v5.5.2) (2018-03-13)
+
+
+### Bug Fixes
+
+* suite clone does not clone fullUrl ([4d9bc62](https://github.com/gemini-testing/gemini/commit/4d9bc62))
+
+
+
 <a name="5.5.1"></a>
 ## [5.5.1](https://github.com/gemini-testing/gemini/compare/v5.5.0...v5.5.1) (2018-02-26)
 
