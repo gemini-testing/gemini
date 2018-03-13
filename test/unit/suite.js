@@ -342,9 +342,26 @@ describe('suite', () => {
 
         it('should return cloned suite', () => {
             const suite = createSuite('origin');
+            suite.browsers = ['bro1', 'bro2'];
             const clonedSuite = suite.clone();
 
-            assert.notEqual(clonedSuite, suite);
+            assert.deepEqual(clonedSuite, suite);
+            assert.notEqual(clonedSuite, suite); //not equal by link
+            assert.notEqual(clonedSuite.browsers, suite.browsers); //not equal by link
+        });
+
+        it('should clone all enumerable properties', () => {
+            const suite = createSuite('origin');
+            let value = 'some/path';
+            Object.defineProperty(suite, 'fullUrl', {
+                enumerable: true,
+                get: () => value
+            });
+            const clonedSuite = suite.clone();
+
+            assert.equal(clonedSuite.fullUrl, 'some/path');
+            value = 'another/path';
+            assert.equal(clonedSuite.fullUrl, 'another/path');
         });
 
         it('should clone nested suites', () => {
