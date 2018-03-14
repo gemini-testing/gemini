@@ -413,8 +413,6 @@ describe('browser/new-browser', () => {
 
         beforeEach(() => {
             browser = makeBrowser({browserName: 'browser', version: '1.0'});
-
-            browser.chooseLocator();
         });
 
         it('should reset mouse position', () => {
