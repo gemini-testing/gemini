@@ -176,6 +176,15 @@ describe('runner/BrowserRunner', () => {
                 return run_({rootUrl: 'http://localhost/foo/bat/', suiteUrl: 'testUrl//'})
                     .then((suite) => assert.equal(suite.fullUrl, '/foo/bat/testUrl'));
             });
+
+            it('should clone "fullUrl" option correctly on cloning suite', () => {
+                return run_({rootUrl: 'http://localhost/', suiteUrl: 'testUrl'})
+                    .then((suite) => {
+                        const suiteClone = suite.clone();
+                        suiteClone.url += '/?query=value';
+                        assert.equal(suiteClone.fullUrl, '/testUrl/?query=value');
+                    });
+            });
         });
     });
 });
