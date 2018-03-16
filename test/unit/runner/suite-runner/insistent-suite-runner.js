@@ -1,16 +1,15 @@
 'use strict';
 
+const Promise = require('bluebird');
+const _ = require('lodash');
+
+const {BrowserAgent} = require('gemini-core');
 const Events = require('lib/constants/events');
 const InsistentSuiteRunner = require('lib/runner/suite-runner/insistent-suite-runner');
 const RegularSuiteRunner = require('lib/runner/suite-runner/regular-suite-runner');
 const CancelledError = require('lib/errors/cancelled-error');
 const NoRefImageError = require('lib/errors/no-ref-image-error');
-const makeStateStub = require('../../../util').makeStateStub;
-const makeSuiteStub = require('../../../util').makeSuiteStub;
-const makeSuiteTree = require('../../../util').makeSuiteTree;
-const BrowserAgent = require('gemini-core').BrowserAgent;
-const Promise = require('bluebird');
-const _ = require('lodash');
+const {makeStateStub, makeSuiteStub, makeSuiteTree} = require('../../../util');
 
 describe('runner/suite-runner/insistent-suite-runner', () => {
     const sandbox = sinon.sandbox.create();
@@ -453,23 +452,44 @@ describe('runner/suite-runner/insistent-suite-runner', () => {
         });
 
         it('should retry only failed states', () => {
-            const tree = makeSuiteTree({suite: ['1st', '2nd', '3rd']}, {browsers: ['bro']});
+            sandbox.spy(RegularSuiteRunner, 'create');
 
+            const suite = makeSuiteTree({suite: ['1st', '2nd', '3rd']}, {browsers: ['bro', 'firefox']}).suite;
             stubWrappedRun_((runner) => {
                 runner.emit(Events.TEST_RESULT, {state: {name: '1st'}, equal: true});
                 runner.emit(Events.ERROR, {state: {name: '2nd'}});
                 runner.emit(Events.TEST_RESULT, {state: {name: '3rd'}, equal: false});
             });
 
-            sandbox.spy(RegularSuiteRunner, 'create');
-
-            return mkRunnerWithRetries_({suite: tree.suite, browserAgent: mkBrowserAgentStub_('bro')})
+            return mkRunnerWithRetries_({suite, browserAgent: mkBrowserAgentStub_('bro')})
                 .run()
                 .then(() => {
                     const retriedSuite = RegularSuiteRunner.create.secondCall.args[0];
                     assert.deepEqual(retriedSuite.states[0].browsers, []);
                     assert.deepEqual(retriedSuite.states[1].browsers, ['bro']);
                     assert.deepEqual(retriedSuite.states[2].browsers, ['bro']);
+                });
+        });
+
+        it('should not affect child states', () => {
+            sandbox.spy(RegularSuiteRunner, 'create');
+
+            const suite = makeSuiteTree({
+                suite: {
+                    child: ['childState']
+                }
+            }, {browsers: ['bro', 'firefox']}).suite;
+            makeStateStub(suite, {name: 'rootState'});
+
+            stubWrappedRun_((runner) => {
+                runner.emit(Events.TEST_RESULT, {state: {name: 'rootState'}, equal: false});
+            });
+
+            return mkRunnerWithRetries_({suite, browserAgent: mkBrowserAgentStub_('bro')})
+                .run()
+                .then(() => {
+                    const childState = suite.children[0].states[0];
+                    assert.deepEqual(childState.browsers, ['bro', 'firefox']);
                 });
         });
     });
