@@ -220,20 +220,9 @@ gemini configuration.
 ## Events
 
 `gemini` instance emits some events, which can be used by external scripts or
-plugins:
+plugins.
 
-* `START_RUNNER` — emitted before the start of `test` or `update` command. If
-  you return a promise from the event handler, the start of the command will
-  be delayed until the promise resolves.
-
-* `END_RUNNER` — emitted after the end of the `test` or `update` command.
-
-* `BEFORE_FILE_READ` — emitted before each test file is read. The event is emitted
-  with 1 argument `filePath` which is the absolute path to the file to be read.
-
-* `AFTER_FILE_READ` — emitted after each test file have been read. The event is
-  emitted with 1 argument `filePath` which is the absolute path to the file that
-  was read.
+[See the details](../doc/events.md) about available events.
 
 Plugin example with the listening on the events:
 ```javascript
