@@ -172,20 +172,22 @@ describe('suite', () => {
             matcher2 = {b: 2};
         });
 
-        it('should be false by default', () => {
-            assert.isFalse(suite.skipped);
+        it('should be empty by default', () => {
+            assert.deepEqual(suite.skipped, []);
         });
 
         it('should be changed by skip(object) method', () => {
             suite.skip(matcher);
+
             assert.deepEqual(suite.skipped, [matcher]);
         });
 
         it('should be inherited by children', () => {
-            suite.skip();
+            suite.skip(matcher);
 
             const child = createSuite('child', suite);
-            assert.isTrue(child.skipped);
+
+            assert.equal(suite.skipped, child.skipped);
         });
 
         it('should merge multiple matchers together', () => {
@@ -193,20 +195,6 @@ describe('suite', () => {
             suite.skip(matcher2);
 
             assert.deepEqual(suite.skipped, [matcher, matcher2]);
-        });
-
-        it('should not override `true` by browser list', () => {
-            suite.skip();
-            suite.skip(matcher);
-
-            assert.isTrue(suite.skipped);
-        });
-
-        it('should override browser list by `true`', () => {
-            suite.skip(matcher);
-            suite.skip();
-
-            assert.isTrue(suite.skipped);
         });
 
         it('should merge children list with parent', () => {
@@ -240,12 +228,6 @@ describe('suite', () => {
 
         it('should be "false" for any browser if a suite is not skipped', function() {
             assert.isFalse(suite.shouldSkip('browser'));
-        });
-
-        it('should be "true" for any browser if a suite is skipped', () => {
-            suite.skip();
-
-            assert.isTrue(suite.shouldSkip('browser'));
         });
 
         it('should be "true" for a browser if a suite is skipped in it', () => {
