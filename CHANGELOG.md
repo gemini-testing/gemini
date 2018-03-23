@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.6.1"></a>
+## [5.6.1](https://github.com/gemini-testing/gemini/compare/v5.6.0...v5.6.1) (2018-03-23)
+
+
+### Bug Fixes
+
+* child suites retries not called ([a141462](https://github.com/gemini-testing/gemini/commit/a141462))
+
+
+
 <a name="5.6.0"></a>
 # [5.6.0](https://github.com/gemini-testing/gemini/compare/v5.5.2...v5.6.0) (2018-03-20)
 
