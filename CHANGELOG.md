@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.6.2"></a>
+## [5.6.2](https://github.com/gemini-testing/gemini/compare/v5.6.1...v5.6.2) (2018-03-26)
+
+
+### Bug Fixes
+
+* move set option to commander global options ([85d7d04](https://github.com/gemini-testing/gemini/commit/85d7d04))
+
+
+
 <a name="5.6.1"></a>
 ## [5.6.1](https://github.com/gemini-testing/gemini/compare/v5.6.0...v5.6.1) (2018-03-23)
 
