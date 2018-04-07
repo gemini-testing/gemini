@@ -2,6 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/gemini.svg?maxAge=2592000)](https://www.npmjs.com/package/gemini)
 [![Build Status](https://travis-ci.org/gemini-testing/gemini.svg?branch=master)](https://travis-ci.org/gemini-testing/gemini)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/gemini/gemini/branch/master?svg=true)](https://ci.appveyor.com/project/gemini/gemini/branch/master)
 [![Coverage Status](https://img.shields.io/coveralls/gemini-testing/gemini.svg)](https://coveralls.io/r/gemini-testing/gemini)
 [![Join the chat at https://gitter.im/gemini-testing/gemini](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gemini-testing/gemini?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Stories on waffle.io](https://img.shields.io/badge/waffle-dashboard-green.svg)](http://waffle.io/gemini-testing/gemini)
