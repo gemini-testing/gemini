@@ -1,21 +1,22 @@
 build: off
 version: "{build}"
+
 environment:
   matrix:
     - nodejs_version: "6"
     - nodejs_version: "8"
+
 platform:
   # - x86
   - x64
+
 matrix:
   fast_finish: true
-cache:
-  - node_modules
+
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - if exist node_modules npm prune
-  - if exist node_modules npm rebuild
   - npm install
+
 test_script:
   - node --version
   - npm --version
