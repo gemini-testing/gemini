@@ -55,11 +55,11 @@
     "standard-version": "^4.0.0"
   },
   "scripts": {
-    "test-unit": "istanbul test _mocha -- --recursive test/unit",
+    "test-unit": "istanbul test node_modules/mocha/bin/_mocha -- --recursive test/unit",
     "postpublish": "npm run publish-site",
-    "test-func": "istanbul test _mocha test/functional",
-    "test-browser": "istanbul test _mocha test/browser",
-    "test": "istanbul test _mocha -- --recursive test/unit test/functional test/browser",
+    "test-func": "istanbul test node_modules/mocha/bin/_mocha test/functional",
+    "test-browser": "istanbul test node_modules/mocha/bin/_mocha test/browser",
+    "test": "istanbul test node_modules/mocha/bin/_mocha -- --recursive test/unit test/functional test/browser",
     "lint": "eslint .",
     "release": "standard-version",
     "precommit": "npm run lint",
