@@ -3,6 +3,7 @@ var Config = require('lib/config'),
     parser = require('lib/config/options'),
     GeminiError = require('lib/errors/gemini-error'),
     MissingOptionError = require('gemini-configparser').MissingOptionError,
+    path = require('path'),
     _ = require('lodash');
 
 describe('config', function() {
@@ -290,7 +291,7 @@ describe('config', function() {
                         projectRoot: './rel/path'
                     }
                 });
-                assert.equal(config.system.projectRoot, '/some/path/rel/path');
+                assert.equal(config.system.projectRoot, path.resolve('/some/path/rel/path'));
             });
 
             it('should leave absolute path unchanged', function() {
@@ -300,7 +301,7 @@ describe('config', function() {
                     }
                 });
 
-                assert.equal(config.system.projectRoot, '/some/absolute/path');
+                assert.equal(config.system.projectRoot, path.resolve('/some/absolute/path'));
             });
         });
 
@@ -312,7 +313,7 @@ describe('config', function() {
                     }
                 });
 
-                assert.equal(config.system.sourceRoot, '/some/absolute/path');
+                assert.equal(config.system.sourceRoot, path.resolve('/some/absolute/path'));
             });
 
             it('should resolve relative paths relatively to projectRoot', function() {
@@ -322,10 +323,10 @@ describe('config', function() {
                         sourceRoot: './rel/path'
                     }
                 });
-                assert.equal(config.system.sourceRoot, '/root/rel/path');
+                assert.equal(config.system.sourceRoot, path.resolve('/root/rel/path'));
             });
 
-            it('should leave absolute path unchanged', function() {
+            it('should normalize absolute path', function() {
                 var config = createConfig({
                     system: {
                         projectRoot: '/root',
@@ -333,7 +334,7 @@ describe('config', function() {
                     }
                 });
 
-                assert.equal(config.system.sourceRoot, '/some/absolute/path');
+                assert.equal(config.system.sourceRoot, path.resolve('/some/absolute/path'));
             });
         });
 
@@ -764,12 +765,12 @@ describe('config', function() {
                 var config = createBrowserConfig({
                     screenshotsDir: 'screens'
                 });
-                assert.equal(config.screenshotsDir, '/some/path/screens');
+                assert.equal(config.screenshotsDir, path.resolve('/some/path/screens'));
             });
 
             it('should be gemini/screens by default', function() {
                 var config = createBrowserConfig({});
-                assert.equal(config.screenshotsDir, '/some/path/gemini/screens');
+                assert.equal(config.screenshotsDir, path.resolve('/some/path/gemini/screens'));
             });
 
             //TODO: toplevel

@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const testsAPI = require('lib/tests-api');
 const Suite = require('lib/suite');
 
@@ -194,6 +195,7 @@ describe('tests-api', () => {
         describe('file path', () => {
             const file = '/root/path/file.js';
             const relativeFile = 'path/file.js';
+            const osPath = unixPath => unixPath.split('/').join(path.sep);
 
             beforeEach(() => {
                 gemini = testsAPI(rootSuite, [], file, {system: {projectRoot: '/root'}});
@@ -202,7 +204,7 @@ describe('tests-api', () => {
             it('should be set relative for suite', () => {
                 gemini.suite('suite', () => {});
 
-                assert.equal(rootSuite.children[0].file, relativeFile);
+                assert.equal(rootSuite.children[0].file, osPath(relativeFile));
                 assert.isTrue(rootSuite.children[0].hasOwnProperty('file'));
             });
 
@@ -211,7 +213,7 @@ describe('tests-api', () => {
                     gemini.suite('child', () => {});
                 });
 
-                assert.equal(rootSuite.children[0].children[0].file, relativeFile);
+                assert.equal(rootSuite.children[0].children[0].file, osPath(relativeFile));
                 assert.isFalse(rootSuite.children[0].children[0].hasOwnProperty('file'));
             });
         });
