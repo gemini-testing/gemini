@@ -27,6 +27,8 @@ describe('browser/new-browser', () => {
             windowHandle: sinon.stub().returns(Promise.resolve({})),
             moveTo: sinon.stub().returns(Promise.resolve()),
             elementByCssSelector: sinon.stub().returns(Promise.resolve()),
+            elementByLinkText: sinon.stub().returns(Promise.resolve()),
+            elementByXPath: sinon.stub().returns(Promise.resolve()),
             on: sinon.stub(),
             currentContext: sinon.stub().returns(Promise.resolve()),
             context: sinon.stub().returns(Promise.resolve()),
