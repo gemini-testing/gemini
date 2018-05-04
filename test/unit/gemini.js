@@ -65,8 +65,9 @@ describe('gemini', () => {
     };
 
     beforeEach(() => {
-        sandbox.stub(Runner.prototype, 'cancel').returns(Promise.resolve());
+        sandbox.stub(Runner.prototype, 'cancel');
         sandbox.stub(console, 'warn');
+        sandbox.stub(console, 'error');
         sandbox.stub(pluginsLoader, 'load');
         sandbox.stub(temp, 'init');
     });
@@ -428,6 +429,63 @@ describe('gemini', () => {
                 return gemini.test()
                     .then(() => gemini.test())
                     .then(() => assert.calledOnce(onInit));
+            });
+        });
+    });
+
+    describe('halt', () => {
+        let gemini;
+
+        beforeEach(() => {
+            sandbox.stub(process, 'exit');
+            sandbox.stub(Runner.prototype, 'run').callsFake(() => gemini.emitAndWait(Events.START_RUNNER));
+
+            gemini = initGemini();
+        });
+
+        it('should throw provided error', () => {
+            gemini.on(Events.START_RUNNER, () => {
+                gemini.halt(new Error('test error'));
+            });
+
+            return assert.isRejected(gemini.test(), /Error: test error/);
+        });
+
+        it('should cancel test runner', () => {
+            gemini.on(Events.START_RUNNER, () => {
+                gemini.halt(new Error('test error'));
+            });
+
+            return gemini.test()
+                .catch(() => {
+                    assert.calledOnce(Runner.prototype.cancel);
+                });
+        });
+
+        describe('shutdown timeout', () => {
+            it('should force exit if timeout is reached', () => {
+                gemini.on(Events.START_RUNNER, () => {
+                    gemini.halt(new Error('test error'), 250);
+                });
+
+                return gemini.test()
+                    .catch(() => Promise.delay(300))
+                    .then(() => {
+                        assert.calledWithMatch(console.error, /Forcing shutdown.../);
+                        assert.calledOnceWith(process.exit, 1);
+                    });
+            });
+
+            it('should do nothing if timeout is set to zero', () => {
+                sandbox.spy(global, 'setTimeout');
+                gemini.on(Events.START_RUNNER, () => {
+                    gemini.halt(new Error('test error'), 0);
+                });
+
+                return gemini.test()
+                    .catch(() => {
+                        assert.notCalled(global.setTimeout);
+                    });
             });
         });
     });

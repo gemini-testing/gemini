@@ -203,6 +203,14 @@ Returns promise that resolve to a stats object with following keys:
 
 Rejects promise if critical error occurred.
 
+## Halting
+
+```js
+gemini.halt(error, [timeout=60000ms]);
+```
+
+Method for abnormal termination of the test run in case of a terminal error. If process fails to gracefully shutdown in `timeout` milliseconds, it would be forcibly terminated (unless `timeout` is explicitly set to `0`).
+
 ## Utilites
 
 * `gemini.getScreenshotPath(suite, stateName, browserId)` — returns path to
