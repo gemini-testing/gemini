@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.0"></a>
+# [5.7.0](https://github.com/gemini-testing/gemini/compare/v5.6.2...v5.7.0) (2018-05-07)
+
+
+### Features
+
+* introduce hermione.halt method ([da68965](https://github.com/gemini-testing/gemini/commit/da68965))
+
+
+
 <a name="5.6.2"></a>
 ## [5.6.2](https://github.com/gemini-testing/gemini/compare/v5.6.1...v5.6.2) (2018-03-26)
 
