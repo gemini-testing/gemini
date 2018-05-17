@@ -36,7 +36,10 @@ describe('Reporter#FlatVerbose', () => {
 
     it('should correctly do the rendering', () => {
         const test = {
-            suite: {path: ['block', 'size', 'big']},
+            suite: {
+                path: ['block', 'size', 'big'],
+                shouldSkip: () => false
+            },
             state: {name: 'hover'},
             browserId: 'chrome',
             sessionId: '0fc23des'
@@ -47,9 +50,13 @@ describe('Reporter#FlatVerbose', () => {
 
     it('should not render session identifier for skipped tests', () => {
         const test = {
-            suite: {path: ['some-path'], skipped: {}},
+            suite: {
+                path: ['some-path'], skipped: {},
+                shouldSkip: () => true
+            },
             state: {name: 'some-name'},
-            browserId: 'chrome'
+            browserId: 'chrome',
+            sessionId: '0fc23des'
         };
 
         assert.equal(getTestLog(test), 'some-path some-name [chrome]');
