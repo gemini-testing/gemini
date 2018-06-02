@@ -1,7 +1,7 @@
 'use strict';
 const PassthroughEmitter = require('lib/passthrough-emitter');
 
-describe.only('PassthroughEmitter', () => {
+describe('PassthroughEmitter', () => {
     let runner,
         child;
 
