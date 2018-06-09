@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.2"></a>
+## [5.7.2](https://github.com/gemini-testing/gemini/compare/v5.7.1...v5.7.2) (2018-06-09)
+
+
+
 <a name="5.7.1"></a>
 ## [5.7.1](https://github.com/gemini-testing/gemini/compare/v5.7.0...v5.7.1) (2018-05-21)
 
