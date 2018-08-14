@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.8.0"></a>
+# [5.8.0](https://github.com/gemini-testing/gemini/compare/v5.7.2...v5.8.0) (2018-08-14)
+
+
+### Features
+
+* set default browser orientation before each test ([8348d7a](https://github.com/gemini-testing/gemini/commit/8348d7a))
+
+
+
 <a name="5.7.2"></a>
 ## [5.7.2](https://github.com/gemini-testing/gemini/compare/v5.7.1...v5.7.2) (2018-06-09)
 
