@@ -23,6 +23,7 @@ describe('browser/new-browser', () => {
             get: sinon.stub().returns(Promise.resolve({})),
             eval: sinon.stub().returns(Promise.resolve('')),
             setWindowSize: sinon.stub().returns(Promise.resolve({})),
+            setOrientation: sinon.stub().returns(Promise.resolve({})),
             maximize: sinon.stub().returns(Promise.resolve()),
             windowHandle: sinon.stub().returns(Promise.resolve({})),
             moveTo: sinon.stub().returns(Promise.resolve()),
@@ -255,6 +256,20 @@ describe('browser/new-browser', () => {
             browser = makeBrowser({browserName: 'phantomjs', version: '1.0'}, {calibrate: false});
 
             return launchBrowser().then(() => assert.called(wd.maximize));
+        });
+
+        describe('set default orientation', () => {
+            it('should set to value specified in config', () => {
+                browser.config.orientation = 'portrait';
+
+                return launchBrowser().then(() => assert.calledWith(wd.setOrientation, 'portrait'));
+            });
+
+            it('should do nothing if no value is specified', () => {
+                delete browser.config.orientation;
+
+                return launchBrowser().then(() => assert.notCalled(wd.setOrientation));
+            });
         });
 
         describe('with windowSize option', () => {

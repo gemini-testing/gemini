@@ -911,6 +911,68 @@ describe('config', function() {
             });
         });
 
+        describe('orientation', function() {
+            it('should be null by default', function() {
+                var config = createBrowserConfig();
+
+                assert.isNull(config.orientation);
+            });
+
+            it('should accept "portrait" value', function() {
+                var config = createBrowserConfig({
+                    orientation: 'portrait'
+                });
+
+                assert.equal(config.orientation, 'portrait');
+            });
+
+            it('should accept "landscape" value', function() {
+                var config = createBrowserConfig({
+                    orientation: 'landscape'
+                });
+
+                assert.equal(config.orientation, 'landscape');
+            });
+
+            it('should not accept any other string value', function() {
+                assert.throws(function() {
+                    createBrowserConfig({
+                        orientation: 'lalalal'
+                    });
+                }, /"orientation" must be "landscape" or "portrait"/);
+            });
+
+            it('should not accept non-string value', function() {
+                assert.throws(function() {
+                    createBrowserConfig({
+                        orientation: 100
+                    });
+                }, /a value must be string/);
+            });
+
+            shouldBeSettableFromTopLevel('orientation', 'portrait');
+            shouldOverrideTopLevelValue('orientation', {
+                top: 'portrait',
+                browser: 'landscape'
+            });
+
+            it('should correctly parse env var', function() {
+                assertParsesEnv({
+                    property: 'browsers.browser.orientation',
+                    value: 'portrait',
+                    expected: 'portrait'
+                });
+            });
+
+            it('should correctly parse cli flag', function() {
+                assertParsesCli({
+                    property: 'browsers.browser.orientation',
+                    value: 'portrait',
+                    expected: 'portrait'
+                });
+            });
+        });
+
         describe('desiredCapabilities', function() {
             it('should accept objects', function() {
                 var config = createBrowserConfig({

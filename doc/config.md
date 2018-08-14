@@ -248,6 +248,11 @@ Settings list:
 
   This is useful when the page has elements which are animated.
 
+* `orientation` – browser orientation that will be set before each test run. It is useful to restore the default browser orientation after test execution in which orientation was changed. There are 3 allowed values for this option:
+    * `null` (default). No action will be taken.
+    * `landscape`. Orientation will be changed to landscape mode before running the test.
+    * `portrait`. Orientation will be changed to portrait mode before running the test.
+
 ## Sets
 
 You can link some set of tests with certain browsers using `sets`.
