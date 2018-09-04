@@ -3,6 +3,7 @@
 const Promise = require('bluebird');
 
 const ActionsBuilder = require('lib/tests-api/actions-builder');
+const StateError = require('lib/errors/state-error');
 const util = require('../../util');
 
 describe('tests-api/actions-builder', () => {
@@ -25,14 +26,10 @@ describe('tests-api/actions-builder', () => {
 
     describe('changeOrientation', () => {
         beforeEach(() => {
-            sandbox.stub(browser, 'getOrientation').returns(Promise.resolve());
-            sandbox.stub(browser, 'setOrientation').returns(Promise.resolve());
-        });
-
-        it('should throw in case of passed arguments', () => {
-            const fn = () => mkActionsBuilder().changeOrientation('awesome argument');
-
-            assert.throws(fn, TypeError, /\.changeOrientation\(\) does not accept any arguments/);
+            sandbox.stub(browser, 'getOrientation').resolves();
+            sandbox.stub(browser, 'setOrientation').resolves();
+            sandbox.stub(browser, 'evalScript').resolves();
+            sandbox.stub(browser, 'waitFor').resolves();
         });
 
         it('should return ActionsBuilder instance', () => {
@@ -75,6 +72,35 @@ describe('tests-api/actions-builder', () => {
             const changeOrientation = mkAction('changeOrientation', browser);
 
             return assert.isRejected(changeOrientation(), /awesome error/);
+        });
+
+        it('should wait for orientation change', () => {
+            const changeOrientation = mkAction('changeOrientation', browser);
+
+            return changeOrientation()
+                .then(() => assert.callOrder(browser.setOrientation, browser.waitFor));
+        });
+
+        it('should wait for orientation change using the default timeout', () => {
+            const changeOrientation = mkAction('changeOrientation', browser);
+
+            return changeOrientation()
+                .then(() => assert.calledWith(browser.waitFor, sinon.match.any, 2500));
+        });
+
+        it('should wait for orientation change using the passed timeout', () => {
+            const changeOrientation = mkAction('changeOrientation', browser);
+
+            return changeOrientation({timeout: 100500})
+                .then(() => assert.calledWith(browser.waitFor, sinon.match.any, 100500));
+        });
+
+        it('should be rejected if orientation did not changed in passed timeout', () => {
+            browser.waitFor.rejects();
+
+            const changeOrientation = mkAction('changeOrientation', browser);
+
+            return assert.isRejected(changeOrientation(), StateError);
         });
     });
 
