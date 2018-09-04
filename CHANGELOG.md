@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.8.1"></a>
+## [5.8.1](https://github.com/gemini-testing/gemini/compare/v5.8.0...v5.8.1) (2018-09-04)
+
+
+### Bug Fixes
+
+* 'changeOrientation' action waits for screen rotate ([4e42d7e](https://github.com/gemini-testing/gemini/commit/4e42d7e))
+
+
+
 <a name="5.8.0"></a>
 # [5.8.0](https://github.com/gemini-testing/gemini/compare/v5.7.2...v5.8.0) (2018-08-14)
 
