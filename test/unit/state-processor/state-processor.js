@@ -102,12 +102,14 @@ describe('state-processor/state-processor', () => {
 
             browserSession.browser.config.getScreenshotPath.returns('/some/path');
             browserSession.browser.config.tolerance = 100500;
+            browserSession.browser.config.antialiasingTolerance = 200500;
 
             return exec_({state})
                 .then(() => assert.calledWithMatch(job, {
                     execOpts: {
                         referencePath: '/some/path',
-                        tolerance: 100500
+                        tolerance: 100500,
+                        antialiasingTolerance: 200500
                     }
                 }));
         });

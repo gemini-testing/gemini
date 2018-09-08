@@ -77,7 +77,8 @@ describe('state-processor/capture-processor/capture-processor', () => {
             const opts = {
                 referencePath: '/ref/path',
                 pixelRatio: 100500,
-                tolerance: 200500
+                tolerance: 200500,
+                antialiasingTolerance: 300500
             };
 
             return exec_(opts, {canHaveCaret: false})
@@ -85,7 +86,8 @@ describe('state-processor/capture-processor/capture-processor', () => {
                     assert.calledOnceWith(Image.compare, '/temp/path', '/ref/path', {
                         canHaveCaret: false,
                         pixelRatio: 100500,
-                        tolerance: 200500
+                        tolerance: 200500,
+                        antialiasingTolerance: 300500
                     });
                 });
         });

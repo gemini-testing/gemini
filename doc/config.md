@@ -13,6 +13,7 @@ desiredCapabilities:
   commonThing: value
 calibrate: false
 tolerance: 3.5
+antialiasingTolerance: 0
 httpTimeout: 5000
 sessionRequestTimeout: 60000
 sessionQuitTimeout: 5000
@@ -210,6 +211,8 @@ Settings list:
   recommended, prefer changing tolerance for particular suites or states
   instead.
 
+* `antialiasingTolerance` — read about this option in [looks-same](https://github.com/gemini-testing/looks-same#comparing-images-with-ignoring-antialiasing).
+
 * `windowSize` — specify browser window dimensions (i.e. `1600x1200`). If not
   specified, the size of the window depends on WebDriver. :warning: You can't set specific resolutions for browser Opera or mobile platforms. They use only full-screen resolution.
 
@@ -226,7 +229,7 @@ Settings list:
   specified, the fallen tests will not be relaunched (by default it's 0).
 
   Note that the same test never be performed in the same browser session.
-  
+
 * `shouldRetry` — function which defines whether to make a retry. Should returns `Boolean` value. First argument is `data` which is the result of the test run, it's an Object with following fields:
     * `attempt {Number}` number of retries performed for the test
     * `retriesLeft {Number}` number of retries left

@@ -707,46 +707,51 @@ describe('config', function() {
             });
         });
 
-        describe('tolerance', function() {
-            it('should not accept non-numbers', function() {
-                assert.throws(function() {
-                    createBrowserConfig({
-                        tolerance: 'very tolerant'
+        [
+            {optionName: 'tolerance', defaultValue: 2.3},
+            {optionName: 'antialiasingTolerance', defaultValue: 0}
+        ].forEach(({optionName, defaultValue}) => {
+            describe(`${optionName}`, function() {
+                it('should not accept non-numbers', function() {
+                    assert.throws(function() {
+                        createBrowserConfig({
+                            [optionName]: 'very tolerant'
+                        });
+                    }, GeminiError);
+                });
+
+                it('should accept numbers', function() {
+                    var config = createBrowserConfig({
+                        [optionName]: 2.8
                     });
-                }, GeminiError);
-            });
-
-            it('should accept numbers', function() {
-                var config = createBrowserConfig({
-                    tolerance: 2.8
+                    assert.equal(config[optionName], 2.8);
                 });
-                assert.equal(config.tolerance, 2.8);
-            });
 
-            it('should be 2.3 by default', function() {
-                var config = createBrowserConfig({});
-                assert.equal(config.tolerance, 2.3);
-            });
-
-            shouldBeSettableFromTopLevel('tolerance', 3.0);
-            shouldOverrideTopLevelValue('tolerance', {
-                top: 4.0,
-                browser: 5.0
-            });
-
-            it('should correctly parse env var', function() {
-                assertParsesEnv({
-                    property: 'browsers.browser.tolerance',
-                    value: '100',
-                    expected: 100
+                it(`should be ${defaultValue} by default`, function() {
+                    var config = createBrowserConfig({});
+                    assert.equal(config[optionName], defaultValue);
                 });
-            });
 
-            it('should correctly parse cli flag', function() {
-                assertParsesCli({
-                    property: 'browsers.browser.tolerance',
-                    value: '100',
-                    expected: 100
+                shouldBeSettableFromTopLevel(`${optionName}`, 3.0);
+                shouldOverrideTopLevelValue(`${optionName}`, {
+                    top: 4.0,
+                    browser: 5.0
+                });
+
+                it('should correctly parse env var', function() {
+                    assertParsesEnv({
+                        property: `browsers.browser.${optionName}`,
+                        value: '100',
+                        expected: 100
+                    });
+                });
+
+                it('should correctly parse cli flag', function() {
+                    assertParsesCli({
+                        property: `browsers.browser.${optionName}`,
+                        value: '100',
+                        expected: 100
+                    });
                 });
             });
         });
