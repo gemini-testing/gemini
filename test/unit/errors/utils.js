@@ -15,7 +15,7 @@ describe('errors utils', () => {
         });
 
         it('should handle NoRefImageError', () => {
-            let obj = {name: 'NoRefImageError'};
+            let obj = {name: 'NoRefImageError', refImg: {}, currImg: {}};
 
             let error = errorUtils.fromPlainObject(obj);
 

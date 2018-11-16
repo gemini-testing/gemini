@@ -136,7 +136,7 @@ Emitted before launching browser for test. Event is emitted with 1 argument <cod
 Emitted always during update. Event is emitted with 1 argument <code>result</code>:
 <pre>
 {
-    imagePath, // absolute path to the reference image
+    refImg,    // reference image info which includes absolute path and size (width, height)
     updated,   // shows if reference image has been changed
     suite,
     state,
@@ -154,8 +154,8 @@ Emitted if test has failed but <b>there is still number of retries left</b>.
 Event is emitted with 1 argument <code>result</code>:
 <pre>
 {
-    referencePath, // absolute path to the reference image
-    currentPath,   // absolute path to the current image on your disk
+    refImg,        // reference image info which includes absolute path and size (width, height)
+    currImg,       // current image info which includes absolute path and size (width, height)
     equal,         // always <i>false</i> for retries
     tolerance,     // specified for current test or globally in <i>.gemini.js</i>
     saveDiffTo,    /* function responsible for building <i>diff</i> and <i>present</i>
@@ -178,8 +178,8 @@ Event is emitted with 1 argument <code>result</code>:
 Emitted always after the test is completed. Event is emitted with 1 argument <code>result</code>:
 <pre>
 {
-    referencePath, // absolute path to the reference image
-    currentPath,   // absolute path to the current image on your disk
+    refImg,        // reference image info which includes absolute path and size (width, height)
+    currImg,       // current image info which includes absolute path and size (width, height)
     equal,         // shows if images are equal
     tolerance,     // specified for current test or globally in <i>.gemini.js</i>
     saveDiffTo,    /* function responsible for building <i>diff</i> and <i>present</i>
@@ -240,8 +240,8 @@ For example, if <i>Reference image is missing</i>, <code>err</code> will have ad
 
 <pre>
 {
-    currentPath,
-    refImagePath,
+    refImg,
+    currImg,
     suite,
     state,
     browserId,
