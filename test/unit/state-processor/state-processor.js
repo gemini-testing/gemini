@@ -107,7 +107,7 @@ describe('state-processor/state-processor', () => {
             return exec_({state})
                 .then(() => assert.calledWithMatch(job, {
                     execOpts: {
-                        referencePath: '/some/path',
+                        refImg: {path: '/some/path', size: null},
                         tolerance: 100500,
                         antialiasingTolerance: 200500
                     }

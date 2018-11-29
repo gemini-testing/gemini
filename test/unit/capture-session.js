@@ -145,13 +145,16 @@ describe('capture session', () => {
         let browser;
         let session;
         let error;
+        let image;
 
         beforeEach(() => {
+            image = {
+                save: sinon.stub().resolves(),
+                getSize: sinon.stub()
+            };
             browser = {
                 config: {},
-                captureViewportImage: sinon.stub().returns(Promise.resolve({
-                    save: sinon.stub()
-                }))
+                captureViewportImage: sinon.stub().returns(Promise.resolve(image))
             };
             session = CaptureSession.create(browser);
             error = {};
@@ -162,14 +165,17 @@ describe('capture session', () => {
                 .then(() => assert.called(browser.captureViewportImage));
         });
 
-        it('should add an image path to error', () => {
+        it('should add image to an error', () => {
             temp.path.returns('/path/to/img');
+            image.getSize.returns({width: 100, height: 200});
 
             return session.extendWithPageScreenshot(error)
-                .then(() => assert.deepEqual(error.imagePath, '/path/to/img'));
+                .then(() => {
+                    assert.deepEqual(error.img, {path: '/path/to/img', size: {width: 100, height: 200}});
+                });
         });
 
-        it('should not add an image to error if can not captureViewportImage', () => {
+        it('should not add image to an error if can not captureViewportImage', () => {
             browser.captureViewportImage = sinon.stub().callsFake(() => Promise.reject({}));
 
             error = new StateError('some error');
