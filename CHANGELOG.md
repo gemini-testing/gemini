@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/gemini-testing/gemini/compare/v5.9.1...v6.0.0) (2018-11-29)
+
+
+### Features
+
+* emits image sizes on test execution events ([09b4318](https://github.com/gemini-testing/gemini/commit/09b4318))
+
+
+### BREAKING CHANGES
+
+* now on test execution events (TEST_RESULT, UPDATE_RESULT, RETRY, ERROR) emited image info (object) with path and size instead of only emit image path
+
+
+
 <a name="5.9.1"></a>
 ## [5.9.1](https://github.com/gemini-testing/gemini/compare/v5.9.0...v5.9.1) (2018-10-02)
 
