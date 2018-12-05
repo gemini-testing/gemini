@@ -97,7 +97,7 @@ Required software:
 1. WebDriver server implementation. There are several options:
 
    - [Selenium Server](http://docs.seleniumhq.org/download/) — for testing in
-     different browsers. Launch with the `selenium-standalone start` command.
+     different browsers. Launch with the `selenium-standalone start` command (if you will get error like "No Java runtime present, requesting install." you should install [Java Development Kit (JDK)](https://www.oracle.com/technetwork/java/javase/downloads/index.html) for your OS.).
 
    - [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/) — for
      testing in Google Chrome. Launch with the `chromedriver --port=4444 --url-base=wd/hub` command.
