@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.0.0"></a>
+# [7.0.0](https://github.com/gemini-testing/gemini/compare/v6.0.0...v7.0.0) (2018-12-13)
+
+
+### Bug Fixes
+
+* do not convert ref image file to base64 to get size ([99c767f](https://github.com/gemini-testing/gemini/commit/99c767f))
+
+
+### Chores
+
+* drop node versions previous to 8 ([2eeddbb](https://github.com/gemini-testing/gemini/commit/2eeddbb))
+
+
+### BREAKING CHANGES
+
+* now supported version of node >= 8.0.0
+
+
+
 <a name="6.0.0"></a>
 # [6.0.0](https://github.com/gemini-testing/gemini/compare/v5.9.1...v6.0.0) (2018-11-29)
 
