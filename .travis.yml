@@ -3,7 +3,6 @@ sudo: false
 script: npm run ${NPM_SCRIPT}
 after_success: cat ${TRAVIS_BUILD_DIR}/coverage/lcov.info | coveralls
 node_js:
-  - '6'
   - '8'
 env:
   global:
