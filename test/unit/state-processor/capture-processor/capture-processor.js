@@ -40,9 +40,10 @@ describe('state-processor/capture-processor/capture-processor', () => {
         sandbox.stub(utils, 'copyImg').resolves(true);
         sandbox.stub(utils, 'saveRef').resolves(true);
         sandbox.stub(utils, 'existsRef').resolves(true);
+        sandbox.stub(Image, 'create').returns(Object.create(Image.prototype));
         sandbox.stub(Image, 'compare').resolves(true);
         sandbox.stub(Image.prototype, 'save').resolves();
-        sandbox.stub(Image, 'fromBase64').returns(mkImage());
+        sandbox.stub(Image.prototype, 'getSize');
     });
 
     afterEach(() => sandbox.restore());
@@ -149,7 +150,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
                 fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
 
                 const refImage = mkImage({size: {width: 100, height: 200}});
-                Image.fromBase64.withArgs('ref-buffer-data').returns(refImage);
+                Image.create.withArgs('ref-buffer-data').returns(refImage);
 
                 const currImage = mkImage({size: {width: 100, height: 200}});
 
@@ -169,7 +170,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
                 fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
 
                 const refImage = mkImage({size: {width: 100, height: 200}});
-                Image.fromBase64.withArgs('ref-buffer-data').returns(refImage);
+                Image.create.withArgs('ref-buffer-data').returns(refImage);
 
                 const currImage = mkImage({size: {width: 300, height: 400}});
 
@@ -197,7 +198,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
             fs.readFileSync.withArgs('/existent/path').returns('existent-buffer-data');
 
             const refImage = mkImage({size: {width: 100, height: 200}});
-            Image.fromBase64.withArgs('existent-buffer-data').returns(refImage);
+            Image.create.withArgs('existent-buffer-data').returns(refImage);
 
             return exec_({refImg: {path: '/existent/path', size: null}})
                 .then((res) => {
@@ -286,7 +287,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
                 fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
 
                 const refImage = mkImage({size: {width: 100, height: 200}});
-                Image.fromBase64.withArgs('ref-buffer-data').returns(refImage);
+                Image.create.withArgs('ref-buffer-data').returns(refImage);
 
                 return exec_({refImg: {path: '/ref/path', size: null}})
                     .then((res) => {
@@ -312,7 +313,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
                 it('should update a reference image size', () => {
                     fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
                     const refImage = mkImage({size: {width: 100, height: 200}});
-                    Image.fromBase64.withArgs('ref-buffer-data').returns(refImage);
+                    Image.create.withArgs('ref-buffer-data').returns(refImage);
 
                     const currImage = mkImage({size: {width: 300, height: 400}});
 
@@ -330,7 +331,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
 
                     fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
                     const refImage = mkImage({size: {width: 100, height: 200}});
-                    Image.fromBase64.withArgs('ref-buffer-data').returns(refImage);
+                    Image.create.withArgs('ref-buffer-data').returns(refImage);
 
                     const currImage = mkImage({size: {width: 300, height: 400}});
 
