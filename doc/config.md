@@ -13,7 +13,9 @@ desiredCapabilities:
   commonThing: value
 calibrate: false
 tolerance: 3.5
-antialiasingTolerance: 0
+antialiasingTolerance: 0,
+compareOpts:
+  stopOnFirstFail: true
 httpTimeout: 5000
 sessionRequestTimeout: 60000
 sessionQuitTimeout: 5000
@@ -212,6 +214,10 @@ Settings list:
   instead.
 
 * `antialiasingTolerance` — read about this option in [looks-same](https://github.com/gemini-testing/looks-same#comparing-images-with-ignoring-antialiasing).
+
+* `compareOpts` — extra options for images comparing. It's an Object with following fields:
+    * `[stopOnFirstFail] {Boolean}` Only first pixel will be found if this option is true
+  See [looks-same](https://github.com/gemini-testing/looks-same#comparing-images) documentation for the list of options.
 
 * `windowSize` — specify browser window dimensions (i.e. `1600x1200`). If not
   specified, the size of the window depends on WebDriver. :warning: You can't set specific resolutions for browser Opera or mobile platforms. They use only full-screen resolution.

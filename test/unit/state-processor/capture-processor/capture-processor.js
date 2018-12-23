@@ -84,7 +84,8 @@ describe('state-processor/capture-processor/capture-processor', () => {
                 refImg: {path: '/ref/path', size: null},
                 pixelRatio: 100500,
                 tolerance: 200500,
-                antialiasingTolerance: 300500
+                antialiasingTolerance: 300500,
+                compareOpts: {stopOnFirstFail: true}
             };
 
             return exec_(opts, {canHaveCaret: false})
@@ -93,7 +94,8 @@ describe('state-processor/capture-processor/capture-processor', () => {
                         canHaveCaret: false,
                         pixelRatio: 100500,
                         tolerance: 200500,
-                        antialiasingTolerance: 300500
+                        antialiasingTolerance: 300500,
+                        compareOpts: {stopOnFirstFail: true}
                     });
                 });
         });
@@ -153,7 +155,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
                 Image.create.withArgs('ref-buffer-data').returns(refImage);
 
                 const currImage = mkImage({size: {width: 100, height: 200}});
-
+                Image.compare.resolves({equal: true});
                 return exec_({refImg: {path: '/ref/path', size: null}}, {image: currImage})
                     .then((result) => {
                         assert.deepEqual(result, {
@@ -165,7 +167,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
             });
 
             it('different', () => {
-                Image.compare.resolves(false);
+                Image.compare.resolves({equal: false, diffBounds: {left: 0, top: 0, right: 10, bottom: 10}});
                 temp.path.withArgs({suffix: '.png'}).returns('/temp/path');
                 fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
 
@@ -179,6 +181,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
                         assert.deepEqual(result, {
                             refImg: {path: '/ref/path', size: {width: 100, height: 200}},
                             currImg: {path: '/temp/path', size: {width: 300, height: 400}},
+                            diffBounds: {left: 0, top: 0, right: 10, bottom: 10},
                             equal: false
                         });
                     });
@@ -288,7 +291,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
 
                 const refImage = mkImage({size: {width: 100, height: 200}});
                 Image.create.withArgs('ref-buffer-data').returns(refImage);
-
+                Image.compare.resolves({equal: true});
                 return exec_({refImg: {path: '/ref/path', size: null}})
                     .then((res) => {
                         assert.notCalled(utils.copyImg);
@@ -301,7 +304,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
 
             describe('if images are different', () => {
                 beforeEach(() => {
-                    Image.compare.resolves(false);
+                    Image.compare.resolves({equal: false});
                     temp.path.withArgs({suffix: '.png'}).returns('/temp/path');
                 });
 
