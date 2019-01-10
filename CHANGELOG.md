@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.1.2"></a>
+## [7.1.2](https://github.com/gemini-testing/gemini/compare/v7.1.1...v7.1.2) (2019-01-10)
+
+
+### Bug Fixes
+
+* do not fall by memory in looks-same ([67b432e](https://github.com/gemini-testing/gemini/commit/67b432e))
+
+
+
 <a name="7.1.1"></a>
 ## [7.1.1](https://github.com/gemini-testing/gemini/compare/v7.1.0...v7.1.1) (2018-12-26)
 
