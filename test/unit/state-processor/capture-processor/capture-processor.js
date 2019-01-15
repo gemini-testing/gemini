@@ -151,11 +151,8 @@ describe('state-processor/capture-processor/capture-processor', () => {
                 temp.path.withArgs({suffix: '.png'}).returns('/temp/path');
                 fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
 
-                const refImage = mkImage({size: {width: 100, height: 200}});
-                Image.create.withArgs('ref-buffer-data').returns(refImage);
-
                 const currImage = mkImage({size: {width: 100, height: 200}});
-                Image.compare.resolves({equal: true});
+                Image.compare.resolves({equal: true, metaInfo: {refImg: {size: {width: 100, height: 200}}}});
                 return exec_({refImg: {path: '/ref/path', size: null}}, {image: currImage})
                     .then((result) => {
                         assert.deepEqual(result, {
@@ -167,12 +164,13 @@ describe('state-processor/capture-processor/capture-processor', () => {
             });
 
             it('different', () => {
-                Image.compare.resolves({equal: false, diffBounds: {left: 0, top: 0, right: 10, bottom: 10}});
+                Image.compare.resolves({
+                    equal: false,
+                    diffBounds: {left: 0, top: 0, right: 10, bottom: 10},
+                    metaInfo: {refImg: {size: {width: 100, height: 200}}}
+                });
                 temp.path.withArgs({suffix: '.png'}).returns('/temp/path');
                 fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
-
-                const refImage = mkImage({size: {width: 100, height: 200}});
-                Image.create.withArgs('ref-buffer-data').returns(refImage);
 
                 const currImage = mkImage({size: {width: 300, height: 400}});
 
@@ -203,11 +201,11 @@ describe('state-processor/capture-processor/capture-processor', () => {
             const refImage = mkImage({size: {width: 100, height: 200}});
             Image.create.withArgs('existent-buffer-data').returns(refImage);
 
-            return exec_({refImg: {path: '/existent/path', size: null}})
+            return exec_({refImg: {path: '/existent/path'}})
                 .then((res) => {
                     assert.notCalled(utils.saveRef);
                     assert.deepEqual(res, {
-                        refImg: {path: '/existent/path', size: {width: 100, height: 200}},
+                        refImg: {path: '/existent/path'},
                         updated: false
                     });
                 });
@@ -289,9 +287,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
             it('should not update a reference image if images are the same', () => {
                 fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
 
-                const refImage = mkImage({size: {width: 100, height: 200}});
-                Image.create.withArgs('ref-buffer-data').returns(refImage);
-                Image.compare.resolves({equal: true});
+                Image.compare.resolves({equal: true, metaInfo: {refImg: {size: {width: 100, height: 200}}}});
                 return exec_({refImg: {path: '/ref/path', size: null}})
                     .then((res) => {
                         assert.notCalled(utils.copyImg);
@@ -333,12 +329,11 @@ describe('state-processor/capture-processor/capture-processor', () => {
                     utils.copyImg.resolves(false);
 
                     fs.readFileSync.withArgs('/ref/path').returns('ref-buffer-data');
-                    const refImage = mkImage({size: {width: 100, height: 200}});
-                    Image.create.withArgs('ref-buffer-data').returns(refImage);
 
+                    Image.compare.resolves({metaInfo: {refImg: {size: {width: 100, height: 200}}}});
                     const currImage = mkImage({size: {width: 300, height: 400}});
 
-                    return exec_({refImg: {path: '/ref/path', size: null}}, {image: currImage})
+                    return exec_({refImg: {path: '/ref/path'}}, {image: currImage})
                         .then((res) => {
                             assert.deepEqual(res, {
                                 refImg: {path: '/ref/path', size: {width: 100, height: 200}},
