@@ -6,6 +6,7 @@ const Promise = require('bluebird');
 const CaptureSession = require('lib/capture-session');
 const StateProcessor = require('lib/state-processor/state-processor');
 const TestStateProcessor = require('lib/state-processor/test-state-processor');
+const {Image} = require('gemini-core');
 const util = require('../../util');
 
 describe('state-processor/test-state-processor', () => {
@@ -27,7 +28,10 @@ describe('state-processor/test-state-processor', () => {
         return mkTestStateProc_().exec(opts.state, opts.browserSession, opts.page, opts.emit);
     };
 
-    beforeEach(() => sandbox.stub(StateProcessor.prototype, 'exec'));
+    beforeEach(() => {
+        sandbox.stub(StateProcessor.prototype, 'exec');
+        sandbox.stub(Image, 'buildDiff');
+    });
 
     afterEach(() => sandbox.restore());
 
@@ -78,6 +82,55 @@ describe('state-processor/test-state-processor', () => {
                 .then(() => {
                     assert.calledWithExactly(emit, 'testResult', result);
                 });
+        });
+
+        describe('should build diff image with', () => {
+            const mkBrowserSession_ = (opts = {}) => _.set({}, 'browser.config', opts);
+            const mkResult_ = (opts = {}) => {
+                return _.defaults(opts, {
+                    equal: false,
+                    refImg: {path: '/default-ref/path'},
+                    currImg: {path: '/default-curr/path'}
+                });
+            };
+
+            it('options from "buildDiffOpts"', () => {
+                const result = mkResult_();
+                const buildDiffOpts = {foo: 'bar', baz: 'qux'};
+                const browserSession = mkBrowserSession_({buildDiffOpts});
+                const emit = sandbox.stub();
+
+                StateProcessor.prototype.exec.returns(Promise.resolve(result));
+
+                return exec_({emit, browserSession})
+                    .then(() => {
+                        result.saveDiffTo();
+
+                        assert.calledOnceWith(
+                            Image.buildDiff,
+                            sinon.match({foo: 'bar', baz: 'qux'})
+                        );
+                    });
+            });
+
+            it('with overriden option from "buildDiffOpts"', () => {
+                const result = mkResult_({tolerance: 100500});
+                const buildDiffOpts = {tolerance: 500100};
+                const browserSession = mkBrowserSession_({buildDiffOpts});
+                const emit = sandbox.stub();
+
+                StateProcessor.prototype.exec.returns(Promise.resolve(result));
+
+                return exec_({emit, browserSession})
+                    .then(() => {
+                        result.saveDiffTo();
+
+                        assert.calledOnceWith(
+                            Image.buildDiff,
+                            sinon.match({tolerance: 500100})
+                        );
+                    });
+            });
         });
     });
 });

@@ -916,6 +916,32 @@ describe('config', function() {
             });
         });
 
+        describe('buildDiffOpts', function() {
+            it('should throw error if "buildDiffOpts" is not a object', () => {
+                assert.throws(function() {
+                    createBrowserConfig({
+                        buildDiffOpts: 'some-string'
+                    });
+                }, 'buildDiffOpts should be object');
+            });
+
+            ['ignoreAntialiasing', 'ignoreCaret'].forEach(function(option) {
+                it(`should set "${option}" to "true" by default`, () => {
+                    var config = createBrowserConfig();
+
+                    assert.equal(config.buildDiffOpts[option], true);
+                });
+            });
+
+            it('should set provided value', function() {
+                const config = createBrowserConfig({
+                    buildDiffOpts: {k1: 'v1', k2: 'v2'}
+                });
+
+                assert.deepEqual(config.buildDiffOpts, {k1: 'v1', k2: 'v2'});
+            });
+        });
+
         describe('orientation', function() {
             it('should be null by default', function() {
                 var config = createBrowserConfig();
