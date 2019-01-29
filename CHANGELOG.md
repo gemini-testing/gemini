@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.3.0"></a>
+# [7.3.0](https://github.com/gemini-testing/gemini/compare/v7.2.0...v7.3.0) (2019-01-29)
+
+
+### Bug Fixes
+
+* build diff image with using "antialiasingTolerance" prop ([7ff6e2a](https://github.com/gemini-testing/gemini/commit/7ff6e2a))
+
+
+### Features
+
+* add option "buildDiffOpts" to configure building diff image ([2c672df](https://github.com/gemini-testing/gemini/commit/2c672df))
+
+
+
 <a name="7.2.0"></a>
 # [7.2.0](https://github.com/gemini-testing/gemini/compare/v7.1.2...v7.2.0) (2019-01-24)
 
