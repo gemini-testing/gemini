@@ -167,6 +167,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
                 Image.compare.resolves({
                     equal: false,
                     diffBounds: {left: 0, top: 0, right: 10, bottom: 10},
+                    diffClusters: [{left: 0, top: 0, right: 10, bottom: 10}],
                     metaInfo: {refImg: {size: {width: 100, height: 200}}}
                 });
                 temp.path.withArgs({suffix: '.png'}).returns('/temp/path');
@@ -180,6 +181,7 @@ describe('state-processor/capture-processor/capture-processor', () => {
                             refImg: {path: '/ref/path', size: {width: 100, height: 200}},
                             currImg: {path: '/temp/path', size: {width: 300, height: 400}},
                             diffBounds: {left: 0, top: 0, right: 10, bottom: 10},
+                            diffClusters: [{left: 0, top: 0, right: 10, bottom: 10}],
                             equal: false
                         });
                     });
