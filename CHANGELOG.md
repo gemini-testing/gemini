@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.4.0"></a>
+# [7.4.0](https://github.com/gemini-testing/gemini/compare/v7.3.0...v7.4.0) (2019-03-13)
+
+
+### Bug Fixes
+
+* notice about deprecated option replacement ([b066b16](https://github.com/gemini-testing/gemini/commit/b066b16))
+
+
+### Features
+
+* add diff clusters ([f80cf09](https://github.com/gemini-testing/gemini/commit/f80cf09))
+
+
+
 <a name="7.3.0"></a>
 # [7.3.0](https://github.com/gemini-testing/gemini/compare/v7.2.0...v7.3.0) (2019-01-29)
 
