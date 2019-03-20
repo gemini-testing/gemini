@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.4.1"></a>
+## [7.4.1](https://github.com/gemini-testing/gemini/compare/v7.4.0...v7.4.1) (2019-03-20)
+
+
+### Bug Fixes
+
+* error maximum call stack size exceeded from looks-same ([0e18704](https://github.com/gemini-testing/gemini/commit/0e18704))
+
+
+
 <a name="7.4.0"></a>
 # [7.4.0](https://github.com/gemini-testing/gemini/compare/v7.3.0...v7.4.0) (2019-03-13)
 
