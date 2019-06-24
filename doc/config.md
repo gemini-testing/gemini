@@ -65,6 +65,7 @@ system:
     teamcity: true
   debug: true
   parallelLimit: 3
+  workers: 4
   diffColor: '#ff0000'
   coverage:
     enabled: true
@@ -124,6 +125,9 @@ exclude:
   a limit of a number of browser that can be run once at a time. Use this
   option to limit the number of browsers that `gemini` will try to run in
   parallel.
+
+* `workers` — by default, `gemini` will run as many parallel
+  workers as cores available, this option allows you to limit it.
 
 * `diffColor` — specifies color which will be used to highlight differences
   between images. Specified in hexadecimal RGB (`#RRGGBB`). Magenta by default
