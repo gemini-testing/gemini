@@ -106,6 +106,7 @@ Required software:
      --webdriver=4444` command.
 
    - Cloud WebDriver services, such as
+     [LambdaTest](https://www.lambdatest.com/)
      [SauceLabs](http://saucelabs.com/) or
      [BrowserStack](http://www.browserstack.com/)
 
