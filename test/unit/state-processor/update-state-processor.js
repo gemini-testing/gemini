@@ -10,6 +10,7 @@ const util = require('../../util');
 
 describe('state-processor/update-state-processor', () => {
     const sandbox = sinon.sandbox.create();
+    const config = {system: {workers: 4}};
 
     const exec_ = (opts) => {
         opts = _.defaultsDeep(opts || {}, {
@@ -19,7 +20,7 @@ describe('state-processor/update-state-processor', () => {
             emit: sinon.spy()
         });
 
-        return new UpdateStateProcessor({}).exec(opts.state, opts.browserSession, opts.page, opts.emit);
+        return new UpdateStateProcessor(config, {}).exec(opts.state, opts.browserSession, opts.page, opts.emit);
     };
 
     beforeEach(() => sandbox.stub(StateProcessor.prototype, 'exec'));
