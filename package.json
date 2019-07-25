@@ -1,6 +1,6 @@
 {
   "name": "gemini",
-  "version": "7.4.1",
+  "version": "7.5.0",
   "description": "UI Screenshot testing utility",
   "engines": {
     "node": ">= 8.0.0"
@@ -46,7 +46,7 @@
     "gitbook-cli": "^2.3.0",
     "gitbook-plugin-advanced-emoji": "^0.2.2",
     "glob-extra": "^4.0.0",
-    "husky": "^0.11.4",
+    "husky": "^3.0.1",
     "istanbul": "^0.4.5",
     "mocha": "^2.1.0",
     "proxyquire": "^1.7.3",

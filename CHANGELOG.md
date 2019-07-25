@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.5.0"></a>
+# [7.5.0](https://github.com/gemini-testing/gemini/compare/v7.4.1...v7.5.0) (2019-07-25)
+
+
+### Features
+
+* **config:** add support for workers config option ([d7b7710](https://github.com/gemini-testing/gemini/commit/d7b7710))
+
+
+
 <a name="7.4.1"></a>
 ## [7.4.1](https://github.com/gemini-testing/gemini/compare/v7.4.0...v7.4.1) (2019-03-20)
 
