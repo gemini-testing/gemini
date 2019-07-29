@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.5.1"></a>
+## [7.5.1](https://github.com/gemini-testing/gemini/compare/v7.5.0...v7.5.1) (2019-07-29)
+
+
+### Bug Fixes
+
+* make executeJS method work properly with arrow function ([514fc1b](https://github.com/gemini-testing/gemini/commit/514fc1b))
+
+
+
 <a name="7.5.0"></a>
 # [7.5.0](https://github.com/gemini-testing/gemini/compare/v7.4.1...v7.5.0) (2019-07-25)
 
