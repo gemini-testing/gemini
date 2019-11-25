@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.5.2"></a>
+## [7.5.2](https://github.com/gemini-testing/gemini/compare/v7.5.1...v7.5.2) (2019-11-25)
+
+
+
 <a name="7.5.1"></a>
 ## [7.5.1](https://github.com/gemini-testing/gemini/compare/v7.5.0...v7.5.1) (2019-07-29)
 
