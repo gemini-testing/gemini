@@ -46,5 +46,17 @@ describe('PassthroughEmitter', () => {
                 assert.equal(data, 'some-data');
             });
     });
+
+    it('should be able to pass multiple event arguments', () => {
+        runner.passthroughEvent(child, 'some-event');
+        runner.on('some-event', function(...args) {
+            return `some-data ${args[0]} ${args[1]}`;
+        });
+
+        return child.emitAndWait('some-event', 'foo', 'bar')
+            .then((data) => {
+                assert.equal(data, `some-data foo bar`);
+            });
+    });
 });
 
