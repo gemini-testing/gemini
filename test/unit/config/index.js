@@ -1,6 +1,7 @@
 'use strict';
 var Config = require('lib/config'),
     configReader = require('lib/config/config-reader'),
+    path = require('path'),
     _ = require('lodash');
 
 describe('config', function() {
@@ -59,23 +60,23 @@ describe('config', function() {
         });
 
         it('should not override anything by default', function() {
-            assert.equal(this.getFinalConfigValue(), this.configValue);
+            assert.equal(this.getFinalConfigValue(), path.resolve(this.configValue));
         });
 
         it('should not override value with env if allowOverredies.env is false', function() {
-            assert.equal(this.getFinalConfigValue({env: false}), this.configValue);
+            assert.equal(this.getFinalConfigValue({env: false}), path.resolve(this.configValue));
         });
 
         it('should override value with env if allowOverredies.env is true', function() {
-            assert.equal(this.getFinalConfigValue({env: true}), this.envValue);
+            assert.equal(this.getFinalConfigValue({env: true}), path.resolve(this.envValue));
         });
 
         it('should not override value with cli if allowOverredies.cli is false', function() {
-            assert.equal(this.getFinalConfigValue({cli: false}), this.configValue);
+            assert.equal(this.getFinalConfigValue({cli: false}), path.resolve(this.configValue));
         });
 
         it('should override value with cli if allowOverredies.cli is true', function() {
-            assert.equal(this.getFinalConfigValue({cli: true}), this.cliValue);
+            assert.equal(this.getFinalConfigValue({cli: true}), path.resolve(this.cliValue));
         });
     });
 

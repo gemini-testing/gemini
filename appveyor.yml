@@ -1,0 +1,24 @@
+build: off
+version: "{build}"
+
+environment:
+  matrix:
+    - nodejs_version: "6"
+    - nodejs_version: "8"
+
+platform:
+  # - x86
+  - x64
+
+matrix:
+  fast_finish: true
+
+install:
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - npm install
+
+test_script:
+  - node --version
+  - npm --version
+  - npm run test-unit
+  - npm run test-func

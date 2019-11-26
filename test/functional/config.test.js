@@ -26,7 +26,7 @@ describe('config', function() {
 
             it('should read valid config', function() {
                 var config = new Config(configPath('validConfig.yml'));
-                assert.deepPropertyVal(config, 'system.projectRoot', '/it/works');
+                assert.deepPropertyVal(config, 'system.projectRoot', path.resolve('/it/works'));
             });
 
             it('should set correct root', function() {
@@ -43,7 +43,7 @@ describe('config', function() {
         describe('.js', function() {
             it('should read valid config', function() {
                 var config = new Config(configPath('validConfig.js'));
-                assert.deepPropertyVal(config, 'system.projectRoot', '/it/works');
+                assert.deepPropertyVal(config, 'system.projectRoot', path.resolve('/it/works'));
             });
 
             it('should throw on non-existent file', function() {
@@ -56,7 +56,7 @@ describe('config', function() {
         describe('.json', function() {
             it('should read valid config', function() {
                 var config = new Config(configPath('validConfig.json'));
-                assert.deepPropertyVal(config, 'system.projectRoot', '/it/works');
+                assert.deepPropertyVal(config, 'system.projectRoot', path.resolve('/it/works'));
             });
 
             it('should throw on non-existent file', function() {

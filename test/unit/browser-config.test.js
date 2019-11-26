@@ -1,6 +1,7 @@
 'use strict';
 var BrowserConfig = require('lib/config/browser-config'),
-    createSuite = require('lib/suite').create;
+    createSuite = require('lib/suite').create,
+    path = require('path');
 
 describe('BrowserConfig', function() {
     function createConfig(options) {
@@ -33,7 +34,7 @@ describe('BrowserConfig', function() {
                 suite = createSuite('suite'),
                 dir = config.getScreenshotsDir(suite, 'state');
 
-            assert.equal(dir, '/screens/suite/state');
+            assert.equal(dir, path.resolve('/screens/suite/state'));
         });
 
         it('should return path for nested suite and state', function() {
@@ -42,7 +43,7 @@ describe('BrowserConfig', function() {
                 child = createSuite('child', parent),
                 dir = config.getScreenshotsDir(child, 'state');
 
-            assert.equal(dir, '/screens/parent/child/state');
+            assert.equal(dir, path.resolve('/screens/parent/child/state'));
         });
     });
 
@@ -52,8 +53,8 @@ describe('BrowserConfig', function() {
                     screenshotsDir: '/screens'
                 }),
                 suite = createSuite('suite'),
-                path = config.getScreenshotPath(suite, 'state');
-            assert.equal(path, '/screens/suite/state/browser.png');
+                screenshotPath = config.getScreenshotPath(suite, 'state');
+            assert.equal(screenshotPath, path.resolve('/screens/suite/state/browser.png'));
         });
     });
 });
