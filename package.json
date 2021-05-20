@@ -27,7 +27,7 @@
     "micromatch": "^2.3.11",
     "node-fetch": "^1.6.3",
     "plugins-loader": "^1.1.0",
-    "png-img": "^2.1.0",
+    "png-img": "^3.3.0",
     "resolve": "^1.1.0",
     "sizzle": "^2.2.0",
     "source-map": "^0.5.3",
